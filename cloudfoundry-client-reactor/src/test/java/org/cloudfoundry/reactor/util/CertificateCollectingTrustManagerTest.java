@@ -17,6 +17,7 @@
 package org.cloudfoundry.reactor.util;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -25,9 +26,9 @@ import static org.mockito.Mockito.verify;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import javax.net.ssl.X509TrustManager;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CertificateCollectingTrustManagerTest {
+final class CertificateCollectingTrustManagerTest {
 
     private final X509Certificate[] chain = new X509Certificate[0];
 
@@ -36,14 +37,18 @@ public final class CertificateCollectingTrustManagerTest {
     private final CertificateCollectingTrustManager trustManager =
             new CertificateCollectingTrustManager(this.delegate);
 
-    @Test(expected = IllegalStateException.class)
-    public void checkClientTrustedAlreadyCollected() {
-        this.trustManager.checkClientTrusted(this.chain, null);
-        this.trustManager.checkClientTrusted(this.chain, null);
+    @Test
+    void checkClientTrustedAlreadyCollected() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    this.trustManager.checkClientTrusted(this.chain, null);
+                    this.trustManager.checkClientTrusted(this.chain, null);
+                });
     }
 
     @Test
-    public void checkClientTrustedNotTrusted() throws CertificateException {
+    void checkClientTrustedNotTrusted() throws CertificateException {
         doThrow(new CertificateException())
                 .when(this.delegate)
                 .checkClientTrusted(this.chain, null);
@@ -54,20 +59,24 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void checkClientTrustedTrusted() {
+    void checkClientTrustedTrusted() {
         this.trustManager.checkClientTrusted(this.chain, null);
 
         assertThat(this.trustManager.isTrusted()).isTrue();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void checkServerTrustedAlreadyCollected() {
-        this.trustManager.checkServerTrusted(this.chain, null);
-        this.trustManager.checkServerTrusted(this.chain, null);
+    @Test
+    void checkServerTrustedAlreadyCollected() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    this.trustManager.checkServerTrusted(this.chain, null);
+                    this.trustManager.checkServerTrusted(this.chain, null);
+                });
     }
 
     @Test
-    public void checkServerTrustedNotTrusted() throws CertificateException {
+    void checkServerTrustedNotTrusted() throws CertificateException {
         doThrow(new CertificateException())
                 .when(this.delegate)
                 .checkServerTrusted(this.chain, null);
@@ -78,21 +87,21 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void checkServerTrustedTrusted() {
+    void checkServerTrustedTrusted() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
         assertThat(this.trustManager.isTrusted()).isTrue();
     }
 
     @Test
-    public void getAcceptedIssuers() {
+    void getAcceptedIssuers() {
         this.trustManager.getAcceptedIssuers();
 
         verify(this.delegate).getAcceptedIssuers();
     }
 
     @Test
-    public void getCollectedCertificateChain() {
+    void getCollectedCertificateChain() {
         this.trustManager.checkServerTrusted(this.chain, null);
 
         X509Certificate[] collectedCertificateChain =
@@ -103,12 +112,12 @@ public final class CertificateCollectingTrustManagerTest {
     }
 
     @Test
-    public void getCollectedCertificateChainNotCollected() {
+    void getCollectedCertificateChainNotCollected() {
         assertThat(this.trustManager.getCollectedCertificateChain()).isNull();
     }
 
     @Test
-    public void isTrusted() {
+    void isTrusted() {
         assertThat(this.trustManager.isTrusted()).isFalse();
     }
 }

@@ -16,40 +16,58 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UpdateGroupRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDisplayName() {
-        UpdateGroupRequest.builder().groupId("test-group-id").version("*").build();
-    }
+final class UpdateGroupRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateGroupRequest.builder()
-                .identityZoneId("test-identity-zone-id")
-                .displayName("group-test")
-                .version("*")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noIdentityZoneId() {
-        UpdateGroupRequest.builder().displayName("group-test").version("*").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noVersion() {
-        UpdateGroupRequest.builder()
-                .identityZoneId("test-identity-zone-id")
-                .displayName("group-test")
-                .groupId("test-group-id")
-                .build();
+    @Test
+    void noDisplayName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateGroupRequest.builder().groupId("test-group-id").version("*").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateGroupRequest.builder()
+                            .identityZoneId("test-identity-zone-id")
+                            .displayName("group-test")
+                            .version("*")
+                            .build();
+                });
+    }
+
+    @Test
+    void noIdentityZoneId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateGroupRequest.builder().displayName("group-test").version("*").build();
+                });
+    }
+
+    @Test
+    void noVersion() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateGroupRequest.builder()
+                            .identityZoneId("test-identity-zone-id")
+                            .displayName("group-test")
+                            .groupId("test-group-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         UpdateGroupRequest.builder()
                 .identityZoneId("test-identity-zone-id")
                 .displayName("group-test")

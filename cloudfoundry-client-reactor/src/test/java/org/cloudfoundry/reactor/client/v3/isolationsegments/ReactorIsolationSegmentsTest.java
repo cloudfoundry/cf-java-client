@@ -54,17 +54,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
+class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
 
     private final ReactorIsolationSegments isolationSegments =
             new ReactorIsolationSegments(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void addOrganizationEntitlement() {
+    void addOrganizationEntitlement() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -119,7 +119,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -164,7 +164,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -186,7 +186,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -232,7 +232,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -374,7 +374,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listEntitledOrganizations() {
+    void listEntitledOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -444,7 +444,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listOrganizationsRelationship() {
+    void listOrganizationsRelationship() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -495,7 +495,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpacesRelationship() {
+    void listSpacesRelationship() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -540,7 +540,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeOrganizationEntitlement() {
+    void removeOrganizationEntitlement() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -564,7 +564,7 @@ public class ReactorIsolationSegmentsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

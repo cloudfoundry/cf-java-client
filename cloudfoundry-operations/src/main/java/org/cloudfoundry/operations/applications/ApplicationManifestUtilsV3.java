@@ -327,6 +327,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 process.getReadinessHealthCheckInvocationTimeout());
         putIfPresent(
                 yaml, "readiness-health-check-interval", process.getReadinessHealthCheckInterval());
+        putIfPresent(yaml, "health-check-type", process.getHealthCheckType().getValue());
         putIfPresent(yaml, "instances", process.getInstances());
         putIfPresent(yaml, "memory", process.getMemory());
         putIfPresent(yaml, "timeout", process.getTimeout());

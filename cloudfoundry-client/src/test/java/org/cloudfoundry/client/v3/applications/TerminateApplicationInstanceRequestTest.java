@@ -16,33 +16,50 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class TerminateApplicationInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        TerminateApplicationInstanceRequest.builder().index("test-index").type("test-type").build();
-    }
+final class TerminateApplicationInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noIndex() {
-        TerminateApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .type("test-type")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        TerminateApplicationInstanceRequest.builder()
-                .applicationId("test-application-id")
-                .index("test-index")
-                .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    TerminateApplicationInstanceRequest.builder()
+                            .index("test-index")
+                            .type("test-type")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noIndex() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    TerminateApplicationInstanceRequest.builder()
+                            .applicationId("test-application-id")
+                            .type("test-type")
+                            .build();
+                });
+    }
+
+    @Test
+    void noType() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    TerminateApplicationInstanceRequest.builder()
+                            .applicationId("test-application-id")
+                            .index("test-index")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         TerminateApplicationInstanceRequest.builder()
                 .applicationId("test-application-id")
                 .index("test-index")

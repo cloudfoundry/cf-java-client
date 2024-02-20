@@ -46,17 +46,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
+final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiTest {
 
     private final ServicePlanVisibilities servicePlanVisibilities =
             new ReactorServicePlanVisibilities(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -107,7 +107,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -130,7 +130,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -174,7 +174,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -223,7 +223,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -279,7 +279,7 @@ public final class ReactorServicePlanVisibilitiesTest extends AbstractClientApiT
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

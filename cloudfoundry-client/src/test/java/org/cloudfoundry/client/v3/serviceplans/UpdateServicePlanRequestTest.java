@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.serviceplans;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UpdateServicePlanRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanId() {
-        UpdateServicePlanRequest.builder().build();
+final class UpdateServicePlanRequestTest {
+
+    @Test
+    void noServicePlanId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateServicePlanRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateServicePlanRequest.builder().servicePlanId("test-service-plan-id").build();
     }
 }

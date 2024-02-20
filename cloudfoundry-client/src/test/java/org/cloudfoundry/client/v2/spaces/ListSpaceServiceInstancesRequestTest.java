@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.spaces;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListSpaceServiceInstancesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        ListSpaceServiceInstancesRequest.builder().build();
+final class ListSpaceServiceInstancesRequestTest {
+
+    @Test
+    void noSpaceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListSpaceServiceInstancesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListSpaceServiceInstancesRequest.builder().spaceId("test-space-id").build();
     }
 }

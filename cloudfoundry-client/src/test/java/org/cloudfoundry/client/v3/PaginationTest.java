@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class PaginationTest {
+final class PaginationTest {
 
     @Test
-    public void valid() {
+    void valid() {
         Pagination.builder().build();
     }
 }

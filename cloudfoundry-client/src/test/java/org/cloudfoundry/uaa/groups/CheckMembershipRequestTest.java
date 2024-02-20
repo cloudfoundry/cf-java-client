@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CheckMembershipRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noGroupId() {
-        CheckMembershipRequest.builder().memberId("test-member-id").build();
-    }
+final class CheckMembershipRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noMemberId() {
-        CheckMembershipRequest.builder().groupId("test-group-id").build();
+    @Test
+    void noGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CheckMembershipRequest.builder().memberId("test-member-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noMemberId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CheckMembershipRequest.builder().groupId("test-group-id").build();
+                });
+    }
+
+    @Test
+    void valid() {
         CheckMembershipRequest.builder()
                 .groupId("test-group-id")
                 .memberId("test-member-id")

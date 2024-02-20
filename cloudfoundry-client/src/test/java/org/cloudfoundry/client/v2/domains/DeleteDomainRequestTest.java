@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.domains;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteDomainRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        DeleteDomainRequest.builder().build();
+final class DeleteDomainRequestTest {
+
+    @Test
+    void noDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteDomainRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteDomainRequest.builder().domainId("test-id").build();
     }
 }

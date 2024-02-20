@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.spaceadmin;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetSpaceQuotaRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        GetSpaceQuotaRequest.builder().build();
+final class GetSpaceQuotaRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetSpaceQuotaRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetSpaceQuotaRequest.builder().name("test-name").build();
     }
 }

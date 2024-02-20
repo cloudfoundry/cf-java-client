@@ -43,17 +43,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public class ReactorRolesV3Test extends AbstractClientApiTest {
+class ReactorRolesV3Test extends AbstractClientApiTest {
 
     private final ReactorRolesV3 roles =
             new ReactorRolesV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -142,7 +142,7 @@ public class ReactorRolesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -168,7 +168,7 @@ public class ReactorRolesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -238,7 +238,7 @@ public class ReactorRolesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/roles").build())

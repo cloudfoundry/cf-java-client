@@ -16,18 +16,24 @@
 
 package org.cloudfoundry.operations.buildpacks;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.time.Duration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class DeleteBuildpackRequestTest {
+class DeleteBuildpackRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        DeleteBuildpackRequest.builder().build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteBuildpackRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteBuildpackRequest.builder()
                 .name("test-buildpack-name")
                 .completionTimeout(Duration.ofSeconds(5))

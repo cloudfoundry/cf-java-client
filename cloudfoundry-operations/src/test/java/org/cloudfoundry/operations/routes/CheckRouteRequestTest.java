@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CheckRouteRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomain() {
-        CheckRouteRequest.builder().build();
+final class CheckRouteRequestTest {
+
+    @Test
+    void noDomain() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CheckRouteRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CheckRouteRequest.builder().domain("test-domain").build();
     }
 }

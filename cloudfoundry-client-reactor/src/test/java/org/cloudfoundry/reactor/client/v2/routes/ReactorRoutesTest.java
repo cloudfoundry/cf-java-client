@@ -58,17 +58,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorRoutesTest extends AbstractClientApiTest {
+final class ReactorRoutesTest extends AbstractClientApiTest {
 
     private final ReactorRoutes routes =
             new ReactorRoutes(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateApplication() {
+    void associateApplication() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -122,7 +122,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -177,7 +177,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -196,7 +196,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -235,7 +235,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void exists() {
+    void exists() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -261,7 +261,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -314,7 +314,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/routes?page=-1").build())
@@ -372,7 +372,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void listApplications() {
+    void listApplications() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -456,7 +456,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listMappings() {
+    void listMappings() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -512,7 +512,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeApplication() {
+    void removeApplication() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -535,7 +535,7 @@ public final class ReactorRoutesTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

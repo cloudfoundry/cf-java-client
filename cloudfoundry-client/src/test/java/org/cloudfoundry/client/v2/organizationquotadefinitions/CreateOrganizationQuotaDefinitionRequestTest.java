@@ -16,77 +16,103 @@
 
 package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateOrganizationQuotaDefinitionRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noInstanceMemoryLimit() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .memoryLimit(1024)
-                .name("test-quota-definition-name")
-                .nonBasicServicesAllowed(false)
-                .totalRoutes(-1)
-                .totalServices(-1)
-                .build();
-    }
+final class CreateOrganizationQuotaDefinitionRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noMemoryLimit() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(1024)
-                .name("test-quota-definition-name")
-                .nonBasicServicesAllowed(false)
-                .totalRoutes(-1)
-                .totalServices(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(1024)
-                .memoryLimit(1024)
-                .nonBasicServicesAllowed(false)
-                .totalRoutes(-1)
-                .totalServices(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noNonBasicServicesAllowed() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(1024)
-                .memoryLimit(1024)
-                .name("test-quota-definition-name")
-                .totalRoutes(-1)
-                .totalServices(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTotalRoutes() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(1024)
-                .memoryLimit(1024)
-                .name("test-quota-definition-name")
-                .totalServices(-1)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTotalServices() {
-        CreateOrganizationQuotaDefinitionRequest.builder()
-                .instanceMemoryLimit(1024)
-                .memoryLimit(1024)
-                .name("test-quota-definition-name")
-                .nonBasicServicesAllowed(false)
-                .totalRoutes(-1)
-                .build();
+    @Test
+    void noInstanceMemoryLimit() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .memoryLimit(1024)
+                            .name("test-quota-definition-name")
+                            .nonBasicServicesAllowed(false)
+                            .totalRoutes(-1)
+                            .totalServices(-1)
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noMemoryLimit() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .instanceMemoryLimit(1024)
+                            .name("test-quota-definition-name")
+                            .nonBasicServicesAllowed(false)
+                            .totalRoutes(-1)
+                            .totalServices(-1)
+                            .build();
+                });
+    }
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .instanceMemoryLimit(1024)
+                            .memoryLimit(1024)
+                            .nonBasicServicesAllowed(false)
+                            .totalRoutes(-1)
+                            .totalServices(-1)
+                            .build();
+                });
+    }
+
+    @Test
+    void noNonBasicServicesAllowed() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .instanceMemoryLimit(1024)
+                            .memoryLimit(1024)
+                            .name("test-quota-definition-name")
+                            .totalRoutes(-1)
+                            .totalServices(-1)
+                            .build();
+                });
+    }
+
+    @Test
+    void noTotalRoutes() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .instanceMemoryLimit(1024)
+                            .memoryLimit(1024)
+                            .name("test-quota-definition-name")
+                            .totalServices(-1)
+                            .build();
+                });
+    }
+
+    @Test
+    void noTotalServices() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateOrganizationQuotaDefinitionRequest.builder()
+                            .instanceMemoryLimit(1024)
+                            .memoryLimit(1024)
+                            .name("test-quota-definition-name")
+                            .nonBasicServicesAllowed(false)
+                            .totalRoutes(-1)
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateOrganizationQuotaDefinitionRequest.builder()
                 .instanceMemoryLimit(1024)
                 .memoryLimit(1024)

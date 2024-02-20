@@ -65,16 +65,16 @@ import org.cloudfoundry.uaa.users.UserInfoRequest;
 import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorUsersTest extends AbstractUaaApiTest {
+final class ReactorUsersTest extends AbstractUaaApiTest {
 
     private final ReactorUsers users =
             new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void changePassword() {
+    void changePassword() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -109,7 +109,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -260,7 +260,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -413,7 +413,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void expirePassword() {
+    void expirePassword() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -444,7 +444,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getVerificationLink() {
+    void getVerificationLink() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -477,7 +477,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void inviteUsers() {
+    void inviteUsers() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -530,7 +530,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -702,7 +702,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void lookup() {
+    void lookup() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -754,7 +754,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -864,7 +864,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void userInfo() {
+    void userInfo() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/userinfo").build())
@@ -896,7 +896,7 @@ public final class ReactorUsersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void verifyUser() {
+    void verifyUser() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

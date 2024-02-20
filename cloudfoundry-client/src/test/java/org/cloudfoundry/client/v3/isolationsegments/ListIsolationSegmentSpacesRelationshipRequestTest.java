@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListIsolationSegmentSpacesRelationshipRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noIsolationSegmentId() {
-        ListIsolationSegmentSpacesRelationshipRequest.builder().build();
+final class ListIsolationSegmentSpacesRelationshipRequestTest {
+
+    @Test
+    void noIsolationSegmentId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListIsolationSegmentSpacesRelationshipRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListIsolationSegmentSpacesRelationshipRequest.builder()
                 .isolationSegmentId("test-isolation-segment-id")
                 .build();

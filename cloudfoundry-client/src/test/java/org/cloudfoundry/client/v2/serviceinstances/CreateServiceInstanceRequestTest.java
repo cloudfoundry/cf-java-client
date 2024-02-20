@@ -16,33 +16,47 @@
 
 package org.cloudfoundry.client.v2.serviceinstances;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateServiceInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateServiceInstanceRequest.builder()
-                .servicePlanId("service-plan-id")
-                .spaceId("space-id")
-                .build();
-    }
+final class CreateServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noServicePlanId() {
-        CreateServiceInstanceRequest.builder().name("name").spaceId("space-id").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSpaceId() {
-        CreateServiceInstanceRequest.builder()
-                .name("name")
-                .servicePlanId("service-plan-id")
-                .build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .servicePlanId("service-plan-id")
+                            .spaceId("space-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noServicePlanId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder().name("name").spaceId("space-id").build();
+                });
+    }
+
+    @Test
+    void noSpaceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .name("name")
+                            .servicePlanId("service-plan-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateServiceInstanceRequest.builder()
                 .name("name")
                 .servicePlanId("service-plan-id")

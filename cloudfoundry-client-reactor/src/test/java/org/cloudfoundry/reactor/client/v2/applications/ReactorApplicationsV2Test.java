@@ -93,11 +93,11 @@ import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.OperationUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.test.StepVerifier;
 
-public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
+final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     private final ReactorApplicationsV2 applications =
             new ReactorApplicationsV2(
@@ -105,7 +105,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void associateRoute() {
+    void associateRoute() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -179,7 +179,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void copy() {
+    void copy() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -225,7 +225,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -301,7 +301,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -323,7 +323,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void download() {
+    void download() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -357,7 +357,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void downloadDroplet() {
+    void downloadDroplet() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -391,7 +391,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void environment() {
+    void environment() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -455,7 +455,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -522,7 +522,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getPermissions() {
+    void getPermissions() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -555,7 +555,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void instances() {
+    void instances() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -592,7 +592,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -770,7 +770,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listRoutes() {
+    void listRoutes() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -832,7 +832,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceBindings() {
+    void listServiceBindings() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -895,7 +895,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeRoute() {
+    void removeRoute() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -918,7 +918,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeServiceBinding() {
+    void removeServiceBinding() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -943,7 +943,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void restage() {
+    void restage() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1004,7 +1004,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void statistics() {
+    void statistics() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1064,7 +1064,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void summary() {
+    void summary() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1161,7 +1161,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void terminateInstance() {
+    void terminateInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1185,7 +1185,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1260,7 +1260,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void upload() throws IOException {
+    void upload() throws IOException {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1363,7 +1363,7 @@ public final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void uploadDroplet() throws IOException {
+    void uploadDroplet() throws IOException {
         mockRequest(
                 InteractionContext.builder()
                         .request(

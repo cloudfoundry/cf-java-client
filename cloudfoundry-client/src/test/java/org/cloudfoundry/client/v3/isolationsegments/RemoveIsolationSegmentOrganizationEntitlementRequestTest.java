@@ -16,26 +16,36 @@
 
 package org.cloudfoundry.client.v3.isolationsegments;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RemoveIsolationSegmentOrganizationEntitlementRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noIsolationSegmentId() {
-        RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-                .organizationId("test-organization-id")
-                .build();
-    }
+final class RemoveIsolationSegmentOrganizationEntitlementRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
-                .isolationSegmentId("test-isolation-segment-id")
-                .build();
+    @Test
+    void noIsolationSegmentId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+                            .organizationId("test-organization-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
+                            .isolationSegmentId("test-isolation-segment-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         RemoveIsolationSegmentOrganizationEntitlementRequest.builder()
                 .isolationSegmentId("test-isolation-segment-id")
                 .organizationId("test-organization-id")

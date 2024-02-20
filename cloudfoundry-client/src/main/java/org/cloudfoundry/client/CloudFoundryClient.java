@@ -63,6 +63,7 @@ import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.resourcematch.ResourceMatchV3;
 import org.cloudfoundry.client.v3.roles.RolesV3;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
+import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
@@ -248,6 +249,11 @@ public interface CloudFoundryClient {
     SecurityGroups securityGroups();
 
     /**
+     * Main entry point to the Cloud Foundry Security Groups V3 Client API
+     */
+    SecurityGroupsV3 securityGroupsV3();
+
+    /**
      * Main entry point to the Cloud Foundry Service Bindings V2 Client API
      */
     ServiceBindingsV2 serviceBindingsV2();
@@ -348,7 +354,8 @@ public interface CloudFoundryClient {
     Tasks tasks();
 
     /**
-     * Main entry point to the Cloud Foundry User Provided Service Instances Client API
+     * Main entry point to the Cloud Foundry User Provided Service Instances Client
+     * API
      */
     UserProvidedServiceInstances userProvidedServiceInstances();
 

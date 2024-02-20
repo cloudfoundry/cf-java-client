@@ -16,36 +16,54 @@
 
 package org.cloudfoundry.client.v3.servicebindings;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateServiceBindingRequestTest {
+final class CreateServiceBindingRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRelationships() {
-        CreateServiceBindingRequest.builder().type(ServiceBindingType.APPLICATION).build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noType() {
-        CreateServiceBindingRequest.builder()
-                .relationships(
-                        ServiceBindingRelationships.builder()
-                                .application(
-                                        ToOneRelationship.builder()
-                                                .data(Relationship.builder().id("test-id").build())
-                                                .build())
-                                .serviceInstance(
-                                        ToOneRelationship.builder()
-                                                .data(Relationship.builder().id("test-id").build())
-                                                .build())
-                                .build())
-                .build();
+    @Test
+    void noRelationships() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceBindingRequest.builder()
+                            .type(ServiceBindingType.APPLICATION)
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noType() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceBindingRequest.builder()
+                            .relationships(
+                                    ServiceBindingRelationships.builder()
+                                            .application(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id("test-id")
+                                                                            .build())
+                                                            .build())
+                                            .serviceInstance(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id("test-id")
+                                                                            .build())
+                                                            .build())
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateServiceBindingRequest.builder()
                 .relationships(
                         ServiceBindingRelationships.builder()

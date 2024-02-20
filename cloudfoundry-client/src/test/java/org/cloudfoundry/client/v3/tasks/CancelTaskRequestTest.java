@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.tasks;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CancelTaskRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noTaskId() {
-        CancelTaskRequest.builder().build();
+final class CancelTaskRequestTest {
+
+    @Test
+    void noTaskId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CancelTaskRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CancelTaskRequest.builder().taskId("test-task-id").build();
     }
 }

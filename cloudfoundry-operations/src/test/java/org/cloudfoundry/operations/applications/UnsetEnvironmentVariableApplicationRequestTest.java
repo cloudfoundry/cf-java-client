@@ -16,24 +16,34 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UnsetEnvironmentVariableApplicationRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UnsetEnvironmentVariableApplicationRequest.builder()
-                .variableName("test-variable-name")
-                .build();
-    }
+final class UnsetEnvironmentVariableApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noVariableName() {
-        UnsetEnvironmentVariableApplicationRequest.builder().name("test-name").build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UnsetEnvironmentVariableApplicationRequest.builder()
+                            .variableName("test-variable-name")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noVariableName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UnsetEnvironmentVariableApplicationRequest.builder().name("test-name").build();
+                });
+    }
+
+    @Test
+    void valid() {
         UnsetEnvironmentVariableApplicationRequest.builder()
                 .name("test-name")
                 .variableName("test-variable-name")

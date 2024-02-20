@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class EnableServiceAccessRequestTest {
+final class EnableServiceAccessRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListServiceAccessSettingsRequest.builder()
                 .brokerName("test-broker-name")
                 .organizationName("test-organization-name")

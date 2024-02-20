@@ -53,17 +53,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorServicePlansTest extends AbstractClientApiTest {
+final class ReactorServicePlansTest extends AbstractClientApiTest {
 
     private final ReactorServicePlans servicePlans =
             new ReactorServicePlans(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -85,7 +85,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteAsync() {
+    void deleteAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -128,7 +128,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         Map<String, String> details = new HashMap<>();
         details.put(
                 "description", "Billing account number used to charge use of shared fake server.");
@@ -207,7 +207,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -268,7 +268,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listServiceInstances() {
+    void listServiceInstances() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -335,7 +335,7 @@ public final class ReactorServicePlansTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

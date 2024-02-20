@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.operations.routes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListRoutesRequestTest {
+final class ListRoutesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListRoutesRequest.builder().build();
     }
 }

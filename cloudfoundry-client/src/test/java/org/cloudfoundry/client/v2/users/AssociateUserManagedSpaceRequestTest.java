@@ -16,22 +16,34 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class AssociateUserManagedSpaceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noManagedSpaceId() {
-        AssociateUserManagedSpaceRequest.builder().userId("test-user-id").build();
-    }
+final class AssociateUserManagedSpaceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserId() {
-        AssociateUserManagedSpaceRequest.builder().managedSpaceId("test-managed-space-id").build();
+    @Test
+    void noManagedSpaceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AssociateUserManagedSpaceRequest.builder().userId("test-user-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noUserId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AssociateUserManagedSpaceRequest.builder()
+                            .managedSpaceId("test-managed-space-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         AssociateUserManagedSpaceRequest.builder()
                 .managedSpaceId("test-managed-space-id")
                 .userId("test-user-id")

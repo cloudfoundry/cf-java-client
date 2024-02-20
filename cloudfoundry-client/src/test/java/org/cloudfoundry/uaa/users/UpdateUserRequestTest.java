@@ -16,68 +16,110 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UpdateUserRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void incompleteName() {
-        UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
-                .id("user-id")
-                .version("*")
-                .name(Name.builder().givenName("John").build())
-                .userName("jdoe")
-                .build();
-    }
+final class UpdateUserRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
-                .version("*")
-                .name(Name.builder().familyName("Doe").givenName("John").build())
-                .userName("jdoe")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
-                .id("user-id")
-                .version("*")
-                .userName("jdoe")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
-                .id("user-id")
-                .version("*")
-                .name(Name.builder().familyName("Doe").givenName("John").build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noVersion() {
-        UpdateUserRequest.builder()
-                .active(true)
-                .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())
-                .id("user-id")
-                .name(Name.builder().familyName("Doe").givenName("John").build())
-                .userName("jdoe")
-                .build();
+    @Test
+    void incompleteName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateUserRequest.builder()
+                            .active(true)
+                            .email(
+                                    Email.builder()
+                                            .primary(true)
+                                            .value("john.doe@pivotal.io")
+                                            .build())
+                            .id("user-id")
+                            .version("*")
+                            .name(Name.builder().givenName("John").build())
+                            .userName("jdoe")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateUserRequest.builder()
+                            .active(true)
+                            .email(
+                                    Email.builder()
+                                            .primary(true)
+                                            .value("john.doe@pivotal.io")
+                                            .build())
+                            .version("*")
+                            .name(Name.builder().familyName("Doe").givenName("John").build())
+                            .userName("jdoe")
+                            .build();
+                });
+    }
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateUserRequest.builder()
+                            .active(true)
+                            .email(
+                                    Email.builder()
+                                            .primary(true)
+                                            .value("john.doe@pivotal.io")
+                                            .build())
+                            .id("user-id")
+                            .version("*")
+                            .userName("jdoe")
+                            .build();
+                });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateUserRequest.builder()
+                            .active(true)
+                            .email(
+                                    Email.builder()
+                                            .primary(true)
+                                            .value("john.doe@pivotal.io")
+                                            .build())
+                            .id("user-id")
+                            .version("*")
+                            .name(Name.builder().familyName("Doe").givenName("John").build())
+                            .build();
+                });
+    }
+
+    @Test
+    void noVersion() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateUserRequest.builder()
+                            .active(true)
+                            .email(
+                                    Email.builder()
+                                            .primary(true)
+                                            .value("john.doe@pivotal.io")
+                                            .build())
+                            .id("user-id")
+                            .name(Name.builder().familyName("Doe").givenName("John").build())
+                            .userName("jdoe")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         UpdateUserRequest.builder()
                 .active(true)
                 .email(Email.builder().primary(true).value("john.doe@pivotal.io").build())

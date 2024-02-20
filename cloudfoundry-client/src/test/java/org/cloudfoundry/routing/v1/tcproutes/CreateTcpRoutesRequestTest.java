@@ -16,77 +16,99 @@
 
 package org.cloudfoundry.routing.v1.tcproutes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class CreateTcpRoutesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noBackendIp() {
-        CreateTcpRoutesRequest.builder()
-                .tcpRoute(
-                        TcpRouteConfiguration.builder()
-                                .backendPort(9999)
-                                .port(999)
-                                .routerGroupId("test-router-group-id")
-                                .ttl(99)
-                                .build())
-                .build();
-    }
+class CreateTcpRoutesRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noBackendPort() {
-        CreateTcpRoutesRequest.builder()
-                .tcpRoute(
-                        TcpRouteConfiguration.builder()
-                                .backendIp("test-backend-ip")
-                                .port(999)
-                                .routerGroupId("test-router-group-id")
-                                .ttl(99)
-                                .build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPort() {
-        CreateTcpRoutesRequest.builder()
-                .tcpRoute(
-                        TcpRouteConfiguration.builder()
-                                .backendIp("test-backend-ip")
-                                .backendPort(9999)
-                                .routerGroupId("test-router-group-id")
-                                .ttl(99)
-                                .build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRouterGroupId() {
-        CreateTcpRoutesRequest.builder()
-                .tcpRoute(
-                        TcpRouteConfiguration.builder()
-                                .backendIp("test-backend-ip")
-                                .backendPort(9999)
-                                .port(999)
-                                .ttl(99)
-                                .build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTtl() {
-        CreateTcpRoutesRequest.builder()
-                .tcpRoute(
-                        TcpRouteConfiguration.builder()
-                                .backendIp("test-backend-ip")
-                                .backendPort(9999)
-                                .port(999)
-                                .routerGroupId("test-router-group-id")
-                                .build())
-                .build();
+    @Test
+    void noBackendIp() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateTcpRoutesRequest.builder()
+                            .tcpRoute(
+                                    TcpRouteConfiguration.builder()
+                                            .backendPort(9999)
+                                            .port(999)
+                                            .routerGroupId("test-router-group-id")
+                                            .ttl(99)
+                                            .build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noBackendPort() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateTcpRoutesRequest.builder()
+                            .tcpRoute(
+                                    TcpRouteConfiguration.builder()
+                                            .backendIp("test-backend-ip")
+                                            .port(999)
+                                            .routerGroupId("test-router-group-id")
+                                            .ttl(99)
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void noPort() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateTcpRoutesRequest.builder()
+                            .tcpRoute(
+                                    TcpRouteConfiguration.builder()
+                                            .backendIp("test-backend-ip")
+                                            .backendPort(9999)
+                                            .routerGroupId("test-router-group-id")
+                                            .ttl(99)
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void noRouterGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateTcpRoutesRequest.builder()
+                            .tcpRoute(
+                                    TcpRouteConfiguration.builder()
+                                            .backendIp("test-backend-ip")
+                                            .backendPort(9999)
+                                            .port(999)
+                                            .ttl(99)
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void noTtl() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateTcpRoutesRequest.builder()
+                            .tcpRoute(
+                                    TcpRouteConfiguration.builder()
+                                            .backendIp("test-backend-ip")
+                                            .backendPort(9999)
+                                            .port(999)
+                                            .routerGroupId("test-router-group-id")
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateTcpRoutesRequest.builder()
                 .tcpRoute(
                         TcpRouteConfiguration.builder()

@@ -16,27 +16,41 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class MetadataTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void missingCount() {
-        Metadata.builder().expired(1L).newestTimestamp(1L).oldestTimestamp(1L).build();
-    }
+class MetadataTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void missingNewestTimestamp() {
-        Metadata.builder().count(1L).expired(1L).oldestTimestamp(1L).build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void missingOldestTimestamp() {
-        Metadata.builder().count(1L).expired(1L).newestTimestamp(1L).build();
+    @Test
+    void missingCount() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    Metadata.builder().expired(1L).newestTimestamp(1L).oldestTimestamp(1L).build();
+                });
     }
 
     @Test
-    public void valid() {
+    void missingNewestTimestamp() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    Metadata.builder().count(1L).expired(1L).oldestTimestamp(1L).build();
+                });
+    }
+
+    @Test
+    void missingOldestTimestamp() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    Metadata.builder().count(1L).expired(1L).newestTimestamp(1L).build();
+                });
+    }
+
+    @Test
+    void valid() {
         Metadata.builder().count(1L).expired(1L).newestTimestamp(1L).oldestTimestamp(1L).build();
     }
 }

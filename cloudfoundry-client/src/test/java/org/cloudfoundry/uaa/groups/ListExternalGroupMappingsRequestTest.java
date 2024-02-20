@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListExternalGroupMappingsRequestTest {
+final class ListExternalGroupMappingsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListExternalGroupMappingsRequest.builder().build();
     }
 }

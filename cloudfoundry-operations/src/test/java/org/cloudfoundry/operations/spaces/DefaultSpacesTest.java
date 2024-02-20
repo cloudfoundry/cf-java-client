@@ -81,12 +81,12 @@ import org.cloudfoundry.client.v2.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v2.spaces.UpdateSpaceResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.operations.spaceadmin.SpaceQuota;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
-public final class DefaultSpacesTest extends AbstractOperationsTest {
+final class DefaultSpacesTest extends AbstractOperationsTest {
 
     private final DefaultSpaces spaces =
             new DefaultSpaces(
@@ -95,7 +95,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
                     Mono.just(TEST_USERNAME));
 
     @Test
-    public void allowSsh() {
+    void allowSsh() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -111,7 +111,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void allowSshAlreadyAllowed() {
+    void allowSshAlreadyAllowed() {
         requestOrganizationSpacesWithSsh(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", true);
 
@@ -123,7 +123,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void allowSshNoSpace() {
+    void allowSshNoSpace() {
         requestOrganizationSpacesEmpty(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
 
@@ -139,7 +139,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createNoOrgNoQuota() {
+    void createNoOrgNoQuota() {
         requestCreateSpace(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -161,7 +161,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createNoOrgQuota() {
+    void createNoOrgQuota() {
         requestOrganizationSpaceQuotas(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -192,7 +192,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createNoOrgQuotaNotFound() {
+    void createNoOrgQuotaNotFound() {
         requestOrganizationSpaceQuotas(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-quota", null);
 
@@ -214,7 +214,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createOrgNotFound() {
+    void createOrgNotFound() {
         requestOrganizations(this.cloudFoundryClient, "test-other-organization", null);
 
         this.spaces
@@ -236,7 +236,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createOrgQuota() {
+    void createOrgQuota() {
         requestOrganizations(
                 this.cloudFoundryClient, "test-other-organization", "test-other-organization-id");
         requestOrganizationSpaceQuotas(
@@ -270,7 +270,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -291,7 +291,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteFailure() {
+    void deleteFailure() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -318,7 +318,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteInvalidSpace() {
+    void deleteInvalidSpace() {
         requestOrganizationSpacesEmpty(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
 
@@ -334,7 +334,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disallowSsh() {
+    void disallowSsh() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -350,7 +350,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disallowSshAlreadyDisallowed() {
+    void disallowSshAlreadyDisallowed() {
         requestOrganizationSpacesWithSsh(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name", false);
 
@@ -362,7 +362,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disallowSshNoSpace() {
+    void disallowSshNoSpace() {
         requestOrganizationSpacesEmpty(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
 
@@ -378,7 +378,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
@@ -426,7 +426,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getNoSecurityGroupRules() {
+    void getNoSecurityGroupRules() {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
@@ -467,7 +467,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getSpaceQuotaNull() {
+    void getSpaceQuotaNull() {
         requestOrganization(this.cloudFoundryClient, "test-space-organizationId");
         requestOrganizationSpaces(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME, null);
@@ -503,7 +503,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
 
         this.spaces
@@ -515,7 +515,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void rename() {
+    void rename() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -535,7 +535,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void renameNoSpace() {
+    void renameNoSpace() {
         requestOrganizationSpacesEmpty(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
 
@@ -555,7 +555,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void sshAllowed() {
+    void sshAllowed() {
         requestOrganizationSpaces(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_ID,
@@ -571,7 +571,7 @@ public final class DefaultSpacesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void sshAllowedNoSpace() {
+    void sshAllowedNoSpace() {
         requestOrganizationSpacesEmpty(
                 this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-space-name");
 

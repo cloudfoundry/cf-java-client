@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.privatedomains;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListPrivateDomainsRequestTest {
+final class ListPrivateDomainsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListPrivateDomainsRequest.builder().build();
     }
 }

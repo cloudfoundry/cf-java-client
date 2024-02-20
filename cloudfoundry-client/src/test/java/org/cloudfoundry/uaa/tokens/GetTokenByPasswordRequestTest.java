@@ -16,48 +16,66 @@
 
 package org.cloudfoundry.uaa.tokens;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetTokenByPasswordRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        GetTokenByPasswordRequest.builder()
-                .clientSecret("test-client-secret")
-                .password("test-password")
-                .username("test-username")
-                .build();
-    }
+final class GetTokenByPasswordRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientSecret() {
-        GetTokenByPasswordRequest.builder()
-                .clientId("test-client-id")
-                .password("test-password")
-                .username("test-username")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPassword() {
-        GetTokenByPasswordRequest.builder()
-                .clientId("test-client-id")
-                .clientSecret("test-client-secret")
-                .username("test-username")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        GetTokenByPasswordRequest.builder()
-                .clientId("test-client-id")
-                .clientSecret("test-client-secret")
-                .password("test-password")
-                .build();
+    @Test
+    void noClientId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByPasswordRequest.builder()
+                            .clientSecret("test-client-secret")
+                            .password("test-password")
+                            .username("test-username")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noClientSecret() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByPasswordRequest.builder()
+                            .clientId("test-client-id")
+                            .password("test-password")
+                            .username("test-username")
+                            .build();
+                });
+    }
+
+    @Test
+    void noPassword() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByPasswordRequest.builder()
+                            .clientId("test-client-id")
+                            .clientSecret("test-client-secret")
+                            .username("test-username")
+                            .build();
+                });
+    }
+
+    @Test
+    void noUsername() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetTokenByPasswordRequest.builder()
+                            .clientId("test-client-id")
+                            .clientSecret("test-client-secret")
+                            .password("test-password")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         GetTokenByPasswordRequest.builder()
                 .clientId("test-client-id")
                 .clientSecret("test-client-secret")

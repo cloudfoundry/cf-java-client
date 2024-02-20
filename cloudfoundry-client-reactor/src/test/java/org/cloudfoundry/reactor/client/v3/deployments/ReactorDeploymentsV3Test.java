@@ -43,17 +43,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
+class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
     private final ReactorDeploymentsV3 deployments =
             new ReactorDeploymentsV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void cancel() {
+    void cancel() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -78,7 +78,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -171,7 +171,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -246,7 +246,7 @@ public class ReactorDeploymentsV3Test extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/deployments").build())

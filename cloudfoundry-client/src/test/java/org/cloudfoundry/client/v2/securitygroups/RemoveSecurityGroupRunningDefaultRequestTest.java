@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RemoveSecurityGroupRunningDefaultRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecurityGroupRunningDefaultId() {
-        RemoveSecurityGroupRunningDefaultRequest.builder().build();
+final class RemoveSecurityGroupRunningDefaultRequestTest {
+
+    @Test
+    void noSecurityGroupRunningDefaultId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveSecurityGroupRunningDefaultRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         RemoveSecurityGroupRunningDefaultRequest.builder()
                 .securityGroupId("test-security-group-default-id")
                 .build();

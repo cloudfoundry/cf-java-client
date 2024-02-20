@@ -16,19 +16,25 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class RelationshipsTest {
+final class RelationshipsTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noSpace() {
-        ApplicationRelationships.builder().build();
+    @Test
+    void noSpace() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ApplicationRelationships.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ApplicationRelationships.builder()
                 .space(
                         ToOneRelationship.builder()

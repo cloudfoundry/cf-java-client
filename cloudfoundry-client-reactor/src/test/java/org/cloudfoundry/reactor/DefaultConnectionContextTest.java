@@ -25,13 +25,13 @@ import io.netty.handler.logging.LogLevel;
 import java.net.InetSocketAddress;
 import java.time.Duration;
 import java.util.Optional;
-import org.junit.After;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Test;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.transport.ProxyProvider;
 import reactor.test.StepVerifier;
 
-public final class DefaultConnectionContextTest extends AbstractRestTest {
+final class DefaultConnectionContextTest extends AbstractRestTest {
 
     private final DefaultConnectionContext connectionContext =
             DefaultConnectionContext.builder()
@@ -40,13 +40,13 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
                     .secure(false)
                     .build();
 
-    @After
-    public void dispose() {
+    @AfterEach
+    void dispose() {
         this.connectionContext.dispose();
     }
 
     @Test
-    public void getInfo() {
+    void getInfo() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -77,7 +77,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     }
 
     @Test
-    public void multipleInstances() {
+    void multipleInstances() {
         DefaultConnectionContext first =
                 DefaultConnectionContext.builder().apiHost("test-host").build();
 
@@ -92,7 +92,7 @@ public final class DefaultConnectionContextTest extends AbstractRestTest {
     }
 
     @Test
-    public void configurationAlwaysApplied() {
+    void configurationAlwaysApplied() {
         DefaultConnectionContext ctx =
                 DefaultConnectionContext.builder()
                         .connectionPoolSize(24)

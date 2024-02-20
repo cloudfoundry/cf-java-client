@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.routing.v1.tcproutes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class ListTcpRoutesRequestTest {
+class ListTcpRoutesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListTcpRoutesRequest.builder().build();
     }
 }

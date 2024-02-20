@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ApplicationStatisticsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ApplicationStatisticsRequest.builder().build();
+final class ApplicationStatisticsRequestTest {
+
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ApplicationStatisticsRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ApplicationStatisticsRequest.builder().applicationId("test-application-id").build();
     }
 }

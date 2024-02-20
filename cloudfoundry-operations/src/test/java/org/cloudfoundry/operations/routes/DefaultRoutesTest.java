@@ -1,17 +1,15 @@
 /*
  * Copyright 2013-2021 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cloudfoundry.operations.routes;
@@ -21,35 +19,24 @@ import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.Optional;
-import java.util.Queue;
-import java.util.function.Supplier;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
-import org.cloudfoundry.client.v2.jobs.ErrorDetails;
-import org.cloudfoundry.client.v2.jobs.GetJobRequest;
-import org.cloudfoundry.client.v2.jobs.GetJobResponse;
-import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsResponse;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesResponse;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
-import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsResponse;
 import org.cloudfoundry.client.v2.routes.ListRoutesResponse;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
-import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceEntity;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
@@ -64,70 +51,50 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToManyRelationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesResponse;
+import org.cloudfoundry.client.v3.domains.DomainRelationships;
+import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.jobs.GetJobRequest;
+import org.cloudfoundry.client.v3.jobs.GetJobResponse;
+import org.cloudfoundry.client.v3.jobs.JobState;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsResponse;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-import reactor.test.scheduler.VirtualTimeScheduler;
 
-public final class DefaultRoutesTest extends AbstractOperationsTest {
+final class DefaultRoutesTest extends AbstractOperationsTest {
 
     private final DefaultRoutes routes =
             new DefaultRoutes(
                     Mono.just(this.cloudFoundryClient),
                     Mono.just(TEST_ORGANIZATION_ID),
                     Mono.just(TEST_SPACE_ID));
+    private static final String TEST_DOMAIN_ID = "3a5d3d89-3f89-4f05-8188-8a2b298c79d5";
+    private static final String TEST_DOMAIN_NAME = "domain-name";
+    private static final String TEST_PATH = "test-path";
+    private static final String TEST_HOST = "192.168.0,.1";
+
+    private static final String TEST_JOB_ID = "test-job-id";
 
     @Test
-    public void checkRouteInvalidDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
-
-        this.routes
-                .check(CheckRouteRequest.builder().domain("test-domain").host("test-host").build())
-                .as(StepVerifier::create)
-                .expectNext(false)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void checkRouteInvalidHost() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRouteExistsFalse(
-                this.cloudFoundryClient,
-                "test-private-domain-metadata-id",
-                "test-host",
-                "test-path");
+    void checkRoute() {
+        mockListDomains(this.cloudFoundryClient);
+        mockCheckReservedRoutes(this.cloudFoundryClient);
 
         this.routes
                 .check(
                         CheckRouteRequest.builder()
-                                .domain("test-domain")
-                                .host("test-host")
-                                .path("test-path")
-                                .build())
-                .as(StepVerifier::create)
-                .expectNext(false)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void checkRoutePrivateDomain() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRouteExistsTrue(
-                this.cloudFoundryClient,
-                "test-private-domain-metadata-id",
-                "test-host",
-                "test-path");
-
-        this.routes
-                .check(
-                        CheckRouteRequest.builder()
-                                .domain("test-domain")
-                                .host("test-host")
-                                .path("test-path")
+                                .host(TEST_HOST)
+                                .path(TEST_PATH)
+                                .domain(TEST_DOMAIN_NAME)
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(true)
@@ -135,31 +102,67 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    public void checkRouteSharedDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomains(this.cloudFoundryClient, "test-domain");
-        requestRouteExistsTrue(
-                this.cloudFoundryClient,
-                "test-shared-domain-metadata-id",
-                "test-host",
-                "test-path");
+    private static void mockCheckReservedRoutes(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient
+                        .domainsV3()
+                        .checkReservedRoutes(
+                                CheckReservedRoutesRequest.builder()
+                                        .domainId(TEST_DOMAIN_ID)
+                                        .host(TEST_HOST)
+                                        .path(TEST_PATH)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                CheckReservedRoutesResponse.builder().matchingRoute(true).build()));
+    }
 
-        this.routes
-                .check(
-                        CheckRouteRequest.builder()
-                                .domain("test-domain")
-                                .host("test-host")
-                                .path("test-path")
-                                .build())
-                .as(StepVerifier::create)
-                .expectNext(true)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+    private static void mockListDomains(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient
+                        .organizationsV3()
+                        .listDomains(
+                                ListOrganizationDomainsRequest.builder()
+                                        .name(TEST_DOMAIN_NAME)
+                                        .page(1)
+                                        .organizationId(TEST_ORGANIZATION_ID)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                ListOrganizationDomainsResponse.builder()
+                                        .pagination(
+                                                Pagination.builder()
+                                                        .totalResults(1)
+                                                        .totalPages(1)
+                                                        .build())
+                                        .resource(
+                                                DomainResource.builder()
+                                                        .id(TEST_DOMAIN_ID)
+                                                        .createdAt("2019-03-08T01:06:19Z")
+                                                        .updatedAt("2019-03-08T01:06:19Z")
+                                                        .name(TEST_DOMAIN_NAME)
+                                                        .isInternal(false)
+                                                        .relationships(
+                                                                DomainRelationships.builder()
+                                                                        .organization(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                TEST_ORGANIZATION_ID)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .sharedOrganizations(
+                                                                                ToManyRelationship
+                                                                                        .builder()
+                                                                                        .build())
+                                                                        .build())
+                                                        .build())
+                                        .build()));
     }
 
     @Test
-    public void createRouteAssignedPort() {
+    void createRouteAssignedPort() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -186,7 +189,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRouteInvalidDomain() {
+    void createRouteInvalidDomain() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
@@ -208,7 +211,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRouteInvalidSpace() {
+    void createRouteInvalidSpace() {
         requestSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
 
@@ -230,7 +233,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRouteNoHost() {
+    void createRouteNoHost() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestCreateRoute(
@@ -256,7 +259,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRouteNoPath() {
+    void createRouteNoPath() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestCreateRoute(
@@ -282,7 +285,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRoutePrivateDomain() {
+    void createRoutePrivateDomain() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestCreateRoute(
@@ -309,7 +312,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createRouteRandomPort() {
+    void createRouteRandomPort() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -336,27 +339,31 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteAssignedPort() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomains(this.cloudFoundryClient, "test-domain");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-metadata-id", null, null, 9999);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
+    void deleteOrphanedRoutes() {
+        mockDeleteOrphanedRoutes(this.cloudFoundryClient);
 
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.delete(
-                                        DeleteRouteRequest.builder()
-                                                .domain("test-domain")
-                                                .port(9999)
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+        this.routes
+                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder().build())
+                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
+    private static void mockDeleteOrphanedRoutes(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient
+                        .spacesV3()
+                        .deleteUnmappedRoutes(
+                                DeleteUnmappedRoutesRequest.builder()
+                                        .spaceId(TEST_SPACE_ID)
+                                        .build()))
+                .thenReturn(Mono.just(TEST_JOB_ID));
+        when(cloudFoundryClient.jobsV3().get(GetJobRequest.builder().jobId(TEST_JOB_ID).build()))
+                .thenReturn(
+                        Mono.just(fill(GetJobResponse.builder()).state(JobState.COMPLETE).build()));
+    }
+
     @Test
-    public void deleteFailure() {
+    void deleteRoute() {
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(
                 this.cloudFoundryClient,
@@ -364,200 +371,43 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 "test-host",
                 "test-path",
                 null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.delete(
-                                        DeleteRouteRequest.builder()
-                                                .domain("test-domain")
-                                                .host("test-host")
-                                                .path("test-path")
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .consumeErrorWith(
-                        t ->
-                                assertThat(t)
-                                        .isInstanceOf(ClientV2Exception.class)
-                                        .hasMessage(
-                                                "test-error-details-errorCode(1):"
-                                                        + " test-error-details-description"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteInvalidDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
+        mockDeleteRequest(this.cloudFoundryClient, "test-route-id");
 
         this.routes
                 .delete(
                         DeleteRouteRequest.builder()
-                                .domain("test-domain")
                                 .host("test-host")
                                 .path("test-path")
-                                .build())
-                .as(StepVerifier::create)
-                .consumeErrorWith(
-                        t ->
-                                assertThat(t)
-                                        .isInstanceOf(IllegalArgumentException.class)
-                                        .hasMessage("Domain test-domain does not exist"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteInvalidRoute() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRoutesEmpty(
-                this.cloudFoundryClient,
-                "test-private-domain-metadata-id",
-                "test-host",
-                "test-path",
-                null);
-
-        this.routes
-                .delete(
-                        DeleteRouteRequest.builder()
                                 .domain("test-domain")
-                                .host("test-host")
-                                .path("test-path")
                                 .build())
                 .as(StepVerifier::create)
-                .consumeErrorWith(
-                        t ->
-                                assertThat(t)
-                                        .isInstanceOf(IllegalArgumentException.class)
-                                        .hasMessage("Route for test-domain does not exist"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesAssociatedApplication() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplications(this.cloudFoundryClient, "test-route-id");
-
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder().build())
-                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    public void deleteOrphanedRoutesAssociatedService() {
-        requestSpaceRoutesService(this.cloudFoundryClient, TEST_SPACE_ID);
-
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder().build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
+    private static void mockDeleteRequest(CloudFoundryClient cloudFoundryClient, String routeId) {
+        when(cloudFoundryClient
+                        .routesV3()
+                        .delete(
+                                org.cloudfoundry.client.v3.routes.DeleteRouteRequest.builder()
+                                        .routeId(routeId)
+                                        .build()))
+                .thenReturn(Mono.just("test-delete-job"));
+        when(cloudFoundryClient
+                        .jobsV3()
+                        .get(
+                                org.cloudfoundry.client.v3.jobs.GetJobRequest.builder()
+                                        .jobId("test-delete-job")
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder())
+                                        .state(org.cloudfoundry.client.v3.jobs.JobState.COMPLETE)
+                                        .build()));
     }
 
     @Test
-    public void deleteOrphanedRoutesNoAssociations() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.deleteOrphanedRoutes(
-                                        DeleteOrphanedRoutesRequest.builder().build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesNoAssociationsFailure() {
-        requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-route-id");
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobFailure(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.deleteOrphanedRoutes(
-                                        DeleteOrphanedRoutesRequest.builder().build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .consumeErrorWith(
-                        t ->
-                                assertThat(t)
-                                        .isInstanceOf(ClientV2Exception.class)
-                                        .hasMessage(
-                                                "test-error-details-errorCode(1):"
-                                                        + " test-error-details-description"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteOrphanedRoutesNoRoutes() {
-        requestSpaceRoutesEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
-
-        this.routes
-                .deleteOrphanedRoutes(DeleteOrphanedRoutesRequest.builder().build())
-                .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deletePrivateDomain() {
-        requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestRoutes(
-                this.cloudFoundryClient,
-                "test-private-domain-metadata-id",
-                "test-host",
-                "test-path",
-                null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.delete(
-                                        DeleteRouteRequest.builder()
-                                                .domain("test-domain")
-                                                .host("test-host")
-                                                .path("test-path")
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void deleteSharedDomain() {
-        requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
-        requestSharedDomains(this.cloudFoundryClient, "test-domain");
-        requestRoutes(
-                this.cloudFoundryClient,
-                "test-shared-domain-metadata-id",
-                "test-host",
-                "test-path",
-                null);
-        requestDeleteRoute(this.cloudFoundryClient, "test-route-id");
-        requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.routes.delete(
-                                        DeleteRouteRequest.builder()
-                                                .domain("test-domain")
-                                                .host("test-host")
-                                                .path("test-path")
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    public void listCurrentOrganizationNoSpace() {
+    void listCurrentOrganizationNoSpace() {
         requestOrganizationsRoutes(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
@@ -586,7 +436,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listCurrentOrganizationNoSpaceNoRoutes() {
+    void listCurrentOrganizationNoSpaceNoRoutes() {
         requestOrganizationsRoutesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
@@ -601,7 +451,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listCurrentSpace() {
+    void listCurrentSpace() {
         requestSpaceRoutes(this.cloudFoundryClient, TEST_SPACE_ID);
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
@@ -625,7 +475,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listCurrentSpaceNoPath() {
+    void listCurrentSpaceNoPath() {
         requestSpaceRoutesNoPath(this.cloudFoundryClient, TEST_SPACE_ID);
         requestPrivateDomainsAll(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomainsAll(this.cloudFoundryClient);
@@ -648,7 +498,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteAssignedPort() {
+    void mapRouteAssignedPort() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -678,7 +528,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteExists() {
+    void mapRouteExists() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(
@@ -703,7 +553,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteInvalidApplicationName() {
+    void mapRouteInvalidApplicationName() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutesEmpty(
@@ -740,7 +590,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteInvalidDomain() {
+    void mapRouteInvalidDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
@@ -763,7 +613,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteNoHost() {
+    void mapRouteNoHost() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutesEmpty(
@@ -795,7 +645,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRoutePath() {
+    void mapRoutePath() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutesTwo(
@@ -819,7 +669,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRoutePrivateDomain() {
+    void mapRoutePrivateDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutesEmpty(
@@ -852,7 +702,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void mapRouteSharedDomain() {
+    void mapRouteSharedDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -886,7 +736,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRouteAssignedPort() {
+    void unmapRouteAssignedPort() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -907,7 +757,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRouteInvalidApplicationName() {
+    void unmapRouteInvalidApplicationName() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
 
@@ -929,7 +779,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRouteInvalidDomain() {
+    void unmapRouteInvalidDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomainsEmpty(this.cloudFoundryClient, "test-domain");
@@ -951,7 +801,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRouteInvalidRoute() {
+    void unmapRouteInvalidRoute() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutesEmpty(
@@ -979,7 +829,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRoutePrivateDomain() {
+    void unmapRoutePrivateDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestRoutes(
@@ -1005,7 +855,7 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unmapRouteSharedDomain() {
+    void unmapRouteSharedDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
         requestSharedDomains(this.cloudFoundryClient, "test-domain");
@@ -1126,93 +976,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                 .thenReturn(Mono.just(fill(CreateRouteResponse.builder(), "route-").build()));
     }
 
-    private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
-        when(cloudFoundryClient
-                        .routes()
-                        .delete(
-                                org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-                                        .async(true)
-                                        .routeId(routeId)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(DeleteRouteResponse.builder())
-                                        .entity(fill(JobEntity.builder(), "job-entity-").build())
-                                        .build()));
-    }
-
-    private static void requestJobFailure(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs().get(GetJobRequest.builder().jobId(jobId).build()))
-                .thenReturn(
-                        Mono.defer(
-                                new Supplier<Mono<GetJobResponse>>() {
-
-                                    private final Queue<GetJobResponse> responses =
-                                            new LinkedList<>(
-                                                    Arrays.asList(
-                                                            fill(GetJobResponse.builder(), "job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .status(
-                                                                                            "running")
-                                                                                    .build())
-                                                                    .build(),
-                                                            fill(GetJobResponse.builder(), "job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .errorDetails(
-                                                                                            fill(
-                                                                                                            ErrorDetails
-                                                                                                                    .builder(),
-                                                                                                            "error-details-")
-                                                                                                    .build())
-                                                                                    .status(
-                                                                                            "failed")
-                                                                                    .build())
-                                                                    .build()));
-
-                                    @Override
-                                    public Mono<GetJobResponse> get() {
-                                        return Mono.just(this.responses.poll());
-                                    }
-                                }));
-    }
-
-    private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs().get(GetJobRequest.builder().jobId(jobId).build()))
-                .thenReturn(
-                        Mono.defer(
-                                new Supplier<Mono<GetJobResponse>>() {
-
-                                    private final Queue<GetJobResponse> responses =
-                                            new LinkedList<>(
-                                                    Arrays.asList(
-                                                            fill(GetJobResponse.builder(), "job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .status(
-                                                                                            "running")
-                                                                                    .build())
-                                                                    .build(),
-                                                            fill(GetJobResponse.builder(), "job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .status(
-                                                                                            "finished")
-                                                                                    .build())
-                                                                    .build()));
-
-                                    @Override
-                                    public Mono<GetJobResponse> get() {
-                                        return Mono.just(this.responses.poll());
-                                    }
-                                }));
-    }
-
     private static void requestOrganizationsRoutes(
             CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient
@@ -1325,32 +1088,6 @@ public final class DefaultRoutesTest extends AbstractOperationsTest {
                                         .routeId(routeId)
                                         .build()))
                 .thenReturn(Mono.empty());
-    }
-
-    private static void requestRouteExistsFalse(
-            CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient
-                        .routes()
-                        .exists(
-                                RouteExistsRequest.builder()
-                                        .domainId(domainId)
-                                        .host(host)
-                                        .path(path)
-                                        .build()))
-                .thenReturn(Mono.just(false));
-    }
-
-    private static void requestRouteExistsTrue(
-            CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        when(cloudFoundryClient
-                        .routes()
-                        .exists(
-                                RouteExistsRequest.builder()
-                                        .domainId(domainId)
-                                        .host(host)
-                                        .path(path)
-                                        .build()))
-                .thenReturn(Mono.just(true));
     }
 
     private static void requestRoutes(

@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.logcache.v1;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class TimerTest {
+class TimerTest {
 
     @Test
-    public void valid() {
+    void valid() {
         Timer.builder().build();
     }
 }

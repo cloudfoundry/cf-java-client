@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.shareddomains;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteSharedDomainRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        DeleteSharedDomainRequest.builder().build();
+final class DeleteSharedDomainRequestTest {
+
+    @Test
+    void noId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteSharedDomainRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteSharedDomainRequest.builder().sharedDomainId("test-shared-domain-id").build();
     }
 }

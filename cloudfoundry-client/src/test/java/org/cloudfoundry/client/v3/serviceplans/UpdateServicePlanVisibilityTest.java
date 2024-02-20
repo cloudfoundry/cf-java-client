@@ -16,12 +16,14 @@
 
 package org.cloudfoundry.client.v3.serviceplans;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class UpdateServicePlanVisibilityTest {
+import org.junit.jupiter.api.Test;
+
+class UpdateServicePlanVisibilityTest {
 
     @Test
-    public void valid() {
+    void valid() {
         UpdateServicePlanVisibilityRequest.builder()
                 .servicePlanId("test-service-plan-id")
                 .type(Visibility.ORGANIZATION)
@@ -33,15 +35,19 @@ public class UpdateServicePlanVisibilityTest {
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void invalid() {
-        UpdateServicePlanVisibilityRequest.builder()
-                .servicePlanId("test-service-plan-id")
-                .organization(
-                        Organization.builder()
-                                .name("test-organization")
-                                .guid("test-organization-id")
-                                .build())
-                .build();
+    @Test
+    void invalid() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateServicePlanVisibilityRequest.builder()
+                            .servicePlanId("test-service-plan-id")
+                            .organization(
+                                    Organization.builder()
+                                            .name("test-organization")
+                                            .guid("test-organization-id")
+                                            .build())
+                            .build();
+                });
     }
 }

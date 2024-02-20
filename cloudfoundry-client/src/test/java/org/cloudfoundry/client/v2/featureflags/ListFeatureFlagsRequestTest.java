@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.featureflags;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListFeatureFlagsRequestTest {
+final class ListFeatureFlagsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListFeatureFlagsRequest.builder().build();
     }
 }

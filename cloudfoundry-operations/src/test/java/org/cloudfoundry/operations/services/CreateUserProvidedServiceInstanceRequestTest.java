@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.services;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateUserProvidedServiceInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateUserProvidedServiceInstanceRequest.builder().build();
+final class CreateUserProvidedServiceInstanceRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateUserProvidedServiceInstanceRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         CreateUserProvidedServiceInstanceRequest.builder().name("test-name").build();
     }
 }

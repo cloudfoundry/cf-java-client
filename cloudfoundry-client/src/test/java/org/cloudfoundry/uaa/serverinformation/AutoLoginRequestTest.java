@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.uaa.serverinformation;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class AutoLoginRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noClientId() {
-        AutoLoginRequest.builder().code("test-code").build();
-    }
+final class AutoLoginRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noCode() {
-        AutoLoginRequest.builder().clientId("test-client-id").build();
+    @Test
+    void noClientId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AutoLoginRequest.builder().code("test-code").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noCode() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AutoLoginRequest.builder().clientId("test-client-id").build();
+                });
+    }
+
+    @Test
+    void valid() {
         AutoLoginRequest.builder().clientId("test-client-id").code("test-code").build();
     }
 }

@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.useradmin;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DeleteUserRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noUsername() {
-        DeleteUserRequest.builder().build();
+final class DeleteUserRequestTest {
+
+    @Test
+    void noUsername() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DeleteUserRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DeleteUserRequest.builder().username("test-username").build();
     }
 }

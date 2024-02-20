@@ -90,16 +90,16 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorUsersTest extends AbstractClientApiTest {
+final class ReactorUsersTest extends AbstractClientApiTest {
 
     private final ReactorUsers users =
             new ReactorUsers(CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void associateAuditedOrganization() {
+    void associateAuditedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -160,7 +160,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateAuditedSpace() {
+    void associateAuditedSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -221,7 +221,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateBillingManagedOrganization() {
+    void associateBillingManagedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -283,7 +283,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateManagedOrganization() {
+    void associateManagedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -344,7 +344,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateManagedSpace() {
+    void associateManagedSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -405,7 +405,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateOrganization() {
+    void associateOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -466,7 +466,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void associateSpace() {
+    void associateSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -527,7 +527,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -584,7 +584,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -603,7 +603,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -655,7 +655,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/users?page=-1").build())
@@ -740,7 +740,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listAuditedOrganizations() {
+    void listAuditedOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -810,7 +810,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listAuditedSpaces() {
+    void listAuditedSpaces() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -883,7 +883,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listBillingManagedOrganizations() {
+    void listBillingManagedOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -955,7 +955,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listManagedOrganizations() {
+    void listManagedOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1025,7 +1025,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listManagedSpaces() {
+    void listManagedSpaces() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1098,7 +1098,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listOrganizations() {
+    void listOrganizations() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1168,7 +1168,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSpaces() {
+    void listSpaces() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1240,7 +1240,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditedOrganization() {
+    void removeAuditedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1264,7 +1264,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeAuditedSpace() {
+    void removeAuditedSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1288,7 +1288,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeBillingManagedOrganization() {
+    void removeBillingManagedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1313,7 +1313,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeManagedOrganization() {
+    void removeManagedOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1337,7 +1337,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeManagedSpace() {
+    void removeManagedSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1361,7 +1361,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeOrganization() {
+    void removeOrganization() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1385,7 +1385,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void removeSpace() {
+    void removeSpace() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1410,7 +1410,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    public void summary() {
+    void summary() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1902,7 +1902,7 @@ public final class ReactorUsersTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

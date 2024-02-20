@@ -16,40 +16,54 @@
 
 package org.cloudfoundry.operations.applications;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.file.Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class PushApplicationRequestTest {
+final class PushApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void applicationAndDocker() {
+    @Test
+    void applicationAndDocker() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    PushApplicationRequest.builder()
+                            .path(Paths.get("test-application"))
+                            .dockerImage("test-docker")
+                            .name("test-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void noApplicationOrDocker() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    PushApplicationRequest.builder().name("test-name").build();
+                });
+    }
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    PushApplicationRequest.builder().path(Paths.get("test-application")).build();
+                });
+    }
+
+    @Test
+    void validApplication() {
         PushApplicationRequest.builder()
                 .path(Paths.get("test-application"))
-                .dockerImage("test-docker")
                 .name("test-name")
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationOrDocker() {
-        PushApplicationRequest.builder().name("test-name").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        PushApplicationRequest.builder().path(Paths.get("test-application")).build();
-    }
-
     @Test
-    public void validApplication() {
-        PushApplicationRequest.builder()
-                .path(Paths.get("test-application"))
-                .name("test-name")
-                .build();
-    }
-
-    @Test
-    public void validDocker() {
+    void validDocker() {
         PushApplicationRequest.builder().dockerImage("test-docker").name("test-name").build();
     }
 }

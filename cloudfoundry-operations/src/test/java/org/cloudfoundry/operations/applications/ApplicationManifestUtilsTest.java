@@ -20,7 +20,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatExceptionOfType;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.NONE;
 import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PORT;
-import static org.junit.Assume.assumeTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -31,13 +32,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.commons.lang3.SystemUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 
-public final class ApplicationManifestUtilsTest {
+final class ApplicationManifestUtilsTest {
 
     @Test
-    public void anchorsAndReferences() throws IOException {
+    void anchorsAndReferences() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -53,7 +54,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readCommon() throws IOException {
+    void readCommon() throws IOException {
         List<ApplicationManifest> expected =
                 Arrays.asList(
                         ApplicationManifest.builder()
@@ -113,7 +114,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readCommonAndInherit() throws IOException {
+    void readCommonAndInherit() throws IOException {
         List<ApplicationManifest> expected =
                 Arrays.asList(
                         ApplicationManifest.builder()
@@ -188,7 +189,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readDocker() throws IOException {
+    void readDocker() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -212,7 +213,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readInherit() throws IOException {
+    void readInherit() throws IOException {
         List<ApplicationManifest> expected =
                 Arrays.asList(
                         ApplicationManifest.builder()
@@ -298,7 +299,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readInheritCommon() throws IOException {
+    void readInheritCommon() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -331,7 +332,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readNoApplications() throws IOException {
+    void readNoApplications() throws IOException {
         List<ApplicationManifest> actual =
                 ApplicationManifestUtils.read(
                         new ClassPathResource("fixtures/manifest-hotel.yml").getFile().toPath());
@@ -339,20 +340,30 @@ public final class ApplicationManifestUtilsTest {
         assertThat(actual).isEmpty();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void readNoName() throws IOException {
-        ApplicationManifestUtils.read(
-                new ClassPathResource("fixtures/manifest-foxtrot.yml").getFile().toPath());
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void readNoRoute() throws IOException {
-        ApplicationManifestUtils.read(
-                new ClassPathResource("fixtures/manifest-golf.yml").getFile().toPath());
+    @Test
+    void readNoName() throws IOException {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ApplicationManifestUtils.read(
+                            new ClassPathResource("fixtures/manifest-foxtrot.yml")
+                                    .getFile()
+                                    .toPath());
+                });
     }
 
     @Test
-    public void relativePath() throws IOException {
+    void readNoRoute() throws IOException {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ApplicationManifestUtils.read(
+                            new ClassPathResource("fixtures/manifest-golf.yml").getFile().toPath());
+                });
+    }
+
+    @Test
+    void relativePath() throws IOException {
         Path root = new ClassPathResource("fixtures/manifest-november.yml").getFile().toPath();
 
         List<ApplicationManifest> expected =
@@ -368,7 +379,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void testDiskQuotaAndMemoryParsing() throws Exception {
+    void diskQuotaAndMemoryParsing() throws Exception {
         List<ApplicationManifest> expected =
                 Arrays.asList(
                         ApplicationManifest.builder()
@@ -425,7 +436,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readSingleBuildpack() throws IOException {
+    void readSingleBuildpack() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -441,7 +452,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution() throws IOException {
+    void readWithVariableSubstitution() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -460,7 +471,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_throwExceptionOnMissing() throws IOException {
+    void readWithVariableSubstitution_throwExceptionOnMissing() throws IOException {
         assertThatExceptionOfType(NoSuchElementException.class)
                 .isThrownBy(
                         () -> {
@@ -476,7 +487,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_dontEvaluateRegex() throws IOException {
+    void readWithVariableSubstitution_dontEvaluateRegex() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -493,7 +504,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_avoidEndlessSubstitution() throws IOException {
+    void readWithVariableSubstitution_avoidEndlessSubstitution() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -510,7 +521,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_dontAllowInjectionTest() throws IOException {
+    void readWithVariableSubstitution_dontAllowInjectionTest() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -527,7 +538,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_addMultipleVariablesInOneField() throws IOException {
+    void readWithVariableSubstitution_addMultipleVariablesInOneField() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -544,7 +555,7 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void readWithVariableSubstitution_noSubstitutionAtAll() throws IOException {
+    void readWithVariableSubstitution_noSubstitutionAtAll() throws IOException {
         List<ApplicationManifest> expected =
                 Collections.singletonList(
                         ApplicationManifest.builder()
@@ -561,25 +572,25 @@ public final class ApplicationManifestUtilsTest {
     }
 
     @Test
-    public void unixRead() throws IOException {
+    void unixRead() throws IOException {
         assumeTrue(SystemUtils.IS_OS_UNIX);
         read("/alpha-path", "fixtures/manifest-alpha-unix.yml");
     }
 
     @Test
-    public void unixWrite() throws IOException {
+    void unixWrite() throws IOException {
         assumeTrue(SystemUtils.IS_OS_UNIX);
         write("/alpha-path", "fixtures/manifest-echo-unix.yml");
     }
 
     @Test
-    public void windowsRead() throws IOException {
+    void windowsRead() throws IOException {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
         read("c:\\alpha-path", "fixtures/manifest-alpha-windows.yml");
     }
 
     @Test
-    public void windowsWrite() throws IOException {
+    void windowsWrite() throws IOException {
         assumeTrue(SystemUtils.IS_OS_WINDOWS);
         write("c:\\alpha-path", "fixtures/manifest-echo-windows.yml");
     }

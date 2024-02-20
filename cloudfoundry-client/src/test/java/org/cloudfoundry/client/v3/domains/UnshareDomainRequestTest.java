@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.client.v3.domains;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UnshareDomainRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        UnshareDomainRequest.builder().organizationId("test-org-id").build();
-    }
+final class UnshareDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        UnshareDomainRequest.builder().domainId("test-domain-id").build();
+    @Test
+    void noDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UnshareDomainRequest.builder().organizationId("test-org-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UnshareDomainRequest.builder().domainId("test-domain-id").build();
+                });
+    }
+
+    @Test
+    void valid() {
         UnshareDomainRequest.builder()
                 .domainId("test-domain-id")
                 .organizationId("test-org-id")

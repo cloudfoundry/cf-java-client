@@ -22,16 +22,16 @@ import java.time.Duration;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-public final class DefaultAdvancedTest extends AbstractOperationsTest {
+final class DefaultAdvancedTest extends AbstractOperationsTest {
 
     private final DefaultAdvanced advanced = new DefaultAdvanced(Mono.just(this.uaaClient));
 
     @Test
-    public void sshCode() {
+    void sshCode() {
         requestAuthorizeByAuthorizationCodeGrantApi(this.uaaClient);
 
         this.advanced

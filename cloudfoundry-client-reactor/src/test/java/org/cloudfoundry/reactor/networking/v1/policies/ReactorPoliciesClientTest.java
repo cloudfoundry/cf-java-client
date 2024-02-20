@@ -34,17 +34,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.networking.AbstractNetworkingApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
+final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
 
     private final ReactorPolicies policies =
             new ReactorPolicies(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void create() {
+    void create() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -108,7 +108,7 @@ public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -174,7 +174,7 @@ public final class ReactorPoliciesClientTest extends AbstractNetworkingApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/policies").build())

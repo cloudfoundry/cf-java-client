@@ -16,28 +16,38 @@
 
 package org.cloudfoundry.client.v3.domains;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ShareDomainRequestTest {
+final class ShareDomainRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyRelationship() {
-        ShareDomainRequest.builder()
-                .domainId("test-domain-id")
-                .data(Relationship.builder().build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noDomainId() {
-        ShareDomainRequest.builder()
-                .data(Relationship.builder().id("shared-organization-id").build())
-                .build();
+    @Test
+    void emptyRelationship() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ShareDomainRequest.builder()
+                            .domainId("test-domain-id")
+                            .data(Relationship.builder().build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noDomainId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ShareDomainRequest.builder()
+                            .data(Relationship.builder().id("shared-organization-id").build())
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         ShareDomainRequest.builder()
                 .domainId("test-domain-id")
                 .data(Relationship.builder().id("shared-organization-id").build())

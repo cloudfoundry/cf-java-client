@@ -41,8 +41,6 @@ import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
@@ -127,8 +125,14 @@ import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -144,14 +148,14 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
-public final class DefaultApplicationsTest extends AbstractOperationsTest {
+final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private RandomWords randomWords = mock(RandomWords.class, RETURNS_SMART_NULLS);
 
@@ -163,7 +167,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                     Mono.just(TEST_SPACE_ID));
 
     @Test
-    public void copySourceNoRestartOrgSpace() {
+    void copySourceNoRestartOrgSpace() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -198,7 +202,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void copySourceNoRestartSpace() {
+    void copySourceNoRestartSpace() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -229,7 +233,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void copySourceOrganizationNotFound() {
+    void copySourceOrganizationNotFound() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -257,7 +261,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void copySourceRestart() {
+    void copySourceRestart() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -290,7 +294,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void copySourceSpaceNotFound() {
+    void copySourceSpaceNotFound() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -317,7 +321,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteAndDeleteRoutes() {
+    void deleteAndDeleteRoutes() {
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
@@ -339,7 +343,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteAndDeleteRoutesFailure() {
+    void deleteAndDeleteRoutesFailure() {
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
@@ -366,7 +370,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteAndDoNotDeleteRoutes() {
+    void deleteAndDoNotDeleteRoutes() {
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
@@ -381,7 +385,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteWithBoundRoutes() {
+    void deleteWithBoundRoutes() {
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationSummary(this.cloudFoundryClient, "test-metadata-id");
@@ -405,10 +409,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableSsh() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-metadata-id", false);
+    void disableSsh() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient, "test-application-id", true);
+        requestUpdateApplicationSshV3(this.cloudFoundryClient, "test-application-id", false);
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -418,8 +423,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableSshAlreadyDisabled() {
-        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, false);
+    void disableSshAlreadyDisabled() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient, "test-application-id", false);
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -429,8 +436,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void disableSshNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    void disableSshNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .disableSsh(DisableApplicationSshRequest.builder().name("test-app-name").build())
@@ -444,10 +451,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableSsh() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
-        requestUpdateApplicationSsh(this.cloudFoundryClient, "test-application-id", true);
+    void enableSsh() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient, "test-application-id", false);
+        requestUpdateApplicationSshV3(this.cloudFoundryClient, "test-application-id", true);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -457,8 +465,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableSshAlreadyEnabled() {
-        requestApplicationsWithSsh(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, true);
+    void enableSshAlreadyEnabled() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient, "test-application-id", true);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -468,8 +478,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void enableSshNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    void enableSshNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .enableSsh(EnableApplicationSshRequest.builder().name("test-app-name").build())
@@ -483,7 +493,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -516,7 +526,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getApplicationManifest() {
+    void getApplicationManifest() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
@@ -552,7 +562,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getApplicationManifestDocker() {
+    void getApplicationManifestDocker() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationSummaryDocker(this.cloudFoundryClient, "test-application-id");
@@ -593,7 +603,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getApplicationManifestNoRoutes() {
+    void getApplicationManifestNoRoutes() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationSummaryNoRoutes(this.cloudFoundryClient, "test-application-id");
@@ -625,7 +635,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getApplicationManifestTcp() {
+    void getApplicationManifestTcp() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationSummaryTcp(this.cloudFoundryClient, "test-application-id");
@@ -661,7 +671,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getBuildpackError() {
+    void getBuildpackError() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -688,7 +698,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getDetectedBuildpack() {
+    void getDetectedBuildpack() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -721,8 +731,9 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEnvironments() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+    void getEnvironments() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestApplicationEnvironment(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
@@ -753,8 +764,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEnvironmentsNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+    void getEnvironmentsNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
                 .getEnvironments(
@@ -769,7 +780,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEvents() {
+    void getEvents() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
@@ -805,7 +816,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEventsBadTimeSparseMetadata() {
+    void getEventsBadTimeSparseMetadata() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
@@ -838,7 +849,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEventsFoundZero() {
+    void getEventsFoundZero() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(this.cloudFoundryClient, "test-metadata-id");
 
@@ -850,7 +861,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEventsLimitZero() {
+    void getEventsLimitZero() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
@@ -880,7 +891,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEventsNoRequestMetadata() {
+    void getEventsNoRequestMetadata() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
@@ -906,7 +917,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getEventsTwo() {
+    void getEventsTwo() {
         requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
@@ -958,7 +969,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getHealthCheck() {
+    void getHealthCheck() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -977,7 +988,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getInstancesError() {
+    void getInstancesError() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -1004,7 +1015,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getNoBuildpack() {
+    void getNoBuildpack() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -1037,7 +1048,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getStagingError() {
+    void getStagingError() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -1064,7 +1075,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getStoppedError() {
+    void getStoppedError() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatisticsError(this.cloudFoundryClient, "test-application-id", 200003);
@@ -1097,7 +1108,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getWithEmptyInstance() {
+    void getWithEmptyInstance() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -1130,7 +1141,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getWithEmptyInstanceStats() {
+    void getWithEmptyInstanceStats() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationEmptyStats(this.cloudFoundryClient, "test-application-id");
@@ -1163,7 +1174,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getWithNoInstances() {
+    void getWithNoInstances() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationStatistics(this.cloudFoundryClient, "test-application-id");
@@ -1190,7 +1201,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getWithNullStats() {
+    void getWithNullStats() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationNullStats(this.cloudFoundryClient, "test-application-id");
@@ -1223,7 +1234,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getWithNullUsage() {
+    void getWithNullUsage() {
         requestApplications(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationNullUsage(this.cloudFoundryClient, "test-application-id");
@@ -1258,7 +1269,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         requestSpaceSummary(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.applications
@@ -1275,7 +1286,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listTasks() {
+    void listTasks() {
         requestApplicationsV3(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-metadata-id");
         requestListTasks(this.cloudFoundryClient, "test-metadata-id");
@@ -1296,7 +1307,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void logs() {
+    void logs() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1313,7 +1324,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void logsNoApp() {
+    void logsNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -1329,7 +1340,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void logsRecent() {
+    void logsRecent() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1346,7 +1357,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void logsRecentNotSet() {
+    void logsRecentNotSet() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1363,7 +1374,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushDocker() {
+    void pushDocker() {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateDockerApplication(
@@ -1414,7 +1425,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushDockerPrivateRepository() {
+    void pushDockerPrivateRepository() {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
         requestCreateDockerApplication(
@@ -1469,7 +1480,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushDomainNotFound() throws IOException {
+    void pushDomainNotFound() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
@@ -1491,14 +1502,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
 
         this.applications
@@ -1518,7 +1526,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushExistingApplication() throws IOException {
+    void pushExistingApplication() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1544,14 +1552,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1584,7 +1589,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushExistingApplicationWithEnvironmentVariables() throws IOException {
+    void pushExistingApplicationWithEnvironmentVariables() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1615,14 +1620,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1661,7 +1663,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushExistingApplicationWithNullEnvironment() throws IOException {
+    void pushExistingApplicationWithNullEnvironment() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1688,14 +1690,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -1737,7 +1736,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushExistingRouteWithHost() throws IOException {
+    void pushExistingRouteWithHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -1767,14 +1766,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(
@@ -1800,7 +1796,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushExistingRouteWithNoHost() throws IOException {
+    void pushExistingRouteWithNoHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -1826,14 +1822,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestAssociateRoute(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestUpload(
@@ -1859,7 +1852,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushInvalidStack() throws IOException {
+    void pushInvalidStack() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1885,7 +1878,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushMultipleRoutes() throws IOException {
+    void pushMultipleRoutes() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -1908,14 +1901,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "test1", null, null);
         requestCreateRoute(
@@ -1970,7 +1960,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNewApplication() throws IOException {
+    void pushNewApplication() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -1991,14 +1981,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(
@@ -2039,7 +2026,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNewApplicationWithEnvironmentVariables() throws IOException {
+    void pushNewApplicationWithEnvironmentVariables() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -2059,14 +2046,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestPrivateDomainsEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID);
         requestSharedDomains(
@@ -2110,7 +2094,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNewRouteWithHost() throws IOException {
+    void pushNewRouteWithHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2136,14 +2120,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2177,7 +2158,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNewRouteWithNoHost() throws IOException {
+    void pushNewRouteWithNoHost() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2202,14 +2183,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2243,7 +2221,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoDomainNoneFound() throws IOException {
+    void pushNoDomainNoneFound() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2260,14 +2238,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
 
@@ -2287,7 +2262,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoDomainPrivate() throws IOException {
+    void pushNoDomainPrivate() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2305,14 +2280,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
 
@@ -2332,7 +2304,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoDomainShared() throws IOException {
+    void pushNoDomainShared() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2352,14 +2324,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2392,7 +2361,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoHostnameFlag() throws IOException {
+    void pushNoHostnameFlag() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -2414,14 +2383,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-shared-domain-id", "", null, null);
@@ -2459,7 +2425,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoInstances() throws IOException {
+    void pushNoInstances() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2483,14 +2449,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2521,7 +2484,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoRoute() throws IOException {
+    void pushNoRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2543,14 +2506,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestUpload(
@@ -2575,7 +2535,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoRouteFlag() throws IOException {
+    void pushNoRouteFlag() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -2597,14 +2557,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRemoveApplicationRoute(
@@ -2634,7 +2591,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushNoStart() throws IOException {
+    void pushNoStart() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2654,14 +2611,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutesEmpty(this.cloudFoundryClient, "test-application-id");
         requestCreateRoute(
@@ -2692,7 +2646,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushPrivateDomain() throws IOException {
+    void pushPrivateDomain() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2717,14 +2671,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2757,7 +2708,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushRandomRoute() throws IOException {
+    void pushRandomRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application.name", TEST_SPACE_ID);
@@ -2788,14 +2739,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2829,7 +2777,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushSharedDomain() throws IOException {
+    void pushSharedDomain() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2854,14 +2802,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2894,7 +2839,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushStartFailsRunning() throws IOException {
+    void pushStartFailsRunning() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2919,14 +2864,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -2963,7 +2905,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushStartFailsStaging() throws IOException {
+    void pushStartFailsStaging() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -2989,14 +2931,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -3032,7 +2971,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushTcpRandomRoute() throws IOException {
+    void pushTcpRandomRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -3053,14 +2992,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, null, null);
@@ -3095,7 +3031,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushTcpRoute() throws IOException {
+    void pushTcpRoute() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
@@ -3116,14 +3052,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
         requestRoutesEmpty(this.cloudFoundryClient, "test-tcp-domain-id", null, 61001, null);
@@ -3164,7 +3097,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void pushUploadFails() throws IOException {
+    void pushUploadFails() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
         requestApplicationsEmpty(this.cloudFoundryClient, "test-name", TEST_SPACE_ID);
@@ -3189,14 +3122,11 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient,
                 Arrays.asList(
                         new ResourceMatchingUtils.ArtifactMetadata(
-                                "da39a3ee5e6b4b0d3255bfef95601890afd80709",
-                                "Staticfile",
-                                "100644",
-                                0),
+                                "da39a3ee5e6b4b0d3255bfef95601890afd80709", "Staticfile", "644", 0),
                         new ResourceMatchingUtils.ArtifactMetadata(
                                 "45044a6ddbfe11415a8f8a6219de68a2c66b496b",
                                 "index.html",
-                                "100644",
+                                "644",
                                 178)));
         requestCreateRoute(
                 this.cloudFoundryClient,
@@ -3231,7 +3161,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void rename() {
+    void rename() {
         requestApplications(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
         requestUpdateApplicationRename(
@@ -3249,7 +3179,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void renameNoApp() {
+    void renameNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
@@ -3268,7 +3198,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restage() {
+    void restage() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3290,7 +3220,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restageInvalidApplication() {
+    void restageInvalidApplication() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -3306,7 +3236,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restageStagingFailure() {
+    void restageStagingFailure() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3329,7 +3259,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restageStartingFailurePartial() {
+    void restageStartingFailurePartial() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3351,7 +3281,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restageStartingFailureTotal() {
+    void restageStartingFailureTotal() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3379,7 +3309,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restageTimeout() {
+    void restageTimeout() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3406,7 +3336,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartFailurePartial() {
+    void restartFailurePartial() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -3426,7 +3356,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartFailureTotal() {
+    void restartFailureTotal() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -3451,7 +3381,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartInstance() {
+    void restartInstance() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3472,7 +3402,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartNoApp() {
+    void restartNoApp() {
         requestApplicationsEmpty(
                 this.cloudFoundryClient, "test-non-existent-app-name", TEST_SPACE_ID);
 
@@ -3493,7 +3423,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartNotStartedAndNotStopped() {
+    void restartNotStartedAndNotStopped() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -3513,7 +3443,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartStarted() {
+    void restartStarted() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -3533,7 +3463,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void restartStopped() {
+    void restartStopped() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -3552,7 +3482,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void runTask() {
+    void runTask() {
         requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3580,7 +3510,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void scaleDiskAndInstancesNotStarted() {
+    void scaleDiskAndInstancesNotStarted() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationScale(
@@ -3599,7 +3529,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void scaleDiskAndInstancesStarted() {
+    void scaleDiskAndInstancesStarted() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
         requestUpdateApplicationScale(
@@ -3620,7 +3550,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void scaleInstances() {
+    void scaleInstances() {
         requestApplications(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
         requestUpdateApplicationScale(this.cloudFoundryClient, "test-metadata-id", null, 2, null);
@@ -3633,7 +3563,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void scaleInstancesNoApp() {
+    void scaleInstancesNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
@@ -3648,7 +3578,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void scaleNoChange() {
+    void scaleNoChange() {
         requestApplications(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
 
@@ -3660,7 +3590,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setEnvironmentVariable() {
+    void setEnvironmentVariable() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-app",
@@ -3692,7 +3622,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setEnvironmentVariableNoApp() {
+    void setEnvironmentVariableNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
@@ -3712,7 +3642,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void setHealthCheck() {
+    void setHealthCheck() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3733,9 +3663,10 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void sshEnabled() {
-        requestApplications(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
+    void sshEnabled() {
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-application-id");
+        requestGetSshEnabled(this.cloudFoundryClient, "test-application-id", true);
 
         this.applications
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name("test-app-name").build())
@@ -3746,8 +3677,8 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void sshEnabledNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+    void sshEnabledNoApp() {
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name("test-app-name").build())
@@ -3761,7 +3692,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startApplicationFailurePartial() {
+    void startApplicationFailurePartial() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -3780,7 +3711,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startApplicationFailureTotal() {
+    void startApplicationFailureTotal() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -3805,7 +3736,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startApplicationTimeout() {
+    void startApplicationTimeout() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -3830,7 +3761,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startInvalidApplication() {
+    void startInvalidApplication() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -3846,7 +3777,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startStartedApplication() {
+    void startStartedApplication() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
 
@@ -3858,7 +3789,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void startStoppedApplication() {
+    void startStoppedApplication() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
@@ -3877,7 +3808,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void stopInvalidApplication() {
+    void stopInvalidApplication() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -3893,7 +3824,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void stopStartedApplication() {
+    void stopStartedApplication() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
@@ -3906,7 +3837,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void stopStoppedApplication() {
+    void stopStoppedApplication() {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
 
@@ -3918,7 +3849,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void terminateTask() {
+    void terminateTask() {
         requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3939,7 +3870,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void terminateTaskNoTask() {
+    void terminateTaskNoTask() {
         requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -3964,7 +3895,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetEnvironmentVariable() {
+    void unsetEnvironmentVariable() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-app",
@@ -3995,7 +3926,7 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unsetEnvironmentVariableNoApp() {
+    void unsetEnvironmentVariableNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
@@ -4049,22 +3980,22 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationEnvironment(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .environment(
-                                ApplicationEnvironmentRequest.builder()
+                        .applicationsV3()
+                        .getEnvironment(
+                                GetApplicationEnvironmentRequest.builder()
                                         .applicationId(applicationId)
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                ApplicationEnvironmentResponse.builder()
-                                        .runningEnvironmentJson(
+                                GetApplicationEnvironmentResponse.builder()
+                                        .runningEnvironmentVariable(
                                                 "running-env-name", "running-env-value")
-                                        .applicationEnvironmentJson(
+                                        .applicationEnvironmentVariable(
                                                 "application-env-name", "application-env-value")
-                                        .stagingEnvironmentJson(
+                                        .stagingEnvironmentVariable(
                                                 "staging-env-name", "staging-env-value")
-                                        .environmentJson("env-name", "env-value")
-                                        .systemEnvironmentJson(
+                                        .environmentVariable("env-name", "env-value")
+                                        .systemEnvironmentVariable(
                                                 "system-env-name", "system-env-value")
                                         .build()));
     }
@@ -4659,6 +4590,19 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .spaceId(spaceId)
                                         .build()))
                 .thenReturn(Mono.just(fill(ListSpaceApplicationsResponse.builder()).build()));
+    }
+
+    private static void requestApplicationsEmptyV3(
+            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .list(
+                                ListApplicationsRequest.builder()
+                                        .name(application)
+                                        .spaceId(spaceId)
+                                        .page(1)
+                                        .build()))
+                .thenReturn(Mono.just(fill(ListApplicationsResponse.builder()).build()));
     }
 
     private static void requestApplicationsSpecificState(
@@ -5847,6 +5791,42 @@ public final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                 ApplicationEntity.builder(),
                                                                 "application-entity-")
                                                         .build())
+                                        .build()));
+    }
+
+    private static void requestUpdateApplicationSshV3(
+            CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
+
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .updateFeature(
+                                UpdateApplicationFeatureRequest.builder()
+                                        .applicationId(applicationId)
+                                        .featureName(APP_FEATURE_SSH)
+                                        .enabled(enabled)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(UpdateApplicationFeatureResponse.builder())
+                                        .description("test-description")
+                                        .name("test-application-name")
+                                        .enabled(enabled)
+                                        .build()));
+    }
+
+    private static void requestGetSshEnabled(
+            CloudFoundryClient cloudFoundryClient, String applicationId, boolean status) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .getSshEnabled(
+                                GetApplicationSshEnabledRequest.builder()
+                                        .applicationId(applicationId)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(GetApplicationSshEnabledResponse.builder())
+                                        .reason("test-reason")
+                                        .enabled(status)
                                         .build()));
     }
 

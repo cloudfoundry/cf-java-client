@@ -18,9 +18,9 @@ package org.cloudfoundry.operations;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
+final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
     private final DefaultCloudFoundryOperations operations =
             DefaultCloudFoundryOperations.builder()
@@ -32,72 +32,72 @@ public final class DefaultCloudFoundryOperationsTest extends AbstractOperationsT
                     .build();
 
     @Test
-    public void advanced() {
+    void advanced() {
         assertThat(this.operations.advanced()).isNotNull();
     }
 
     @Test
-    public void applications() {
+    void applications() {
         assertThat(this.operations.applications()).isNotNull();
     }
 
     @Test
-    public void buildpacks() {
+    void buildpacks() {
         assertThat(this.operations.buildpacks()).isNotNull();
     }
 
     @Test
-    public void domains() {
+    void domains() {
         assertThat(this.operations.domains()).isNotNull();
     }
 
     @Test
-    public void networkPolicies() {
+    void networkPolicies() {
         assertThat(this.operations.networkPolicies()).isNotNull();
     }
 
     @Test
-    public void organizationAdmin() {
+    void organizationAdmin() {
         assertThat(this.operations.organizationAdmin()).isNotNull();
     }
 
     @Test
-    public void organizations() {
+    void organizations() {
         assertThat(this.operations.organizations()).isNotNull();
     }
 
     @Test
-    public void routes() {
+    void routes() {
         assertThat(this.operations.routes()).isNotNull();
     }
 
     @Test
-    public void serviceAdmin() {
+    void serviceAdmin() {
         assertThat(this.operations.serviceAdmin()).isNotNull();
     }
 
     @Test
-    public void services() {
+    void services() {
         assertThat(this.operations.services()).isNotNull();
     }
 
     @Test
-    public void spaceAdmin() {
+    void spaceAdmin() {
         assertThat(this.operations.spaceAdmin()).isNotNull();
     }
 
     @Test
-    public void spaces() {
+    void spaces() {
         assertThat(this.operations.spaces()).isNotNull();
     }
 
     @Test
-    public void stacks() {
+    void stacks() {
         assertThat(this.operations.stacks()).isNotNull();
     }
 
     @Test
-    public void userAdmin() {
+    void userAdmin() {
         assertThat(this.operations.userAdmin()).isNotNull();
     }
 }

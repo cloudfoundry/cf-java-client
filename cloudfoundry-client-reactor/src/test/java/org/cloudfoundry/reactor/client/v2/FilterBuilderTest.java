@@ -29,14 +29,14 @@ import java.util.stream.Stream;
 import org.cloudfoundry.client.v2.FilterParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameter;
 import org.cloudfoundry.reactor.util.UriQueryParameters;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public final class FilterBuilderTest {
+final class FilterBuilderTest {
 
     @Test
-    public void test() {
+    void test() {
         UriComponentsBuilder builder = UriComponentsBuilder.newInstance();
 
         Stream<UriQueryParameter> parameters =

@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v3.processes;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ListProcessesRequestTest {
+final class ListProcessesRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         ListProcessesRequest.builder().build();
     }
 }

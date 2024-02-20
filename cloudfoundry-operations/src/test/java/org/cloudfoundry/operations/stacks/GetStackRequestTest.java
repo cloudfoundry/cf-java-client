@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.stacks;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetStackRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        GetStackRequest.builder().build();
+final class GetStackRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetStackRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetStackRequest.builder().name("test-stack-name").build();
     }
 }

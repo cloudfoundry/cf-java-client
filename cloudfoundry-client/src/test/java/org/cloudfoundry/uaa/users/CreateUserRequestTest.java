@@ -16,33 +16,47 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CreateUserRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void incompleteName() {
-        CreateUserRequest.builder()
-                .email(Email.builder().primary(true).value("test-email").build())
-                .name(Name.builder().familyName("test-family-name").build())
-                .userName("test-userName")
-                .build();
-    }
+final class CreateUserRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noEmail() {
-        CreateUserRequest.builder().userName("test-userName").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noUserName() {
-        CreateUserRequest.builder()
-                .email(Email.builder().primary(true).value("test-email").build())
-                .build();
+    @Test
+    void incompleteName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateUserRequest.builder()
+                            .email(Email.builder().primary(true).value("test-email").build())
+                            .name(Name.builder().familyName("test-family-name").build())
+                            .userName("test-userName")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noEmail() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateUserRequest.builder().userName("test-userName").build();
+                });
+    }
+
+    @Test
+    void noUserName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateUserRequest.builder()
+                            .email(Email.builder().primary(true).value("test-email").build())
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateUserRequest.builder()
                 .email(Email.builder().primary(true).value("test-email").build())
                 .userName("test-userName")

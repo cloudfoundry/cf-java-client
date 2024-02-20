@@ -16,36 +16,50 @@
 
 package org.cloudfoundry.client.v3.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class UpdateApplicationFeatureRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        UpdateApplicationFeatureRequest.builder()
-                .applicationId("test-application-id")
-                .enabled(true)
-                .build();
-    }
+final class UpdateApplicationFeatureRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noEnabled() {
-        UpdateApplicationFeatureRequest.builder()
-                .applicationId("test-application-id")
-                .featureName("test-feature-name")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noFeatureName() {
-        UpdateApplicationFeatureRequest.builder()
-                .enabled(true)
-                .featureName("test-feature-name")
-                .build();
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateApplicationFeatureRequest.builder()
+                            .applicationId("test-application-id")
+                            .enabled(true)
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noEnabled() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateApplicationFeatureRequest.builder()
+                            .applicationId("test-application-id")
+                            .featureName("test-feature-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void noFeatureName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateApplicationFeatureRequest.builder()
+                            .enabled(true)
+                            .featureName("test-feature-name")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         UpdateApplicationFeatureRequest.builder()
                 .applicationId("test-application-id")
                 .enabled(true)

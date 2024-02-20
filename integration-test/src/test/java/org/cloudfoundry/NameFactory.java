@@ -634,5 +634,4 @@ public interface NameFactory {
     default boolean isVariableValue(String candidate) {
         return isName(VARIABLE_VALUE_PREFIX, candidate);
     }
-
 }

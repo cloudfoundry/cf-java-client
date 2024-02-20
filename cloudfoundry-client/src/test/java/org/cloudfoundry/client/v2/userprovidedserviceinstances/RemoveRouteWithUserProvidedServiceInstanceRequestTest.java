@@ -16,24 +16,36 @@
 
 package org.cloudfoundry.client.v2.userprovidedserviceinstances;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class RemoveRouteWithUserProvidedServiceInstanceRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        RemoveUserProvidedServiceInstanceRouteRequest.builder()
-                .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
-                .build();
-    }
+final class RemoveRouteWithUserProvidedServiceInstanceRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noUserProvidedServiceInstanceId() {
-        RemoveUserProvidedServiceInstanceRouteRequest.builder().routeId("test-route-id").build();
+    @Test
+    void noRouteId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveUserProvidedServiceInstanceRouteRequest.builder()
+                            .userProvidedServiceInstanceId("test-user-provided-service-instance-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noUserProvidedServiceInstanceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    RemoveUserProvidedServiceInstanceRouteRequest.builder()
+                            .routeId("test-route-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         RemoveUserProvidedServiceInstanceRouteRequest.builder()
                 .routeId("test-route-id")
                 .userProvidedServiceInstanceId("test-user-provided-service-instance-id")

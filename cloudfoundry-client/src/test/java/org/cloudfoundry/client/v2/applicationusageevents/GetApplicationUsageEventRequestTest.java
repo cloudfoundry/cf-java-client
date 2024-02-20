@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetApplicationUsageEventRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationUsageEventId() {
-        GetApplicationUsageEventRequest.builder().build();
+final class GetApplicationUsageEventRequestTest {
+
+    @Test
+    void noApplicationUsageEventId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetApplicationUsageEventRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetApplicationUsageEventRequest.builder()
                 .applicationUsageEventId("test-application-usage-event-id")
                 .build();

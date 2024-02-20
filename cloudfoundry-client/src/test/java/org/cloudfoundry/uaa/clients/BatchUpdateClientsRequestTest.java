@@ -17,23 +17,32 @@
 package org.cloudfoundry.uaa.clients;
 
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class BatchUpdateClientsRequestTest {
+final class BatchUpdateClientsRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void emptyClient() {
-        BatchUpdateClientsRequest.builder().clients().build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noClient() {
-        BatchUpdateClientsRequest.builder().build();
+    @Test
+    void emptyClient() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    BatchUpdateClientsRequest.builder().clients().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noClient() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    BatchUpdateClientsRequest.builder().build();
+                });
+    }
+
+    @Test
+    void valid() {
         BatchUpdateClientsRequest.builder()
                 .client(
                         UpdateClient.builder()

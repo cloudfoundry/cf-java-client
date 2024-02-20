@@ -16,36 +16,50 @@
 
 package org.cloudfoundry.uaa.identityproviders;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class OpenIdConnectConfigurationTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noAuthUrl() {
-        OpenIdConnectConfiguration.builder()
-                .tokenUrl("test-token-url")
-                .relyingPartyId("test-relying-party-id")
-                .build();
-    }
+final class OpenIdConnectConfigurationTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRelyingPartyId() {
-        OpenIdConnectConfiguration.builder()
-                .authUrl("test-auth-url")
-                .tokenUrl("test-token-url")
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noTokenUrl() {
-        OpenIdConnectConfiguration.builder()
-                .authUrl("test-auth-url")
-                .relyingPartyId("test-relying-party-id")
-                .build();
+    @Test
+    void noAuthUrl() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    OpenIdConnectConfiguration.builder()
+                            .tokenUrl("test-token-url")
+                            .relyingPartyId("test-relying-party-id")
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noRelyingPartyId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    OpenIdConnectConfiguration.builder()
+                            .authUrl("test-auth-url")
+                            .tokenUrl("test-token-url")
+                            .build();
+                });
+    }
+
+    @Test
+    void noTokenUrl() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    OpenIdConnectConfiguration.builder()
+                            .authUrl("test-auth-url")
+                            .relyingPartyId("test-relying-party-id")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         OpenIdConnectConfiguration.builder()
                 .authUrl("test-auth-url")
                 .tokenUrl("test-token-url")

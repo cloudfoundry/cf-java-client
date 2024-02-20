@@ -16,14 +16,16 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class CreateServiceInstanceRequestTest {
+class CreateServiceInstanceRequestTest {
 
     @Test
-    public void validManagedServiceInstance() {
+    void validManagedServiceInstance() {
         CreateServiceInstanceRequest.builder()
                 .type(ServiceInstanceType.MANAGED)
                 .name("test-service-instance-name")
@@ -50,7 +52,7 @@ public class CreateServiceInstanceRequestTest {
     }
 
     @Test
-    public void validUserProvidedServiceInstance() {
+    void validUserProvidedServiceInstance() {
         CreateServiceInstanceRequest.builder()
                 .type(ServiceInstanceType.USER_PROVIDED)
                 .syslogDrainUrl("https://syslog.com")
@@ -60,29 +62,34 @@ public class CreateServiceInstanceRequestTest {
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void testWithMissingName() {
-        CreateServiceInstanceRequest.builder()
-                .type(ServiceInstanceType.MANAGED)
-                .relationships(
-                        ServiceInstanceRelationships.builder()
-                                .servicePlan(
-                                        ToOneRelationship.builder()
-                                                .data(
-                                                        Relationship.builder()
-                                                                .id("test-service-plan-id")
-                                                                .build())
-                                                .build())
-                                .space(
-                                        ToOneRelationship.builder()
-                                                .data(
-                                                        Relationship.builder()
-                                                                .id("test-space-id")
-                                                                .build())
-                                                .build())
-                                .build())
-                .tags("foo", "bar")
-                .parameter("key", "value")
-                .build();
+    @Test
+    void withMissingName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateServiceInstanceRequest.builder()
+                            .type(ServiceInstanceType.MANAGED)
+                            .relationships(
+                                    ServiceInstanceRelationships.builder()
+                                            .servicePlan(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id(
+                                                                                    "test-service-plan-id")
+                                                                            .build())
+                                                            .build())
+                                            .space(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id("test-space-id")
+                                                                            .build())
+                                                            .build())
+                                            .build())
+                            .tags("foo", "bar")
+                            .parameter("key", "value")
+                            .build();
+                });
     }
 }

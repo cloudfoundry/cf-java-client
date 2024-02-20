@@ -22,10 +22,10 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import io.netty.handler.codec.http.HttpResponseStatus;
 import java.time.Duration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class DelegatingRootProviderTest extends AbstractRestTest {
+final class DelegatingRootProviderTest extends AbstractRestTest {
 
     private final DelegatingRootProvider rootProvider =
             DelegatingRootProvider.builder()
@@ -36,7 +36,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
                     .build();
 
     @Test
-    public void getRoot() {
+    void getRoot() {
         this.rootProvider
                 .getRoot(CONNECTION_CONTEXT)
                 .as(StepVerifier::create)
@@ -46,7 +46,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootCloudFoundryClientV2() {
+    void getRootCloudFoundryClientV2() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -68,7 +68,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootCloudFoundryClientV2Fallback() {
+    void getRootCloudFoundryClientV2Fallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -88,7 +88,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootCloudFoundryClientV3() {
+    void getRootCloudFoundryClientV3() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -110,7 +110,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootCloudFoundryClientV3Fallback() {
+    void getRootCloudFoundryClientV3Fallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -130,7 +130,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootDopplerClient() {
+    void getRootDopplerClient() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -150,7 +150,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootDopplerClientFallback() {
+    void getRootDopplerClientFallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -180,7 +180,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKeyNoKey() {
+    void getRootKeyNoKey() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -209,7 +209,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKeyNoValue() {
+    void getRootKeyNoValue() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -238,7 +238,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootNetworkingClient() {
+    void getRootNetworkingClient() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -261,7 +261,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootRoutingClientFallback() {
+    void getRootRoutingClientFallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -291,7 +291,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootTokenProviderFallback() {
+    void getRootTokenProviderFallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -321,7 +321,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootUaaClient() {
+    void getRootUaaClient() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -342,7 +342,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootUaaClientFallback() {
+    void getRootUaaClientFallback() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())
@@ -372,7 +372,7 @@ public final class DelegatingRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getWithInvalidRoot() {
+    void getWithInvalidRoot() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/").build())

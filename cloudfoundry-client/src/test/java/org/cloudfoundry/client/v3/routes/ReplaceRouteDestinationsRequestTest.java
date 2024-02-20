@@ -16,29 +16,37 @@
 
 package org.cloudfoundry.client.v3.routes;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ReplaceRouteDestinationsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noRouteId() {
-        ReplaceRouteDestinationsRequest.builder()
-                .destination(
-                        Destination.builder()
-                                .application(
-                                        Application.builder()
-                                                .applicationId("test-application-id")
-                                                .process(
-                                                        Process.builder().type("test-type").build())
-                                                .build())
-                                .destinationId("test-destination-id")
-                                .port(999)
-                                .build())
-                .build();
+class ReplaceRouteDestinationsRequestTest {
+
+    @Test
+    void noRouteId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ReplaceRouteDestinationsRequest.builder()
+                            .destination(
+                                    Destination.builder()
+                                            .application(
+                                                    Application.builder()
+                                                            .applicationId("test-application-id")
+                                                            .process(
+                                                                    Process.builder()
+                                                                            .type("test-type")
+                                                                            .build())
+                                                            .build())
+                                            .destinationId("test-destination-id")
+                                            .port(999)
+                                            .build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ReplaceRouteDestinationsRequest.builder().routeId("test-route-destination-id").build();
     }
 }

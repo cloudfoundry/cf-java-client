@@ -16,31 +16,45 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class CopySourceApplicationRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CopySourceApplicationRequest.builder().targetName("test-target-name").build();
-    }
+final class CopySourceApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noTargetName() {
-        CopySourceApplicationRequest.builder().name("test-name").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void organizationNoSpace() {
-        CopySourceApplicationRequest.builder()
-                .name("test-name")
-                .targetName("test-target-name")
-                .targetOrganization("test-target-organization")
-                .build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CopySourceApplicationRequest.builder().targetName("test-target-name").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noTargetName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CopySourceApplicationRequest.builder().name("test-name").build();
+                });
+    }
+
+    @Test
+    void organizationNoSpace() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CopySourceApplicationRequest.builder()
+                            .name("test-name")
+                            .targetName("test-target-name")
+                            .targetOrganization("test-target-organization")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CopySourceApplicationRequest.builder()
                 .name("test-name")
                 .targetName("test-target-name")

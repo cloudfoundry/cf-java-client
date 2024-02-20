@@ -37,17 +37,17 @@ import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
+class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
 
     private final ReactorLogCacheEndpoints logCacheEndpoints =
             new ReactorLogCacheEndpoints(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void info() {
+    void info() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/api/v1/info").build())
@@ -68,7 +68,7 @@ public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
     }
 
     @Test
-    public void meta() {
+    void meta() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/api/v1/meta").build())
@@ -107,7 +107,7 @@ public class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
     }
 
     @Test
-    public void read() {
+    void read() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

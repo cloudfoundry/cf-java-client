@@ -106,12 +106,12 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvide
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UpdateUserProvidedServiceInstanceResponse;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceEntity;
 import org.cloudfoundry.operations.AbstractOperationsTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
 
-public final class DefaultServicesTest extends AbstractOperationsTest {
+final class DefaultServicesTest extends AbstractOperationsTest {
 
     private final DefaultServices services =
             new DefaultServices(
@@ -120,7 +120,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
                     Mono.just(TEST_SPACE_ID));
 
     @Test
-    public void bindRouteServiceInstanceAlreadyBound() {
+    void bindRouteServiceInstanceAlreadyBound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(
@@ -146,7 +146,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindRouteServiceInstanceDomainNotFound() {
+    void bindRouteServiceInstanceDomainNotFound() {
         requestListOrganizationPrivateDomainsEmpty(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSharedDomainsEmpty(this.cloudFoundryClient, "test-domain-name");
@@ -168,7 +168,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindRouteServiceInstancePrivateDomain() {
+    void bindRouteServiceInstancePrivateDomain() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(
@@ -193,7 +193,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindRouteServiceInstancePrivateDomainWithHostAndPath() {
+    void bindRouteServiceInstancePrivateDomainWithHostAndPath() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesUserProvided(
@@ -221,7 +221,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindRouteServiceInstanceServiceInstanceNotFound() {
+    void bindRouteServiceInstanceServiceInstanceNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSpaceServiceInstancesEmpty(
@@ -247,7 +247,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindRouteServiceInstanceSharedDomain() {
+    void bindRouteServiceInstanceSharedDomain() {
         requestListOrganizationPrivateDomainsEmpty(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListSharedDomains(this.cloudFoundryClient, "test-domain-name");
@@ -273,7 +273,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindServiceInstance() {
+    void bindServiceInstance() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -296,7 +296,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindServiceInstanceAlreadyBound() {
+    void bindServiceInstanceAlreadyBound() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -320,7 +320,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindServiceInstanceNoApplication() {
+    void bindServiceInstanceNoApplication() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -343,7 +343,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void bindServiceInstanceNoServiceInstance() {
+    void bindServiceInstanceNoServiceInstance() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -367,7 +367,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createServiceInstance() {
+    void createServiceInstance() {
         requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
         requestListSpaceServicePlans(
                 this.cloudFoundryClient, "test-service-id", "test-plan", "test-plan-id");
@@ -396,7 +396,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createServiceKey() {
+    void createServiceKey() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
         requestCreateServiceKey(
@@ -418,7 +418,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createServiceKeyNoServiceInstance() {
+    void createServiceKeyNoServiceInstance() {
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance-does-not-exist", TEST_SPACE_ID);
 
@@ -442,7 +442,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void createUserProvidedServiceInstance() {
+    void createUserProvidedServiceInstance() {
         requestCreateUserProvidedServiceInstance(
                 this.cloudFoundryClient,
                 TEST_SPACE_ID,
@@ -468,7 +468,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceInstance() {
+    void deleteServiceInstance() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestDeleteServiceInstance(this.cloudFoundryClient, "test-service-instance-id");
@@ -486,7 +486,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceInstanceAcceptsIncomplete() {
+    void deleteServiceInstanceAcceptsIncomplete() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestDeleteServiceInstanceAcceptsIncomplete(
@@ -504,7 +504,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceInstanceNotFound() {
+    void deleteServiceInstanceNotFound() {
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
 
@@ -523,7 +523,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceKey() {
+    void deleteServiceKey() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeys(
@@ -546,7 +546,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceKeyNoServiceInstance() {
+    void deleteServiceKeyNoServiceInstance() {
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance", TEST_SPACE_ID);
 
@@ -568,7 +568,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteServiceKeyNoServiceKey() {
+    void deleteServiceKeyNoServiceKey() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeysEmpty(
@@ -592,7 +592,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void deleteUserProvidedServiceInstance() {
+    void deleteUserProvidedServiceInstance() {
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestDeleteUserProvidedServiceInstance(
@@ -609,7 +609,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getServiceInstanceManaged() {
+    void getServiceInstanceManaged() {
         requestListSpaceServiceInstancesManaged(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestGetServicePlan(
@@ -649,7 +649,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getServiceInstanceNoInstances() {
+    void getServiceInstanceNoInstances() {
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-invalid-name", TEST_SPACE_ID);
 
@@ -667,7 +667,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getServiceInstanceUserProvided() {
+    void getServiceInstanceUserProvided() {
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceBindings(
@@ -692,7 +692,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getServiceKey() {
+    void getServiceKey() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeys(
@@ -720,7 +720,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void getServiceKeyNoKeys() {
+    void getServiceKeyNoKeys() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeysEmpty(
@@ -744,7 +744,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstancesManagedServices() {
+    void listInstancesManagedServices() {
         requestGetSpaceSummaryManagedServices(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
@@ -765,7 +765,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstancesNoApplications() {
+    void listInstancesNoApplications() {
         requestGetSpaceSummaryManagedServicesNoApplications(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
@@ -785,7 +785,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstancesNoInstances() {
+    void listInstancesNoInstances() {
         requestGetSpaceSummaryEmpty(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
@@ -796,7 +796,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstancesOneApplication() {
+    void listInstancesOneApplication() {
         requestGetSpaceSummaryManagedServicesOneApplication(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
@@ -817,7 +817,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listInstancesUserProvidedServices() {
+    void listInstancesUserProvidedServices() {
         requestGetSpaceSummaryUserProvidedServices(this.cloudFoundryClient, TEST_SPACE_ID);
 
         this.services
@@ -835,7 +835,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceKeys() {
+    void listServiceKeys() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeys(
@@ -858,7 +858,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceKeysEmpty() {
+    void listServiceKeysEmpty() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListSpaceServiceInstanceServiceKeysEmpty(
@@ -875,7 +875,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceKeysNoServiceInstance() {
+    void listServiceKeysNoServiceInstance() {
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
 
@@ -896,7 +896,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceOfferings() {
+    void listServiceOfferings() {
         requestListSpaceServicesTwo(
                 this.cloudFoundryClient, TEST_SPACE_ID, "test-service1", "test-service2");
         requestListSpaceServicePlans(
@@ -943,7 +943,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void listServiceOfferingsSingle() {
+    void listServiceOfferingsSingle() {
         requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
         requestListSpaceServicePlans(
                 this.cloudFoundryClient,
@@ -973,7 +973,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void renameServiceInstance() {
+    void renameServiceInstance() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestRenameServiceInstance(
@@ -993,7 +993,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unbindRoute() {
+    void unbindRoute() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
@@ -1014,7 +1014,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unbindRouteServiceInstanceRouteNotFound() {
+    void unbindRouteServiceInstanceRouteNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListRoutesEmpty(this.cloudFoundryClient, "test-private-domain-id");
@@ -1037,7 +1037,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unbindRouteServiceInstanceServiceInstanceNotFound() {
+    void unbindRouteServiceInstanceServiceInstanceNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
@@ -1062,7 +1062,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unbindServiceInstance() {
+    void unbindServiceInstance() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -1084,7 +1084,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void unbindServiceInstanceFailure() {
+    void unbindServiceInstanceFailure() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -1112,7 +1112,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateService() {
+    void updateService() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
         requestGetServicePlan(
@@ -1145,7 +1145,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNewPlanDoesNotExist() {
+    void updateServiceNewPlanDoesNotExist() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
         requestGetServicePlan(
@@ -1178,7 +1178,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNoParameters() {
+    void updateServiceNoParameters() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
         requestGetServicePlan(
@@ -1210,7 +1210,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNoPlan() {
+    void updateServiceNoPlan() {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
         requestUpdateServiceInstance(
                 this.cloudFoundryClient,
@@ -1233,7 +1233,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNoPlanExists() {
+    void updateServiceNoPlanExists() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, null);
 
@@ -1256,7 +1256,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNoTags() {
+    void updateServiceNoTags() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
         requestGetServicePlan(
@@ -1288,7 +1288,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNotPublic() {
+    void updateServiceNotPublic() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
         requestGetServicePlan(
@@ -1320,7 +1320,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServiceNotVisible() {
+    void updateServiceNotVisible() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-plan-id");
         requestGetServicePlan(
@@ -1351,7 +1351,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateServicePlanNotUpdateable() {
+    void updateServicePlanNotUpdateable() {
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID, "test-service-plan-id");
         requestGetServicePlan(
@@ -1381,7 +1381,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateUserProvidedService() {
+    void updateUserProvidedService() {
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
         requestUpdateUserProvidedServiceInstance(
@@ -1405,7 +1405,7 @@ public final class DefaultServicesTest extends AbstractOperationsTest {
     }
 
     @Test
-    public void updateUserProvidedServiceNotUserProvided() {
+    void updateUserProvidedServiceNotUserProvided() {
         requestListSpaceServiceInstances(this.cloudFoundryClient, "test-service", TEST_SPACE_ID);
 
         this.services

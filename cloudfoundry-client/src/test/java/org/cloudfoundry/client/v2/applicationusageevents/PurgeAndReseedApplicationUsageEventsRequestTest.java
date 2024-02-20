@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.client.v2.applicationusageevents;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class PurgeAndReseedApplicationUsageEventsRequestTest {
+final class PurgeAndReseedApplicationUsageEventsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         PurgeAndReseedApplicationUsageEventsRequest.builder().build();
     }
 }

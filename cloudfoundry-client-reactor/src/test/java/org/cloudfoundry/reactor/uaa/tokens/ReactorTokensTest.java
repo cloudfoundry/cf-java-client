@@ -48,17 +48,17 @@ import org.cloudfoundry.uaa.tokens.RefreshTokenRequest;
 import org.cloudfoundry.uaa.tokens.RefreshTokenResponse;
 import org.cloudfoundry.uaa.tokens.TokenFormat;
 import org.cloudfoundry.uaa.tokens.TokenKey;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorTokensTest extends AbstractUaaApiTest {
+final class ReactorTokensTest extends AbstractUaaApiTest {
 
     private final ReactorTokens tokens =
             new ReactorTokens(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void check() {
+    void check() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -126,7 +126,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getKey() {
+    void getKey() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/token_key").build())
@@ -167,7 +167,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByAuthorizationCode() {
+    void getTokenByAuthorizationCode() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -210,7 +210,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByClientCredentials() {
+    void getTokenByClientCredentials() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -252,7 +252,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByOneTimePasscode() {
+    void getTokenByOneTimePasscode() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -295,7 +295,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByOpenId() {
+    void getTokenByOpenId() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -340,7 +340,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void getTokenByPassword() {
+    void getTokenByPassword() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -385,7 +385,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void listKeys() {
+    void listKeys() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/token_keys").build())
@@ -429,7 +429,7 @@ public final class ReactorTokensTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void refreshToken() {
+    void refreshToken() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

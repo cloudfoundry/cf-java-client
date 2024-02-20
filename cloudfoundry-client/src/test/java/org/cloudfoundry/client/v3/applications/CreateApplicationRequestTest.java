@@ -16,32 +16,45 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CreateApplicationRequestTest {
+final class CreateApplicationRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateApplicationRequest.builder()
-                .relationships(
-                        ApplicationRelationships.builder()
-                                .space(
-                                        ToOneRelationship.builder()
-                                                .data(Relationship.builder().id("test-id").build())
-                                                .build())
-                                .build())
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noRelationships() {
-        CreateApplicationRequest.builder().name("test-name").build();
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateApplicationRequest.builder()
+                            .relationships(
+                                    ApplicationRelationships.builder()
+                                            .space(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id("test-id")
+                                                                            .build())
+                                                            .build())
+                                            .build())
+                            .build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noRelationships() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateApplicationRequest.builder().name("test-name").build();
+                });
+    }
+
+    @Test
+    void valid() {
         CreateApplicationRequest.builder()
                 .name("test-name")
                 .relationships(

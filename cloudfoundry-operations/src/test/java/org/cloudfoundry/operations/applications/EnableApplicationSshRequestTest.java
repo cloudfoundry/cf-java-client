@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class EnableApplicationSshRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        EnableApplicationSshRequest.builder().build();
+final class EnableApplicationSshRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    EnableApplicationSshRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         EnableApplicationSshRequest.builder().name("test-name").build();
     }
 }

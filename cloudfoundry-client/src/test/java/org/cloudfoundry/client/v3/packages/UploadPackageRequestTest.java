@@ -16,26 +16,36 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class UploadPackageRequestTest {
+final class UploadPackageRequestTest {
 
     private static final Path TEST_PACKAGE = Paths.get("/");
 
-    @Test(expected = IllegalStateException.class)
-    public void neitherBitsNorResources() {
-        UploadPackageRequest.builder().packageId("test-package-id").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noPackageId() {
-        UploadPackageRequest.builder().bits(TEST_PACKAGE).build();
+    @Test
+    void neitherBitsNorResources() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UploadPackageRequest.builder().packageId("test-package-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noPackageId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UploadPackageRequest.builder().bits(TEST_PACKAGE).build();
+                });
+    }
+
+    @Test
+    void valid() {
         UploadPackageRequest.builder().bits(TEST_PACKAGE).packageId("test-package-id").build();
     }
 }

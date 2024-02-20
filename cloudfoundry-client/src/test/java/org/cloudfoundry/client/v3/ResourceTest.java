@@ -16,23 +16,36 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.immutables.value.Value;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class ResourceTest {
+final class ResourceTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noCreatedAt() {
-        StubResource.builder().id("test-id").updatedAt("test-updated-at").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noId() {
-        StubResource.builder().createdAt("test-created-at").updatedAt("test-updated-at").build();
+    @Test
+    void noCreatedAt() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    StubResource.builder().id("test-id").updatedAt("test-updated-at").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    StubResource.builder()
+                            .createdAt("test-created-at")
+                            .updatedAt("test-updated-at")
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         StubResource.builder()
                 .createdAt("test-created-at")
                 .id("test-id")

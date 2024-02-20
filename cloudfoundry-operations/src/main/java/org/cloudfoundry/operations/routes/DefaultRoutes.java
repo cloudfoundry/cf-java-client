@@ -1,23 +1,20 @@
 /*
  * Copyright 2013-2021 the original author or authors.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except
+ * in compliance with the License. You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Unless required by applicable law or agreed to in writing, software distributed under the License
+ * is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express
+ * or implied. See the License for the specific language governing permissions and limitations under
+ * the License.
  */
 
 package org.cloudfoundry.operations.routes;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 import java.time.Duration;
 import java.util.Collections;
@@ -38,10 +35,8 @@ import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.routes.AbstractRouteResource;
 import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
-import org.cloudfoundry.client.v2.routes.DeleteRouteResponse;
 import org.cloudfoundry.client.v2.routes.ListRouteApplicationsRequest;
 import org.cloudfoundry.client.v2.routes.RouteEntity;
-import org.cloudfoundry.client.v2.routes.RouteExistsRequest;
 import org.cloudfoundry.client.v2.routes.RouteResource;
 import org.cloudfoundry.client.v2.serviceinstances.UnionServiceInstanceResource;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
@@ -50,6 +45,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceRoutesRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.domains.CheckReservedRoutesRequest;
+import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationDomainsRequest;
+import org.cloudfoundry.client.v3.spaces.DeleteUnmappedRoutesRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
@@ -81,24 +80,60 @@ public final class DefaultRoutes implements Routes {
         return Mono.zip(this.cloudFoundryClient, this.organizationId)
                 .flatMap(
                         function(
-                                (cloudFoundryClient, organizationId) ->
+                                (client, organizationId) ->
                                         Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getOptionalDomainId(
-                                                        cloudFoundryClient,
+                                                this.cloudFoundryClient,
+                                                getOptionalDomainIdByName(
+                                                        client,
                                                         organizationId,
                                                         request.getDomain()))))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, domainId) ->
-                                        requestRouteExists(
-                                                cloudFoundryClient,
+                                (client, domainId) ->
+                                        routeExists(
+                                                client,
                                                 domainId,
                                                 request.getHost(),
                                                 request.getPath())))
                 .defaultIfEmpty(false)
                 .transform(OperationsLogging.log("Check Route Exists"))
                 .checkpoint();
+    }
+
+    private static Mono<Boolean> routeExists(
+            CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
+        return cloudFoundryClient
+                .domainsV3()
+                .checkReservedRoutes(
+                        CheckReservedRoutesRequest.builder()
+                                .domainId(domainId)
+                                .host(host)
+                                .path(path)
+                                .build())
+                .flatMap(response -> Mono.just(response.getMatchingRoute()));
+    }
+
+    private static Mono<String> getOptionalDomainIdByName(
+            CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
+        return listDomains(cloudFoundryClient, organizationId, new String[] {domain})
+                .singleOrEmpty()
+                .map(resource -> resource.getId());
+    }
+
+    private static Flux<DomainResource> listDomains(
+            CloudFoundryClient cloudFoundryClient,
+            String organizationId,
+            String[] domainNamesFilter) {
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        cloudFoundryClient
+                                .organizationsV3()
+                                .listDomains(
+                                        ListOrganizationDomainsRequest.builder()
+                                                .names(domainNamesFilter)
+                                                .page(page)
+                                                .organizationId(organizationId)
+                                                .build()));
     }
 
     @Override
@@ -170,43 +205,22 @@ public final class DefaultRoutes implements Routes {
     @Override
     public Mono<Void> deleteOrphanedRoutes(DeleteOrphanedRoutesRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMapMany(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        requestSpaceRoutes(cloudFoundryClient, spaceId)
-                                                .filter(
-                                                        route ->
-                                                                isRouteOrphan(
-                                                                        ResourceUtils.getEntity(
-                                                                                route)))
-                                                .map(ResourceUtils::getId)
-                                                .map(
-                                                        routeId ->
-                                                                Tuples.of(
-                                                                        cloudFoundryClient,
-                                                                        routeId))))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, routeId) ->
-                                        getApplications(cloudFoundryClient, routeId)
-                                                .map(
-                                                        applicationResources ->
-                                                                Tuples.of(
-                                                                        cloudFoundryClient,
-                                                                        applicationResources,
-                                                                        routeId))))
-                .filter(
-                        predicate(
-                                (cloudFoundryClient, applicationResources, routeId) ->
-                                        isApplicationOrphan(applicationResources)))
+                                (client, spaceId) ->
+                                        Mono.zip(
+                                                this.cloudFoundryClient,
+                                                client.spacesV3()
+                                                        .deleteUnmappedRoutes(
+                                                                DeleteUnmappedRoutesRequest
+                                                                        .builder()
+                                                                        .spaceId(spaceId)
+                                                                        .build()))))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, applicationResources, routeId) ->
-                                        deleteRoute(
-                                                cloudFoundryClient,
-                                                request.getCompletionTimeout(),
-                                                routeId)))
-                .then()
+                                (client, job) ->
+                                        JobUtils.waitForCompletion(
+                                                client, request.getCompletionTimeout(), job)))
                 .transform(OperationsLogging.log("Delete Orphaned Routes"))
                 .checkpoint();
     }
@@ -324,15 +338,6 @@ public final class DefaultRoutes implements Routes {
                 .checkpoint();
     }
 
-    private static Mono<Void> deleteRoute(
-            CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String routeId) {
-        return requestDeleteRoute(cloudFoundryClient, routeId)
-                .flatMap(
-                        job ->
-                                JobUtils.waitForCompletion(
-                                        cloudFoundryClient, completionTimeout, job));
-    }
-
     private static Mono<Map<String, String>> getAllDomains(
             CloudFoundryClient cloudFoundryClient, String organizationId) {
         return requestAllPrivateDomains(cloudFoundryClient, organizationId)
@@ -386,11 +391,6 @@ public final class DefaultRoutes implements Routes {
                 .collectList();
     }
 
-    private static Mono<List<ApplicationResource>> getApplications(
-            CloudFoundryClient cloudFoundryClient, String routeId) {
-        return requestApplications(cloudFoundryClient, routeId).collectList();
-    }
-
     private static Mono<Resource<?>> getDomain(
             CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
         return getDomains(cloudFoundryClient, organizationId, domain)
@@ -414,13 +414,6 @@ public final class DefaultRoutes implements Routes {
         return requestPrivateDomains(cloudFoundryClient, organizationId, domain)
                 .map((Function<PrivateDomainResource, Resource<?>>) in -> in)
                 .switchIfEmpty(requestSharedDomains(cloudFoundryClient, domain));
-    }
-
-    private static Mono<String> getOptionalDomainId(
-            CloudFoundryClient cloudFoundryClient, String organizationId, String domain) {
-        return getDomains(cloudFoundryClient, organizationId, domain)
-                .singleOrEmpty()
-                .map(ResourceUtils::getId);
     }
 
     private static Mono<AbstractRouteResource> getOrCreateRoute(
@@ -562,10 +555,6 @@ public final class DefaultRoutes implements Routes {
         return Mono.just(spaces.get(spaceId));
     }
 
-    private static boolean isApplicationOrphan(List<ApplicationResource> applications) {
-        return applications.isEmpty();
-    }
-
     private static boolean isIdentical(String s, String t) {
         return s == null ? t == null : s.equals(t);
     }
@@ -673,13 +662,21 @@ public final class DefaultRoutes implements Routes {
                 .create(builder.domainId(domainId).spaceId(spaceId).build());
     }
 
-    private static Mono<DeleteRouteResponse> requestDeleteRoute(
+    private static Mono<Void> deleteRoute(
+            CloudFoundryClient cloudFoundryClient, Duration completionTimeout, String routeId) {
+        return requestDeleteRoute(cloudFoundryClient, routeId)
+                .flatMap(
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        cloudFoundryClient, completionTimeout, job));
+    }
+
+    private static Mono<String> requestDeleteRoute(
             CloudFoundryClient cloudFoundryClient, String routeId) {
         return cloudFoundryClient
-                .routes()
+                .routesV3()
                 .delete(
-                        org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-                                .async(true)
+                        org.cloudfoundry.client.v3.routes.DeleteRouteRequest.builder()
                                 .routeId(routeId)
                                 .build());
     }
@@ -720,18 +717,6 @@ public final class DefaultRoutes implements Routes {
                         RemoveApplicationRouteRequest.builder()
                                 .applicationId(applicationId)
                                 .routeId(routeId)
-                                .build());
-    }
-
-    private static Mono<Boolean> requestRouteExists(
-            CloudFoundryClient cloudFoundryClient, String domainId, String host, String path) {
-        return cloudFoundryClient
-                .routes()
-                .exists(
-                        RouteExistsRequest.builder()
-                                .domainId(domainId)
-                                .host(host)
-                                .path(path)
                                 .build());
     }
 
@@ -826,9 +811,5 @@ public final class DefaultRoutes implements Routes {
         service.ifPresent(builder::service);
 
         return builder.build();
-    }
-
-    private boolean isRouteOrphan(RouteEntity entity) {
-        return entity.getServiceInstanceId() == null || entity.getServiceInstanceId().isEmpty();
     }
 }

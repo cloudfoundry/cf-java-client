@@ -35,17 +35,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
+final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
 
     private final ReactorServiceUsageEvents serviceUsageEvents =
             new ReactorServiceUsageEvents(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -102,7 +102,7 @@ public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -166,7 +166,7 @@ public final class ReactorServiceUsageEventsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void purgeAndReseed() {
+    void purgeAndReseed() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

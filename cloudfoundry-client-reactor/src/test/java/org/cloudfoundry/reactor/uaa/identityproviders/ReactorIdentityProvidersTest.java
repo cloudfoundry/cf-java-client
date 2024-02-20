@@ -50,17 +50,17 @@ import org.cloudfoundry.uaa.identityproviders.SamlConfiguration;
 import org.cloudfoundry.uaa.identityproviders.Type;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderRequest;
 import org.cloudfoundry.uaa.identityproviders.UpdateIdentityProviderResponse;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
+final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
 
     private final ReactorIdentityProviders identityProviders =
             new ReactorIdentityProviders(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void createLdap() {
+    void createLdap() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -135,7 +135,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void createOauth() {
+    void createOauth() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -208,7 +208,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void createSaml() {
+    void createSaml() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -341,7 +341,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void delete() {
+    void delete() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -429,7 +429,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -517,7 +517,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -673,7 +673,7 @@ public final class ReactorIdentityProvidersTest extends AbstractUaaApiTest {
     }
 
     @Test
-    public void update() {
+    void update() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

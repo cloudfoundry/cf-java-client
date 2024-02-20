@@ -16,27 +16,35 @@
 
 package org.cloudfoundry.client.v3.serviceinstances;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public class UpdateServiceInstanceRequestTest {
+class UpdateServiceInstanceRequestTest {
 
     @Test
-    public void testServiceInstanceIdOnly() {
+    void serviceInstanceIdOnly() {
         UpdateServiceInstanceRequest.builder()
                 .serviceInstanceId("test-service-instance-id")
                 .build();
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceInstanceId() {
-        UpdateServiceInstanceRequest.builder().metadata(Metadata.builder().build()).build();
+    @Test
+    void noServiceInstanceId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    UpdateServiceInstanceRequest.builder()
+                            .metadata(Metadata.builder().build())
+                            .build();
+                });
     }
 
     @Test
-    public void validManagedServiceInstance() {
+    void validManagedServiceInstance() {
         UpdateServiceInstanceRequest.builder()
                 .metadata(Metadata.builder().build())
                 .serviceInstanceId("test-service-instance-id")

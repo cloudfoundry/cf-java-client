@@ -16,22 +16,32 @@
 
 package org.cloudfoundry.uaa.groups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class MapExternalGroupRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noExternalGroup() {
-        MapExternalGroupRequest.builder().groupId("test-group-id").build();
-    }
+final class MapExternalGroupRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noGroupId() {
-        MapExternalGroupRequest.builder().externalGroup("test-external-group").build();
+    @Test
+    void noExternalGroup() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    MapExternalGroupRequest.builder().groupId("test-group-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    MapExternalGroupRequest.builder().externalGroup("test-external-group").build();
+                });
+    }
+
+    @Test
+    void valid() {
         MapExternalGroupRequest.builder()
                 .groupId("test-group-id")
                 .externalGroup("test-external-group")

@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v2.OrderDirection.ASCENDING;
 import static org.cloudfoundry.client.v2.OrderDirection.DESCENDING;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class PaginatedRequestTest {
+final class PaginatedRequestTest {
 
     @Test
-    public void orderedBy() {
+    void orderedBy() {
         assertThat(ASCENDING.getValue()).isEqualTo("asc");
         assertThat(DESCENDING.getValue()).isEqualTo("desc");
     }

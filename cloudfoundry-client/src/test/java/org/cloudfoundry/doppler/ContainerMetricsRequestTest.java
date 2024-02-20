@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.doppler;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ContainerMetricsRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noApplicationId() {
-        ContainerMetricsRequest.builder().build();
+final class ContainerMetricsRequestTest {
+
+    @Test
+    void noApplicationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ContainerMetricsRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ContainerMetricsRequest.builder().applicationId("test-application-id").build();
     }
 }

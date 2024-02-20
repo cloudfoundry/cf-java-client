@@ -20,10 +20,10 @@ import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import java.time.Duration;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class InfoPayloadRootProviderTest extends AbstractRestTest {
+final class InfoPayloadRootProviderTest extends AbstractRestTest {
 
     private final InfoPayloadRootProvider rootProvider =
             InfoPayloadRootProvider.builder()
@@ -34,7 +34,7 @@ public final class InfoPayloadRootProviderTest extends AbstractRestTest {
                     .build();
 
     @Test
-    public void getRoot() {
+    void getRoot() {
         this.rootProvider
                 .getRoot(CONNECTION_CONTEXT)
                 .as(StepVerifier::create)
@@ -44,7 +44,7 @@ public final class InfoPayloadRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKey() {
+    void getRootKey() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/v2/info").build())
@@ -64,7 +64,7 @@ public final class InfoPayloadRootProviderTest extends AbstractRestTest {
     }
 
     @Test
-    public void getRootKeyNoKey() {
+    void getRootKeyNoKey() {
         mockRequest(
                 InteractionContext.builder()
                         .request(TestRequest.builder().method(GET).path("/v2/info").build())

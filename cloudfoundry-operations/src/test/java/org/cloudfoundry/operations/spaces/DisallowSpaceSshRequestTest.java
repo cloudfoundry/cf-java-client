@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.spaces;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DisallowSpaceSshRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        DisallowSpaceSshRequest.builder().build();
+final class DisallowSpaceSshRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DisallowSpaceSshRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DisallowSpaceSshRequest.builder().name("test-name").build();
     }
 }

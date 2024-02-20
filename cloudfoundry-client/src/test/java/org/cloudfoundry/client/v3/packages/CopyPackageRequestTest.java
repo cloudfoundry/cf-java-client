@@ -16,32 +16,45 @@
 
 package org.cloudfoundry.client.v3.packages;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class CopyPackageRequestTest {
+final class CopyPackageRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noRelationships() {
-        CopyPackageRequest.builder().sourcePackageId("test-source-package-id").build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void noSourcePackageId() {
-        CopyPackageRequest.builder()
-                .relationships(
-                        PackageRelationships.builder()
-                                .application(
-                                        ToOneRelationship.builder()
-                                                .data(Relationship.builder().id("test-id").build())
-                                                .build())
-                                .build())
-                .build();
+    @Test
+    void noRelationships() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CopyPackageRequest.builder().sourcePackageId("test-source-package-id").build();
+                });
     }
 
     @Test
-    public void valid() {
+    void noSourcePackageId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CopyPackageRequest.builder()
+                            .relationships(
+                                    PackageRelationships.builder()
+                                            .application(
+                                                    ToOneRelationship.builder()
+                                                            .data(
+                                                                    Relationship.builder()
+                                                                            .id("test-id")
+                                                                            .build())
+                                                            .build())
+                                            .build())
+                            .build();
+                });
+    }
+
+    @Test
+    void valid() {
         CopyPackageRequest.builder()
                 .relationships(
                         PackageRelationships.builder()

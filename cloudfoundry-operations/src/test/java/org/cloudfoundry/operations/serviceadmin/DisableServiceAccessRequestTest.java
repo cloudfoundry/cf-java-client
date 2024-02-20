@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.operations.serviceadmin;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class DisableServiceAccessRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noServiceName() {
-        DisableServiceAccessRequest.builder().build();
+final class DisableServiceAccessRequestTest {
+
+    @Test
+    void noServiceName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    DisableServiceAccessRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         DisableServiceAccessRequest.builder().serviceName("test-service-name").build();
     }
 }

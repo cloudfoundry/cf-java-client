@@ -16,20 +16,26 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class CreateSecurityGroupRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noName() {
-        CreateSecurityGroupRequest.builder()
-                .rule(RuleEntity.builder().build())
-                .spaceId("test-space-id")
-                .build();
+class CreateSecurityGroupRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    CreateSecurityGroupRequest.builder()
+                            .rule(RuleEntity.builder().build())
+                            .spaceId("test-space-id")
+                            .build();
+                });
     }
 
     @Test
-    public void validMax() {
+    void validMax() {
         CreateSecurityGroupRequest.builder()
                 .name("test-security-group-name")
                 .rule(RuleEntity.builder().build())
@@ -38,7 +44,7 @@ public class CreateSecurityGroupRequestTest {
     }
 
     @Test
-    public void validMin() {
+    void validMin() {
         CreateSecurityGroupRequest.builder().name("test-security-group-name").build();
     }
 }

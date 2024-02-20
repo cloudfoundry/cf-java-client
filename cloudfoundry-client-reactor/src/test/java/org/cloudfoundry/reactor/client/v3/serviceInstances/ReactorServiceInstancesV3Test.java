@@ -62,17 +62,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
+final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
 
     private final ReactorServiceInstancesV3 serviceInstances =
             new ReactorServiceInstancesV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void getManagedServiceParameters() {
+    void getManagedServiceParameters() {
         Map<String, Object> parameters = new HashMap<>();
         parameters.put("key_1", "value_1");
         parameters.put("key_2", "value_2");
@@ -108,7 +108,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUserProvidedCredentials() {
+    void getUserProvidedCredentials() {
         Map<String, Object> credentials = new HashMap<>();
         credentials.put("username", "my-username");
         credentials.put("password", "super-secret");
@@ -145,7 +145,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void get() {
+    void get() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -254,7 +254,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -378,7 +378,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void listSharedSpaces() {
+    void listSharedSpaces() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -423,7 +423,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void share() {
+    void share() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -472,7 +472,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void unshare() {
+    void unshare() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -496,7 +496,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void createManagedServiceInstance() {
+    void createManagedServiceInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -556,7 +556,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void testCreateUserProvidedService() {
+    void createUserProvidedService() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -676,7 +676,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateManagedServiceInstance() {
+    void updateManagedServiceInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -824,7 +824,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateManagedServiceInstanceAsync() {
+    void updateManagedServiceInstanceAsync() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -878,7 +878,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void updateUserProvidedServiceInstance() {
+    void updateUserProvidedServiceInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -988,7 +988,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteManagedServiceInstance() {
+    void deleteManagedServiceInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -1016,7 +1016,7 @@ public final class ReactorServiceInstancesV3Test extends AbstractClientApiTest {
     }
 
     @Test
-    public void deleteUserProvidedServiceInstance() {
+    void deleteUserProvidedServiceInstance() {
         mockRequest(
                 InteractionContext.builder()
                         .request(

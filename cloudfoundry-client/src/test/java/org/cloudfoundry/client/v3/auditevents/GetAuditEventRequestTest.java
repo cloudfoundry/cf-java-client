@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v3.auditevents;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class GetAuditEventRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void invalid() {
-        GetAuditEventRequest.builder().build();
+final class GetAuditEventRequestTest {
+
+    @Test
+    void invalid() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    GetAuditEventRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         GetAuditEventRequest.builder().eventId("test-event-id").build();
     }
 }

@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.users;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class SummaryUserRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noUaaId() {
-        SummaryUserRequest.builder().build();
+final class SummaryUserRequestTest {
+
+    @Test
+    void noUaaId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    SummaryUserRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         SummaryUserRequest.builder().userId("test-uaa-id").build();
     }
 }

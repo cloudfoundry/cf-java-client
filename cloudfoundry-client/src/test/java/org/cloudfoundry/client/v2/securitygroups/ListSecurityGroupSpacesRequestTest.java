@@ -16,17 +16,23 @@
 
 package org.cloudfoundry.client.v2.securitygroups;
 
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public final class ListSecurityGroupSpacesRequestTest {
+import org.junit.jupiter.api.Test;
 
-    @Test(expected = IllegalStateException.class)
-    public void noSecurityGroupId() {
-        ListSecurityGroupSpacesRequest.builder().build();
+final class ListSecurityGroupSpacesRequestTest {
+
+    @Test
+    void noSecurityGroupId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    ListSecurityGroupSpacesRequest.builder().build();
+                });
     }
 
     @Test
-    public void valid() {
+    void valid() {
         ListSecurityGroupSpacesRequest.builder().securityGroupId("test-security-group-id").build();
     }
 }

@@ -1,0 +1,18 @@
+{
+    "data": [
+        {
+            "guid": "space-guid1"
+        },
+        {
+            "guid": "space-guid2"
+        },
+        {
+            "guid": "previous-space-guid"
+        }
+    ],
+    "links": {
+        "self": {
+            "href": "https://api.example.org/v3/security_groups/b85a788e-671f-4549-814d-e34cdb2f539a/relationships/running_spaces"
+        }
+    }
+}

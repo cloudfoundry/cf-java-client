@@ -16,20 +16,26 @@
 
 package org.cloudfoundry.client.v3.spaces;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.cloudfoundry.client.v3.Relationship;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class AssignSpaceIsolationSegmentRequestTest {
+final class AssignSpaceIsolationSegmentRequestTest {
 
-    @Test(expected = IllegalStateException.class)
-    public void noOrganizationId() {
-        AssignSpaceIsolationSegmentRequest.builder()
-                .data(Relationship.builder().id("test-isolation-segment-id").build())
-                .build();
+    @Test
+    void noOrganizationId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> {
+                    AssignSpaceIsolationSegmentRequest.builder()
+                            .data(Relationship.builder().id("test-isolation-segment-id").build())
+                            .build();
+                });
     }
 
     @Test
-    public void validData() {
+    void validData() {
         AssignSpaceIsolationSegmentRequest.builder()
                 .data(Relationship.builder().id("test-isolation-segment-id").build())
                 .spaceId("test-space-id")
@@ -37,7 +43,7 @@ public final class AssignSpaceIsolationSegmentRequestTest {
     }
 
     @Test
-    public void validNoData() {
+    void validNoData() {
         AssignSpaceIsolationSegmentRequest.builder().spaceId("test-space-id").build();
     }
 }

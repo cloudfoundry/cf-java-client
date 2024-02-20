@@ -16,12 +16,12 @@
 
 package org.cloudfoundry.uaa.users;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
-public final class LookupUserIdsRequestTest {
+final class LookupUserIdsRequestTest {
 
     @Test
-    public void valid() {
+    void valid() {
         LookupUserIdsRequest.builder().build();
     }
 }

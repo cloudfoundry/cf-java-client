@@ -1,0 +1,17 @@
+{
+    "name": "my-group0",
+    "rules": [
+        {
+            "protocol": "tcp",
+            "destination": "10.10.10.0/24",
+            "ports": "443,80,8080"
+        },
+        {
+            "protocol": "icmp",
+            "destination": "10.10.10.0/24",
+            "type": 8,
+            "code": 0,
+            "description": "Allow ping requests to private services"
+        }
+    ]
+}

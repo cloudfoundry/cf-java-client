@@ -33,17 +33,17 @@ import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.client.AbstractClientApiTest;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
+final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
 
     private final ReactorFeatureFlags featureFlags =
             new ReactorFeatureFlags(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    public void getAppScaling() {
+    void getAppScaling() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -73,7 +73,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void getUserRoles() {
+    void getUserRoles() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -103,7 +103,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void list() {
+    void list() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
@@ -209,7 +209,7 @@ public final class ReactorFeatureFlagsTest extends AbstractClientApiTest {
     }
 
     @Test
-    public void set() {
+    void set() {
         mockRequest(
                 InteractionContext.builder()
                         .request(
