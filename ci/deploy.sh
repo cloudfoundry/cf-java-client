@@ -28,4 +28,4 @@ cat <<EOF > ~/.m2/settings.xml
 EOF
 
 cd cf-java-client
-./mvnw -Dmaven.test.skip=true deploy
+./mvnw -Dmaven.test.skip=true -DcreateChecksum=true deploy
