@@ -24,6 +24,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
+
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -125,24 +128,40 @@ public final class ResourceMatchingUtilsV3 {
         return Flux.fromIterable(artifactMetadatas);
     }
 
-    private static Mono<ListMatchingResourcesResponse> requestListMatchingResources(
+    static Mono<ListMatchingResourcesResponse> requestListMatchingResources(
             CloudFoundryClient cloudFoundryClient, Collection<ArtifactMetadata> artifactMetadatas) {
-        ListMatchingResourcesRequest request =
-                artifactMetadatas.stream()
-                        .reduce(
-                                ListMatchingResourcesRequest.builder(),
-                                (builder, artifactMetadata) ->
-                                        builder.resource(
-                                                MatchedResource.builder()
-                                                        .checksum(artifactMetadata.getChecksum())
-                                                        .mode(artifactMetadata.getPermissions())
-                                                        .size(artifactMetadata.getSize())
-                                                        .path(artifactMetadata.getPath())
-                                                        .build()),
-                                (a, b) -> a.addAllResources(b.build().getResources()))
-                        .build();
+        Collection<List<ArtifactMetadata>> chunksOfArtifactMetadatas = chunkArtifactMetadatas(artifactMetadatas, 5000);
 
-        return cloudFoundryClient.resourceMatchV3().list(request);
+        List<ListMatchingResourcesResponse> matchingResourcesResponse = new ArrayList<>();
+
+        chunksOfArtifactMetadatas.forEach(chunkOfArtifactMetadatas -> {
+            ListMatchingResourcesRequest request =
+                    chunkOfArtifactMetadatas.stream()
+                            .reduce(
+                                    ListMatchingResourcesRequest.builder(),
+                                    (builder, artifactMetadata) ->
+                                            builder.resource(
+                                                    MatchedResource.builder()
+                                                            .checksum(artifactMetadata.getChecksum())
+                                                            .mode(artifactMetadata.getPermissions())
+                                                            .size(artifactMetadata.getSize())
+                                                            .path(artifactMetadata.getPath())
+                                                            .build()),
+                                    (a, b) -> a.addAllResources(b.build().getResources()))
+                            .build();
+
+            matchingResourcesResponse.add(cloudFoundryClient.resourceMatchV3().list(request).block());
+        });
+        List<MatchedResource> collect = matchingResourcesResponse.stream().map(listMatchingResourcesResponse -> listMatchingResourcesResponse.getResources()).flatMap(Collection::stream).collect(Collectors.toList());
+        ListMatchingResourcesResponse listMatchingResourcesResponse = ListMatchingResourcesResponse.builder().resources(collect).build();
+        Mono<ListMatchingResourcesResponse> listMatchingResourcesResponseMono = Mono.just(listMatchingResourcesResponse);
+        return listMatchingResourcesResponseMono;
+    }
+
+    private static Collection<List<ArtifactMetadata>> chunkArtifactMetadatas(Collection<ArtifactMetadata> artifactMetadatas, int maxNumberOfArtifacts) {
+        final AtomicInteger counter = new AtomicInteger();
+        List<ArtifactMetadata> metadataList = artifactMetadatas.stream().collect(Collectors.toList());
+        return metadataList.stream().collect(Collectors.groupingBy(artifactMetadata -> counter.getAndIncrement() / maxNumberOfArtifacts)).values();
     }
 
     /**
