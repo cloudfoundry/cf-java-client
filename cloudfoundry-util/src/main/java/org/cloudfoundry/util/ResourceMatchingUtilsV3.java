@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipFile;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -46,6 +47,7 @@ public final class ResourceMatchingUtilsV3 {
 
     private static final Logger LOGGER =
             LoggerFactory.getLogger("cloudfoundry-client.resource-matching-v3");
+    public static final int MAX_RESOURCES_SIZE = 5000;
 
     private ResourceMatchingUtilsV3() {}
 
@@ -55,9 +57,9 @@ public final class ResourceMatchingUtilsV3 {
                         ? getArtifactMetadataFromDirectory(application)
                         : getArtifactMetadataFromZip(application))
                 .collectList()
-                .flatMap(
-                        (List<ArtifactMetadata> artifactMetadatas) ->
-                                requestListMatchingResources(cloudFoundryClient, artifactMetadatas))
+                .flatMapMany(Flux::fromIterable)
+                .buffer(MAX_RESOURCES_SIZE)
+                .flatMap(chunk -> requestListMatchingResources(cloudFoundryClient, chunk))
                 .map(ListMatchingResourcesResponse::getResources)
                 .doOnNext(
                         matched ->
@@ -68,6 +70,8 @@ public final class ResourceMatchingUtilsV3 {
                                                 matched.stream()
                                                         .mapToInt(MatchedResource::getSize)
                                                         .sum())))
+                .collectList()
+                .map(lists -> lists.stream().flatMap(List::stream).collect(Collectors.toList()))
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
