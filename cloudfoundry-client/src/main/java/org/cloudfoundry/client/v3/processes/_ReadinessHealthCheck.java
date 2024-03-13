@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,36 +21,23 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+/**
+ * The health check
+ */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Data {
+abstract class _ReadinessHealthCheck {
 
     /**
-     * The endpoint
+     * The data
      */
-    @JsonProperty("endpoint")
+    @JsonProperty("data")
     @Nullable
-    abstract String getEndpoint();
+    abstract Data getData();
 
     /**
-     * The invocation timeout
+     * The type
      */
-    @JsonProperty("invocation_timeout")
-    @Nullable
-    abstract Integer getInvocationTimeout();
-
-    /**
-     * The timeout
-     */
-    @JsonProperty("timeout")
-    @Nullable
-    abstract Integer getTimeout();
-
-    /**
-     * The interval
-    */
-    @JsonProperty("interval")
-    @Nullable
-    abstract Integer getInterval();
-
+    @JsonProperty("type")
+    abstract ReadinessHealthCheckType getType();
 }
