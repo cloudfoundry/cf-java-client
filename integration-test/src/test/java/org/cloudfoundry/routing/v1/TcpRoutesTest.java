@@ -123,7 +123,9 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
                 .filter(route -> backendIp.equals(route.getBackendIp()))
                 .filter(route -> backendPort.equals(route.getBackendPort()))
                 .filter(route -> port.equals(route.getPort()))
-                .flatMap(e -> !"".equals(e.getBackendIp()) ? Flux.error(new RuntimeException("route still found")) : Flux.just(e)
+                .flatMap(e -> !"".equals(e.getBackendIp()) ? 
+                                Flux.error(new RuntimeException("route still found")) :
+                                Flux.just(e)
                  )
                 .retryWhen(Retry.indefinitely().filter(e -> "route still found".equals(e.getMessage())))
                 )
