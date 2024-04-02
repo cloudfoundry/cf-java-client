@@ -237,38 +237,47 @@ public final class ProcessesTest extends AbstractIntegrationTest {
                                 .name(name)
                                 .path(path)
                                 .noStart(false)
+                                .build());
     }
 
     @Test
     public void updateReadinessHealthCheckType() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
-        Path path =  new ClassPathResource("test-application.zip").getFile().toPath();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
 
         createApplication(this.cloudFoundryOperations, applicationName, path)
-            .then(getApplicationId(this.cloudFoundryOperations, applicationName))
-            .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
-            .flatMap(processId -> this.cloudFoundryClient.processes()
-                .update(UpdateProcessRequest.builder()
-                    .readinessHealthCheck(ReadinessHealthCheck
-                        .builder()
-                        .data(Data
-                            .builder()
-                            .endpoint("/test_endpoint")
-                            .invocationTimeout(1)
-                            .interval(2)
-                            .build())
-                        .type(ReadinessHealthCheckType.PORT)
-                        .build())
-                    .processId(processId)
-                    .build())
-                .then(Mono.just(processId)))
-            .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
-            .map(GetProcessResponse::getReadinessHealthCheck)
-            .map(ReadinessHealthCheck::getType)
-            .as(StepVerifier::create)
-            .expectNext(ReadinessHealthCheckType.PORT)
-            .expectComplete()
-            .verify(Duration.ofMinutes(5));
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .update(
+                                                UpdateProcessRequest.builder()
+                                                        .readinessHealthCheck(
+                                                                ReadinessHealthCheck.builder()
+                                                                        .data(
+                                                                                Data.builder()
+                                                                                        .endpoint(
+                                                                                                "/test_endpoint")
+                                                                                        .invocationTimeout(
+                                                                                                1)
+                                                                                        .interval(2)
+                                                                                        .build())
+                                                                        .type(
+                                                                                ReadinessHealthCheckType
+                                                                                        .PORT)
+                                                                        .build())
+                                                        .processId(processId)
+                                                        .build())
+                                        .then(Mono.just(processId)))
+                .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
+                .map(GetProcessResponse::getReadinessHealthCheck)
+                .map(ReadinessHealthCheck::getType)
+                .as(StepVerifier::create)
+                .expectNext(ReadinessHealthCheckType.PORT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getApplicationId(
