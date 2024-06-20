@@ -42,4 +42,18 @@ abstract class _StackEntity {
     @Nullable
     abstract String getName();
 
+           /**
+     * Build RootFS Image
+     */
+    @JsonProperty("build_rootfs_image")
+    @Nullable
+    abstract String getBuildRootfsImage();
+
+   /**
+     * Run RootFS Image
+     */
+    @JsonProperty("run_rootfs_image")
+    @Nullable
+    abstract String getRunRootfsImage();
+
 }

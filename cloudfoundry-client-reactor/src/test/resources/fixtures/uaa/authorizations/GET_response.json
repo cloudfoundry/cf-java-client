@@ -66,6 +66,7 @@
   ],
   "claims_parameter_supported": false,
   "service_documentation": "http://docs.cloudfoundry.org/api/uaa/",
+  "end_session_endpoint": "http://localhost/logout.do",
   "ui_locales_supported": [
     "en-US"
   ]

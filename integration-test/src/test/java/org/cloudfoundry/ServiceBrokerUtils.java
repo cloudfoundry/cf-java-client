@@ -88,6 +88,43 @@ public final class ServiceBrokerUtils {
                                                                 ResourceUtils.getId(response))));
     }
 
+    @SuppressWarnings("BlockingMethodInNonBlockingContext")
+    public static Mono<ServiceBrokerUtils.ServiceBrokerMetadata> createServiceBrokerNonPublic(
+            CloudFoundryClient cloudFoundryClient,
+            NameFactory nameFactory,
+            String planName,
+            String serviceBrokerName,
+            String serviceName,
+            String spaceId,
+            Boolean spaceScoped) {
+        Path application;
+        try {
+            application = new ClassPathResource("test-service-broker.jar").getFile().toPath();
+        } catch (IOException e) {
+            throw Exceptions.propagate(e);
+        }
+
+        return pushServiceBrokerApplication(
+                        cloudFoundryClient,
+                        application,
+                        nameFactory,
+                        planName,
+                        serviceName,
+                        spaceId)
+                .flatMap(
+                        applicationMetadata ->
+                                requestCreateServiceBroker(
+                                                cloudFoundryClient,
+                                                applicationMetadata,
+                                                serviceBrokerName,
+                                                spaceScoped)
+                                        .map(
+                                                response ->
+                                                        new ServiceBrokerMetadata(
+                                                                applicationMetadata,
+                                                                ResourceUtils.getId(response))));
+    }
+
     public static Mono<Void> deleteServiceBroker(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient

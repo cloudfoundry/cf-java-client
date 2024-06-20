@@ -20,6 +20,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
+import org.immutables.value.Value.Default;
 
 /**
  * The entity response payload for the Quota Definition resource
@@ -113,4 +114,13 @@ abstract class _OrganizationQuotaDefinitionEntity {
     @Nullable
     abstract Boolean getTrialDatabaseAllowed();
 
+    /**
+     * The log rate limit
+     */
+    @Value.Default
+    @JsonProperty("log_rate_limit")
+    @Nullable
+    Integer getLogRateLimit(){
+        return -1;
+    }
 }

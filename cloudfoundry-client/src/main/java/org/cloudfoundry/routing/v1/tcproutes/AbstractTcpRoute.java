@@ -64,4 +64,18 @@ abstract class AbstractTcpRoute {
      */
     @JsonProperty("ttl")
     abstract Integer getTtl();
+
+    /**
+     * Backend TLS port
+     */    
+    @JsonProperty("backend_tls_port")
+    @Nullable
+    abstract Integer getBackendTlsPort();
+
+        /**
+     * Instance ID
+     */    
+    @JsonProperty("instance_id")
+    @Nullable
+    abstract Integer getInstanceId();
 }

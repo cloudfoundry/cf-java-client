@@ -82,4 +82,11 @@ abstract class _CreateIdentityZoneRequest {
     @Nullable
     abstract Integer getVersion();
 
+    /**
+     * Whether the identity zone is active
+     */
+    @JsonProperty("active")
+    @Nullable
+    abstract Boolean getActive();
+
 }

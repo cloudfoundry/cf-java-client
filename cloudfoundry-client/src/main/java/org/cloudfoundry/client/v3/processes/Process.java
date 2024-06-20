@@ -19,6 +19,7 @@ package org.cloudfoundry.client.v3.processes;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
+import org.cloudfoundry.Nullable;
 
 /**
  * Base class for responses that are processes
@@ -72,4 +73,20 @@ public abstract class Process extends Resource {
      */
     @JsonProperty("type")
     public abstract String getType();
+
+    /**
+     * The version UUID
+     */
+    @JsonProperty("version")
+    @Nullable
+    public abstract String getVersion();
+
+    /**
+     * The log rate limit
+     */
+    @JsonProperty("log_rate_limit_in_bytes_per_second")
+    @Nullable
+    public abstract Integer getLogRateLimitInBytesPerSecond();
+    
+
 }

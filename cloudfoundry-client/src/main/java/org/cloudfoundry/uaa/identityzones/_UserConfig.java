@@ -19,6 +19,8 @@ package org.cloudfoundry.uaa.identityzones;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -34,6 +36,29 @@ abstract class _UserConfig {
      * The default groups
      */
     @JsonProperty("defaultGroups")
+    @Nullable
     abstract List<String> getDefaultGroups();
+
+    /**
+     * The allowed groups
+     */
+    @JsonProperty("allowedGroups")
+    @Nullable
+    abstract List<String> getAllowedGroups();
+
+    /**
+     * Number of users in the zone. If more than 0, it limits the amount of users in the zone. (defaults to -1, no limit).
+     */
+    @JsonProperty("maxUsers")
+    @Nullable
+    abstract Integer getMaxUsers();
+
+    /**
+     * Flag for switching on the check if origin is valid when creating or updating users
+     */
+    @JsonProperty("checkOriginEnabled")
+    @Nullable
+    abstract Boolean getcheckOriginEnabled();
+
 
 }

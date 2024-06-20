@@ -81,4 +81,11 @@ abstract class _TokenPolicy {
     @Nullable
     abstract Integer getRefreshTokenValidity();
 
+    /**
+     * If true, uaa will issue a new refresh token value in grant type refresh_token.
+     */
+    @JsonProperty("refreshTokenRotate")
+    @Nullable
+    abstract Boolean getRefreshTokenRotate();
+
 }
