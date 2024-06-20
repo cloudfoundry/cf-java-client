@@ -19,6 +19,8 @@ package org.cloudfoundry.uaa.authorizations;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.util.List;
@@ -132,5 +134,19 @@ abstract class _GetOpenIdProviderConfigurationResponse {
      */
     @JsonProperty("userinfo_endpoint")
     abstract String getUserInfoEndpoint();
+
+    /**
+     * URL of the logout endpoint.
+     */
+    @JsonProperty("end_session_endpoint")
+    @Nullable
+    abstract String getEndSessionEndpoint();
+
+    /**
+     * JSON array containing a list of PKCE code challenge methods supported by this authorization endpoint.
+     */
+    @JsonProperty("code_challenge_methods_supported")
+    @Nullable
+    abstract List<String> getCodeChallengeMethodsSupported();
 
 }

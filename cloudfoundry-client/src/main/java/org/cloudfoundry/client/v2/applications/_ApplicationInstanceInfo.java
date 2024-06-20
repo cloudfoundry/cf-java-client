@@ -84,4 +84,11 @@ abstract class _ApplicationInstanceInfo {
     @Nullable
     abstract Long getUptime();
 
+    /**
+     * Routable
+     */
+    @JsonProperty("routable")
+    @Nullable
+    abstract String getRoutable();
+
 }

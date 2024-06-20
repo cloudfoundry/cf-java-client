@@ -17,6 +17,7 @@
 package org.cloudfoundry.client.v3;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.CloudFoundryVersion.PCF_2_9;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -241,6 +242,7 @@ public final class ProcessesTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @IfCloudFoundryVersion(greaterThan = CloudFoundryVersion.PCF_2_13)
     public void updateReadinessHealthCheckType() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Path path = new ClassPathResource("test-application.zip").getFile().toPath();

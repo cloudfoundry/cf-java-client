@@ -64,6 +64,20 @@ abstract class AbstractIdentityProvider {
     abstract String getId();
 
     /**
+     * The alias id
+     */
+    @JsonProperty("aliasId")
+    @Nullable
+    abstract String getAliasId();
+
+    /**
+     * The alias Zone id
+     */
+    @JsonProperty("aliasZid")
+    @Nullable
+    abstract String getAliasZid();
+
+    /**
      * Set to the zone that this provider will be active in. Determined either by the Host header or the zone switch header.
      */
     @JsonProperty("identityZoneId")

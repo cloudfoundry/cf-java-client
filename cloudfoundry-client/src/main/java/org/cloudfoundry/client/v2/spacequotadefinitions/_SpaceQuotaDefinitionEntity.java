@@ -119,4 +119,11 @@ abstract class _SpaceQuotaDefinitionEntity {
     @Nullable
     abstract Integer getTotalServices();
 
+    /** 
+    * The log rate limit
+    */
+   @JsonProperty("log_rate_limit")
+   @Nullable
+   abstract Integer getLogRateLimit();
+
 }

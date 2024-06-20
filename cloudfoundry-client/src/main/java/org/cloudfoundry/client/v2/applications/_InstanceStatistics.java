@@ -46,4 +46,11 @@ abstract class _InstanceStatistics {
     @Nullable
     abstract Statistics getStatistics();
 
+     /**
+     * Routable
+     */
+    @JsonProperty("routable")
+    @Nullable
+    abstract String getRoutable();
+
 }
