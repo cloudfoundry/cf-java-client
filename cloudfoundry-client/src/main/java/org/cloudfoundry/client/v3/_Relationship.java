@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -31,6 +32,7 @@ abstract class _Relationship {
      * The id
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getId();
 
 }

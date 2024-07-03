@@ -25,14 +25,10 @@ final class ShareDomainRequestTest {
 
     @Test
     void emptyRelationship() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> {
-                    ShareDomainRequest.builder()
-                            .domainId("test-domain-id")
-                            .data(Relationship.builder().build())
-                            .build();
-                });
+        ShareDomainRequest.builder()
+                .domainId("test-domain-id")
+                .data(Relationship.builder().build())
+                .build();
     }
 
     @Test
