@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.Test;
 
@@ -24,15 +24,16 @@ final class RelationshipTest {
 
     @Test
     void noId() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> {
-                    Relationship.builder().build();
-                });
+        assertThat(Relationship.builder().build().getId()).isNull();
     }
 
     @Test
-    void valid() {
-        Relationship.builder().id("test-id").build();
+    void nullId() {
+        assertThat(Relationship.builder().id(null).build().getId()).isNull();
+    }
+
+    @Test
+    void nonNullId() {
+        assertThat(Relationship.builder().id("test-id").build().getId()).isEqualTo("test-id");
     }
 }
