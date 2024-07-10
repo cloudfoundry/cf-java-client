@@ -43,6 +43,8 @@ import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheck;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
 import org.cloudfoundry.client.v3.processes.ScaleProcessResponse;
 import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
@@ -117,6 +119,16 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
                                                 .type(HealthCheckType.PORT)
                                                 .data(
                                                         Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .readinessHealthCheck(
+                                        ReadinessHealthCheck.builder()
+                                                .type(ReadinessHealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .interval(null)
                                                                 .timeout(null)
                                                                 .endpoint(null)
                                                                 .build())
@@ -309,6 +321,16 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
                                                                                 .endpoint(null)
                                                                                 .build())
                                                                 .build())
+                                                .readinessHealthCheck(
+                                                        ReadinessHealthCheck.builder()
+                                                                .type(ReadinessHealthCheckType.PORT)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .interval(null)
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
                                                 .metadata(
                                                         Metadata.builder()
                                                                 .annotations(Collections.emptyMap())
@@ -363,6 +385,16 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
                                                                 .type(HealthCheckType.PROCESS)
                                                                 .data(
                                                                         Data.builder()
+                                                                                .timeout(null)
+                                                                                .endpoint(null)
+                                                                                .build())
+                                                                .build())
+                                                .readinessHealthCheck(
+                                                        ReadinessHealthCheck.builder()
+                                                                .type(ReadinessHealthCheckType.PORT)
+                                                                .data(
+                                                                        Data.builder()
+                                                                                .interval(null)
                                                                                 .timeout(null)
                                                                                 .endpoint(null)
                                                                                 .build())
@@ -458,6 +490,16 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
                                                                 .endpoint(null)
                                                                 .build())
                                                 .build())
+                                .readinessHealthCheck(
+                                        ReadinessHealthCheck.builder()
+                                                .type(ReadinessHealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .interval(null)
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
                                 .metadata(
                                         Metadata.builder()
                                                 .annotations(Collections.emptyMap())
@@ -541,6 +583,16 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
                                                 .type(HealthCheckType.PORT)
                                                 .data(
                                                         Data.builder()
+                                                                .timeout(null)
+                                                                .endpoint(null)
+                                                                .build())
+                                                .build())
+                                .readinessHealthCheck(
+                                        ReadinessHealthCheck.builder()
+                                                .type(ReadinessHealthCheckType.PORT)
+                                                .data(
+                                                        Data.builder()
+                                                                .interval(null)
                                                                 .timeout(null)
                                                                 .endpoint(null)
                                                                 .build())
