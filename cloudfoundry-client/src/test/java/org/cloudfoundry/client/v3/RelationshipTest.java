@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import org.junit.jupiter.api.Test;
 
 final class RelationshipTest {
