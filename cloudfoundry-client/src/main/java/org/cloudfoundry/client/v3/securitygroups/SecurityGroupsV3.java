@@ -22,7 +22,7 @@ public interface SecurityGroupsV3 {
 
     /**
      * Makes the <a href=
-     * "https://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating
+     * "https://v3-apidocs.cloudfoundry.org/version/3.169.0/index.html#create-a-security-group">Creating
      * a Security Group</a> request.
      *
      * @param request the Create Security Group request

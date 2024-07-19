@@ -312,7 +312,7 @@ Lastly before running the tests, it is strongly recommended that you take a snap
 ## License
 This project is released under version 2.0 of the [Apache License][l].
 
-[a]: https://apidocs.cloudfoundry.org/latest-release/
+[a]: https://apidocs.cloudfoundry.org/
 [c]: https://github.com/cloudfoundry/cli
 [e]: https://github.com/cloudfoundry/java-client/issues
 [g]: https://gradle.org
