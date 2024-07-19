@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Buildpacks {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/creates_an_admin_buildpack.html">Create the Buildpack</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/creates_an_admin_buildpack.html">Create the Buildpack</a> request
      *
      * @param request the Create Buildpack request
      * @return the response from the Create Buildpack request
@@ -32,7 +32,7 @@ public interface Buildpacks {
     Mono<CreateBuildpackResponse> create(CreateBuildpackRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/delete_a_particular_buildpack.html">Delete the Buildpack</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/delete_a_particular_buildpack.html">Delete the Buildpack</a> request
      *
      * @param request the Delete Buildpack request
      * @return the response from the Delete Buildpack request
@@ -40,7 +40,7 @@ public interface Buildpacks {
     Mono<DeleteBuildpackResponse> delete(DeleteBuildpackRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/retrieve_a_particular_buildpack.html">Retrieve a particular Buildpack</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/retrieve_a_particular_buildpack.html">Retrieve a particular Buildpack</a> request
      *
      * @param request the Get Buildpack request
      * @return the response from the Get Buildpack request
@@ -48,7 +48,7 @@ public interface Buildpacks {
     Mono<GetBuildpackResponse> get(GetBuildpackRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/list_all_buildpacks.html">List all Buildpacks</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/list_all_buildpacks.html">List all Buildpacks</a> request
      *
      * @param request the List all Buildpacks request
      * @return the response from the List all Buildpacks request
@@ -56,9 +56,9 @@ public interface Buildpacks {
     Mono<ListBuildpacksResponse> list(ListBuildpacksRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/change_the_position_of_a_buildpack.html">Change the position of a Buildpack</a>,
-     * <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/enable_or_disable_a_buildpack.html">Enable or disable a Buildpack</a>, and
-     * <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/lock_or_unlock_a_buildpack.html">Lock or unlock a Buildpack</a> requests
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/change_the_position_of_a_buildpack.html">Change the position of a Buildpack</a>,
+     * <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/enable_or_disable_a_buildpack.html">Enable or disable a Buildpack</a>, and
+     * <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/lock_or_unlock_a_buildpack.html">Lock or unlock a Buildpack</a> requests
      *
      * @param request the Update Buildpack request
      * @return the response from the Update Buildpack request
@@ -66,7 +66,7 @@ public interface Buildpacks {
     Mono<UpdateBuildpackResponse> update(UpdateBuildpackRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/buildpacks/upload_the_bits_for_an_admin_buildpack.html">Upload Buildpack</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/buildpacks/upload_the_bits_for_an_admin_buildpack.html">Upload Buildpack</a> request
      *
      * @param request the Upload Buildpack request
      * @return the response from the Upload Buildpack request

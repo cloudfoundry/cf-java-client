@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceBrokers {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/create_a_service_broker.html">Create Service Broker</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_brokers/create_a_service_broker.html">Create Service Broker</a> request
      *
      * @param request the Create Service Broker request
      * @return the response from the Create Service Broker request
@@ -32,7 +32,7 @@ public interface ServiceBrokers {
     Mono<CreateServiceBrokerResponse> create(CreateServiceBrokerRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/delete_a_particular_service_broker.html">Delete the Service Broker</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_brokers/delete_a_particular_service_broker.html">Delete the Service Broker</a> request
      *
      * @param request the Delete Service Broker request
      * @return the response from the Delete Service Broker request
@@ -40,7 +40,7 @@ public interface ServiceBrokers {
     Mono<Void> delete(DeleteServiceBrokerRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/retrieve_a_particular_service_broker.html">Retrieve a Particular Service Broker</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_brokers/retrieve_a_particular_service_broker.html">Retrieve a Particular Service Broker</a> request
      *
      * @param request the Get Service Broker request
      * @return the response from the Get Service Broker request
@@ -48,7 +48,7 @@ public interface ServiceBrokers {
     Mono<GetServiceBrokerResponse> get(GetServiceBrokerRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/list_all_service_brokers.html">List all Service Brokers</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_brokers/list_all_service_brokers.html">List all Service Brokers</a> request
      *
      * @param request the List Service Brokers request
      * @return the response from the List Service Brokers request
@@ -56,7 +56,7 @@ public interface ServiceBrokers {
     Mono<ListServiceBrokersResponse> list(ListServiceBrokersRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_brokers/update_a_service_broker.html">Update Service Broker</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_brokers/update_a_service_broker.html">Update Service Broker</a> request
      *
      * @param request the Update Service Broker request
      * @return the response from the Update Service Broker request

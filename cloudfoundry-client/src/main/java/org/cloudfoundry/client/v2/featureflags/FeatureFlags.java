@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface FeatureFlags {
 
     /**
-     * Makes one of the Get feature flags requests. See <a href="https://apidocs.cloudfoundry.org/latest-release">API</a> under Feature Flags.
+     * Makes one of the Get feature flags requests. See <a href="https://v2-apidocs.cloudfoundry.org">API</a> under Feature Flags.
      *
      * @param request the get feature flag request
      * @return the response from the get feature flag request
@@ -32,7 +32,7 @@ public interface FeatureFlags {
     Mono<GetFeatureFlagResponse> get(GetFeatureFlagRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/feature_flags/get_all_feature_flags.html">List Feature Flags</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/feature_flags/get_all_feature_flags.html">List Feature Flags</a> request
      *
      * @param request the list feature flags request
      * @return the response from the list feature flags request
@@ -40,7 +40,7 @@ public interface FeatureFlags {
     Mono<ListFeatureFlagsResponse> list(ListFeatureFlagsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/feature_flags/set_a_feature_flag.html">Set Feature Flag</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/feature_flags/set_a_feature_flag.html">Set Feature Flag</a> request
      *
      * @param request the set feature flag request
      * @return the response from the set feature flag request
