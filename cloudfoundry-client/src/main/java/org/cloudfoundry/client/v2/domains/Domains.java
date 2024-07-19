@@ -24,8 +24,8 @@ import reactor.core.publisher.Mono;
 public interface Domains {
 
     /**
-     * Makes the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/create_a_domain_owned_by_the_given_organization_%28deprecated%29.html">Create a Domain
-     * owned by the given Organization</a> request and the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">
+     * Makes the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_%28deprecated%29/create_a_domain_owned_by_the_given_organization_%28deprecated%29.html">Create a Domain
+     * owned by the given Organization</a> request and the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_%28deprecated%29/create_a_shared_domain_%28deprecated%29.html">
      * Create a Shared Domain</a> request
      *
      * @param request the Create a Domain request
@@ -35,7 +35,7 @@ public interface Domains {
     Mono<CreateDomainResponse> create(CreateDomainRequest request);
 
     /**
-     * Makes the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/delete_a_particular_domain_%28deprecated%29.html">Delete a Particular Domain</a> request
+     * Makes the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_%28deprecated%29/delete_a_particular_domain_%28deprecated%29.html">Delete a Particular Domain</a> request
      *
      * @param request the Delete a Particular Domain request
      * @return the response from the Delete a Particular Domain request
@@ -44,7 +44,7 @@ public interface Domains {
     Mono<DeleteDomainResponse> delete(DeleteDomainRequest request);
 
     /**
-     * Makes the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">Get Domain</a> request
+     * Makes the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_(deprecated)/retrieve_a_particular_domain_(deprecated).html">Get Domain</a> request
      *
      * @param request The Get Domain request
      * @return the response from the Get Domain request
@@ -53,7 +53,7 @@ public interface Domains {
     Mono<GetDomainResponse> get(GetDomainRequest request);
 
     /**
-     * Makes the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/list_all_domains_%28deprecated%29.html">List all Domains</a> request
+     * Makes the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_%28deprecated%29/list_all_domains_%28deprecated%29.html">List all Domains</a> request
      *
      * @param request the List all Domains request
      * @return the response from the List all Domains request
@@ -62,7 +62,7 @@ public interface Domains {
     Mono<ListDomainsResponse> list(ListDomainsRequest request);
 
     /**
-     * Makes the deprecated <a href="https://apidocs.cloudfoundry.org/latest-release/domains_%28deprecated%29/list_all_spaces_for_the_domain_%28deprecated%29.html">List all Spaces for the Domain</a>
+     * Makes the deprecated <a href="https://v2-apidocs.cloudfoundry.org/domains_%28deprecated%29/list_all_spaces_for_the_domain_%28deprecated%29.html">List all Spaces for the Domain</a>
      * request
      *
      * @param request the List all Spaces for the Domain request
