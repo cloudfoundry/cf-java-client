@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public interface SecurityGroups {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/associate_space_with_the_security_group.html">Associate Space with the Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/associate_space_with_the_security_group.html">Associate Space with the Security Group</a> request.
      *
      * @param request the associate security group space request
      * @return the response from the associate security group space request
@@ -30,7 +30,7 @@ public interface SecurityGroups {
             AssociateSecurityGroupSpaceRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/creating_a_security_group.html">Creating a Security Group</a> request.
      *
      * @param request the create security group request
      * @return the response from the create security group request
@@ -38,7 +38,7 @@ public interface SecurityGroups {
     Mono<CreateSecurityGroupResponse> create(CreateSecurityGroupRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/delete_a_particular_security_group.html">Delete a Particular Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/delete_a_particular_security_group.html">Delete a Particular Security Group</a> request.
      *
      * @param request the delete security group request
      * @return the response from the delete security group request
@@ -46,7 +46,7 @@ public interface SecurityGroups {
     Mono<DeleteSecurityGroupResponse> delete(DeleteSecurityGroupRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/retrieve_a_particular_security_group.html">Retrieve a Particular Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/retrieve_a_particular_security_group.html">Retrieve a Particular Security Group</a> request.
      *
      * @param request the get security groups request
      * @return the response from the get security groups request
@@ -54,7 +54,7 @@ public interface SecurityGroups {
     Mono<GetSecurityGroupResponse> get(GetSecurityGroupRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_security_groups.html">List all Security Groups</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/list_all_security_groups.html">List all Security Groups</a> request.
      *
      * @param request the list all security groups request
      * @return the response from the list all security groups request
@@ -62,7 +62,7 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupsResponse> list(ListSecurityGroupsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_running_defaults/return_the_security_groups_used_for_running_apps.html">List Running Security Groups</a>
      * request.
      *
      * @param request the list running security groups request
@@ -72,7 +72,7 @@ public interface SecurityGroups {
             ListSecurityGroupRunningDefaultsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/list_all_spaces_for_the_security_group.html">List all Spaces for the Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/list_all_spaces_for_the_security_group.html">List all Spaces for the Security Group</a> request.
      *
      * @param request the list all spaces for the security group request
      * @return the response from the list all spaces for the security group request
@@ -80,7 +80,7 @@ public interface SecurityGroups {
     Mono<ListSecurityGroupSpacesResponse> listSpaces(ListSecurityGroupSpacesRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/return_the_security_groups_used_for_staging.html">List Staging Security Groups</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_staging_defaults/return_the_security_groups_used_for_staging.html">List Staging Security Groups</a> request.
      *
      * @param request the list staging security groups request
      * @return the response from the list staging security groups request
@@ -89,7 +89,7 @@ public interface SecurityGroups {
             ListSecurityGroupStagingDefaultsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/removing_a_security_group_as_a_default_for_running_apps.html">
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_running_defaults/removing_a_security_group_as_a_default_for_running_apps.html">
      * Removing a Security Group as a default for running Apps</a> request.
      *
      * @param request the remove running security group request
@@ -98,7 +98,7 @@ public interface SecurityGroups {
     Mono<Void> removeRunningDefault(RemoveSecurityGroupRunningDefaultRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/remove_space_from_the_security_group.html">Remove Space from the Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/remove_space_from_the_security_group.html">Remove Space from the Security Group</a> request.
      *
      * @param request the remove security group space request
      * @return the response from the remove security group space request
@@ -106,7 +106,7 @@ public interface SecurityGroups {
     Mono<Void> removeSpace(RemoveSecurityGroupSpaceRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/removing_a_security_group_as_a_default_for_staging.html">
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_staging_defaults/removing_a_security_group_as_a_default_for_staging.html">
      * Removing a Security Group as a default for staging</a> request.
      *
      * @param request the remove staging security group request
@@ -115,7 +115,7 @@ public interface SecurityGroups {
     Mono<Void> removeStagingDefault(RemoveSecurityGroupStagingDefaultRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_running_defaults/set_a_security_group_as_a_default_for_running_apps.html">Set a Security Group as a default for
      * running Apps</a> request.
      *
      * @param request the list running security groups request
@@ -125,7 +125,7 @@ public interface SecurityGroups {
             SetSecurityGroupRunningDefaultRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_group_staging_defaults/set_a_security_group_as_a_default_for_staging.html">Set a Security Group as a default for
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_group_staging_defaults/set_a_security_group_as_a_default_for_staging.html">Set a Security Group as a default for
      * staging Apps</a> request.
      *
      * @param request the list staging security groups request
@@ -135,7 +135,7 @@ public interface SecurityGroups {
             SetSecurityGroupStagingDefaultRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/security_groups/updating_a_security_group.html">Updating a Security Group</a> request.
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/security_groups/updating_a_security_group.html">Updating a Security Group</a> request.
      *
      * @param request the update security group request
      * @return the response from the update security group request
