@@ -39,12 +39,15 @@ public interface DopplerClient {
      */
     Flux<Envelope> firehose(FirehoseRequest request);
 
+    //TODO Adapt the message
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
      *
+     * @deprecated Do not use this type directly, it exists only for the <em>Jackson</em>-binding infrastructure
      * @param request the Recent Logs request
      * @return the events from the recent logs
      */
+    @Deprecated
     Flux<Envelope> recentLogs(RecentLogsRequest request);
 
     /**
