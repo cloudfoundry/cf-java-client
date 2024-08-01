@@ -40,6 +40,7 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
+
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
@@ -154,6 +155,9 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -199,6 +203,9 @@ public final class DefaultApplications implements Applications {
 
     private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR =
             Comparator.comparing(LogMessage::getTimestamp);
+
+    private static final Comparator<org.cloudfoundry.logcache.v1.Envelope> LOG_MESSAGE_COMPARATOR_LOG_CACHE =
+            Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
@@ -1617,6 +1624,14 @@ public final class DefaultApplications implements Applications {
         }
     }
 
+    private static Flux<LogMessage> getRecentLogs(Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return requestLogsRecentLogCache(logCacheClient, applicationId)
+                .filter(e -> EnvelopeType.LOG.getValue().equals(e.getLog().getType().getValue()))
+                .map(org.cloudfoundry.logcache.v1.Envelope::getLog)
+                .collectSortedList(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .flatMapIterable(d -> d);
+    }
+
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {
         Map<String, Optional<Object>> metadata =
@@ -2507,6 +2522,32 @@ public final class DefaultApplications implements Applications {
                 client ->
                         client.recentLogs(
                                 RecentLogsRequest.builder().applicationId(applicationId).build()));
+    }
+
+    private static Flux<org.cloudfoundry.logcache.v1.Envelope> requestLogsRecentLogCache(
+            Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return logCacheClient.flatMapMany(
+                client ->
+                        client.recentLogs(
+                                ReadRequest.builder()
+                                        .sourceId(applicationId)
+                                        .envelopeType(EnvelopeType.LOG)
+                                        .limit(100)
+                                        .build()
+                                )
+                                .flatMap(
+                                        response ->
+                                                Mono.justOrEmpty(
+                                                        response.getEnvelopes().getBatch().stream().findFirst()
+                                                )
+                                )
+                                .repeatWhenEmpty(
+                                        exponentialBackOff(
+                                                Duration.ofSeconds(1),
+                                                Duration.ofSeconds(5),
+                                                Duration.ofMinutes(1))
+                                )
+        );
     }
 
     private static Flux<Envelope> requestLogsStream(
