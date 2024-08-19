@@ -53,6 +53,11 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
         return getReactorLogCacheEndpoints().read(request);
     }
 
+    @Override
+    public Mono<ReadResponse> recentLogs(ReadRequest request) {
+        return getReactorLogCacheEndpoints().recentLogs(request);
+    }
+
     /**
      * The connection context
      */
