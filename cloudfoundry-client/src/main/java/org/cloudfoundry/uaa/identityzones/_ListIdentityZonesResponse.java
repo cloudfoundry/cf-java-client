@@ -17,11 +17,14 @@
 package org.cloudfoundry.uaa.identityzones;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
+
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 import java.io.IOException;
@@ -33,6 +36,7 @@ import java.util.List;
 @JsonDeserialize(using = _ListIdentityZonesResponse.ListIdentityZonesResponseDeserializer.class)
 @Value.Immutable
 abstract class _ListIdentityZonesResponse {
+
 
     /**
      * The identity zones
