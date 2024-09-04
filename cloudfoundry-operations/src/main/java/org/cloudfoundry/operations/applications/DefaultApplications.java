@@ -156,6 +156,7 @@ import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
@@ -219,6 +220,8 @@ public final class DefaultApplications implements Applications {
 
     private final Mono<DopplerClient> dopplerClient;
 
+    private final Mono<LogCacheClient> logCacheClient;
+
     private final RandomWords randomWords;
 
     private final Mono<String> spaceId;
@@ -226,22 +229,25 @@ public final class DefaultApplications implements Applications {
     public DefaultApplications(
             Mono<CloudFoundryClient> cloudFoundryClient,
             Mono<DopplerClient> dopplerClient,
+            Mono<LogCacheClient> logCacheClient,
             Mono<String> spaceId) {
-        this(cloudFoundryClient, dopplerClient, new WordListRandomWords(), spaceId);
+        this(cloudFoundryClient, dopplerClient, logCacheClient, new WordListRandomWords(), spaceId);
     }
 
     DefaultApplications(
             Mono<CloudFoundryClient> cloudFoundryClient,
             Mono<DopplerClient> dopplerClient,
+            Mono<LogCacheClient> logCacheClient,
             RandomWords randomWords,
             Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
+        this.logCacheClient = logCacheClient;
         this.randomWords = randomWords;
         this.spaceId = spaceId;
     }
 
-    @Override
+@Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
@@ -535,7 +541,7 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
-    public Flux<LogMessage> logs(LogsRequest request) {
+    public Flux<Log> logs(LogsRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
                         function(
@@ -544,7 +550,7 @@ public final class DefaultApplications implements Applications {
                                                 cloudFoundryClient, request.getName(), spaceId)))
                 .flatMapMany(
                         applicationId ->
-                                getLogs(this.dopplerClient, applicationId, request.getRecent()))
+                                getRecentLogs(this.logCacheClient, applicationId))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
     }
@@ -1576,30 +1582,29 @@ public final class DefaultApplications implements Applications {
                 .orElse(0);
     }
 
-    private static Flux<LogMessage> getLogs(
-            Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
+   /*  private static Flux<Log> getLogs(
+            Mono<LogCacheClient> logCacheClient, String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
-            return requestLogsRecent(dopplerClient, applicationId)
-                    .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                    .map(Envelope::getLogMessage)
-                    .collectSortedList(LOG_MESSAGE_COMPARATOR)
-                    .flatMapIterable(d -> d);
-        } else {
-            return requestLogsStream(dopplerClient, applicationId)
-                    .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                    .map(Envelope::getLogMessage)
-                    .transformDeferred(
-                            SortingUtils.timespan(LOG_MESSAGE_COMPARATOR, LOG_MESSAGE_TIMESPAN));
+            return getRecentLogs(logCacheClient, applicationId);
         }
-    }
+    }*/
 
-    private static Flux<LogMessage> getRecentLogs(Mono<LogCacheClient> logCacheClient, String applicationId) {
+    private static Flux<Log> getRecentLogs(Mono<LogCacheClient> logCacheClient, String applicationId) {
         return requestLogsRecentLogCache(logCacheClient, applicationId)
                 .filter(e -> EnvelopeType.LOG.getValue().equals(e.getLog().getType().getValue()))
-                .map(org.cloudfoundry.logcache.v1.Envelope::getLog)
-                .collectSortedList(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
-                .flatMapIterable(d -> d);
+              //  .collectSortedList(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .map(org.cloudfoundry.logcache.v1.Envelope::getLog);
     }
+
+/*     private static Flux<org.cloudfoundry.logcache.v1.Log> getRecentLogs(Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return requestLogsRecentLogCache(logCacheClient, applicationId)
+                .filter(e -> EnvelopeType.LOG.getValue().equals(e.getLog().getType().getValue()))
+                .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .map(org.cloudfoundry.logcache.v1.Envelope::getLog)
+                .collectList()
+                .flatMapIterable(d1 -> d1).cast(org.cloudfoundry.logcache.v1.Log.class);
+    } */
 
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {
