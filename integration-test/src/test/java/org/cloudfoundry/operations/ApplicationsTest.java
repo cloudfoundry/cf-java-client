@@ -529,10 +529,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                 .name(applicationName)
                                                 .recent(true)
                                                 .build()))
-                .map(ApplicationLog::getLogType)
+                .map(org.cloudfoundry.logcache.v1.Log::getType)
                 .next()
                 .as(StepVerifier::create)
-                .expectNext(ApplicationLogType.OUT)
+                .expectNext(org.cloudfoundry.logcache.v1.LogType.OUT)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
