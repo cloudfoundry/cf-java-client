@@ -144,6 +144,10 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
@@ -163,6 +167,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             new DefaultApplications(
                     Mono.just(this.cloudFoundryClient),
                     Mono.just(this.dopplerClient),
+                    Mono.just(this.logCacheClient),
                     this.randomWords,
                     Mono.just(TEST_SPACE_ID));
 
@@ -1318,7 +1323,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
                 .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -1346,12 +1351,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
                 .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -1368,7 +1373,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -5248,17 +5253,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.recentLogs(
-                        RecentLogsRequest.builder().applicationId(applicationId).build()))
+    private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String applicationId) {
+        when(logCacheClient.recentLogs(
+                        ReadRequest.builder().sourceId(applicationId).build()))
                 .thenReturn(
-                        Flux.just(
-                                Envelope.builder()
-                                        .eventType(EventType.LOG_MESSAGE)
-                                        .logMessage(
-                                                fill(LogMessage.builder(), "log-message-").build())
-                                        .origin("rsp")
-                                        .build()));
+                        Mono.just(ReadResponse.builder().envelopes(fill(org.cloudfoundry.logcache.v1.EnvelopeBatch.builder()).build()).build()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {

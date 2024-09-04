@@ -23,6 +23,7 @@ import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.client.v3.spaces.ListSpacesRequest;
 import org.cloudfoundry.client.v3.spaces.SpaceResource;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.advanced.Advanced;
 import org.cloudfoundry.operations.advanced.DefaultAdvanced;
@@ -79,7 +80,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Override
     @Value.Derived
     public Applications applications() {
-        return new DefaultApplications(getCloudFoundryClientPublisher(), getDopplerClientPublisher(), getSpaceId());
+        return new DefaultApplications(getCloudFoundryClientPublisher(), getDopplerClientPublisher(), getLogCacheClientPublisher(), getSpaceId());
     }
 
     @Override
@@ -178,11 +179,24 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Nullable
     abstract DopplerClient getDopplerClient();
 
+        /**
+     * The {@link LogCacheClient} to use for operations functionality
+     */
+    @Nullable
+    abstract LogCacheClient getLogCacheClient();
+
     @Value.Derived
     Mono<DopplerClient> getDopplerClientPublisher() {
         return Optional.ofNullable(getDopplerClient())
             .map(Mono::just)
             .orElse(Mono.error(new IllegalStateException("DopplerClient must be set")));
+    }
+
+    @Value.Derived
+    Mono<LogCacheClient> getLogCacheClientPublisher() {
+        return Optional.ofNullable(getLogCacheClient())
+            .map(Mono::just)
+            .orElse(Mono.error(new IllegalStateException("LogCacheClient must be set")));
     }
 
     /**
