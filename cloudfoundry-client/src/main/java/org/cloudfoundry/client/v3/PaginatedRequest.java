@@ -47,7 +47,7 @@ public abstract class PaginatedRequest {
     public abstract Integer getPerPage();
 
     @Value.Check
-    void check() {
+    public void check() {
         if (getPage() != null && getPage() < 1) {
             throw new IllegalStateException("page must be greater than or equal to 1");
         }
