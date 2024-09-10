@@ -185,6 +185,8 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_STAGING_ERROR = 170001;
 
+    private static final int CF_INSUFFICIENT_RESOURCES = 170008;
+
     private static final int CF_STAGING_NOT_FINISHED = 170002;
 
     private static final int CF_STAGING_TIME_EXPIRED = 170007;
@@ -1471,7 +1473,8 @@ public final class DefaultApplications implements Applications {
                                 CF_INSTANCES_ERROR,
                                 CF_STAGING_NOT_FINISHED,
                                 CF_STAGING_TIME_EXPIRED,
-                                CF_STAGING_ERROR),
+                                CF_STAGING_ERROR,
+                                CF_INSUFFICIENT_RESOURCES),
                         t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
