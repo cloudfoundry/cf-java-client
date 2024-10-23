@@ -17,35 +17,31 @@
 package org.cloudfoundry.client.v3;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * The lifecycle type
+ * Data type for the Buildpack
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Lifecycle {
+abstract class _CnbData implements LifecycleData {
 
     /**
-     * The data for the lifecycle
+     * The buildpack
      */
-    @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.EXTERNAL_PROPERTY, property = "type")
-    @JsonSubTypes({
-        @JsonSubTypes.Type(name = "buildpack", value = BuildpackData.class),
-        @JsonSubTypes.Type(name = "docker", value = DockerData.class),
-        @JsonSubTypes.Type(name = "kpack", value = KpackData.class),
-        @JsonSubTypes.Type(name = "cnb", value = CnbData.class)
-    })
-    @JsonProperty("data")
-    abstract LifecycleData getData();
+    @JsonProperty("buildpacks")
+    @Nullable
+    abstract List<String> getBuildpacks();
 
     /**
-     * The type
+     * The stack
      */
-    @JsonProperty("type")
-    abstract LifecycleType getType();
+    @JsonProperty("stack")
+    @Nullable
+    abstract String getStack();
 
 }

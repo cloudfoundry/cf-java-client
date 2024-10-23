@@ -29,16 +29,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.Collections;
-import org.cloudfoundry.client.v3.BuildpackData;
-import org.cloudfoundry.client.v3.Checksum;
-import org.cloudfoundry.client.v3.ChecksumType;
-import org.cloudfoundry.client.v3.KpackData;
-import org.cloudfoundry.client.v3.Lifecycle;
-import org.cloudfoundry.client.v3.LifecycleType;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.Pagination;
-import org.cloudfoundry.client.v3.Relationship;
-import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.*;
 import org.cloudfoundry.client.v3.droplets.Buildpack;
 import org.cloudfoundry.client.v3.droplets.DropletResource;
 import org.cloudfoundry.client.v3.droplets.DropletState;
@@ -497,7 +488,7 @@ final class ReactorPackagesTest extends AbstractClientApiTest {
                         ListPackageDropletsResponse.builder()
                                 .pagination(
                                         Pagination.builder()
-                                                .totalResults(3)
+                                                .totalResults(4)
                                                 .totalPages(1)
                                                 .first(
                                                         Link.builder()
@@ -624,6 +615,61 @@ final class ReactorPackagesTest extends AbstractClientApiTest {
                                                         Link.builder()
                                                                 .href(
                                                                         "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058397/relationships/current_droplet")
+                                                                .method("PATCH")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DropletResource.builder()
+                                                .id("e351a2f2-dfc6-454b-8777-60ed2ff98edb")
+                                                .state(DropletState.STAGED)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.CNB)
+                                                                .data(CnbData.builder().build())
+                                                                .build())
+                                                .image(null)
+                                                .executionMetadata("PRIVATE DATA HIDDEN")
+                                                .processType(
+                                                        "redacted_message",
+                                                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .checksum(
+                                                        Checksum.builder()
+                                                                .type(ChecksumType.SHA256)
+                                                                .value(
+                                                                        "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855")
+                                                                .build())
+                                                .buildpack(
+                                                        Buildpack.builder()
+                                                                .name("ruby_buildpack")
+                                                                .detectOutput("ruby 1.6.14")
+                                                                .build())
+                                                .stack("cflinuxfs2")
+                                                .createdAt("2016-03-28T23:39:34Z")
+                                                .updatedAt("2016-03-28T23:39:47Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/e351a2f2-dfc6-454b-8777-60ed2ff98edb")
+                                                                .build())
+                                                .link(
+                                                        "package",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/45c63fe0-f5f4-4f23-963e-a8311193d11e")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058398")
+                                                                .build())
+                                                .link(
+                                                        "assign_current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058398/relationships/current_droplet")
                                                                 .method("PATCH")
                                                                 .build())
                                                 .build())
