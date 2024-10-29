@@ -66,6 +66,13 @@ abstract class _IdentityZoneConfiguration {
     abstract CorsPolicy getCorsPolicy();
 
     /**
+     * The default identity provider
+     */
+    @JsonProperty("defaultIdentityProvider")
+    @Nullable
+    abstract String getDefaultIdentityProvider();
+
+    /**
      * The issuer of this zone
      */
     @JsonProperty("issuer")
