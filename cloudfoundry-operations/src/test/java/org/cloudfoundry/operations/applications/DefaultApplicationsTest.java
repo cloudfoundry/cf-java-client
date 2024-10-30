@@ -144,8 +144,11 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.LogType;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
@@ -1318,10 +1321,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-application-name");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
+                .logs(ReadRequest.builder().sourceId("test-application-name").build())
                 .as(StepVerifier::create)
                 .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
@@ -1333,7 +1336,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
+                .logs(ReadRequest.builder().sourceId("test-application-name").build())
                 .as(StepVerifier::create)
                 .consumeErrorWith(
                         t ->
@@ -1354,7 +1357,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
+                .logs(ReadRequest.builder().sourceId("test-application-name").build())
                 .as(StepVerifier::create)
                 .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
@@ -1371,7 +1374,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestLogsStream(this.dopplerClient, "test-metadata-id");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
+                .logs(ReadRequest.builder().sourceId("test-application-name").build())
                 .as(StepVerifier::create)
                 .expectNext(fill(Log.builder(), "log-message-").build())
                 .expectComplete()
@@ -5254,10 +5257,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String applicationId) {
-        when(logCacheClient.recentLogs(
-                        ReadRequest.builder().sourceId(applicationId).build()))
-                .thenReturn(
-                        Mono.just(ReadResponse.builder().envelopes(fill(org.cloudfoundry.logcache.v1.EnvelopeBatch.builder()).build()).build()));
+            when(logCacheClient.recentLogs(
+                            ReadRequest.builder().sourceId(applicationId).build()))
+                            .thenReturn(
+                                            Mono.just(fill(ReadResponse.builder())
+                                                     .envelopes(fill(EnvelopeBatch.builder())
+                                                        .batch(fill(org.cloudfoundry.logcache.v1.Envelope.builder())
+                                                            .log(fill(Log.builder())
+                                                                     .payload("test-payload")
+                                                                     .type(LogType.OUT).build())
+                                                            .build())
+                                                        .build())
+                                                     .build()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {

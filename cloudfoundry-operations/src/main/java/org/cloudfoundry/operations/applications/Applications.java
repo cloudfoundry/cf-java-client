@@ -18,6 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
 
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -122,7 +124,7 @@ public interface Applications {
      * @param request the application logs request
      * @return the applications logs
      */
-    Flux<Log> logs(LogsRequest request);
+    Flux<Log> logs(ReadRequest request);
 
     /**
      * Push a specific application

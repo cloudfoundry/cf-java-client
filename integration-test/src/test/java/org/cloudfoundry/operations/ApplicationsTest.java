@@ -32,6 +32,7 @@ import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.MessageType;
 import org.cloudfoundry.logcache.v1.LogType;
+import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -496,17 +497,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations,
                         new ClassPathResource("test-application.zip").getFile().toPath(),
                         applicationName,
-                        false)
-                .thenMany(
-                        this.cloudFoundryOperations
+                        false)                
+                .thenMany(this.cloudFoundryOperations
                                 .applications()
-                                .logs(
-                                        LogsRequest.builder()
-                                                .name(applicationName)
-                                                .recent(true)
+                                .logs(ReadRequest.builder()
+                                                .sourceId(applicationName)
                                                 .build()))
                 .map(org.cloudfoundry.logcache.v1.Log::getType)
-                .next()
                 .as(StepVerifier::create)
                 .expectNext(org.cloudfoundry.logcache.v1.LogType.OUT)
                 .expectComplete()
