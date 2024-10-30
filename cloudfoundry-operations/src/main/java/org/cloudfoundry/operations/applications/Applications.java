@@ -18,6 +18,8 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -125,7 +127,7 @@ public interface Applications {
      * @deprecated Use {@link #logs(ApplicationLogsRequest)} instead.
      */
     @Deprecated
-    Flux<Log> logs(LogsRequest request);
+    Flux<Log> logs(ReadRequest request);
 
     /**
      * List the applications logs.

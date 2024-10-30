@@ -526,8 +526,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                 .applications()
                                 .logs(
                                         ApplicationLogsRequest.builder()
-                                                .name(applicationName)
-                                                .recent(true)
+                                                .sourceId(applicationName)
                                                 .build()))
                 .map(org.cloudfoundry.logcache.v1.Log::getType)
                 .next()

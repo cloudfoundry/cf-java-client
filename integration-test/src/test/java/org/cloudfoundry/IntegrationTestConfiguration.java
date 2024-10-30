@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.TestLogCacheEndpoints;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -266,6 +267,7 @@ public class IntegrationTestConfiguration {
     DefaultCloudFoundryOperations cloudFoundryOperations(
             CloudFoundryClient cloudFoundryClient,
             DopplerClient dopplerClient,
+            LogCacheClient logCacheClient,
             NetworkingClient networkingClient,
             RoutingClient routingClient,
             UaaClient uaaClient,
@@ -274,6 +276,7 @@ public class IntegrationTestConfiguration {
         return DefaultCloudFoundryOperations.builder()
                 .cloudFoundryClient(cloudFoundryClient)
                 .dopplerClient(dopplerClient)
+                .logCacheClient(logCacheClient)
                 .networkingClient(networkingClient)
                 .routingClient(routingClient)
                 .uaaClient(uaaClient)

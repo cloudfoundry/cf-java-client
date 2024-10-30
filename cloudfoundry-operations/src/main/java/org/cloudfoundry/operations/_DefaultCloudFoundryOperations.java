@@ -179,18 +179,18 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Nullable
     abstract DopplerClient getDopplerClient();
 
-        /**
-     * The {@link LogCacheClient} to use for operations functionality
-     */
-    @Nullable
-    abstract LogCacheClient getLogCacheClient();
-
     @Value.Derived
     Mono<DopplerClient> getDopplerClientPublisher() {
         return Optional.ofNullable(getDopplerClient())
             .map(Mono::just)
             .orElse(Mono.error(new IllegalStateException("DopplerClient must be set")));
     }
+
+    /**
+     * The {@link LogCacheClient} to use for operations functionality
+     */
+    @Nullable
+    abstract LogCacheClient getLogCacheClient();
 
     @Value.Derived
     Mono<LogCacheClient> getLogCacheClientPublisher() {
