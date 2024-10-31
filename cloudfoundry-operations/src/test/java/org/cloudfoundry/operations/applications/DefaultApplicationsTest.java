@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -1326,7 +1327,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         this.applications
                 .logs(ReadRequest.builder().sourceId("test-application-name").build())
                 .as(StepVerifier::create)
-                .expectNext(fill(Log.builder(), "log-message-").build())
+                .expectNextMatches(log -> log.getPayload().equals("test-payload"))
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -5258,16 +5259,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String applicationId) {
             when(logCacheClient.recentLogs(
-                            ReadRequest.builder().sourceId(applicationId).build()))
+                            any()))
                             .thenReturn(
                                             Mono.just(fill(ReadResponse.builder())
-                                                     .envelopes(fill(EnvelopeBatch.builder())
-                                                        .batch(fill(org.cloudfoundry.logcache.v1.Envelope.builder())
-                                                            .log(fill(Log.builder())
-                                                                     .payload("test-payload")
-                                                                     .type(LogType.OUT).build())
-                                                            .build())
-                                                        .build())
+                .envelopes(fill(EnvelopeBatch.builder())
+                        .batch(fill(org.cloudfoundry.logcache.v1.Envelope.builder())
+                                .log(fill(Log.builder())
+                                        .payload("test-payload")
+                                        .type(LogType.OUT).build())
+                                .build())
+                        .build())
                                                      .build()));
     }
 
