@@ -17,7 +17,6 @@
 package org.cloudfoundry.client.v3;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.CloudFoundryVersion.PCF_2_9;
 
 import java.io.IOException;
 import java.nio.file.Path;

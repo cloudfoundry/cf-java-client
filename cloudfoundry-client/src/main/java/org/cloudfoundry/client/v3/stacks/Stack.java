@@ -46,25 +46,24 @@ public abstract class Stack extends Resource {
     @Nullable
     public abstract Metadata getMetadata();
 
-       /**
+    /**
      * Build RootFS Image
      */
     @JsonProperty("build_rootfs_image")
     @Nullable
     abstract String getBuildRootfsImage();
 
-   /**
+    /**
      * Run RootFS Image
      */
     @JsonProperty("run_rootfs_image")
     @Nullable
     abstract String getRunRootfsImage();
 
-     /**
+    /**
      * Whether the stack is configured to be the default stack for new applications.
      */
     @JsonProperty("default")
     @Nullable
     abstract Boolean geDefault();
-
 }
