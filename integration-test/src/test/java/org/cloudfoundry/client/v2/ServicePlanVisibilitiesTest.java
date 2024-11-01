@@ -16,7 +16,7 @@
 
 package org.cloudfoundry.client.v2;
 
-import static org.cloudfoundry.ServiceBrokerUtils.createServiceBroker;
+import static org.cloudfoundry.ServiceBrokerUtils.createServiceBrokerNonPublic;
 import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -68,7 +68,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -133,7 +133,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -203,7 +203,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -267,7 +267,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -334,7 +334,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -411,7 +411,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -490,7 +490,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,
@@ -563,7 +563,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 this.cloudFoundryClient, organizationId, spaceName))
                         .flatMap(
                                 spaceId ->
-                                        createServiceBroker(
+                                        createServiceBrokerNonPublic(
                                                 this.cloudFoundryClient,
                                                 this.nameFactory,
                                                 planName,

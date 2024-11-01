@@ -56,4 +56,45 @@ abstract class _OAuth2Configuration extends AbstractAuthenticationConfiguration 
     @Nullable
     abstract String getResponseType();
 
+    /**
+     * A URL for fetching user info attributes when queried with the obtained token authorization.
+     */
+    @JsonProperty("userInfoUrl")
+    @Nullable
+    abstract String getUserInfoUrl();
+
+    /**
+     * Name of the request parameter that is used to pass a known username when redirecting to this identity provider from the account chooser
+     */
+    @JsonProperty("userPropagationParameter")
+    @Nullable
+    abstract String getUserPropagationParameter();
+
+    /**
+     * A flag controlling whether PKCE (RFC 7636) is active in authorization code flow when requesting tokens from the external provider.
+     */
+    @JsonProperty("cacheJwks")
+    @Nullable
+    abstract Boolean getCacheJwks();
+
+    /**
+     * Option to enable caching for the JWKS (verification key for validating token signatures)
+     */
+    @JsonProperty("pkce")
+    @Nullable
+    abstract Boolean getPkce();
+
+    /**
+     * OAuth 2.0 logout endpoint.
+     */
+    @JsonProperty("logoutUrl")
+    @Nullable
+    abstract String getLogoutUrl();
+
+    /**
+     * A flag controlling whether to log out of the external provider after a successful UAA logout
+     */
+    @JsonProperty("performRpInitiatedLogout")
+    @Nullable
+    abstract Boolean getPerformRpInitiatedLogout();
 }

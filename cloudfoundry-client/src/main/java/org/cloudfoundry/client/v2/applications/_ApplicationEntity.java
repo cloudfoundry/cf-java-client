@@ -121,4 +121,11 @@ abstract class _ApplicationEntity extends AbstractApplicationEntity {
     @Nullable
     abstract String getVersion();
 
+    /**
+     * The log rate limit
+     */
+    @JsonProperty("log_rate_limit")
+    @Nullable
+    abstract Integer getLogRateLimit();
+
 }

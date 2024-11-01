@@ -58,4 +58,12 @@ abstract class _SummaryOrganizationResponse {
     @Nullable
     abstract String getStatus();
 
+    /**
+     * mode
+     */
+    @JsonProperty("mode")
+    @Nullable
+    abstract String getMode();
+
+
 }

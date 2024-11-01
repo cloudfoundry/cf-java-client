@@ -401,6 +401,12 @@ class ReactorOrganizationsV3Test extends AbstractClientApiTest {
                                         UsageSummary.builder()
                                                 .startedInstances(3)
                                                 .memoryInMb(50)
+                                                .routes(0)
+                                                .serviceInstances(0)
+                                                .reservedPorts(0)
+                                                .perAppTasks(2)
+                                                .domains(2)
+                                                .serviceKeys(0)
                                                 .build())
                                 .link(
                                         "self",
