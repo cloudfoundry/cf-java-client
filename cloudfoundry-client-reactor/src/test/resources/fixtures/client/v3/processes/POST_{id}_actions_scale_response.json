@@ -12,6 +12,14 @@
       "endpoint": null
     }
   },
+  "readiness_health_check": {
+    "type": "port",
+    "data": {
+      "interval": null,
+      "endpoint": null,
+      "invocation_timeout": null
+    }
+  },
   "metadata": {
     "annotations": {},
     "labels": {}
