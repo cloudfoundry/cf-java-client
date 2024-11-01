@@ -127,7 +127,7 @@ public interface Applications {
      * @deprecated Use {@link #logs(ApplicationLogsRequest)} instead.
      */
     @Deprecated
-    Flux<Log> logs(ReadRequest request);
+    Flux<Log> logs(LogsRequest request);
 
     /**
      * List the applications logs.
