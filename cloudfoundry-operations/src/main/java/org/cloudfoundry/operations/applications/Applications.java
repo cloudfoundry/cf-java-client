@@ -124,7 +124,7 @@ public interface Applications {
      * @param request the application logs request
      * @return the applications logs
      */
-    Flux<Log> logs(ReadRequest request);
+    Flux<Log> logs(LogsRequest request);
 
     /**
      * Push a specific application
