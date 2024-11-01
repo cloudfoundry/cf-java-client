@@ -46,4 +46,12 @@ public interface LogCacheClient {
      * @return the read response
      */
     Mono<ReadResponse> read(ReadRequest request);
+
+    /**
+     * Makes the Log Cache RecentLogs /api/v1/read request
+     *
+     * @param request the Recent Logs request
+     * @return the events from the recent logs
+     */
+    Mono<ReadResponse> recentLogs(ReadRequest request);
 }
