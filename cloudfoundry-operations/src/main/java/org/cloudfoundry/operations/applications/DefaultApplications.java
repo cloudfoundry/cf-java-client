@@ -542,13 +542,13 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
-    public Flux<Log> logs(ReadRequest request) {
+    public Flux<Log> logs(LogsRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
                         function(
                                 (cloudFoundryClient, spaceId) ->
                                         getApplicationId(
-                                                cloudFoundryClient, request.getSourceId(), spaceId)))
+                                                cloudFoundryClient, request.getName(), spaceId)))
                 .flatMapMany(
                         applicationId ->
                                 getRecentLogs(this.logCacheClient, applicationId))
