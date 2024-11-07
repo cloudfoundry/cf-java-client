@@ -56,4 +56,18 @@ abstract class _ProcessUsage {
     @Nullable
     abstract String getTime();
 
+    /**
+     * The CPU entitlement
+     */
+    @JsonProperty("cpu_entitlement")
+    @Nullable
+    abstract Double getCpuEntitlement();
+
+    /** 
+    * The current logging usage of the instance
+    */
+   @JsonProperty("log_rate")
+   @Nullable
+   abstract Integer getLogRateLimit();
+
 }

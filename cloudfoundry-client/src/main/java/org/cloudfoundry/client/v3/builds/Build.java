@@ -93,4 +93,11 @@ public abstract class Build extends Resource {
     @JsonProperty("staging_disk_in_mb")
     @Nullable
     public abstract Integer getStagingDisk();
+
+    /**
+     * Log rate limit in bytes per second allocated for staging of the build
+     */
+    @JsonProperty("staging_log_rate_limit_bytes_per_second")
+    @Nullable
+    public abstract Integer getStagingLogRateLimitBytesPerSecond();
 }

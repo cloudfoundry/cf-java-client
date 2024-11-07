@@ -89,4 +89,11 @@ public abstract class Task extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract TaskRelationships getTaskRelationships();
+
+    /**
+     * Amount of log rate to allocate for the task in bytes
+     */
+    @JsonProperty("log_rate_limit_in_bytes_per_second")
+    @Nullable
+    public abstract Integer getLogRateLimitInBytesPerSecond();
 }

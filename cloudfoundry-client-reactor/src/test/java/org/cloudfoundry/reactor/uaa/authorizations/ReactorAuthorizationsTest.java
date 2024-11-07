@@ -367,6 +367,7 @@ final class ReactorAuthorizationsTest extends AbstractUaaApiTest {
                                 .supportedUiLocale(Locale.US)
                                 .tokenEndpoint("http://localhost/oauth/token")
                                 .userInfoEndpoint("http://localhost/userinfo")
+                                .endSessionEndpoint("http://localhost/logout.do")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));

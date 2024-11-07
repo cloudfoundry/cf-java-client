@@ -107,4 +107,11 @@ abstract class _CreateOrganizationQuotaDefinitionRequest {
     @Nullable
     abstract Boolean getTrialDatabaseAllowed();
 
+   /** 
+    * The log rate limit
+    */
+   @JsonProperty("log_rate_limit")
+   @Nullable
+   abstract Integer getLogRateLimit();
+
 }

@@ -97,4 +97,11 @@ abstract class _Statistics {
     @Nullable
     abstract Usage getUsage();
 
+    /** 
+    * The log rate limit
+    */
+   @JsonProperty("log_rate_limit")
+   @Nullable
+   abstract Integer getLogRateLimit();
+
 }

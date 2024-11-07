@@ -37,4 +37,11 @@ abstract class AbstractIdentityProviderConfiguration implements IdentityProvider
     @JsonProperty("providerDescription")
     @Nullable
     abstract String getProviderDescription();
+
+    /**
+     * explicit method to authenticate against the identity provider.
+     */
+    @JsonProperty("authMethod")
+    @Nullable
+    abstract String getAuthMethod();
 }

@@ -104,4 +104,25 @@ public abstract class ProcessStatistics {
     @JsonProperty("usage")
     @Nullable
     public abstract ProcessUsage getUsage();
+
+    /**
+     * Routable
+     */
+    @JsonProperty("routable")
+    @Nullable
+    abstract String getRoutable();
+
+    /**
+     * The internal IP address of the instance
+     */
+    @JsonProperty("instance_internal_ip")
+    @Nullable
+    public abstract String getInstanceInternalIp();
+
+    /**
+     * The log rate limit
+     */
+    @JsonProperty("log_rate_limit")
+    @Nullable
+    abstract Integer getLogRateLimit();
 }

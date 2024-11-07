@@ -1,7 +1,13 @@
 {
   "usage_summary": {
     "started_instances": 3,
-    "memory_in_mb": 50
+    "memory_in_mb": 50,
+    "routes": 0,
+    "service_instances": 0,
+    "reserved_ports": 0,
+    "per_app_tasks": 2,
+    "domains": 2,
+    "service_keys": 0
   },
   "links": {
     "self": {

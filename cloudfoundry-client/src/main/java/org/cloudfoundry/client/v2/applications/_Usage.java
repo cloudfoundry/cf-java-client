@@ -36,6 +36,13 @@ abstract class _Usage {
     abstract Double getCpu();
 
     /**
+     * The CPU entitlement
+     */
+    @JsonProperty("cpu_entitlement")
+    @Nullable
+    abstract Double getCpuEntitlement();
+
+    /**
      * The disk usage
      */
     @JsonProperty("disk")
@@ -55,5 +62,12 @@ abstract class _Usage {
     @JsonProperty("time")
     @Nullable
     abstract String getTime();
+
+    /** 
+    * The log rate limit
+    */
+   @JsonProperty("log_rate")
+   @Nullable
+   abstract Integer getLogRate();
 
 }

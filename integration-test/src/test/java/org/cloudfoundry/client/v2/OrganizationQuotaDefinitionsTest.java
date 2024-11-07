@@ -56,6 +56,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 .nonBasicServicesAllowed(false)
                                 .totalRoutes(10)
                                 .totalServices(-1)
+                                .logRateLimit(-1)
                                 .build())
                 .map(ResourceUtils::getEntity)
                 .as(StepVerifier::create)
@@ -73,6 +74,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 .totalServiceKeys(-1)
                                 .totalServices(-1)
                                 .trialDatabaseAllowed(false)
+                                .logRateLimit(-1)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -147,6 +149,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 .totalServiceKeys(-1)
                                 .totalServices(5)
                                 .trialDatabaseAllowed(false)
+                                .logRateLimit(-1)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -226,6 +229,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 .totalServiceKeys(-1)
                                 .totalServices(10)
                                 .trialDatabaseAllowed(false)
+                                .logRateLimit(-1)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -244,6 +248,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 .nonBasicServicesAllowed(false)
                                 .totalRoutes(10)
                                 .totalServices(5)
+                                .logRateLimit(-1)
                                 .build());
     }
 
