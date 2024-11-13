@@ -46,4 +46,11 @@ abstract class _Data {
     @Nullable
     abstract Integer getTimeout();
 
+    /**
+     * The interval in seconds between health check requests
+     */
+    @JsonProperty("interval")
+    @Nullable
+    abstract Integer getInterval();
+
 }
