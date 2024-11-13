@@ -34,4 +34,10 @@ abstract class _ApplicationRelationships {
     @JsonProperty("space")
     abstract ToOneRelationship getSpace();
 
+        /**
+     * The current droplet relationship
+     */
+    @JsonProperty("current_droplet")
+    abstract ToOneRelationship getCurrentDroplet();
+
 }
