@@ -39,6 +39,8 @@ final class CreateApplicationRequestTest {
                                                                             .id("test-id")
                                                                             .build())
                                                             .build())
+                                             .currentDroplet(ToOneRelationship.builder()
+                                                                .data(Relationship.builder().build()).build())
                                             .build())
                             .build();
                 });
@@ -63,6 +65,8 @@ final class CreateApplicationRequestTest {
                                         ToOneRelationship.builder()
                                                 .data(Relationship.builder().id("test-id").build())
                                                 .build())
+                                .currentDroplet(ToOneRelationship.builder()
+                                                .data(Relationship.builder().build()).build())
                                 .build())
                 .build();
     }

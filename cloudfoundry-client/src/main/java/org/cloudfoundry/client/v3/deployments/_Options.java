@@ -14,32 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.deployments;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
-/**
- * The Application relationships
- */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationRelationships {
+abstract class _Options {
 
     /**
-     * The space relationship
+     * The The maximum number of new instances to deploy simultaneously
      */
-    @JsonProperty("space")
-    abstract ToOneRelationship getSpace();
+    @JsonProperty("max_in_flight")
+    abstract Integer getMaxInFlight();
 
-        /**
-     * The current droplet relationship
-     */
-    @JsonProperty("current_droplet")
-    @Nullable
-    abstract ToOneRelationship getCurrentDroplet();
 }

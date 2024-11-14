@@ -48,6 +48,7 @@ public abstract class Process extends Resource {
      * The readiness health check
      */
     @JsonProperty("readiness_health_check")
+    @Nullable
     public abstract ReadinessHealthCheck getReadinessHealthCheck();
 
     /**
