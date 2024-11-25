@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v2.info;
+package org.cloudfoundry.reactor.client.v3.info;
 
 import java.util.Map;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.info.GetInfoResponse;
-import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.client.v3.info.GetInfoRequestV3;
+import org.cloudfoundry.client.v3.info.GetInfoResponseV3;
+import org.cloudfoundry.client.v3.info.InfoV3;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
-import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
+import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
 /**
- * The Reactor-based implementation of {@link Info}
+ * The Reactor-based implementation of {@link InfoV3}
  */
-public final class ReactorInfo extends AbstractClientV2Operations implements Info {
+public class ReactorInfoV3 extends AbstractClientV3Operations implements InfoV3 {
 
     /**
      * Creates an instance
@@ -38,7 +38,7 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorInfo(
+    public ReactorInfoV3(
             ConnectionContext connectionContext,
             Mono<String> root,
             TokenProvider tokenProvider,
@@ -46,10 +46,9 @@ public final class ReactorInfo extends AbstractClientV2Operations implements Inf
         super(connectionContext, root, tokenProvider, requestTags);
     }
 
-    @Deprecated
     @Override
-    public Mono<GetInfoResponse> get(GetInfoRequest request) {
-        return get(request, GetInfoResponse.class, builder -> builder.pathSegment("info"))
+    public Mono<GetInfoResponseV3> get(GetInfoRequestV3 request) {
+        return get(request, GetInfoResponseV3.class, builder -> builder.pathSegment("info"))
                 .checkpoint();
     }
 }
