@@ -29,6 +29,7 @@ import org.cloudfoundry.operations.domains.Domain;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -101,6 +102,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void createSharedTcp() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String domainName = this.nameFactory.getDomainName();
 
         this.cloudFoundryOperations
@@ -138,6 +140,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listRouterGroups() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         this.cloudFoundryOperations
                 .domains()
                 .listRouterGroups()
@@ -150,6 +153,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
 
     @Test
     public void listTcp() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateTcpDomain(this.cloudFoundryOperations, domainName)
