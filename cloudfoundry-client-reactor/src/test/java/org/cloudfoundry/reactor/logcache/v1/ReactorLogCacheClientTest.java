@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,14 @@ package org.cloudfoundry.reactor.logcache.v1;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import java.io.IOException;
+import java.net.URI;
 import java.time.Duration;
 import java.util.Collections;
 import org.cloudfoundry.logcache.v1.Envelope;
@@ -34,17 +41,79 @@ import org.cloudfoundry.logcache.v1.Metadata;
 import org.cloudfoundry.logcache.v1.Metric;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.cloudfoundry.reactor.InteractionContext;
+import org.cloudfoundry.reactor.RootProvider;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
+    private static final String API_ROOT = "http://api.my.rapid.server.com";
+    private static final String LOGCACHE = "http://log-cache.my.rlog-cached.server.com";
 
     private final ReactorLogCacheEndpoints logCacheEndpoints =
             new ReactorLogCacheEndpoints(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+
+    @Test
+    void getRootFromFallback() throws IOException {
+        URI webServerUri = URI.create(this.root.block(Duration.ofSeconds(5)));
+        Mono<String> apiRoot = Mono.just(API_ROOT);
+        RootProvider rootProvider = mock(RootProvider.class);
+        when(rootProvider.getRoot(eq("log_cache"), any()))
+                .thenReturn(Mono.error(new IllegalArgumentException())); // trigger fallback
+        when(rootProvider.getRoot(any())).thenReturn(apiRoot);
+        ConnectionContext connectionContext =
+                DefaultConnectionContext.builder()
+                        .rootProvider(rootProvider)
+                        .apiHost(webServerUri.getHost())
+                        .port(webServerUri.getPort())
+                        .secure(false)
+                        .build();
+        ReactorLogCacheClient examinee =
+                ReactorLogCacheClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(TOKEN_PROVIDER)
+                        .build();
+        Mono<String> logCacheRoot = examinee.getRoot();
+        String rootString = logCacheRoot.block(Duration.ofSeconds(15));
+        assertThat(rootString).isEqualTo(LOGCACHE);
+    }
+
+    @Test
+    void getRootFromEndpoint() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/GET_response.json")
+                                        .build())
+                        .build());
+        URI webServerUri = URI.create(this.root.block(Duration.ofSeconds(5)));
+        ConnectionContext connectionContext =
+                DefaultConnectionContext.builder()
+                        .apiHost(webServerUri.getHost())
+                        .port(webServerUri.getPort())
+                        .secure(false)
+                        .build();
+        ReactorLogCacheClient examinee =
+                ReactorLogCacheClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(TOKEN_PROVIDER)
+                        .build();
+        Mono<String> logCacheRoot = examinee.getRoot();
+        String rootString = logCacheRoot.block(Duration.ofSeconds(5));
+        assertThat(rootString)
+                .isEqualTo(
+                        "http://cache-for-logging.cf.lod-cfcli3.cfrt-sof.sapcloud.io:"
+                                + webServerUri.getPort());
+    }
 
     @Test
     void info() {

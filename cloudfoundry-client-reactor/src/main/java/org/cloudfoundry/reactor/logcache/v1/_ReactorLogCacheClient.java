@@ -24,6 +24,7 @@ import org.cloudfoundry.logcache.v1.MetaResponse;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
+import org.cloudfoundry.reactor.RootProvider;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -70,7 +71,7 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        final Mono<String> cached = getConnectionContext().getRootProvider().getRoot("log-cache", getConnectionContext())
+        final Mono<String> cached = getConnectionContext().getRootProvider().getRoot("log_cache", getConnectionContext())
             .onErrorResume(IllegalArgumentException.class, e -> deriveLogCacheUrl());
 
         return getConnectionContext().getCacheDuration()
