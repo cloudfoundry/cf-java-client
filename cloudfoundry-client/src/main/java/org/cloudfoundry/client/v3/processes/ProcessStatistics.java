@@ -42,6 +42,7 @@ public abstract class ProcessStatistics {
     @JsonProperty("instance_internal_ip")
     @Nullable
     public abstract String instance_internal_ip();
+
     /**
      * The file descriptor quota
      */

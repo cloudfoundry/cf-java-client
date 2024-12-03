@@ -16,11 +16,7 @@
 
 package org.cloudfoundry.routing.v1;
 
-
-import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import java.time.Duration;
-import java.util.List;
-
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.NameFactory;
 import org.cloudfoundry.routing.RoutingClient;
@@ -36,10 +32,8 @@ import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
-import org.cloudfoundry.routing.v1.tcproutes.TcpRoutes;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -103,7 +97,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
                                         port,
                                         routerGroupId))
                 .flatMap(
-                        routerGroupId -> 
+                        routerGroupId ->
                                 this.routingClient
                                         .tcpRoutes()
                                         .delete(
@@ -116,19 +110,26 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
                                                                         .routerGroupId(
                                                                                 routerGroupId)
                                                                         .build())
-                                                        .build())
-                )
-                .thenMany(requestListTcpRoutes(this.routingClient)
-                .flatMapIterable(ListTcpRoutesResponse::getTcpRoutes)
-                .filter(route -> backendIp.equals(route.getBackendIp()))
-                .filter(route -> backendPort.equals(route.getBackendPort()))
-                .filter(route -> port.equals(route.getPort()))
-                .flatMap(e -> !"".equals(e.getBackendIp()) ? 
-                                Flux.error(new RuntimeException("route still found")) :
-                                Flux.just(e)
-                 )
-                .retryWhen(Retry.indefinitely().filter(e -> "route still found".equals(e.getMessage())))
-                )
+                                                        .build()))
+                .thenMany(
+                        requestListTcpRoutes(this.routingClient)
+                                .flatMapIterable(ListTcpRoutesResponse::getTcpRoutes)
+                                .filter(route -> backendIp.equals(route.getBackendIp()))
+                                .filter(route -> backendPort.equals(route.getBackendPort()))
+                                .filter(route -> port.equals(route.getPort()))
+                                .flatMap(
+                                        e ->
+                                                !"".equals(e.getBackendIp())
+                                                        ? Flux.error(
+                                                                new RuntimeException(
+                                                                        "route still found"))
+                                                        : Flux.just(e))
+                                .retryWhen(
+                                        Retry.indefinitely()
+                                                .filter(
+                                                        e ->
+                                                                "route still found"
+                                                                        .equals(e.getMessage()))))
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
