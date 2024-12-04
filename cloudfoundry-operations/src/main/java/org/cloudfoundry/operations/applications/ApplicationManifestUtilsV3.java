@@ -41,14 +41,12 @@ import reactor.core.Exceptions;
  * Utilities for dealing with {@link ManifestV3}s.  Includes the functionality to transform to and from standard CLI YAML files.
  */
 public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCommon {
-    private static final Yaml YAML;
+    private static final DumperOptions dumperOptions;
 
     static {
-        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions = new DumperOptions();
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumperOptions.setExplicitStart(true);
-
-        YAML = new Yaml(dumperOptions);
     }
 
     private static final Pattern FIND_VARIABLE_REGEX =
@@ -104,9 +102,10 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
      * @param out      the {@link OutputStream} to write to
      * @param manifest the manifest to write
      */
-    public static void write(OutputStream out, ManifestV3 manifest) {
+    public static void write(OutputStream out, ManifestV3 manifest) {            
+        Yaml yaml = new Yaml(dumperOptions);
         try (Writer writer = new OutputStreamWriter(out)) {
-            YAML.dump(toYaml(manifest), writer);
+            yaml.dump(toYaml(manifest), writer);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
