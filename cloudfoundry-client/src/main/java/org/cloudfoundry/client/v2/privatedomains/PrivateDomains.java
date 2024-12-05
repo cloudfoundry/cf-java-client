@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface PrivateDomains {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/private_domains/create_a_private_domain_owned_by_the_given_organization.html">Create a Private Domain owned by the given
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/private_domains/create_a_private_domain_owned_by_the_given_organization.html">Create a Private Domain owned by the given
      * Organization</a> request
      *
      * @param request the Create a Private Domain request
@@ -33,7 +33,7 @@ public interface PrivateDomains {
     Mono<CreatePrivateDomainResponse> create(CreatePrivateDomainRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/private_domains/delete_a_particular_private_domain.html">Delete a Particular Private Domain</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/private_domains/delete_a_particular_private_domain.html">Delete a Particular Private Domain</a> request
      *
      * @param request the Delete Private Domain request
      * @return the response from the Delete Private Domain request
@@ -41,7 +41,7 @@ public interface PrivateDomains {
     Mono<DeletePrivateDomainResponse> delete(DeletePrivateDomainRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/private_domains/retrieve_a_particular_private_domain.html">Retrieve a Particular Private Domain</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/private_domains/retrieve_a_particular_private_domain.html">Retrieve a Particular Private Domain</a> request
      *
      * @param request the Get Private Domain request
      * @return the response from the Get Private Domain request
@@ -49,7 +49,7 @@ public interface PrivateDomains {
     Mono<GetPrivateDomainResponse> get(GetPrivateDomainRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/private_domains/filtering_private_domains_by_name.html">List Private Domains</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/private_domains/filtering_private_domains_by_name.html">List Private Domains</a> request
      *
      * @param request the List Private Domains request
      * @return the response from the List Private Domains request
@@ -57,7 +57,7 @@ public interface PrivateDomains {
     Mono<ListPrivateDomainsResponse> list(ListPrivateDomainsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/private_domains/list_all_shared_organizations_for_the_private_domain.html">List all Shared Organizations for the Private
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/private_domains/list_all_shared_organizations_for_the_private_domain.html">List all Shared Organizations for the Private
      * Domain</a> request
      *
      * @param request the List Private Domain Shared Organizations request

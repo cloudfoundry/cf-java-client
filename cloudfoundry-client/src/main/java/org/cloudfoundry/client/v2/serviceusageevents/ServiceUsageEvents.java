@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceUsageEvents {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_usage_events/retrieve_a_particular_service_usage_event.html">Retrieve a Particular Service Usage Events</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_usage_events/retrieve_a_particular_service_usage_event.html">Retrieve a Particular Service Usage Events</a> request
      *
      * @param request the Get Service Usage Events
      * @return the response from the Get Service Usage Events request
@@ -32,7 +32,7 @@ public interface ServiceUsageEvents {
     Mono<GetServiceUsageEventResponse> get(GetServiceUsageEventRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_usage_events/list_service_usage_events.html">List Service Usage Events</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_usage_events/list_service_usage_events.html">List Service Usage Events</a> request
      *
      * @param request the List Service Usage Events request
      * @return the response from the List Service Usage Events request
@@ -40,7 +40,7 @@ public interface ServiceUsageEvents {
     Mono<ListServiceUsageEventsResponse> list(ListServiceUsageEventsRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_usage_events/purge_and_reseed_service_usage_events.html">Purge and Reseed Service Usage Events</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_usage_events/purge_and_reseed_service_usage_events.html">Purge and Reseed Service Usage Events</a> request
      *
      * @param request the Purge and Reseed Service Usage Events
      * @return the response from the Purge and Reseed Service Usage Events request
