@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor;
 
 import io.netty.handler.codec.http.HttpHeaders;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.cloudfoundry.reactor.util.JsonCodec;
@@ -78,6 +79,12 @@ abstract class AbstractRootProvider implements RootProvider {
     }
 
     @Override
+    public final Mono<String> getRootKey(Queue<String> key, ConnectionContext connectionContext) {
+        Mono<String> cached = doGetRootKey(key, connectionContext);
+        return connectionContext.getCacheDuration().map(cached::cache).orElseGet(cached::cache);
+    }
+
+    @Override
     public final Mono<String> getRoot(ConnectionContext connectionContext) {
         Mono<String> cached =
                 doGetRoot(connectionContext)
@@ -91,6 +98,9 @@ abstract class AbstractRootProvider implements RootProvider {
 
     protected abstract Mono<UriComponents> doGetRoot(
             String key, ConnectionContext connectionContext);
+
+    protected abstract Mono<String> doGetRootKey(
+            Queue<String> key, ConnectionContext connectionContext);
 
     protected final UriComponents getRoot() {
         UriComponentsBuilder builder =

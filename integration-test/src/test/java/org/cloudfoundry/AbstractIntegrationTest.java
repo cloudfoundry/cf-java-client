@@ -25,8 +25,13 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Method;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import java.util.function.Consumer;
+import org.cloudfoundry.reactor.ConnectionContext;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInfo;
@@ -45,10 +50,14 @@ public abstract class AbstractIntegrationTest {
 
     public String testName;
 
+    private static Boolean serverUsesRouting = null;
+
     @Autowired protected NameFactory nameFactory;
 
     @Autowired @RegisterExtension
     public CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule;
+
+    @Autowired private ConnectionContext connectionContext;
 
     @BeforeEach
     public void testEntry(TestInfo testInfo) {
@@ -57,6 +66,15 @@ public abstract class AbstractIntegrationTest {
             this.testName = testMethod.get().getName();
         }
         this.logger.debug(">> {} <<", getTestName());
+        if (serverUsesRouting == null) {
+            Queue<String> keyList = new LinkedList<String>(Arrays.asList("links", "routing"));
+            String routing =
+                    connectionContext
+                            .getRootProvider()
+                            .getRootKey(keyList, connectionContext)
+                            .block(Duration.ofMinutes(5));
+            serverUsesRouting = Boolean.valueOf(!routing.isBlank());
+        }
     }
 
     @AfterEach
@@ -82,6 +100,10 @@ public abstract class AbstractIntegrationTest {
 
     protected static <T> Consumer<Tuple2<T, T>> tupleEquality() {
         return consumer((expected, actual) -> assertThat(actual).isEqualTo(expected));
+    }
+
+    protected boolean serverUsesRouting() {
+        return serverUsesRouting;
     }
 
     private String getTestName() {
