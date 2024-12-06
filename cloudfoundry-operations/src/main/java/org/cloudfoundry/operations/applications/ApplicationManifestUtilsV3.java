@@ -33,6 +33,7 @@ import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.yaml.snakeyaml.DumperOptions;
 import org.yaml.snakeyaml.Yaml;
 import reactor.core.Exceptions;
@@ -209,6 +210,27 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 variables,
                 s -> HealthCheckType.from((String) s),
                 builder::healthCheckType);
+        asString(
+                raw,
+                "readiness-health-check-http-endpoint",
+                variables,
+                builder::readinessHealthCheckHttpEndpoint);
+        asInteger(
+                raw,
+                "readiness-health-check-invocation-timeout",
+                variables,
+                builder::readinessHealthCheckInvocationTimeout);
+        asInteger(
+                raw,
+                "readiness-health-check-interval",
+                variables,
+                builder::readinessHealthCheckInterval);
+        as(
+                raw,
+                "readiness-health-check-type",
+                variables,
+                s -> ReadinessHealthCheckType.from((String) s),
+                builder::readinessHealthCheckType);
         asInteger(raw, "instances", variables, builder::instances);
         asString(raw, "memory", variables, builder::memory);
         asInteger(raw, "timeout", variables, builder::timeout);
@@ -293,6 +315,18 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "health-check-http-endpoint", process.getHealthCheckHttpEndpoint());
         putIfPresent(
                 yaml, "health-check-invocation-timeout", process.getHealthCheckInvocationTimeout());
+        putIfPresent(yaml, "health-check-type", process.getHealthCheckType());
+        putIfPresent(yaml, "readiness-health-check-type", process.getReadinessHealthCheckType());
+        putIfPresent(
+                yaml,
+                "readiness-health-check-http-endpoint",
+                process.getReadinessHealthCheckHttpEndpoint());
+        putIfPresent(
+                yaml,
+                "readiness-health-check-invocation-timeout",
+                process.getReadinessHealthCheckInvocationTimeout());
+        putIfPresent(
+                yaml, "readiness-health-check-interval", process.getReadinessHealthCheckInterval());
         putIfPresent(yaml, "health-check-type", process.getHealthCheckType().getValue());
         putIfPresent(yaml, "instances", process.getInstances());
         putIfPresent(yaml, "memory", process.getMemory());

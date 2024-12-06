@@ -100,4 +100,8 @@ public abstract class Build extends Resource {
     @JsonProperty("staging_log_rate_limit_bytes_per_second")
     @Nullable
     public abstract Integer getStagingLogRateLimitBytesPerSecond();
+
+    @JsonProperty("staging_log_rate_limit_bytes_per_second")
+    @Nullable
+    public abstract Integer staging_log_rate_limit_bytes_per_second();
 }

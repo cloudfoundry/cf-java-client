@@ -58,6 +58,10 @@ abstract class _ApplicationEntity extends AbstractApplicationEntity {
     @Nullable
     abstract String getEventsUrl();
 
+    @JsonProperty("log_rate_limit")
+    @Nullable
+    abstract String getLogRateLimit();
+
     /**
      * The package state
      */
