@@ -63,7 +63,7 @@ abstract class _ProcessUsage {
     @Nullable
     abstract Double getCpuEntitlement();
 
-    /** 
+    /**
     * The current logging usage of the instance
     */
    @JsonProperty("log_rate")

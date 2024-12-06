@@ -40,6 +40,8 @@ final class RelationshipsTest {
                         ToOneRelationship.builder()
                                 .data(Relationship.builder().id("test-id").build())
                                 .build())
+                .currentDroplet(
+                        ToOneRelationship.builder().data(Relationship.builder().build()).build())
                 .build();
     }
 }

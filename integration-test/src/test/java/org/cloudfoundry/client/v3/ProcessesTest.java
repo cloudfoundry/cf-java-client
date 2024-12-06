@@ -27,19 +27,8 @@ import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
-import org.cloudfoundry.client.v3.processes.GetProcessRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessResponse;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
-import org.cloudfoundry.client.v3.processes.HealthCheck;
-import org.cloudfoundry.client.v3.processes.HealthCheckType;
-import org.cloudfoundry.client.v3.processes.ListProcessesRequest;
+import org.cloudfoundry.client.v3.processes.*;
 import org.cloudfoundry.client.v3.processes.Process;
-import org.cloudfoundry.client.v3.processes.ProcessResource;
-import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
-import org.cloudfoundry.client.v3.processes.ScaleProcessRequest;
-import org.cloudfoundry.client.v3.processes.TerminateProcessInstanceRequest;
-import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.operations.CloudFoundryOperations;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
@@ -235,6 +224,47 @@ public final class ProcessesTest extends AbstractIntegrationTest {
                                 .path(path)
                                 .noStart(false)
                                 .build());
+    }
+
+    @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
+    public void updateReadinessHealthCheckType() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        Path path = new ClassPathResource("test-application.zip").getFile().toPath();
+
+        createApplication(this.cloudFoundryOperations, applicationName, path)
+                .then(getApplicationId(this.cloudFoundryOperations, applicationName))
+                .flatMap(applicationId -> getProcessId(this.cloudFoundryClient, applicationId))
+                .flatMap(
+                        processId ->
+                                this.cloudFoundryClient
+                                        .processes()
+                                        .update(
+                                                UpdateProcessRequest.builder()
+                                                        .readinessHealthCheck(
+                                                                ReadinessHealthCheck.builder()
+                                                                        .data(
+                                                                                Data.builder()
+                                                                                        .endpoint(
+                                                                                                "/test_endpoint")
+                                                                                        .invocationTimeout(
+                                                                                                1)
+                                                                                        .interval(2)
+                                                                                        .build())
+                                                                        .type(
+                                                                                ReadinessHealthCheckType
+                                                                                        .PORT)
+                                                                        .build())
+                                                        .processId(processId)
+                                                        .build())
+                                        .then(Mono.just(processId)))
+                .flatMap(processId -> requestGetProcess(this.cloudFoundryClient, processId))
+                .map(GetProcessResponse::getReadinessHealthCheck)
+                .map(ReadinessHealthCheck::getType)
+                .as(StepVerifier::create)
+                .expectNext(ReadinessHealthCheckType.PORT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
     }
 
     private static Mono<String> getApplicationId(

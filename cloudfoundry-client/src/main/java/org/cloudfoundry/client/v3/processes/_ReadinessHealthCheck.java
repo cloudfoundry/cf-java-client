@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,32 +14,30 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.applications;
+package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * The Application relationships
+ * The health check
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ApplicationRelationships {
+abstract class _ReadinessHealthCheck {
 
     /**
-     * The space relationship
+     * The data
      */
-    @JsonProperty("space")
-    abstract ToOneRelationship getSpace();
-
-        /**
-     * The current droplet relationship
-     */
-    @JsonProperty("current_droplet")
+    @JsonProperty("data")
     @Nullable
-    abstract ToOneRelationship getCurrentDroplet();
+    abstract Data getData();
+
+    /**
+     * The type
+     */
+    @JsonProperty("type")
+    abstract ReadinessHealthCheckType getType();
 }

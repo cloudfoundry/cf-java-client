@@ -57,6 +57,7 @@ public abstract class ProcessStatistics {
      * The index
      */
     @JsonProperty("index")
+    @Nullable
     public abstract Integer getIndex();
 
     /**

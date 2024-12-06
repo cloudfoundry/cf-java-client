@@ -60,5 +60,12 @@ abstract class _UserConfig {
     @Nullable
     abstract Boolean getcheckOriginEnabled();
 
+    /**
+     * Flag for switching off the loop over all origins in a zone (defaults to true)
+     */
+    @JsonProperty("allowOriginLoop")
+    @Nullable
+    abstract Boolean getAllowOriginLoop();
+
 
 }

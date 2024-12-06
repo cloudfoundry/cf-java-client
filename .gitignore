@@ -9,3 +9,4 @@ bin/
 .factorypath
 .gradle
 .history/
+*.iml
