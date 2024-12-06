@@ -56,6 +56,10 @@ abstract class _ApplicationInstanceInfo {
     @Nullable
     abstract Integer getDebugPort();
 
+    @JsonProperty("routable")
+    @Nullable
+    abstract Boolean getRoutable();
+
     /**
      * The details
      */
