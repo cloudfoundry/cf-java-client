@@ -39,6 +39,9 @@ public abstract class ProcessStatistics {
     @Nullable
     public abstract Long getDiskQuota();
 
+    @JsonProperty("instance_internal_ip")
+    @Nullable
+    public abstract String instance_internal_ip();
     /**
      * The file descriptor quota
      */
@@ -57,7 +60,16 @@ public abstract class ProcessStatistics {
      * The index
      */
     @JsonProperty("index")
+    @Nullable
     public abstract Integer getIndex();
+
+    @JsonProperty("routable")
+    @Nullable
+    public abstract Boolean routable();
+
+    @JsonProperty("log_rate_limit")
+    @Nullable
+    public abstract Integer log_rate_limit();
 
     /**
      * The instance port mappings

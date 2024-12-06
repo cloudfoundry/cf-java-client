@@ -1527,6 +1527,23 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    public void setReadinessHealthCheck() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(this.cloudFoundryOperations, new ClassPathResource("test-application.zip").getFile().toPath(), applicationName, false)
+            .then(this.cloudFoundryOperations.applications()
+                .setHealthCheck(SetApplicationHealthCheckRequest.builder()
+                    .name(applicationName)
+                    .type(ApplicationHealthCheck.PROCESS)
+                    .build()))
+            .then(requestGetHealthCheck(this.cloudFoundryOperations, applicationName))
+            .as(StepVerifier::create)
+            .expectNext(ApplicationHealthCheck.PROCESS)
+            .expectComplete()
+            .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void sshEnabled() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 

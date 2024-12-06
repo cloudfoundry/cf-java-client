@@ -28,6 +28,14 @@
           "endpoint": null
         }
       },
+      "readiness_health_check": {
+        "type": "port",
+        "data": {
+          "interval": null,
+          "endpoint": null,
+          "invocation_timeout": null
+        }
+      },
       "metadata": {
         "annotations": {},
         "labels": {}
@@ -66,6 +74,14 @@
         "data": {
           "timeout": null,
           "endpoint": null
+        }
+      },
+      "readiness_health_check": {
+        "type": "port",
+        "data": {
+          "interval": null,
+          "endpoint": null,
+          "invocation_timeout": null
         }
       },
       "metadata": {

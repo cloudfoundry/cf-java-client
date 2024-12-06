@@ -45,6 +45,12 @@ public abstract class Process extends Resource {
     public abstract HealthCheck getHealthCheck();
 
     /**
+     * The readiness health check
+     */
+    @JsonProperty("readiness_health_check")
+    public abstract ReadinessHealthCheck getReadinessHealthCheck();
+
+    /**
      * The instances
      */
     @JsonProperty("instances")
@@ -56,11 +62,18 @@ public abstract class Process extends Resource {
     @JsonProperty("memory_in_mb")
     public abstract Integer getMemoryInMb();
 
+    @JsonProperty("version")
+    @Nullable
+    public abstract String getMemoryInMbs();
+
     /**
      * The metadata
      */
     @JsonProperty("metadata")
     public abstract Metadata getMetadata();
+
+    @JsonProperty("log_rate_limit_in_bytes_per_second")
+    public abstract Integer getMetadataa();
 
     /**
      * The relationships

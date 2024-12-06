@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2024 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.stacks;
+package org.cloudfoundry.client.v3.processes;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,46 +22,22 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The entity response payload for the Stack resource
+ * The health check
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _StackEntity {
+abstract class _ReadinessHealthCheck {
 
     /**
-     * The description
+     * The data
      */
-    @JsonProperty("description")
+    @JsonProperty("data")
     @Nullable
-    abstract String getDescription();
-
-    @JsonProperty("build_rootfs_image")
-    @Nullable
-    abstract String getDescriptioan();
-
-    @JsonProperty("run_rootfs_image")
-    @Nullable
-    abstract String getDescriptioana();
+    abstract Data getData();
 
     /**
-     * The name
+     * The type
      */
-    @JsonProperty("name")
-    @Nullable
-    abstract String getName();
-
-           /**
-     * Build RootFS Image
-     */
-    @JsonProperty("build_rootfs_image")
-    @Nullable
-    abstract String getBuildRootfsImage();
-
-   /**
-     * Run RootFS Image
-     */
-    @JsonProperty("run_rootfs_image")
-    @Nullable
-    abstract String getRunRootfsImage();
-
+    @JsonProperty("type")
+    abstract ReadinessHealthCheckType getType();
 }

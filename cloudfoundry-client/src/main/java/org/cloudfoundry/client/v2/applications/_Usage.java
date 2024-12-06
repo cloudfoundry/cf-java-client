@@ -35,6 +35,10 @@ abstract class _Usage {
     @Nullable
     abstract Double getCpu();
 
+    @JsonProperty("log_rate")
+    @Nullable
+    abstract String getLogRate();
+
     /**
      * The CPU entitlement
      */
