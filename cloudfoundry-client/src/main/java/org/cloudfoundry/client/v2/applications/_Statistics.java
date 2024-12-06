@@ -34,10 +34,6 @@ abstract class _Statistics {
     @Nullable
     abstract Long getDiskQuota();
 
-    @JsonProperty("log_rate_limit")
-    @Nullable
-    abstract String getLogRateLimit();
-
     /**
      * The application file descriptor quota
      */

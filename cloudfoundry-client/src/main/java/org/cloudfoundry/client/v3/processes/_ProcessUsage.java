@@ -56,10 +56,6 @@ abstract class _ProcessUsage {
     @Nullable
     abstract String getTime();
 
-    @JsonProperty("log_rate")
-    @Nullable
-    abstract Integer log_rate();
-
     /**
      * The CPU entitlement
      */

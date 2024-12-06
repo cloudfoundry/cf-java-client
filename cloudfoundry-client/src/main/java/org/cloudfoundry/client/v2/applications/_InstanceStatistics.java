@@ -46,9 +46,6 @@ abstract class _InstanceStatistics {
     @Nullable
     abstract Statistics getStatistics();
 
-    @JsonProperty("routable")
-    @Nullable
-    abstract Boolean getLogRate();
      /**
      * Routable
      */

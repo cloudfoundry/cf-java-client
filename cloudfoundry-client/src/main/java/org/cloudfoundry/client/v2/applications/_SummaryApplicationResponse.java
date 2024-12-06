@@ -40,9 +40,6 @@ abstract class _SummaryApplicationResponse extends AbstractApplicationEntity {
     @Nullable
     abstract List<Domain> getAvailableDomains();
 
-    @JsonProperty("log_rate_limit")
-    @Nullable
-    abstract String getLogRate();
     /**
      * The detected buildpack
      */
