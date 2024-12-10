@@ -1532,6 +1532,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder().name("test-name").build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1599,6 +1605,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-application-id",
                 Collections.singletonMap("test-key-1", "test-value-1"));
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder()
+                        .name("test-name")
+                        .environmentVariable("test-key-2", "test-value-2")
+                        .build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1669,6 +1684,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id", null);
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder()
+                        .name("test-name")
+                        .environmentVariable("test-key-1", "test-value-1")
+                        .environmentVariable("test-key-2", "test-value-2")
+                        .build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1756,10 +1781,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSharedDomains(
                 this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestCreateRoute(
+                this.cloudFoundryClient,
+                "test-shared-domain-id",
+                "test-host",
+                null,
+                null,
+                "test-space-id",
+                "test-route-id");
         requestRoutes(
                 this.cloudFoundryClient,
                 "test-shared-domain-id",
                 "test-host",
+                null,
                 null,
                 "test-route-id");
         requestListMatchingResources(
@@ -1817,7 +1851,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSharedDomains(
                 this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "", null, "test-route-id");
+        requestRoutes(
+                this.cloudFoundryClient, "test-shared-domain-id", "", null, null, "test-route-id");
+        requestCreateRoute(
+                this.cloudFoundryClient,
+                "test-shared-domain-id",
+                "",
+                null,
+                null,
+                "test-space-id",
+                "test-route-id");
         requestListMatchingResources(
                 this.cloudFoundryClient,
                 Arrays.asList(
@@ -2952,6 +2995,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-application-id");
 
         StepVerifier.withVirtualTime(
                         () ->
@@ -3244,6 +3288,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
                 .restage(RestageApplicationRequest.builder().name("test-application-name").build())
@@ -3317,6 +3362,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
                 .restage(
@@ -4983,6 +5029,29 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
+    private static void requestInstancesApplicationFailing(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV2()
+                        .instances(
+                                ApplicationInstancesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(
+                                                ApplicationInstancesResponse.builder(),
+                                                "application-instances-")
+                                        .instance(
+                                                "instance-0",
+                                                fill(
+                                                                ApplicationInstanceInfo.builder(),
+                                                                "application-instance-info-")
+                                                        .state("FAILED")
+                                                        .build())
+                                        .build()));
+    }
+
     private static void requestGetApplicationTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
@@ -5452,11 +5521,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             CloudFoundryClient cloudFoundryClient,
             String domainId,
             String host,
+            Integer port,
             String routePath,
             String routeId) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
 
         Optional.ofNullable(host).ifPresent(requestBuilder::host);
+        Optional.ofNullable(port).ifPresent(requestBuilder::port);
         Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         when(cloudFoundryClient.routes().list(requestBuilder.domainId(domainId).page(1).build()))
@@ -5472,6 +5543,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .entity(
                                                                 RouteEntity.builder()
                                                                         .host(host)
+                                                                        .port(port)
                                                                         .path(
                                                                                 routePath == null
                                                                                         ? ""
