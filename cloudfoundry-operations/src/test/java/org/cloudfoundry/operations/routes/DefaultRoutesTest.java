@@ -214,6 +214,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void createRouteInvalidSpace() {
         requestSpacesEmpty(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
 
         this.routes
                 .create(
@@ -236,6 +237,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void createRouteNoHost() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestCreateRoute(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -262,6 +264,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void createRouteNoPath() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestCreateRoute(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -288,6 +291,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void createRoutePrivateDomain() {
         requestSpaces(this.cloudFoundryClient, TEST_ORGANIZATION_ID, TEST_SPACE_NAME);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestCreateRoute(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -365,6 +369,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     @Test
     void deleteRoute() {
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutes(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -531,6 +536,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void mapRouteExists() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutes(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -556,6 +562,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void mapRouteInvalidApplicationName() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutesEmpty(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -616,6 +623,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void mapRouteNoHost() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutesEmpty(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -648,6 +656,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void mapRoutePath() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutesTwo(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -672,6 +681,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void mapRoutePrivateDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutesEmpty(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -760,6 +770,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void unmapRouteInvalidApplicationName() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
 
         this.routes
                 .unmap(
@@ -804,6 +815,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void unmapRouteInvalidRoute() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutesEmpty(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
@@ -832,6 +844,7 @@ final class DefaultRoutesTest extends AbstractOperationsTest {
     void unmapRoutePrivateDomain() {
         requestApplications(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
         requestPrivateDomains(this.cloudFoundryClient, TEST_ORGANIZATION_ID, "test-domain");
+        requestSharedDomains(cloudFoundryClient, "test-domain");
         requestRoutes(
                 this.cloudFoundryClient,
                 "test-private-domain-metadata-id",
