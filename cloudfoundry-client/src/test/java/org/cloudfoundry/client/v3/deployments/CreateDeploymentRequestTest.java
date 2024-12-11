@@ -61,4 +61,20 @@ final class CreateDeploymentRequestTest {
                                 .build())
                 .build();
     }
+
+    @Test
+    void withDeploymentStrategy() {
+        CreateDeploymentRequest.builder()
+                .droplet(Relationship.builder().id("droplet-id").build())
+                .deploymentStrategy(DeploymentStrategy.ROLLING)
+                .relationships(
+                        DeploymentRelationships.builder()
+                                .app(
+                                        ToOneRelationship.builder()
+                                                .data(Relationship.builder().id("app-id").build())
+                                                .build())
+                                .build())
+                .build();
+    }
+
 }
