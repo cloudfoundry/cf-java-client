@@ -51,6 +51,7 @@ import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroups;
 import org.cloudfoundry.uaa.UaaClient;
@@ -100,6 +101,8 @@ public abstract class AbstractOperationsTest {
     protected final DomainsV3 domainsV3 = mock(DomainsV3.class, RETURNS_SMART_NULLS);
 
     protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
+
+    protected final LogCacheClient logCacheClient = mock(LogCacheClient.class, RETURNS_SMART_NULLS);
 
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
 
