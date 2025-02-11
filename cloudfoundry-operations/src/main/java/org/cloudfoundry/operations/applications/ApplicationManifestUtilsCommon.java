@@ -423,7 +423,11 @@ abstract class ApplicationManifestUtilsCommon {
         if (null != disk) {
             putIfPresent(yaml, "disk_quota", applicationManifest.getDisk().toString() + "M");
         }
-        putIfPresent(yaml, "docker", applicationManifest.getDocker());
+        putIfPresent(
+                yaml,
+                "docker",
+                applicationManifest.getDocker(),
+                ApplicationManifestUtilsCommon::toDockerYaml);
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
         putIfPresent(

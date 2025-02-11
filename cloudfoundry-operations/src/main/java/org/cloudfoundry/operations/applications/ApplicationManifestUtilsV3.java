@@ -197,7 +197,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
 
         asString(raw, "type", variables, builder::type);
         asString(raw, "command", variables, builder::command);
-        asString(raw, "disk", variables, builder::disk);
+        asString(raw, "disk_quota", variables, builder::disk);
         asString(raw, "health-check-http-endpoint", variables, builder::healthCheckHttpEndpoint);
         asInteger(
                 raw,
