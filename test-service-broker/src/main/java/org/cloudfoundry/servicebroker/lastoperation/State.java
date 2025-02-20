@@ -19,7 +19,6 @@ package org.cloudfoundry.servicebroker.lastoperation;
 import com.fasterxml.jackson.annotation.JsonValue;
 
 enum State {
-
     FAILED("failed"),
 
     IN_PROGRESS("in progress"),
@@ -36,5 +35,4 @@ enum State {
     String getValue() {
         return this.value;
     }
-
 }

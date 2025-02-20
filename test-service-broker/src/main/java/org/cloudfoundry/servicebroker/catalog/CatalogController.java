@@ -16,102 +16,133 @@
 
 package org.cloudfoundry.servicebroker.catalog;
 
+import java.util.UUID;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.UUID;
 
 @RestController
 final class CatalogController {
 
     private final Catalog catalog;
 
-    CatalogController(@Value("${service.name}") String serviceName, @Value("${plan.name}") String planName) {
-        this.catalog = Catalog.builder()
-            .service(Service.builder()
-                .id(UUID.randomUUID().toString())
-                .name(serviceName)
-                .require("route_forwarding")
-                .description("test-service-description")
-                .bindable(true)
-                .planUpdateable(true)
-                .metadata(ServiceMetadata.builder()
-                    .displayName("test-service-display-name")
-                    .listing(Listing.builder()
-                        .blurb("test-listing-blurb")
-                        .imageUrl("http://test-image-host/test-image.gif")
-                        .longDescription("test-listing-long-description")
-                        .build())
-                    .provider(Provider.builder()
-                        .name("test-provider-name")
-                        .build())
-                    .build())
-                .dashboardClient(DashboardClient.builder()
-                    .id(UUID.randomUUID().toString())
-                    .redirectUri("http://test-dashboard-host")
-                    .secret(UUID.randomUUID().toString())
-                    .build())
-                .plan(Plan.builder()
-                    .id(UUID.randomUUID().toString())
-                    .name(planName)
-                    .description("test-plan-description")
-                    .metadata(PlanMetadata.builder()
-                        .bullet(Bullet.builder()
-                            .content("test-plan-metadata-bullet")
-                            .build())
-                        .cost(Cost.builder()
-                            .amount("usd", 1)
-                            .unit("MONTHLY")
-                            .build())
-                        .build())
-                    .build())
-                .build())
-            .service(Service.builder()
-                .id(UUID.randomUUID().toString())
-                .name(serviceName + "-shareable")
-                .description("test-service-description-shareable")
-                .bindable(true)
-                .planUpdateable(true)
-                .metadata(ServiceMetadata.builder()
-                    .displayName("test-service-display-name")
-                    .listing(Listing.builder()
-                        .blurb("test-listing-blurb")
-                        .imageUrl("http://test-image-host/test-image.gif")
-                        .longDescription("test-listing-long-description")
-                        .build())
-                    .provider(Provider.builder()
-                        .name("test-provider-name")
-                        .build())
-                    .shareable(true)
-                    .build())
-                .dashboardClient(DashboardClient.builder()
-                    .id(UUID.randomUUID().toString())
-                    .redirectUri("http://test-dashboard-host")
-                    .secret(UUID.randomUUID().toString())
-                    .build())
-                .plan(Plan.builder()
-                    .id(UUID.randomUUID().toString())
-                    .name(planName + "-shareable")
-                    .description("test-plan-description-shareable")
-                    .metadata(PlanMetadata.builder()
-                        .bullet(Bullet.builder()
-                            .content("test-plan-metadata-bullet")
-                            .build())
-                        .cost(Cost.builder()
-                            .amount("usd", 1)
-                            .unit("MONTHLY")
-                            .build())
-                        .build())
-                    .build())
-                .build())
-            .build();
+    CatalogController(
+            @Value("${service.name}") String serviceName, @Value("${plan.name}") String planName) {
+        this.catalog =
+                Catalog.builder()
+                        .service(
+                                Service.builder()
+                                        .id(UUID.randomUUID().toString())
+                                        .name(serviceName)
+                                        .require("route_forwarding")
+                                        .description("test-service-description")
+                                        .bindable(true)
+                                        .planUpdateable(true)
+                                        .metadata(
+                                                ServiceMetadata.builder()
+                                                        .displayName("test-service-display-name")
+                                                        .listing(
+                                                                Listing.builder()
+                                                                        .blurb("test-listing-blurb")
+                                                                        .imageUrl(
+                                                                                "http://test-image-host/test-image.gif")
+                                                                        .longDescription(
+                                                                                "test-listing-long-description")
+                                                                        .build())
+                                                        .provider(
+                                                                Provider.builder()
+                                                                        .name("test-provider-name")
+                                                                        .build())
+                                                        .build())
+                                        .dashboardClient(
+                                                DashboardClient.builder()
+                                                        .id(UUID.randomUUID().toString())
+                                                        .redirectUri("http://test-dashboard-host")
+                                                        .secret(UUID.randomUUID().toString())
+                                                        .build())
+                                        .plan(
+                                                Plan.builder()
+                                                        .id(UUID.randomUUID().toString())
+                                                        .name(planName)
+                                                        .description("test-plan-description")
+                                                        .metadata(
+                                                                PlanMetadata.builder()
+                                                                        .bullet(
+                                                                                Bullet.builder()
+                                                                                        .content(
+                                                                                                "test-plan-metadata-bullet")
+                                                                                        .build())
+                                                                        .cost(
+                                                                                Cost.builder()
+                                                                                        .amount(
+                                                                                                "usd",
+                                                                                                1)
+                                                                                        .unit(
+                                                                                                "MONTHLY")
+                                                                                        .build())
+                                                                        .build())
+                                                        .build())
+                                        .build())
+                        .service(
+                                Service.builder()
+                                        .id(UUID.randomUUID().toString())
+                                        .name(serviceName + "-shareable")
+                                        .description("test-service-description-shareable")
+                                        .bindable(true)
+                                        .planUpdateable(true)
+                                        .metadata(
+                                                ServiceMetadata.builder()
+                                                        .displayName("test-service-display-name")
+                                                        .listing(
+                                                                Listing.builder()
+                                                                        .blurb("test-listing-blurb")
+                                                                        .imageUrl(
+                                                                                "http://test-image-host/test-image.gif")
+                                                                        .longDescription(
+                                                                                "test-listing-long-description")
+                                                                        .build())
+                                                        .provider(
+                                                                Provider.builder()
+                                                                        .name("test-provider-name")
+                                                                        .build())
+                                                        .shareable(true)
+                                                        .build())
+                                        .dashboardClient(
+                                                DashboardClient.builder()
+                                                        .id(UUID.randomUUID().toString())
+                                                        .redirectUri("http://test-dashboard-host")
+                                                        .secret(UUID.randomUUID().toString())
+                                                        .build())
+                                        .plan(
+                                                Plan.builder()
+                                                        .id(UUID.randomUUID().toString())
+                                                        .name(planName + "-shareable")
+                                                        .description(
+                                                                "test-plan-description-shareable")
+                                                        .metadata(
+                                                                PlanMetadata.builder()
+                                                                        .bullet(
+                                                                                Bullet.builder()
+                                                                                        .content(
+                                                                                                "test-plan-metadata-bullet")
+                                                                                        .build())
+                                                                        .cost(
+                                                                                Cost.builder()
+                                                                                        .amount(
+                                                                                                "usd",
+                                                                                                1)
+                                                                                        .unit(
+                                                                                                "MONTHLY")
+                                                                                        .build())
+                                                                        .build())
+                                                        .build())
+                                        .build())
+                        .build();
     }
 
     @GetMapping("/v2/catalog")
     ResponseEntity<Catalog> catalog() {
         return ResponseEntity.ok(this.catalog);
     }
-
 }

@@ -19,5 +19,4 @@ package org.cloudfoundry.servicebroker.lastoperation;
 public interface LastOperationRepository {
 
     void register(String instanceId, OperationType operationType);
-
 }
