@@ -17,16 +17,14 @@
 /**
  * Created by bhale on 2/22/17.
  */
-
 @Value.Style(
-    add = "*",
-    defaults = @Value.Immutable(copy = false),
-    depluralize = true,
-    jdkOnly = true,
-    put = "*",
-    typeAbstract = "_*",
-    typeImmutable = "*"
-)
+        add = "*",
+        defaults = @Value.Immutable(copy = false),
+        depluralize = true,
+        jdkOnly = true,
+        put = "*",
+        typeAbstract = "_*",
+        typeImmutable = "*")
 package org.cloudfoundry.servicebroker;
 
 import org.immutables.value.Value;
