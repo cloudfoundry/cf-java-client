@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.junit.jupiter.api.Test;
 
 class ApplicationManifestUtilsV3Test {
@@ -25,6 +26,16 @@ class ApplicationManifestUtilsV3Test {
                                         .stack("test-stack")
                                         .timeout(120)
                                         .environmentVariable("TEST_KEY_1", "test-value-1")
+                                        .processe(
+                                                ManifestV3Process.builder()
+                                                        .type("web")
+                                                        .command("test-command-1")
+                                                        .readinessHealthCheckType(
+                                                                ReadinessHealthCheckType.HTTP)
+                                                        .readinessHealthCheckHttpEndpoint(
+                                                                "test-readiness-health-check-http-endpoint")
+                                                        .readinessHealthCheckInvocationTimeout(120)
+                                                        .build())
                                         .service(
                                                 ManifestV3Service.builder()
                                                         .name("test-service-1")
