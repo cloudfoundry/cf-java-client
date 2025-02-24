@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        java: [ 8, 11 ]
+        java: [ 8, 11, 17, 21 ]
     name: Java ${{ matrix.java }} build
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
         run: ./mvnw clean package -Dgpg.skip
       - name: Compile integration tests
         run:  ./mvnw -Pintegration-test test-compile compile
-      - if: ${{ matrix.java != 8 }}
+      - if: ${{ matrix.java == 11 }}
         name: Check style with Spotless
         run:  ./mvnw spotless:check -Pintegration-test
 
