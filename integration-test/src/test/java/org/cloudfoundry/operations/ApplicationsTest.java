@@ -28,8 +28,11 @@ import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.MessageType;
+import org.cloudfoundry.logcache.v1.LogType;
+import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -494,19 +497,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations,
                         new ClassPathResource("test-application.zip").getFile().toPath(),
                         applicationName,
-                        false)
-                .thenMany(
-                        this.cloudFoundryOperations
+                        false)                
+                .thenMany(this.cloudFoundryOperations
                                 .applications()
-                                .logs(
-                                        LogsRequest.builder()
-                                                .name(applicationName)
-                                                .recent(true)
+                                .logs(ReadRequest.builder()
+                                                .sourceId(applicationName)
                                                 .build()))
-                .map(LogMessage::getMessageType)
-                .next()
+                .map(org.cloudfoundry.logcache.v1.Log::getType)
                 .as(StepVerifier::create)
-                .expectNext(MessageType.OUT)
+                .expectNext(org.cloudfoundry.logcache.v1.LogType.OUT)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

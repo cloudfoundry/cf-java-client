@@ -46,6 +46,7 @@ import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.TestLogCacheEndpoints;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.operations.DefaultCloudFoundryOperations;
@@ -257,6 +258,7 @@ public class IntegrationTestConfiguration {
     DefaultCloudFoundryOperations cloudFoundryOperations(
             @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
             DopplerClient dopplerClient,
+            LogCacheClient logCacheClient,
             @Qualifier("nonAdmin") NetworkingClient networkingClient,
             RoutingClient routingClient,
             @Qualifier("nonAdmin") UaaClient uaaClient,
@@ -266,6 +268,7 @@ public class IntegrationTestConfiguration {
                 .cloudFoundryClient(cloudFoundryClient)
                 .dopplerClient(dopplerClient)
                 .networkingClient(networkingClient)
+                .logCacheClient(logCacheClient)
                 .routingClient(routingClient)
                 .uaaClient(uaaClient)
                 .organization(organizationName)
@@ -557,7 +560,7 @@ public class IntegrationTestConfiguration {
 
     @Bean
     String stackName() {
-        return "cflinuxfs3";
+        return "cflinuxfs4";
     }
 
     @Bean(initMethod = "block")
