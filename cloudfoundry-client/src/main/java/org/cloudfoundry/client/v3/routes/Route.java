@@ -62,4 +62,11 @@ public abstract class Route extends Resource {
      */
     @JsonProperty("url")
     public abstract String getUrl();
+
+    /**
+     * The route options
+     */
+    @JsonProperty("options")
+    @Nullable
+    public abstract RouteOptions getOptions();
 }
