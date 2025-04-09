@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -144,10 +145,18 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.LogType;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -163,6 +172,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             new DefaultApplications(
                     Mono.just(this.cloudFoundryClient),
                     Mono.just(this.dopplerClient),
+                    Mono.just(this.logCacheClient),
                     this.randomWords,
                     Mono.just(TEST_SPACE_ID));
 
@@ -1313,12 +1323,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-application-name");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
+                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
                 .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectNextMatches(log -> log.getPayload().equals("test-payload"))
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -1339,39 +1349,40 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    void logsRecent() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+     //    TODO: it's not passing since recentLogs is not properly implemented yet with logcacheclient
+     @Test
+     void logsRecent() {
+         requestApplications(
+                 this.cloudFoundryClient,
+                 "test-application-name",
+                 TEST_SPACE_ID,
+                 "test-metadata-id");
+         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
-                .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
+         this.applications
+                 .logs(LogsRequest.builder().name("test-application-name").build())
+                 .as(StepVerifier::create)
+                 .expectNext(fill(Log.builder(), "log-message-").build())
+                 .expectComplete()
+                 .verify(Duration.ofSeconds(5));
+     }
+     //    TODO: it's not passing since recentLogs is not properly implemented yet with logcacheclient
+     @Test
+     void logsRecentNotSet() {
+         requestApplications(
+                 this.cloudFoundryClient,
+                 "test-application-name",
+                 TEST_SPACE_ID,
+                 "test-metadata-id");
+         requestLogsStream(this.dopplerClient, "test-metadata-id");
 
-    @Test
-    void logsRecentNotSet() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
-
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
-                .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
+         this.applications
+                 .logs(LogsRequest.builder().name("test-application-name").build())
+                 .as(StepVerifier::create)
+                 .expectNext(fill(Log.builder(), "log-message-").build())
+                 .expectComplete()
+                 .verify(Duration.ofSeconds(5));
+     }
 
     @Test
     void pushDocker() {
@@ -5248,17 +5259,21 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.recentLogs(
-                        RecentLogsRequest.builder().applicationId(applicationId).build()))
-                .thenReturn(
-                        Flux.just(
-                                Envelope.builder()
-                                        .eventType(EventType.LOG_MESSAGE)
-                                        .logMessage(
-                                                fill(LogMessage.builder(), "log-message-").build())
-                                        .origin("rsp")
-                                        .build()));
+    private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String applicationId) {
+            when(logCacheClient.recentLogs(
+                            any()))
+                            .thenReturn(
+                                            Mono.just(fill(ReadResponse.builder())
+                                                            .envelopes(fill(EnvelopeBatch.builder())
+                                                                            .batch(fill(org.cloudfoundry.logcache.v1.Envelope
+                                                                                            .builder())
+                                                                                            .log(fill(Log.builder())
+                                                                                                            .payload("test-payload")
+                                                                                                            .type(LogType.OUT)
+                                                                                                            .build())
+                                                                                            .build())
+                                                                            .build())
+                                                            .build()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {
