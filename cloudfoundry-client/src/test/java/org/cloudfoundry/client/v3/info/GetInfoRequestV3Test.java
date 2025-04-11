@@ -14,21 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.client.v3.info;
 
-import reactor.core.publisher.Mono;
+import org.junit.jupiter.api.Test;
 
-/**
- * Main entry point to the Cloud Foundry Info Client API
- * @deprecated use the v3 API.
- */
-public interface Info {
+final class GetInfoRequestV3Test {
 
-    /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/info/get_info.html">Get Info</a> request
-     *
-     * @param request the Get Info request
-     * @return the response from the Get Info request
-     */
-    Mono<GetInfoResponse> get(GetInfoRequest request);
+    @Test
+    void valid() {
+        GetInfoRequestV3.builder().build();
+    }
 }
