@@ -543,6 +543,26 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
+    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+        return logs(LogsRequest.builder()
+                        .name(request.getName())
+                        .recent(request.getRecent())
+                        .build())
+                .map(
+                        logMessage ->
+                                ApplicationLog.builder()
+                                        .sourceId(logMessage.getApplicationId())
+                                        .sourceType(logMessage.getSourceType())
+                                        .instanceId(logMessage.getSourceInstance())
+                                        .message(logMessage.getMessage())
+                                        .timestamp(logMessage.getTimestamp())
+                                        .logType(
+                                                ApplicationLogType.from(
+                                                        logMessage.getMessageType().name()))
+                                        .build());
+    }
+
+    @Override
     @SuppressWarnings("deprecation")
     public Mono<Void> push(PushApplicationRequest request) {
         ApplicationManifest.Builder builder =
