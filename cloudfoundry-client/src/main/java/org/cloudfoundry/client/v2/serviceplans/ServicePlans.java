@@ -21,7 +21,7 @@ import reactor.core.publisher.Mono;
 public interface ServicePlans {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/delete_a_particular_service_plans.html">Delete the Service Plan</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_plans/delete_a_particular_service_plans.html">Delete the Service Plan</a> request
      *
      * @param request the Delete Service Plan request
      * @return the response from the Delete Service Plan request
@@ -29,7 +29,7 @@ public interface ServicePlans {
     Mono<DeleteServicePlanResponse> delete(DeleteServicePlanRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/retrieve_a_particular_service_plan.html">Retrieve a Particular Service Plan</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_plans/retrieve_a_particular_service_plan.html">Retrieve a Particular Service Plan</a> request
      *
      * @param request the Get Service Plan request
      * @return the response from the Get Service Plan request
@@ -37,7 +37,7 @@ public interface ServicePlans {
     Mono<GetServicePlanResponse> get(GetServicePlanRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/list_all_service_plans.html">List Service Plans</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_plans/list_all_service_plans.html">List Service Plans</a> request
      *
      * @param request the List Service Plans request
      * @return the response from the List Service Plans request
@@ -45,7 +45,7 @@ public interface ServicePlans {
     Mono<ListServicePlansResponse> list(ListServicePlansRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/list_all_service_instances_for_the_service_plan.html">List all Service Instances for the Service Plan</a>
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_plans/list_all_service_instances_for_the_service_plan.html">List all Service Instances for the Service Plan</a>
      * request
      *
      * @param request the List Service Instances request
@@ -55,7 +55,7 @@ public interface ServicePlans {
             ListServicePlanServiceInstancesRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_plans/updating_a_service_plan.html">Updating a Service Plan</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_plans/updating_a_service_plan.html">Updating a Service Plan</a> request
      *
      * @param request the Update Service Plan request
      * @return the response from the Update Service Plan request
