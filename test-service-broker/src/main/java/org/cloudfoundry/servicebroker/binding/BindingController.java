@@ -27,16 +27,11 @@ final class BindingController {
 
     @PutMapping("/v2/service_instances/{instanceId}/service_bindings/{bindingId}")
     ResponseEntity<BindResponse> bind() {
-        return ResponseEntity.status(HttpStatus.CREATED)
-            .body(BindResponse.builder()
-                .build());
+        return ResponseEntity.status(HttpStatus.CREATED).body(BindResponse.builder().build());
     }
 
     @DeleteMapping("/v2/service_instances/{instanceId}/service_bindings/{bindingId}")
     ResponseEntity<UnbindResponse> unbind() {
-        return ResponseEntity.ok()
-            .body(UnbindResponse.builder()
-                .build());
+        return ResponseEntity.ok().body(UnbindResponse.builder().build());
     }
-
 }
