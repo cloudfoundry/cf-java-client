@@ -140,13 +140,11 @@ import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
-import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.LogType;
@@ -156,7 +154,6 @@ import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
@@ -1316,25 +1313,26 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    void logs() {
+    void logsRecent_doppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsRecentLogCache(this.logCacheClient, "test-application-name");
-
+        requestLogsRecent(this.dopplerClient, "test-metadata-id");
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
                 .as(StepVerifier::create)
-                .expectNextMatches(log -> log.getPayload().equals("test-payload"))
+                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
+    @SuppressWarnings("deprecation")
     @Test
-    void logsNoApp() {
+    void logsNoApp_doppler() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -1349,40 +1347,56 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-     //    TODO: it's not passing since recentLogs is not properly implemented yet with logcacheclient
-     @Test
-     void logsRecent() {
-         requestApplications(
-                 this.cloudFoundryClient,
-                 "test-application-name",
-                 TEST_SPACE_ID,
-                 "test-metadata-id");
-         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
+    @SuppressWarnings("deprecation")
+    @Test
+    void logs_doppler() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        this.applications
+                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
+                .as(StepVerifier::create)
+                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
 
-         this.applications
-                 .logs(LogsRequest.builder().name("test-application-name").build())
-                 .as(StepVerifier::create)
-                 .expectNext(fill(Log.builder(), "log-message-").build())
-                 .expectComplete()
-                 .verify(Duration.ofSeconds(5));
-     }
-     //    TODO: it's not passing since recentLogs is not properly implemented yet with logcacheclient
-     @Test
-     void logsRecentNotSet() {
-         requestApplications(
-                 this.cloudFoundryClient,
-                 "test-application-name",
-                 TEST_SPACE_ID,
-                 "test-metadata-id");
-         requestLogsStream(this.dopplerClient, "test-metadata-id");
+    @Test
+    void logsRecent_LogCache() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
+        this.applications
+                .logsRecent(ReadRequest.builder().sourceId("test-application-name").build())
+                .as(StepVerifier::create)
+                .expectNext(fill(Log.builder()).type(LogType.OUT).build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
 
-         this.applications
-                 .logs(LogsRequest.builder().name("test-application-name").build())
-                 .as(StepVerifier::create)
-                 .expectNext(fill(Log.builder(), "log-message-").build())
-                 .expectComplete()
-                 .verify(Duration.ofSeconds(5));
-     }
+    @SuppressWarnings("deprecation")
+    @Test
+    void logsRecentNotSet_doppler() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+
+        this.applications
+                .logs(LogsRequest.builder().name("test-application-name").build())
+                .as(StepVerifier::create)
+                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
 
     @Test
     void pushDocker() {
@@ -1543,6 +1557,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id");
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder().name("test-name").build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1610,6 +1630,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-application-id",
                 Collections.singletonMap("test-key-1", "test-value-1"));
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder()
+                        .name("test-name")
+                        .environmentVariable("test-key-2", "test-value-2")
+                        .build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1680,6 +1709,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSpace(this.cloudFoundryClient, TEST_SPACE_ID, TEST_ORGANIZATION_ID);
         requestApplications(
                 this.cloudFoundryClient, "test-name", TEST_SPACE_ID, "test-application-id", null);
+        requestCreateApplication(
+                cloudFoundryClient,
+                ApplicationManifest.builder()
+                        .name("test-name")
+                        .environmentVariable("test-key-1", "test-value-1")
+                        .environmentVariable("test-key-2", "test-value-2")
+                        .build(),
+                TEST_SPACE_ID,
+                null,
+                "test-application-id");
         requestUpdateApplication(
                 this.cloudFoundryClient,
                 "test-application-id",
@@ -1767,10 +1806,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSharedDomains(
                 this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
+        requestCreateRoute(
+                this.cloudFoundryClient,
+                "test-shared-domain-id",
+                "test-host",
+                null,
+                null,
+                "test-space-id",
+                "test-route-id");
         requestRoutes(
                 this.cloudFoundryClient,
                 "test-shared-domain-id",
                 "test-host",
+                null,
                 null,
                 "test-route-id");
         requestListMatchingResources(
@@ -1828,7 +1876,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestSharedDomains(
                 this.cloudFoundryClient, "test-shared-domain", "test-shared-domain-id");
         requestApplicationRoutes(this.cloudFoundryClient, "test-application-id", "test-route-id");
-        requestRoutes(this.cloudFoundryClient, "test-shared-domain-id", "", null, "test-route-id");
+        requestRoutes(
+                this.cloudFoundryClient, "test-shared-domain-id", "", null, null, "test-route-id");
+        requestCreateRoute(
+                this.cloudFoundryClient,
+                "test-shared-domain-id",
+                "",
+                null,
+                null,
+                "test-space-id",
+                "test-route-id");
         requestListMatchingResources(
                 this.cloudFoundryClient,
                 Arrays.asList(
@@ -2963,6 +3020,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-application-id");
 
         StepVerifier.withVirtualTime(
                         () ->
@@ -3255,6 +3313,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
                 .restage(RestageApplicationRequest.builder().name("test-application-name").build())
@@ -3328,6 +3387,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
+        requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
                 .restage(
@@ -4994,6 +5054,29 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
+    private static void requestInstancesApplicationFailing(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV2()
+                        .instances(
+                                ApplicationInstancesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(
+                                                ApplicationInstancesResponse.builder(),
+                                                "application-instances-")
+                                        .instance(
+                                                "instance-0",
+                                                fill(
+                                                                ApplicationInstanceInfo.builder(),
+                                                                "application-instance-info-")
+                                                        .state("FAILED")
+                                                        .build())
+                                        .build()));
+    }
+
     private static void requestGetApplicationTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
@@ -5259,28 +5342,53 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String applicationId) {
-            when(logCacheClient.recentLogs(
-                            any()))
-                            .thenReturn(
-                                            Mono.just(fill(ReadResponse.builder())
-                                                            .envelopes(fill(EnvelopeBatch.builder())
-                                                                            .batch(fill(org.cloudfoundry.logcache.v1.Envelope
-                                                                                            .builder())
-                                                                                            .log(fill(Log.builder())
-                                                                                                            .payload("test-payload")
-                                                                                                            .type(LogType.OUT)
-                                                                                                            .build())
-                                                                                            .build())
-                                                                            .build())
-                                                            .build()));
+    private static void requestLogsRecentLogCache(
+            LogCacheClient logCacheClient, String applicationName, String payload) {
+        when(logCacheClient.recentLogs(any()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ReadResponse.builder())
+                                        .envelopes(
+                                                fill(EnvelopeBatch.builder())
+                                                        .batch(
+                                                                Arrays.asList(
+                                                                        fill(org.cloudfoundry
+                                                                                        .logcache.v1
+                                                                                        .Envelope
+                                                                                        .builder())
+                                                                                .log(
+                                                                                        Log
+                                                                                                .builder()
+                                                                                                .payload(
+                                                                                                        payload)
+                                                                                                .type(
+                                                                                                        LogType
+                                                                                                                .OUT)
+                                                                                                .build())
+                                                                                .build()))
+                                                        .build())
+                                        .build()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {
         when(dopplerClient.stream(StreamRequest.builder().applicationId(applicationId).build()))
                 .thenReturn(
                         Flux.just(
-                                Envelope.builder()
+                                org.cloudfoundry.doppler.Envelope.builder()
+                                        .eventType(EventType.LOG_MESSAGE)
+                                        .logMessage(
+                                                fill(LogMessage.builder(), "log-message-").build())
+                                        .origin("rsp")
+                                        .build()));
+    }
+
+    @SuppressWarnings("deprecation")
+    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
+        when(dopplerClient.recentLogs(
+                        RecentLogsRequest.builder().applicationId(applicationId).build()))
+                .thenReturn(
+                        Flux.just(
+                                org.cloudfoundry.doppler.Envelope.builder()
                                         .eventType(EventType.LOG_MESSAGE)
                                         .logMessage(
                                                 fill(LogMessage.builder(), "log-message-").build())
@@ -5467,11 +5575,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             CloudFoundryClient cloudFoundryClient,
             String domainId,
             String host,
+            Integer port,
             String routePath,
             String routeId) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder();
 
         Optional.ofNullable(host).ifPresent(requestBuilder::host);
+        Optional.ofNullable(port).ifPresent(requestBuilder::port);
         Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
 
         when(cloudFoundryClient.routes().list(requestBuilder.domainId(domainId).page(1).build()))
@@ -5487,6 +5597,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .entity(
                                                                 RouteEntity.builder()
                                                                         .host(host)
+                                                                        .port(port)
                                                                         .path(
                                                                                 routePath == null
                                                                                         ? ""

@@ -19,8 +19,6 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.ReadRequest;
-import org.cloudfoundry.logcache.v1.ReadResponse;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -119,12 +117,21 @@ public interface Applications {
     Flux<Task> listTasks(ListApplicationTasksRequest request);
 
     /**
-     * List the applications logs
+     * List the applications logs from dopplerClient
+     * @deprecated Only for compatibility. Switch to logCacheClient method below.
+     * @param request the application logs request
+     * @return the applications logs
+     */
+    Flux<LogMessage> logs(LogsRequest request);
+
+    /**
+     * List the applications logs from logCacheClient.
+     * If no messages are available, an empty Flux is returned.
      *
      * @param request the application logs request
      * @return the applications logs
      */
-    Flux<Log> logs(LogsRequest request);
+    Flux<Log> logsRecent(ReadRequest request);
 
     /**
      * Push a specific application
