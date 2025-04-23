@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
@@ -86,6 +87,7 @@ import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.FluentMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,6 +95,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
@@ -511,6 +514,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
      * Doppler was dropped in PCF 4.x in favor of logcache. This test does not work
      * on TAS 4.x.
      */
+    @Deprecated
     @Test
     @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_4_v2)
     public void logs() throws IOException {
@@ -525,13 +529,40 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations
                                 .applications()
                                 .logs(
-                                        ApplicationLogsRequest.builder()
-                                                .sourceId(applicationName)
+                                        LogsRequest.builder()
+                                                .name(applicationName)
+                                                .recent(true)
                                                 .build()))
-                .map(org.cloudfoundry.logcache.v1.Log::getType)
+                .map(LogMessage::getMessageType)
                 .next()
                 .as(StepVerifier::create)
-                .expectNext(org.cloudfoundry.logcache.v1.LogType.OUT)
+                .expectNext(MessageType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void logsRecent() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        Mono<String> applicationGuid =
+                getAppGuidFromAppName(cloudFoundryOperations, applicationName);
+        createApplication(
+                this.cloudFoundryOperations,
+                new ClassPathResource("test-application.zip").getFile().toPath(),
+                applicationName,
+                false)
+                .then(
+                        applicationGuid
+                                .map(ApplicationsTest::getReadRequest)
+                                .flatMapMany(
+                                        readRequest ->
+                                                callLogsRecent(
+                                                        this.cloudFoundryOperations,
+                                                        readRequest)
+                                                        .log(null, Level.ALL, SignalType.ON_NEXT))
+                                .map(ApplicationsTest::checkOneLogEntry)
+                                .then())
+                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -2154,5 +2185,28 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations
                 .applications()
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name(applicationName).build());
+    }
+
+    private static ReadRequest getReadRequest(String applicationId) {
+        return ReadRequest.builder().sourceId(applicationId).build();
+    }
+
+    private static Flux<Log> callLogsRecent(
+            CloudFoundryOperations cloudFoundryOperations, ReadRequest readRequest) {
+        return cloudFoundryOperations.applications().logsRecent(readRequest);
+    }
+
+    private static Mono<String> getAppGuidFromAppName(
+            CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations
+                .applications()
+                .get(GetApplicationRequest.builder().name(applicationName).build())
+                .map(ApplicationDetail::getId);
+    }
+
+    private static Log checkOneLogEntry(Log log) {
+        assertThat(log.getType().equals(LogType.OUT));
+        OperationsLogging.log("one log entry: " + log.getType() + " " + log.getPayloadAsText());
+        return log;
     }
 }
