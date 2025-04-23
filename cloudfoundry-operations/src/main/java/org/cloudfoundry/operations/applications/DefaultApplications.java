@@ -150,12 +150,10 @@ import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
-import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
@@ -576,6 +574,83 @@ public final class DefaultApplications implements Applications {
                                                 ApplicationLogType.from(
                                                         logMessage.getMessageType().name()))
                                         .build());
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void logsRecent_doppler() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+        this.applications
+                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
+                .as(StepVerifier::create)
+                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void logsNoApp_doppler() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void logs_doppler() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        this.applications
+                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
+                .as(StepVerifier::create)
+                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsRecent_LogCache() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
+        this.applications
+                .logsRecent(ReadRequest.builder().sourceId("test-application-name").build())
+                .as(StepVerifier::create)
+                .expectNext(fill(Log.builder()).type(LogType.OUT).build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @SuppressWarnings("deprecation")
+    @Test
+    void logsRecentNotSet_doppler() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+
+        this.applications
+                .logs(LogsRequest.builder().name("test-application-name").build())
+                .as(StepVerifier::create)
+                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
     }
 
     @Override
@@ -2430,6 +2505,57 @@ public final class DefaultApplications implements Applications {
                                 .applicationId(applicationId)
                                 .build())
                 .cast(AbstractApplicationResource.class);
+    }
+
+    private static void requestInstancesApplicationFailing(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
+                                        .instance(
+                                                "instance-0",
+                                                fill(
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
+                                                        .state("FAILED")
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestLogsRecentLogCache(
+            LogCacheClient logCacheClient, String applicationName, String payload) {
+        when(logCacheClient.recentLogs(any()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ReadResponse.builder())
+                                        .envelopes(
+                                                fill(EnvelopeBatch.builder())
+                                                        .batch(
+                                                                Arrays.asList(
+                                                                        fill(org.cloudfoundry
+                                                                                .logcache.v1
+                                                                                .Envelope
+                                                                                .builder())
+                                                                                .log(
+                                                                                        Log
+                                                                                                .builder()
+                                                                                                .payload(
+                                                                                                        payload)
+                                                                                                .type(
+                                                                                                        LogType
+                                                                                                                .OUT)
+                                                                                                .build())
+                                                                                .build()))
+                                                        .build())
+                                        .build()));
     }
 
     private static Flux<DomainResource> requestListDomains(
