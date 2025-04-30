@@ -429,7 +429,6 @@ final class ReactorDropletsTest extends AbstractClientApiTest {
                                                                 .build())
                                                 .build())
                                 .build())
-
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
