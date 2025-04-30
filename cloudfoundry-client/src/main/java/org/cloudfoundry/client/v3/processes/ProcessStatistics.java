@@ -126,4 +126,11 @@ public abstract class ProcessStatistics {
     @JsonProperty("log_rate_limit")
     @Nullable
     abstract Integer getLogRateLimit();
+
+    /**
+     * The instance guid
+     */
+    @JsonProperty("instance_guid")
+    @Nullable
+    abstract String getInstanceGuid();
 }

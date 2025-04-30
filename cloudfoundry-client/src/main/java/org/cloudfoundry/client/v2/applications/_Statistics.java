@@ -104,4 +104,11 @@ abstract class _Statistics {
    @Nullable
    abstract Integer getLogRateLimit();
 
+    /**
+    * The instance guid
+    */
+   @JsonProperty("instance_guid")
+   @Nullable
+   abstract String getInstanceGuid();
+
 }
