@@ -43,7 +43,17 @@ public enum DropletState {
     /**
      * The staged state
      */
-    STAGED("STAGED");
+    STAGED("STAGED"),
+
+    /**
+     * The awaiting upload state
+     */
+    AWAITING_UPLOAD("AWAITING_UPLOAD"),
+
+    /**
+     * The processing upload state
+     */
+    PROCESSING_UPLOAD("PROCESSING_UPLOAD");
 
     private final String value;
 
@@ -62,6 +72,10 @@ public enum DropletState {
                 return FAILED;
             case "staged":
                 return STAGED;
+            case "awaiting_upload":
+                return AWAITING_UPLOAD;
+            case "processing_upload":
+                return PROCESSING_UPLOAD;
             default:
                 throw new IllegalArgumentException(String.format("Unknown droplet state: %s", s));
         }
