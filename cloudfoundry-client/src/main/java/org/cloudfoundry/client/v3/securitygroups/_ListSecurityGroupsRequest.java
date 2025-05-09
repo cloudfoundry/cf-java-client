@@ -14,7 +14,7 @@
 
 package org.cloudfoundry.client.v3.securitygroups;
 
-import org.cloudfoundry.client.v2.PaginatedRequest;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 import org.cloudfoundry.client.v3.FilterParameter;
 import org.cloudfoundry.Nullable;
