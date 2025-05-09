@@ -60,7 +60,7 @@ import reactor.netty.http.client.HttpClientRequest;
  * An abstract base class for all token providers that interact with the UAA. It encapsulates the logic to refresh the token before
  * expiration.
  */
-public abstract class AbstractUaaTokenProvider implements TokenProvider {
+public abstract class AbstractUaaTokenProvider implements UaaTokenProvider {
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.token");
 
@@ -105,6 +105,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
      * @param connectionContext A {@link ConnectionContext} to be used to identity which connection the refresh tokens be retrieved for
      * @return a {@link Flux} that emits the last token on subscribe and new refresh tokens as they are negotiated
      */
+    @Override
     public Flux<String> getRefreshTokens(ConnectionContext connectionContext) {
         return getRefreshTokenStream(connectionContext).sink.asFlux();
     }
