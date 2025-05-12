@@ -16,14 +16,13 @@
 
 package org.cloudfoundry.servicebroker.lastoperation;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 final class LastOperationController implements LastOperationRepository {
@@ -41,14 +40,13 @@ final class LastOperationController implements LastOperationRepository {
 
         if (OperationType.DEPROVISION == operationType) {
             return ResponseEntity.status(HttpStatus.GONE)
-                .body(LastOperationDeprovisionResponse.builder()
-                    .build());
+                    .body(LastOperationDeprovisionResponse.builder().build());
         }
 
         return ResponseEntity.ok()
-            .body(LastOperationProvisionUpdateResponse.builder()
-                .state(State.SUCCEEDED)
-                .build());
+                .body(
+                        LastOperationProvisionUpdateResponse.builder()
+                                .state(State.SUCCEEDED)
+                                .build());
     }
-
 }
