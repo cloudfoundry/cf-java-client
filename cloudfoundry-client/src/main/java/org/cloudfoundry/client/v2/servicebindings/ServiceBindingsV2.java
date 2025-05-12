@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface ServiceBindingsV2 {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/create_a_service_binding.html">Create Service Binding</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_bindings/create_a_service_binding.html">Create Service Binding</a> request
      *
      * @param request the Create Service Binding request
      * @return the response from the Create Service Binding request
@@ -32,7 +32,7 @@ public interface ServiceBindingsV2 {
     Mono<CreateServiceBindingResponse> create(CreateServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/delete_a_particular_service_binding.html">Delete the Service Binding</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_bindings/delete_a_particular_service_binding.html">Delete the Service Binding</a> request
      *
      * @param request the Delete Service Binding request
      * @return the response from the Delete Service Binding request
@@ -40,7 +40,7 @@ public interface ServiceBindingsV2 {
     Mono<DeleteServiceBindingResponse> delete(DeleteServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/retrieve_a_particular_service_binding.html">Retrieve a Particular Service Binding</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_bindings/retrieve_a_particular_service_binding.html">Retrieve a Particular Service Binding</a> request
      *
      * @param request the Get Service Binding request
      * @return the response from the Get Service Binding request
@@ -48,7 +48,7 @@ public interface ServiceBindingsV2 {
     Mono<GetServiceBindingResponse> get(GetServiceBindingRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/retrieve_a_particular_service_binding_parameters.html">Retrieve a Particular Service Binding's Parameters</a>
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_bindings/retrieve_a_particular_service_binding_parameters.html">Retrieve a Particular Service Binding's Parameters</a>
      * request
      *
      * @param request the Get Parameters request
@@ -58,7 +58,7 @@ public interface ServiceBindingsV2 {
             GetServiceBindingParametersRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/service_bindings/list_all_service_bindings.html">List all Service Bindings</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/service_bindings/list_all_service_bindings.html">List all Service Bindings</a> request
      *
      * @param request the List Service Bindings request
      * @return the response from the List Service Bindings request

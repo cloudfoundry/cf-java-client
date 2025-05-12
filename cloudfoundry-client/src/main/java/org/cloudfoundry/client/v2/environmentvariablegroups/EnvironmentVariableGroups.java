@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface EnvironmentVariableGroups {
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/getting_the_contents_of_the_running_environment_variable_group.html">Get the Running Environment
+     * Makes the <a href="v2-apidocs.cloudfoundry.org/environment_variable_groups/getting_the_contents_of_the_running_environment_variable_group.html">Get the Running Environment
      * Variables</a> request
      *
      * @param request the Get Running Environment Variables request
@@ -34,7 +34,7 @@ public interface EnvironmentVariableGroups {
             GetRunningEnvironmentVariablesRequest request);
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/getting_the_contents_of_the_staging_environment_variable_group.html">Get the Staging Environment
+     * Makes the <a href="v2-apidocs.cloudfoundry.org/environment_variable_groups/getting_the_contents_of_the_staging_environment_variable_group.html">Get the Staging Environment
      * Variables</a> request
      *
      * @param request the Get Staging Environment Variables request
@@ -44,7 +44,7 @@ public interface EnvironmentVariableGroups {
             GetStagingEnvironmentVariablesRequest request);
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
+     * Makes the <a href="v2-apidocs.cloudfoundry.org/environment_variable_groups/updating_the_contents_of_the_running_environment_variable_group.html">Update the Running Environment
      * Variables</a> request
      *
      * @param request the Update Running Environment Variables request
@@ -54,7 +54,7 @@ public interface EnvironmentVariableGroups {
             UpdateRunningEnvironmentVariablesRequest request);
 
     /**
-     * Makes the <a href="apidocs.cloudfoundry.org/latest-releasehttps://apidocs.cloudfoundry.org/latest-release/environment_variable_groups/updating_the_contents_of_the_staging_environment_variable_group.html">Update
+     * Makes the <a href="v2-apidocs.cloudfoundry.orghttps://v2-apidocs.cloudfoundry.org/environment_variable_groups/updating_the_contents_of_the_staging_environment_variable_group.html">Update
      * the Staging Environment Variables</a> request
      *
      * @param request the Update Staging Environment Variables request
