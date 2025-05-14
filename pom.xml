@@ -70,7 +70,7 @@
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
         <mockito.version>5.8.0</mockito.version>
         <snakeyaml.version>2.2</snakeyaml.version>
-        <wire.version>3.7.1</wire.version>
+        <wire.version>5.2.0</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
         <spotless.version>2.41.1</spotless.version>
