@@ -19,7 +19,6 @@ import static org.cloudfoundry.client.v3.securitygroups.Protocol.TCP;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
-
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
@@ -212,7 +211,11 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                                                                 ListSecurityGroupsRequest.builder()
                                                                         .page(page)
                                                                         .perPage(1)
-                                                                        .names(Collections.singletonList(securityGroup.getName()))
+                                                                        .names(
+                                                                                Collections
+                                                                                        .singletonList(
+                                                                                                securityGroup
+                                                                                                        .getName()))
                                                                         .build())))
                 .as(StepVerifier::create)
                 .expectNextCount(1)
