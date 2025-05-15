@@ -18,6 +18,7 @@ import static org.cloudfoundry.client.v3.securitygroups.Protocol.TCP;
 
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Collections;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.securitygroups.BindRunningSecurityGroupRequest;
@@ -34,6 +35,7 @@ import org.cloudfoundry.client.v3.securitygroups.Rule;
 import org.cloudfoundry.client.v3.securitygroups.UnbindRunningSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.UnbindStagingSecurityGroupRequest;
 import org.cloudfoundry.client.v3.securitygroups.UpdateSecurityGroupRequest;
+import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -190,6 +192,32 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
                                                         .spaceId(v.getT2())
                                                         .names(Arrays.asList(v.getT1().getName()))
                                                         .build()))
+                .as(StepVerifier::create)
+                .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listWithPagination() {
+        this.securityGroup
+                .flux()
+                .flatMap(
+                        securityGroup ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                cloudFoundryClient
+                                                        .securityGroupsV3()
+                                                        .list(
+                                                                ListSecurityGroupsRequest.builder()
+                                                                        .page(page)
+                                                                        .perPage(1)
+                                                                        .names(
+                                                                                Collections
+                                                                                        .singletonList(
+                                                                                                securityGroup
+                                                                                                        .getName()))
+                                                                        .build())))
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .expectComplete()
