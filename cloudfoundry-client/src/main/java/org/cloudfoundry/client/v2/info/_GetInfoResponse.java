@@ -18,6 +18,10 @@ package org.cloudfoundry.client.v2.info;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
@@ -26,10 +30,12 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _GetInfoResponse {
+abstract class _GetInfoResponse{
 
     /**
      * The API version
+     * @deprecated: use connectionContext.getRootProvider().getRootKey(new LinkedList<String>(Arrays.asList("links","cloud_controller_v3","meta","version")), connectionContext)
+     * or connectionContext.getRootProvider().getRootKey(new LinkedList<String>(Arrays.asList("links","cloud_controller_v2","meta","version")), connectionContext)
      */
     @JsonProperty("api_version")
     @Nullable
@@ -37,6 +43,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The application SSH endpoint
+     * @deprecated: use connectionContext.getRootProvider().getRoot("app_ssh", connectionContext)
      */
     @JsonProperty("app_ssh_endpoint")
     @Nullable
@@ -44,6 +51,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The application SSH host key fingerprint
+     * @deprecated: use connectionContext.getRootProvider().getRootKey("app_ssh.meta.host_key_fingerprint", connectionContext)
      */
     @JsonProperty("app_ssh_host_key_fingerprint")
     @Nullable
@@ -51,6 +59,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The application SSH OAuth client
+     * @deprecated: use connectionContext.getRootProvider().getRootKey("app_ssh.meta.oauth_client", connectionContext)
      */
     @JsonProperty("app_ssh_oauth_client")
     @Nullable
@@ -58,6 +67,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The authorization endpoint
+     * @deprecated: use connectionContext.getRootProvider().getRoot("login", connectionContext)
      */
     @JsonProperty("authorization_endpoint")
     @Nullable
@@ -65,6 +75,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The build number
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("build")
     @Nullable
@@ -72,6 +83,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The description
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("description")
     @Nullable
@@ -79,6 +91,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The doppler logging endpoint
+     * @deprecated: use connectionContext.getRootProvider().getRoot("logging", connectionContext)
      */
     @JsonProperty("doppler_logging_endpoint")
     @Nullable
@@ -93,6 +106,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The minimum CLI version
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("min_cli_version")
     @Nullable
@@ -100,6 +114,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The minimum recommended CLI version
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("min_recommended_cli_version")
     @Nullable
@@ -107,6 +122,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The name
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("name")
     @Nullable
@@ -121,6 +137,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The routing endpoint
+     * @deprecated: use connectionContext.getRootProvider().getRoot("routing", connectionContext)
      */
     @JsonProperty("routing_endpoint")
     @Nullable
@@ -128,6 +145,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The support url
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("support")
     @Nullable
@@ -135,6 +153,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The token endpoint
+     * @deprecated: use connectionContext.getRootProvider().getRoot("uaa", connectionContext)
      */
     @JsonProperty("token_endpoint")
     @Nullable
@@ -149,6 +168,7 @@ abstract class _GetInfoResponse {
 
     /**
      * The version
+     * @deprecated: use corresponding method in V3 api.
      */
     @JsonProperty("version")
     @Nullable

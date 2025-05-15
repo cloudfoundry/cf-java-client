@@ -85,6 +85,7 @@ import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceReq
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
 import org.cloudfoundry.util.FluentMap;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -435,6 +436,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void getTcp() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -1120,6 +1122,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushTcpRoute() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -1243,6 +1246,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Test
     public void pushUpdateTcpRoute() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 

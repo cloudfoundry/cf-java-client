@@ -17,65 +17,79 @@
 package org.cloudfoundry.reactor;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import java.util.LinkedList;
+import java.util.Queue;
+
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import org.springframework.web.util.UriComponentsBuilder;
+
 import reactor.core.publisher.Mono;
 
 /**
- * A {@link RootProvider} that returns endpoints by delegating to an {@link RootPayloadRootProvider} and then an {@link InfoPayloadRootProvider}.
+ * A {@link RootProvider} that returns endpoints by delegating to an
+ * {@link RootPayloadRootProvider} and then an {@link InfoPayloadRootProvider}.
  */
 @Value.Immutable
 abstract class _DelegatingRootProvider extends AbstractRootProvider {
 
-    @Override
-    protected Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
-        return getRootPayloadRootProvider().doGetRoot(connectionContext)
-            .onErrorResume(t -> getInfoPayloadRootProvider().doGetRoot(connectionContext));
-    }
+	@Override
+	protected Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
+		return getRootPayloadRootProvider().doGetRoot(connectionContext)
+				.onErrorResume(t -> getInfoPayloadRootProvider().doGetRoot(connectionContext));
+	}
 
-    @Override
-    protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
-        return getRootPayloadRootProvider().doGetRoot(key, connectionContext)
-            .onErrorResume(t -> {
-                if ("cloud_controller_v2".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot(connectionContext)
-                        .map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v2").build());
-                } else if ("cloud_controller_v3".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot(connectionContext)
-                        .map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v3").build());
-                } else if ("logging".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot("doppler_logging_endpoint", connectionContext);
-                } else if ("routing".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot("routing_endpoint", connectionContext);
-                } else if ("uaa".equals(key)) {
-                    return getInfoPayloadRootProvider().doGetRoot("token_endpoint", connectionContext);
-                } else {
-                    return getInfoPayloadRootProvider().doGetRoot(key, connectionContext);
-                }
-            });
-    }
+	@Override
+	protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
+		return getRootPayloadRootProvider().doGetRoot(key, connectionContext).onErrorResume(t -> { 
+			// if root does not return a value, try with info object
+			if ("cloud_controller_v2".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot(connectionContext)
+						.map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v2").build());
+			} else if ("cloud_controller_v3".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot(connectionContext)
+						.map(uri -> UriComponentsBuilder.newInstance().uriComponents(uri).pathSegment("v3").build());
+			} else if ("logging".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot("doppler_logging_endpoint", connectionContext);
+			} else if ("routing".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot("routing_endpoint", connectionContext);
+			} else if ("uaa".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot("token_endpoint", connectionContext);
+			} else if ("login".equals(key)) {
+				return getInfoPayloadRootProvider().doGetRoot("authorization_endpoint", connectionContext);
+			} else {
+				return getInfoPayloadRootProvider().doGetRoot(key, connectionContext);
+			}
+		});
+	}
 
-    @Value.Derived
-    InfoPayloadRootProvider getInfoPayloadRootProvider() {
-        return InfoPayloadRootProvider.builder()
-            .apiHost(getApiHost())
-            .objectMapper(getObjectMapper())
-            .port(getPort())
-            .secure(getSecure())
-            .build();
-    }
+	@Override
+	protected Mono<String> doGetRootKey(Queue<String> keyList, ConnectionContext connectionContext) {
+		Queue<String> keyCopy = new LinkedList<>(keyList);
+		return getRootPayloadRootProvider().doGetRootKey(keyList, connectionContext).onErrorResume(t -> {
+			return getInfoV3PayloadRootProvider().doGetRootKey(keyCopy, connectionContext);
+		});
+	}
 
-    abstract ObjectMapper getObjectMapper();
+	@Value.Derived
+	InfoPayloadRootProvider getInfoPayloadRootProvider() {
+		return InfoPayloadRootProvider.builder().apiHost(getApiHost()).objectMapper(getObjectMapper()).port(getPort())
+				.secure(getSecure()).build();
+	}
 
-    @Value.Derived
-    RootPayloadRootProvider getRootPayloadRootProvider() {
-        return RootPayloadRootProvider.builder()
-            .apiHost(getApiHost())
-            .objectMapper(getObjectMapper())
-            .port(getPort())
-            .secure(getSecure())
-            .build();
-    }
+	@Value.Derived
+	InfoV3PayloadRootProvider getInfoV3PayloadRootProvider() {
+		return InfoV3PayloadRootProvider.builder().apiHost(getApiHost()).objectMapper(getObjectMapper()).port(getPort())
+				.secure(getSecure()).build();
+	}
+
+	abstract ObjectMapper getObjectMapper();
+
+	@Value.Derived
+	RootPayloadRootProvider getRootPayloadRootProvider() {
+		return RootPayloadRootProvider.builder().apiHost(getApiHost()).objectMapper(getObjectMapper()).port(getPort())
+				.secure(getSecure()).build();
+	}
 
 }
