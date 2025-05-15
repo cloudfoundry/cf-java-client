@@ -201,7 +201,8 @@ public final class SecurityGroupsTest extends AbstractIntegrationTest {
     @Test
     public void listWithPagination() {
         this.securityGroup
-                .map(
+                .flux()
+                .flatMap(
                         securityGroup ->
                                 PaginationUtils.requestClientV3Resources(
                                         page ->
