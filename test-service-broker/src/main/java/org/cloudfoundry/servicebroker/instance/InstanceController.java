@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.servicebroker.instance;
 
+import java.util.Map;
+import java.util.Optional;
 import org.cloudfoundry.servicebroker.lastoperation.LastOperationRepository;
 import org.cloudfoundry.servicebroker.lastoperation.OperationType;
 import org.springframework.http.HttpStatus;
@@ -28,9 +30,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
-import java.util.Optional;
-
 @RestController
 final class InstanceController {
 
@@ -41,54 +40,49 @@ final class InstanceController {
     }
 
     @DeleteMapping("/v2/service_instances/{instanceId}")
-    ResponseEntity<?> deprovision(@RequestParam("accepts_incomplete") Optional<Boolean> acceptsIncomplete, @PathVariable String instanceId) {
+    ResponseEntity<?> deprovision(
+            @RequestParam("accepts_incomplete") Optional<Boolean> acceptsIncomplete,
+            @PathVariable String instanceId) {
         if (acceptsIncomplete.orElse(false)) {
             this.lastOperationRepository.register(instanceId, OperationType.DEPROVISION);
 
             return ResponseEntity.accepted()
-                .body(DeprovisionAsyncResponse.builder()
-                    .operation("test-operation")
-                    .build());
+                    .body(DeprovisionAsyncResponse.builder().operation("test-operation").build());
         }
 
-        return ResponseEntity.ok()
-            .body(DeprovisionSyncResponse.builder()
-                .build());
+        return ResponseEntity.ok().body(DeprovisionSyncResponse.builder().build());
     }
 
     @PutMapping("/v2/service_instances/{instanceId}")
-    ResponseEntity<?> provision(@PathVariable String instanceId, @RequestBody Map<String, Object> payload) {
+    ResponseEntity<?> provision(
+            @PathVariable String instanceId, @RequestBody Map<String, Object> payload) {
         boolean acceptsIncomplete = (boolean) payload.getOrDefault("accepts_incomplete", false);
 
         if (acceptsIncomplete) {
             this.lastOperationRepository.register(instanceId, OperationType.PROVISION);
 
-            return ResponseEntity.accepted()
-                .body(ProvisionAsyncResponse.builder()
-                    .build());
+            return ResponseEntity.accepted().body(ProvisionAsyncResponse.builder().build());
         }
 
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ProvisionSyncResponse.builder()
-                .dashboardUrl(String.format("http://test-dashboard-host/%s", instanceId))
-                .build());
+                .body(
+                        ProvisionSyncResponse.builder()
+                                .dashboardUrl(
+                                        String.format("http://test-dashboard-host/%s", instanceId))
+                                .build());
     }
 
     @PatchMapping("/v2/service_instances/{instanceId}")
-    ResponseEntity<?> update(@PathVariable String instanceId, @RequestBody Map<String, Object> payload) {
+    ResponseEntity<?> update(
+            @PathVariable String instanceId, @RequestBody Map<String, Object> payload) {
         boolean acceptsIncomplete = (boolean) payload.getOrDefault("accepts_incomplete", false);
 
         if (acceptsIncomplete) {
             this.lastOperationRepository.register(instanceId, OperationType.UPDATE);
 
-            return ResponseEntity.accepted()
-                .body(UpdateAsyncResponse.builder()
-                    .build());
+            return ResponseEntity.accepted().body(UpdateAsyncResponse.builder().build());
         }
 
-        return ResponseEntity.ok()
-            .body(UpdateSyncResponse.builder()
-                .build());
+        return ResponseEntity.ok().body(UpdateSyncResponse.builder().build());
     }
-
 }

@@ -16,6 +16,4 @@
 
 package org.cloudfoundry.servicebroker;
 
-public @interface Nullable {
-
-}
+public @interface Nullable {}

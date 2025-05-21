@@ -17,11 +17,9 @@
 package org.cloudfoundry.servicebroker.lastoperation;
 
 public enum OperationType {
-
     DEPROVISION,
 
     PROVISION,
 
     UPDATE
-
 }
