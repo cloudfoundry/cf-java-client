@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Queue;
 
 /**
- * A {@link RootProvider} that returns endpoints extracted from the `/v2/info` API for the configured endpoint.
+ * A {@link RootProvider} that returns endpoints extracted from the `/v3/info` API for the configured endpoint.
  */
 @Value.Immutable
-abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
+abstract class _InfoV3PayloadRootProvider extends AbstractRootProvider {
 
     protected Mono<UriComponents> doGetRoot(ConnectionContext connectionContext) {
         return Mono.just(getRoot());
@@ -39,40 +39,62 @@ abstract class _InfoPayloadRootProvider extends AbstractRootProvider {
         return getInfo(connectionContext)
             .map(info -> {
                 if (!info.containsKey(key)) {
-                    throw new IllegalArgumentException(String.format("Info payload does not contain key '%s'", key));
+                    throw new IllegalArgumentException(String.format("InfoV3 payload does not contain key '%s'", key));
                 }
 
-                return normalize(UriComponentsBuilder.fromUriString(info.get(key)));
+                return normalize(UriComponentsBuilder.fromUriString((String) info.get(key)));
             });
     }
 
     protected Mono<String> doGetRootKey(Queue<String> keyList, ConnectionContext connectionContext) {
-    	String key = keyList.poll();
-        return getInfo(connectionContext)
+    	String firstKey = keyList.poll();
+    	
+    	@SuppressWarnings("rawtypes")
+		Mono<Map> payload = getInfo(connectionContext);
+    	return payload
             .map(info -> {
-                if (!info.containsKey(key)) {
-                    throw new IllegalArgumentException(String.format("Info payload does not contain key '%s'", key));
+                if (!info.containsKey(firstKey)) {
+                    throw new IllegalArgumentException(String.format("InfoV3 payload does not contain key '%s'", firstKey));
                 }
-                return info.get(key);
+                return handleEntry(keyList,info.get(firstKey));
             });
+    	
+    }
+
+    private String handleEntry(Queue<String> keyList, Object entry) {
+    	if(entry==null) {
+    		return "";
+    	} else if(entry instanceof String) {
+        	if(keyList.isEmpty()) {
+        		return (String) entry;
+        	}else {
+        		 throw new IllegalArgumentException(String.format("InfoV3 payload does not contain key '%s'", keyList.peek()));
+        	}
+        }else if(entry instanceof Map) {
+        	@SuppressWarnings("unchecked")
+			Map<String, Object> entryMap = (Map<String, Object>) entry;
+        	String key = keyList.poll();
+        	return handleEntry(keyList, entryMap.get(key));
+        } else{
+        	throw new IllegalArgumentException(String.format("InfoV3 payload does contain unknown type '%s'", entry.getClass().getName()));
+        }
     }
 
     abstract ObjectMapper getObjectMapper();
 
     private UriComponentsBuilder buildInfoUri(UriComponentsBuilder root) {
-        return root.pathSegment("v2", "info");
+        return root.pathSegment("v3", "info");
     }
 
-    @SuppressWarnings("unchecked")
-    @Value.Derived
-    private Mono<Map<String, String>> getInfo(ConnectionContext connectionContext) {
+    @SuppressWarnings("rawtypes")
+	@Value.Derived
+    private Mono<Map> getInfo(ConnectionContext connectionContext) {
         return createOperator(connectionContext)
             .flatMap(operator -> operator.get()
                 .uri(this::buildInfoUri)
                 .response()
                 .parseBody(Map.class))
-            .map(payload -> (Map<String, String>) payload)
-            .switchIfEmpty(Mono.error(new IllegalArgumentException("Info endpoint does not contain a payload")))
+            .switchIfEmpty(Mono.error(new IllegalArgumentException("InfoV3 endpoint does not contain a payload")))
             .checkpoint();
     }
 

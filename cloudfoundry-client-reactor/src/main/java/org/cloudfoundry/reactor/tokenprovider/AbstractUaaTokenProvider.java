@@ -66,7 +66,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final String ACCESS_TOKEN = "access_token";
 
-    private static final String AUTHORIZATION_ENDPOINT = "authorization_endpoint";
+    private static final String AUTHORIZATION_ENDPOINT = "login";
 
     private static final String REFRESH_TOKEN = "refresh_token";
 
