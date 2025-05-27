@@ -65,7 +65,7 @@
         <evo-inflector.version>1.3</evo-inflector.version>
         <immutables.version>2.10.1</immutables.version>
         <jackson.version>2.16.1</jackson.version>
-        <java-semver.version>0.9.0</java-semver.version>
+        <java-semver.version>0.10.2</java-semver.version>
         <jjwt.version>0.12.6</jjwt.version>
         <junit-jupiter.version>5.10.1</junit-jupiter.version>
         <mockito.version>5.8.0</mockito.version>
