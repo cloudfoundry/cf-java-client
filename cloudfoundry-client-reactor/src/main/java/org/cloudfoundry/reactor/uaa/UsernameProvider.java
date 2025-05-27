@@ -72,8 +72,7 @@ final class UsernameProvider {
     }
 
     private String getUsername(String token) {
-        JwtParser parser =
-                Jwts.parserBuilder().setSigningKeyResolver(this.signingKeyResolver).build();
+        JwtParser parser = Jwts.parser().setSigningKeyResolver(this.signingKeyResolver).build();
 
         Jws<Claims> jws = parser.parseClaimsJws(token);
 

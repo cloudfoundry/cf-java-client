@@ -58,8 +58,8 @@ final class UaaSigningKeyResolver implements SigningKeyResolver {
 
     @Override
     @SuppressWarnings("rawtypes")
-    public Key resolveSigningKey(JwsHeader header, String plaintext) {
-        return getKey(header.getKeyId());
+    public Key resolveSigningKey(JwsHeader jwsHeader, byte[] bytes) {
+        return getKey(jwsHeader.getKeyId());
     }
 
     private static byte[] decode(TokenKey tokenKey) {

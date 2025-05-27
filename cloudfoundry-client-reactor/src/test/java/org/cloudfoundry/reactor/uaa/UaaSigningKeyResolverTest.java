@@ -22,14 +22,15 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.impl.DefaultClaims;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
+import io.jsonwebtoken.impl.security.AbstractJwk;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.util.Base64;
+import java.util.HashMap;
 import org.cloudfoundry.uaa.tokens.KeyType;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysRequest;
 import org.cloudfoundry.uaa.tokens.ListTokenKeysResponse;
@@ -64,8 +65,10 @@ final class UaaSigningKeyResolverTest {
                                                         .build())
                                         .build()));
 
-        JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
-        Claims claims = new DefaultClaims();
+        HashMap<String, String> params = new HashMap<>();
+        params.put(AbstractJwk.KID.getId(), "test-key-id");
+        DefaultJwsHeader header = new DefaultJwsHeader(params);
+        Claims claims = new DefaultClaims(new HashMap<>());
 
         this.signingKeyResolver.resolveSigningKey(header, claims);
         assertThat(this.signingKeyResolver.resolveSigningKey(header, claims)).isNotNull();
@@ -91,8 +94,10 @@ final class UaaSigningKeyResolverTest {
                                                         .build())
                                         .build()));
 
-        JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
-        Claims claims = new DefaultClaims();
+        HashMap<String, String> params = new HashMap<>();
+        params.put(AbstractJwk.KID.getId(), "test-key-id");
+        DefaultJwsHeader header = new DefaultJwsHeader(params);
+        Claims claims = new DefaultClaims(new HashMap<>());
 
         assertThat(this.signingKeyResolver.resolveSigningKey(header, claims)).isNotNull();
     }
@@ -105,8 +110,10 @@ final class UaaSigningKeyResolverTest {
                     when(this.tokens.listKeys(ListTokenKeysRequest.builder().build()))
                             .thenReturn(Mono.just(ListTokenKeysResponse.builder().build()));
 
-                    JwsHeader<?> header = new DefaultJwsHeader().setKeyId("test-key-id");
-                    Claims claims = new DefaultClaims();
+                    HashMap<String, String> params = new HashMap<>();
+                    params.put(AbstractJwk.KID.getId(), "test-key-id");
+                    DefaultJwsHeader header = new DefaultJwsHeader(params);
+                    Claims claims = new DefaultClaims(new HashMap<>());
 
                     this.signingKeyResolver.resolveSigningKey(header, claims);
                 });
