@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.nio.charset.Charset;
 import java.time.Duration;
 import java.util.Collections;
+import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Pagination;
@@ -99,6 +100,7 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                                 .position(42)
                                 .enabled(true)
                                 .locked(false)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .metadata(
                                         Metadata.builder()
                                                 .annotations(Collections.emptyMap())
@@ -179,6 +181,7 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                                 .position(42)
                                 .enabled(true)
                                 .locked(false)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .metadata(
                                         Metadata.builder()
                                                 .annotations(Collections.emptyMap())
@@ -250,6 +253,7 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                                                 .position(1)
                                                 .enabled(true)
                                                 .locked(false)
+                                                .lifecycle(LifecycleType.BUILDPACK)
                                                 .metadata(
                                                         Metadata.builder()
                                                                 .annotations(Collections.emptyMap())
@@ -315,6 +319,7 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                                 .position(42)
                                 .enabled(true)
                                 .locked(false)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .metadata(
                                         Metadata.builder()
                                                 .annotations(Collections.emptyMap())
@@ -407,6 +412,7 @@ final class ReactorBuildpacksTest extends AbstractClientApiTest {
                                 .position(42)
                                 .enabled(true)
                                 .locked(false)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .metadata(
                                         Metadata.builder()
                                                 .annotations(Collections.emptyMap())
