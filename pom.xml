@@ -73,7 +73,7 @@
         <wire.version>3.7.1</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
-        <spotless.version>2.41.1</spotless.version>
+        <spotless.version>2.44.4</spotless.version>
     </properties>
 
     <dependencyManagement>
