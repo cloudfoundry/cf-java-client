@@ -9,6 +9,7 @@
   "position": 42,
   "enabled": true,
   "locked": false,
+  "lifecycle": "buildpack",
   "metadata": {
     "labels": {},
     "annotations": {}

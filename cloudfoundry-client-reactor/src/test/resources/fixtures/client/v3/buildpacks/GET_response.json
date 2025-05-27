@@ -25,6 +25,7 @@
       "position": 1,
       "enabled": true,
       "locked": false,
+      "lifecycle": "buildpack",
       "metadata": {
         "labels": {},
         "annotations": {}

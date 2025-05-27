@@ -70,4 +70,11 @@ abstract class _BuildpackEntity {
     @Nullable
     abstract String getStack();
 
+    /**
+     * The lifecycle
+     */
+    @JsonProperty("lifecycle")
+    @Nullable
+    abstract LifecycleType getLifecycle();
+
 }
