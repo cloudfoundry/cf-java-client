@@ -161,7 +161,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
-            JwtParser parser = Jwts.parserBuilder().build();
+            JwtParser parser = Jwts.parser().build();
 
             return Optional.of(parser.parseClaimsJwt(jws).getBody());
         } catch (Exception e) {
