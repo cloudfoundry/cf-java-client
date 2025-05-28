@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Info {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/info/get_info.html">Get Info</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/info/get_info.html">Get Info</a> request
      *
      * @param request the Get Info request
      * @return the response from the Get Info request
