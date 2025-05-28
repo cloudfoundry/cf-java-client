@@ -57,6 +57,7 @@ import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.info.InfoV3;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
@@ -115,6 +116,7 @@ import org.cloudfoundry.reactor.client.v3.builpacks.ReactorBuildpacksV3;
 import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
+import org.cloudfoundry.reactor.client.v3.info.ReactorInfoV3;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
 import org.cloudfoundry.reactor.client.v3.organizations.ReactorOrganizationsV3;
@@ -201,7 +203,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @PostConstruct
     public void checkCompatibility() {
-        new CloudFoundryClientCompatibilityChecker(info()).check();
+        new CloudFoundryClientCompatibilityChecker(getConnectionContext()).check();
     }
 
     @Override
@@ -249,8 +251,15 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
+    @Deprecated
     public Info info() {
         return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public InfoV3 infoV3() {
+        return new ReactorInfoV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override

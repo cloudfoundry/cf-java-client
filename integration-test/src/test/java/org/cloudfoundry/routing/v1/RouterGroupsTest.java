@@ -24,6 +24,7 @@ import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
 import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupResponse;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
@@ -37,6 +38,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         this.routingClient
                 .routerGroups()
                 .list(ListRouterGroupsRequest.builder().build())
@@ -51,6 +53,7 @@ public final class RouterGroupsTest extends AbstractIntegrationTest {
 
     @Test
     public void update() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         getRouterGroupId(this.routingClient, DEFAULT_ROUTER_GROUP)
                 .flatMap(
                         routerGroupId ->

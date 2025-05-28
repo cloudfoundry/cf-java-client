@@ -16,6 +16,8 @@
 
 package org.cloudfoundry.reactor;
 
+import java.util.Queue;
+
 import org.immutables.value.Value;
 import org.springframework.web.util.UriComponents;
 import reactor.core.publisher.Mono;
@@ -34,6 +36,11 @@ abstract class _SingleEndpointRootProvider extends AbstractRootProvider {
     @Override
     protected Mono<UriComponents> doGetRoot(String key, ConnectionContext connectionContext) {
         return Mono.just(getRoot());
+    }
+
+    @Override
+    protected Mono<String> doGetRootKey(Queue<String> key, ConnectionContext connectionContext) {
+        return Mono.just(getRoot().toString());
     }
 
 }
