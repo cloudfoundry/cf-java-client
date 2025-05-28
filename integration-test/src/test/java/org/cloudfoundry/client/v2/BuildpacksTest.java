@@ -27,6 +27,7 @@ import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.GetBuildpackRequest;
+import org.cloudfoundry.client.v2.buildpacks.LifecycleType;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
 import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest;
@@ -65,6 +66,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(true)
                                 .name(buildpackName)
                                 .position(2)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -135,6 +137,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -164,6 +167,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -193,6 +197,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -222,6 +227,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(true)
                                 .name(buildpackName)
                                 .position(2)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -253,6 +259,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -284,6 +291,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
+                                .lifecycle(LifecycleType.BUILDPACK)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
