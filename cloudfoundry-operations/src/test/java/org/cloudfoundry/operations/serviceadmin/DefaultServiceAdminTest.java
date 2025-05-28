@@ -270,7 +270,8 @@ final class DefaultServiceAdminTest extends AbstractOperationsTest {
 
     @Test
     void enableServiceAccessServiceNotFound() {
-        requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
+        requestListServicesWithNameAndServiceBrokerIdEmpty(
+                this.cloudFoundryClient, "bogus-service-name");
 
         this.serviceAdmin
                 .enableServiceAccess(
@@ -488,6 +489,9 @@ final class DefaultServiceAdminTest extends AbstractOperationsTest {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilities(this.cloudFoundryClient);
         requestListOrganizationsEmpty(this.cloudFoundryClient, "bogus-organization-name");
+        requestListServicesWithNameEmptyAndServiceBrokerIdAndLabelSet(
+                this.cloudFoundryClient, "bogus-service-name");
+        requestListServicesWithNameEmptyAndServiceBrokerIdSet(this.cloudFoundryClient);
 
         this.serviceAdmin
                 .listServiceAccessSettings(
@@ -534,7 +538,11 @@ final class DefaultServiceAdminTest extends AbstractOperationsTest {
     void listServiceAccessSettingsSpecifyServiceNotFound() {
         requestListServiceBrokers(this.cloudFoundryClient);
         requestListServicePlanVisibilitiesEmpty(this.cloudFoundryClient);
-        requestListServicesWithNameEmpty(this.cloudFoundryClient, "bogus-service-name");
+        requestListServicesWithNameEmptyAndServiceBrokerIdAndLabelSet(
+                this.cloudFoundryClient, "bogus-service-name");
+        requestListServicesWithNameEmptyAndServiceBrokerIdSet(this.cloudFoundryClient);
+        requestListServicesWithNameAndServiceBrokerIdEmpty(
+                this.cloudFoundryClient, "bogus-service-name");
 
         this.serviceAdmin
                 .listServiceAccessSettings(
@@ -985,11 +993,36 @@ final class DefaultServiceAdminTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestListServicesWithNameEmpty(
+    private static void requestListServicesWithNameAndServiceBrokerIdEmpty(
             CloudFoundryClient cloudFoundryClient, String label) {
         when(cloudFoundryClient
                         .services()
                         .list(ListServicesRequest.builder().label(label).page(1).build()))
+                .thenReturn(Mono.just(fill(ListServicesResponse.builder()).build()));
+    }
+
+    private static void requestListServicesWithNameEmptyAndServiceBrokerIdAndLabelSet(
+            CloudFoundryClient cloudFoundryClient, String label) {
+        when(cloudFoundryClient
+                        .services()
+                        .list(
+                                ListServicesRequest.builder()
+                                        .label(label)
+                                        .page(1)
+                                        .serviceBrokerId("test-service-broker-id")
+                                        .build()))
+                .thenReturn(Mono.just(fill(ListServicesResponse.builder()).build()));
+    }
+
+    private static void requestListServicesWithNameEmptyAndServiceBrokerIdSet(
+            CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient
+                        .services()
+                        .list(
+                                ListServicesRequest.builder()
+                                        .page(1)
+                                        .serviceBrokerId("test-service-broker-id")
+                                        .build()))
                 .thenReturn(Mono.just(fill(ListServicesResponse.builder()).build()));
     }
 
