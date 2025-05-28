@@ -31,8 +31,6 @@ public class TestServiceBroker {
 
     @Bean
     ObjectMapper objectMapper() {
-        return new ObjectMapper()
-            .disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        return new ObjectMapper().disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
     }
-
 }

@@ -25,7 +25,6 @@ import com.fasterxml.jackson.databind.annotation.JsonTypeIdResolver;
 import com.fasterxml.jackson.databind.jsontype.impl.TypeIdResolverBase;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v2.Resource;
-import org.cloudfoundry.client.v2.jobs.JobEntity;
 import org.immutables.value.Value;
 
 /**
@@ -40,7 +39,7 @@ abstract class _DeleteServiceInstanceResponse extends Resource<Object> {
      */
     @JsonProperty("entity")
     @JsonTypeIdResolver(_DeleteServiceInstanceResponse.DeleteServiceInstanceResponseTypeIdResolver.class)
-    @JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", defaultImpl = JobEntity.class, visible = true)
+    @JsonTypeInfo(use = JsonTypeInfo.Id.CUSTOM, include = JsonTypeInfo.As.EXISTING_PROPERTY, property = "type", defaultImpl = org.cloudfoundry.client.v2.jobs.JobEntity.class, visible = true)
     @Nullable
     public abstract Object getEntity();
 
