@@ -35,7 +35,7 @@ jobs:
         run: ./mvnw clean package -Dgpg.skip
       - name: Compile integration tests
         run:  ./mvnw -Pintegration-test test-compile compile
-      - if: ${{ matrix.java == 11 }}
+      - if: ${{ matrix.java != 8 }}
         name: Check style with Spotless
         run:  ./mvnw spotless:check -Pintegration-test
 
