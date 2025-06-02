@@ -248,7 +248,6 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .locked(false)
                                 .name(buildpackName)
                                 .position(3)
-                                .stack("cflinuxfs3")
                                 .build());
     }
 
