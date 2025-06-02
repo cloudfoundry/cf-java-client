@@ -30,6 +30,7 @@ import org.cloudfoundry.client.v3.stacks.ListStacksRequest;
 import org.cloudfoundry.client.v3.stacks.Stack;
 import org.cloudfoundry.client.v3.stacks.StackResource;
 import org.cloudfoundry.util.PaginationUtils;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -40,7 +41,12 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired private String stackName;
+    private String stackName;
+
+    @BeforeEach
+    void setUp(@Autowired Mono<String> stackName) {
+        this.stackName = stackName.block();
+    }
 
     @Test
     public void create() {
@@ -53,7 +59,7 @@ public final class StacksTest extends AbstractIntegrationTest {
                                 .description("Test stack description")
                                 .name(stackName)
                                 .build())
-                .thenMany(requestListStacks(this.cloudFoundryClient, stackName))
+                .thenMany(requestListStacks(stackName))
                 .map(Stack::getDescription)
                 .as(StepVerifier::create)
                 .expectNext("Test stack description")
@@ -88,7 +94,7 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void get() {
-        getStackId(this.cloudFoundryClient, this.stackName)
+        getStackId()
                 .flatMap(
                         stackId ->
                                 this.cloudFoundryClient
@@ -103,7 +109,7 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
-        getStackId(this.cloudFoundryClient, this.stackName)
+        getStackId()
                 .flatMapMany(
                         stackId ->
                                 PaginationUtils.requestClientV3Resources(
@@ -124,15 +130,7 @@ public final class StacksTest extends AbstractIntegrationTest {
 
     @Test
     public void listFilterByName() {
-        PaginationUtils.requestClientV3Resources(
-                        page ->
-                                this.cloudFoundryClient
-                                        .stacksV3()
-                                        .list(
-                                                ListStacksRequest.builder()
-                                                        .name(this.stackName)
-                                                        .page(page)
-                                                        .build()))
+        this.requestListStacks(this.stackName)
                 .map(Stack::getName)
                 .as(StepVerifier::create)
                 .expectNext(this.stackName)
@@ -145,9 +143,8 @@ public final class StacksTest extends AbstractIntegrationTest {
         return requestCreateStack(cloudFoundryClient, stackName).map(Stack::getId);
     }
 
-    private static Mono<String> getStackId(
-            CloudFoundryClient cloudFoundryClient, String stackName) {
-        return requestListStacks(cloudFoundryClient, stackName).single().map(Stack::getId);
+    private Mono<String> getStackId() {
+        return this.requestListStacks(this.stackName).single().map(Stack::getId);
     }
 
     private static Mono<CreateStackResponse> requestCreateStack(
@@ -168,11 +165,10 @@ public final class StacksTest extends AbstractIntegrationTest {
                 .get(GetStackRequest.builder().stackId(stackId).build());
     }
 
-    private static Flux<StackResource> requestListStacks(
-            CloudFoundryClient cloudFoundryClient, String stackName) {
+    private Flux<StackResource> requestListStacks(String stackName) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .stacksV3()
                                 .list(
                                         ListStacksRequest.builder()

@@ -34,6 +34,7 @@ import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
@@ -44,6 +45,8 @@ import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequ
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v2.stacks.StackEntity;
+import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.logcache.v1.TestLogCacheEndpoints;
@@ -527,16 +530,20 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, String stackName) {
-        return PaginationUtils.requestClientV2Resources(
-                        page ->
-                                cloudFoundryClient
-                                        .stacks()
-                                        .list(
-                                                ListStacksRequest.builder()
-                                                        .name(stackName)
-                                                        .page(page)
-                                                        .build()))
+    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, Mono<String> stackName) {
+        return stackName
+                .flux()
+                .flatMap(
+                        name ->
+                                PaginationUtils.requestClientV2Resources(
+                                        page ->
+                                                cloudFoundryClient
+                                                        .stacks()
+                                                        .list(
+                                                                ListStacksRequest.builder()
+                                                                        .name(name)
+                                                                        .page(page)
+                                                                        .build())))
                 .single()
                 .map(ResourceUtils::getId)
                 .doOnSubscribe(s -> this.logger.debug(">> STACK ({}) <<", stackName))
@@ -545,9 +552,24 @@ public class IntegrationTestConfiguration {
                 .cache();
     }
 
-    @Bean
-    String stackName() {
-        return "cflinuxfs3";
+    /**
+     * Select the most recent stack available, matching {@code cflinuxfs*}, based
+     * on the stack number.
+     */
+    @Bean(initMethod = "block")
+    @DependsOn("cloudFoundryCleaner")
+    Mono<String> stackName(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.requestClientV2Resources(
+                        page ->
+                                cloudFoundryClient
+                                        .stacks()
+                                        .list(ListStacksRequest.builder().page(page).build()))
+                .map(StackResource::getEntity)
+                .map(StackEntity::getName)
+                .filter(s -> s.matches("^cflinuxfs\\d$"))
+                .sort(Comparator.reverseOrder())
+                .single()
+                .cache();
     }
 
     @Bean(initMethod = "block")
