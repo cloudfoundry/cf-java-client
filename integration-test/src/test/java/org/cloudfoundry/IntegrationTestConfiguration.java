@@ -568,7 +568,7 @@ public class IntegrationTestConfiguration {
                 .map(StackEntity::getName)
                 .filter(s -> s.matches("^cflinuxfs\\d$"))
                 .sort(Comparator.reverseOrder())
-                .single()
+                .next()
                 .cache();
     }
 
