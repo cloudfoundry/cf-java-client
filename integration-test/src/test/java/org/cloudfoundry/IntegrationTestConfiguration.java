@@ -82,12 +82,14 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StringUtils;
 import reactor.core.publisher.Flux;
@@ -95,6 +97,15 @@ import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
 import reactor.util.function.Tuples;
 
+/**
+ * Default configuration class for ALL integration tests.
+ * <p>
+ * Some beans are annotated as {@link Lazy}, meaning that they will only be initialized
+ * if a test class actually uses them through {@link Autowired} injection. This allows us
+ * to declare some CF applications as beans, but only push them when they are actually
+ * used by the class under tests. This makes our tests faster, as pushing an app can take
+ * several minutes.
+ */
 @Configuration
 @EnableAutoConfiguration
 public class IntegrationTestConfiguration {
@@ -460,6 +471,7 @@ public class IntegrationTestConfiguration {
                 .block();
     }
 
+    @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> serviceBrokerId(
@@ -572,6 +584,7 @@ public class IntegrationTestConfiguration {
                 .cache();
     }
 
+    @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp(
@@ -608,6 +621,7 @@ public class IntegrationTestConfiguration {
         return nameFactory.getApplicationName();
     }
 
+    @Lazy
     @Bean
     TestLogCacheEndpoints testLogCacheEndpoints(
             ConnectionContext connectionContext,
