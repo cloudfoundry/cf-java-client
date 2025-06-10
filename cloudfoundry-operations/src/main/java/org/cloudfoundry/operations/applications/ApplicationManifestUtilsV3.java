@@ -197,7 +197,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
 
         asString(raw, "type", variables, builder::type);
         asString(raw, "command", variables, builder::command);
-        asString(raw, "disk", variables, builder::disk);
+        asString(raw, "disk_quota", variables, builder::disk);
         asString(raw, "health-check-http-endpoint", variables, builder::healthCheckHttpEndpoint);
         asInteger(
                 raw,
@@ -315,8 +315,13 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "health-check-http-endpoint", process.getHealthCheckHttpEndpoint());
         putIfPresent(
                 yaml, "health-check-invocation-timeout", process.getHealthCheckInvocationTimeout());
-        putIfPresent(yaml, "health-check-type", process.getHealthCheckType().getValue());
-        putIfPresent(yaml, "readiness-health-check-type", process.getReadinessHealthCheckType());
+        putIfPresent(
+                yaml, "health-check-type", process.getHealthCheckType(), HealthCheckType::getValue);
+        putIfPresent(
+                yaml,
+                "readiness-health-check-type",
+                process.getReadinessHealthCheckType(),
+                ReadinessHealthCheckType::getValue);
         putIfPresent(
                 yaml,
                 "readiness-health-check-http-endpoint",
