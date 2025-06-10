@@ -339,7 +339,53 @@ final class ReactorDropletsTest extends AbstractClientApiTest {
                                 .resource(
                                         DropletResource.builder()
                                                 .id("fdf3851c-def8-4de1-87f1-6d4543189e22")
-                                                .state(DropletState.STAGED)
+                                                .state(DropletState.PROCESSING_UPLOAD)
+                                                .error(null)
+                                                .lifecycle(
+                                                        Lifecycle.builder()
+                                                                .type(LifecycleType.DOCKER)
+                                                                .data(DockerData.builder().build())
+                                                                .build())
+                                                .executionMetadata("[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .processType(
+                                                        "redacted_message",
+                                                        "[PRIVATE DATA HIDDEN IN LISTS]")
+                                                .image(
+                                                        "cloudfoundry/diego-docker-app-custom:latest")
+                                                .checksum(null)
+                                                .stack(null)
+                                                .createdAt("2016-03-17T00:00:01Z")
+                                                .updatedAt("2016-03-17T21:41:32Z")
+                                                .link(
+                                                        "self",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/droplets/fdf3851c-def8-4de1-87f1-6d4543189e22")
+                                                                .build())
+                                                .link(
+                                                        "package",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/packages/c5725684-a02f-4e59-bc67-8f36ae944688")
+                                                                .build())
+                                                .link(
+                                                        "app",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396")
+                                                                .build())
+                                                .link(
+                                                        "assign_current_droplet",
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/apps/7b34f1cf-7e73-428a-bb5a-8a17a8058396/relationships/current_droplet")
+                                                                .method("PATCH")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        DropletResource.builder()
+                                                .id("fdf3851c-def8-4de1-87f1-6d4543189e23")
+                                                .state(DropletState.AWAITING_UPLOAD)
                                                 .error(null)
                                                 .lifecycle(
                                                         Lifecycle.builder()

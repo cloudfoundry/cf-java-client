@@ -27,6 +27,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SigningKeyResolver;
 import io.jsonwebtoken.impl.DefaultJwsHeader;
+import io.jsonwebtoken.impl.security.AbstractJwk;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
 import java.security.NoSuchAlgorithmException;
@@ -34,7 +35,7 @@ import java.security.PrivateKey;
 import java.sql.Date;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
+import java.util.HashMap;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.junit.jupiter.api.Test;
@@ -103,8 +104,11 @@ final class UsernameProviderTest {
 
     @SuppressWarnings("unchecked")
     private static String getToken(PrivateKey privateKey, Instant expiration) {
+        HashMap<String, String> params = new HashMap<>();
+        params.put(AbstractJwk.KID.getId(), "test-key-id");
+        DefaultJwsHeader header = new DefaultJwsHeader(params);
         return Jwts.builder()
-                .setHeader((Map<String, Object>) new DefaultJwsHeader().setKeyId("test-key"))
+                .setHeader(header)
                 .signWith(privateKey, SignatureAlgorithm.RS256)
                 .claim("user_name", "test-username")
                 .setExpiration(Date.from(expiration))

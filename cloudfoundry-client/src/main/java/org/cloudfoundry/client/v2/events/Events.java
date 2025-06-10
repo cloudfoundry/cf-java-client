@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface Events {
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/events/retrieve_a_particular_event.html">Get Event</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/events/retrieve_a_particular_event.html">Get Event</a> request
      *
      * @param request the Get Event request
      * @return the response from the Get Event request
@@ -32,7 +32,7 @@ public interface Events {
     Mono<GetEventResponse> get(GetEventRequest request);
 
     /**
-     * Makes the <a href="https://apidocs.cloudfoundry.org/latest-release/events/list_all_events.html">List Events</a> request
+     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/events/list_all_events.html">List Events</a> request
      *
      * @param request the List Events request
      * @return the response from the List Events request

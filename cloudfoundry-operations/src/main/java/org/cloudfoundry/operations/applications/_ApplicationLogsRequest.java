@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,20 +14,25 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v2.info;
+package org.cloudfoundry.operations.applications;
 
-import reactor.core.publisher.Mono;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
 /**
- * Main entry point to the Cloud Foundry Info Client API
+ * Represents a request for logs.
  */
-public interface Info {
+@Value.Immutable
+abstract class _ApplicationLogsRequest {
 
     /**
-     * Makes the <a href="https://v2-apidocs.cloudfoundry.org/info/get_info.html">Get Info</a> request
-     *
-     * @param request the Get Info request
-     * @return the response from the Get Info request
+     * The name of the application
      */
-    Mono<GetInfoResponse> get(GetInfoRequest request);
+    abstract String getName();
+
+    /**
+     * Whether only recent logs should be retrieved
+     */
+    @Nullable
+    abstract Boolean getRecent();
 }

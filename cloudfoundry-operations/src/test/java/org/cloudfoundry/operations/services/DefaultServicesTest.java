@@ -123,6 +123,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void bindRouteServiceInstanceAlreadyBound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
@@ -171,6 +172,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void bindRouteServiceInstancePrivateDomain() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
@@ -196,6 +198,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void bindRouteServiceInstancePrivateDomainWithHostAndPath() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(
@@ -224,6 +227,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void bindRouteServiceInstanceServiceInstanceNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
@@ -945,6 +949,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     @Test
     void listServiceOfferingsSingle() {
         requestListSpaceServices(this.cloudFoundryClient, TEST_SPACE_ID, "test-service");
+        requestListSpaceServicesTwo(this.cloudFoundryClient, TEST_SPACE_ID, "label1", "label2");
         requestListSpaceServicePlans(
                 this.cloudFoundryClient,
                 "test-service-id",
@@ -996,6 +1001,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void unbindRoute() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
         requestListSpaceServiceInstancesUserProvided(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -1017,6 +1023,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void unbindRouteServiceInstanceRouteNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListRoutesEmpty(this.cloudFoundryClient, "test-private-domain-id");
         requestListSpaceServiceInstances(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);
@@ -1040,6 +1047,7 @@ final class DefaultServicesTest extends AbstractOperationsTest {
     void unbindRouteServiceInstanceServiceInstanceNotFound() {
         requestListOrganizationPrivateDomains(
                 this.cloudFoundryClient, "test-domain-name", TEST_ORGANIZATION_ID);
+        requestListSharedDomains(cloudFoundryClient, "test-domain-name");
         requestListRoutes(this.cloudFoundryClient, "test-private-domain-id");
         requestListSpaceServiceInstancesEmpty(
                 this.cloudFoundryClient, "test-service-instance-name", TEST_SPACE_ID);

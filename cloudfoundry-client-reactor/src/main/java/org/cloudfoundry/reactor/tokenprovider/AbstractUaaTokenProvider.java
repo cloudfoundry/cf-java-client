@@ -25,7 +25,6 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtParser;
 import io.jsonwebtoken.Jwts;
 import io.netty.handler.codec.http.HttpHeaders;
-import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.util.AsciiString;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -46,7 +45,6 @@ import org.cloudfoundry.reactor.util.JsonCodec;
 import org.cloudfoundry.reactor.util.Operator;
 import org.cloudfoundry.reactor.util.OperatorContext;
 import org.cloudfoundry.reactor.util.UserAgent;
-import org.cloudfoundry.uaa.UaaException;
 import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -163,7 +161,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
         try {
             String jws = token.substring(0, token.lastIndexOf('.') + 1);
-            JwtParser parser = Jwts.parserBuilder().build();
+            JwtParser parser = Jwts.parser().build();
 
             return Optional.of(parser.parseClaimsJwt(jws).getBody());
         } catch (Exception e) {
@@ -253,12 +251,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                         connectionContext,
                         refreshTokenGrantTokenRequestTransformer(refreshToken),
                         tokensExtractor(connectionContext))
-                .onErrorResume(
-                        t ->
-                                t instanceof UaaException
-                                        && ((UaaException) t).getStatusCode()
-                                                == HttpResponseStatus.UNAUTHORIZED.code(),
-                        t -> Mono.empty());
+                .doOnError(t -> LOGGER.error("Refresh token grant error.", t))
+                .onErrorResume(t -> Mono.empty());
     }
 
     private BiConsumer<HttpClientRequest, HttpClientForm> refreshTokenGrantTokenRequestTransformer(

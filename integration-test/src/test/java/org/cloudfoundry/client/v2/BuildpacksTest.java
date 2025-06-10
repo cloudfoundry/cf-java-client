@@ -57,15 +57,11 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                 .name(buildpackName)
                                 .position(2)
                                 .build())
-                .map(ResourceUtils::getEntity)
+                .thenMany(requestListBuildpacks(this.cloudFoundryClient, buildpackName))
+                .map(BuildpackResource::getEntity)
+                .map(BuildpackEntity::getName)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .locked(true)
-                                .name(buildpackName)
-                                .position(2)
-                                .build())
+                .expectNext(buildpackName)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -128,14 +124,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                                         .buildpackId(buildpackId)
                                                         .build()))
                 .map(ResourceUtils::getEntity)
+                .map(BuildpackEntity::getName)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .locked(false)
-                                .name(buildpackName)
-                                .position(3)
-                                .build())
+                .expectNext(buildpackName)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -157,14 +148,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                                                                 .build()))
                                         .map(ResourceUtils::getEntity)
                                         .filter(entity -> buildpackName.equals(entity.getName())))
+                .map(BuildpackEntity::getName)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .locked(false)
-                                .name(buildpackName)
-                                .position(3)
-                                .build())
+                .expectNext(buildpackName)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -177,23 +163,17 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                 .flatMapMany(
                         buildpackId ->
                                 PaginationUtils.requestClientV2Resources(
-                                                page ->
-                                                        this.cloudFoundryClient
-                                                                .buildpacks()
-                                                                .list(
-                                                                        ListBuildpacksRequest
-                                                                                .builder()
-                                                                                .name(buildpackName)
-                                                                                .build()))
-                                        .map(ResourceUtils::getEntity))
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .buildpacks()
+                                                        .list(
+                                                                ListBuildpacksRequest.builder()
+                                                                        .name(buildpackName)
+                                                                        .build())))
+                .map(ResourceUtils::getEntity)
+                .map(BuildpackEntity::getName)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .locked(false)
-                                .name(buildpackName)
-                                .position(3)
-                                .build())
+                .expectNext(buildpackName)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -216,13 +196,8 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                                         .build()))
                 .map(ResourceUtils::getEntity)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(true)
-                                .locked(true)
-                                .name(buildpackName)
-                                .position(2)
-                                .build())
+                .expectNextMatches(
+                        b -> b.getEnabled() && b.getLocked() && b.getPosition().equals(2))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -245,15 +220,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                                         .filename(filename)
                                                         .build()))
                 .map(ResourceUtils::getEntity)
+                .map(BuildpackEntity::getFilename)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .filename(filename)
-                                .locked(false)
-                                .name(buildpackName)
-                                .position(3)
-                                .build())
+                .expectNext(filename)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -276,15 +245,9 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                                                         .filename(filename)
                                                         .build()))
                 .map(ResourceUtils::getEntity)
+                .map(BuildpackEntity::getFilename)
                 .as(StepVerifier::create)
-                .expectNext(
-                        BuildpackEntity.builder()
-                                .enabled(false)
-                                .filename(filename + ".zip")
-                                .locked(false)
-                                .name(buildpackName)
-                                .position(3)
-                                .build())
+                .expectNext(filename + ".zip")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

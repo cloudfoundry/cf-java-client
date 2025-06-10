@@ -18,16 +18,23 @@ package org.cloudfoundry.client.v2;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.blobstores.DeleteBlobstoreBuildpackCachesRequest;
 import org.cloudfoundry.util.JobUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 public final class BlobstoresTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
+
+    // The buildpacks cache needs to be non-empty for the DELETE call to succeed.
+    // We pull the "testLogCacheApp" bean, which ensures the bean will be initialized,
+    // the app will be pushed, and it will add some data to the cache.
+    @Autowired private Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp;
 
     @Test
     public void delete() {

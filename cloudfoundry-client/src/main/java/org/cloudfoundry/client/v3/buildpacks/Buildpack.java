@@ -18,6 +18,7 @@ package org.cloudfoundry.client.v3.buildpacks;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.LifecycleType;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
@@ -76,4 +77,11 @@ public abstract class Buildpack extends Resource {
      */
     @JsonProperty("state")
     public abstract BuildpackState getState();
+
+    /**
+     * The lifecycle
+     */
+    @JsonProperty("lifecycle")
+    @Nullable
+    public abstract LifecycleType getLifecycle();
 }

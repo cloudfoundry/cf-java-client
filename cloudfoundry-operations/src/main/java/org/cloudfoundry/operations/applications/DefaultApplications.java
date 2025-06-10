@@ -189,6 +189,8 @@ public final class DefaultApplications implements Applications {
 
     private static final int CF_STAGING_TIME_EXPIRED = 170007;
 
+    private static final int CF_INSUFFICIENT_RESOURCES = 170008;
+
     private static final String[] ENTRY_FIELDS_CRASH = {"index", "reason", "exit_description"};
 
     private static final String[] ENTRY_FIELDS_NORMAL = {
@@ -540,6 +542,26 @@ public final class DefaultApplications implements Applications {
                                 getLogs(this.dopplerClient, applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
+    }
+
+    @Override
+    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+        return logs(LogsRequest.builder()
+                        .name(request.getName())
+                        .recent(request.getRecent())
+                        .build())
+                .map(
+                        logMessage ->
+                                ApplicationLog.builder()
+                                        .sourceId(logMessage.getApplicationId())
+                                        .sourceType(logMessage.getSourceType())
+                                        .instanceId(logMessage.getSourceInstance())
+                                        .message(logMessage.getMessage())
+                                        .timestamp(logMessage.getTimestamp())
+                                        .logType(
+                                                ApplicationLogType.from(
+                                                        logMessage.getMessageType().name()))
+                                        .build());
     }
 
     @Override
@@ -1471,6 +1493,7 @@ public final class DefaultApplications implements Applications {
                                 CF_INSTANCES_ERROR,
                                 CF_STAGING_NOT_FINISHED,
                                 CF_STAGING_TIME_EXPIRED,
+                                CF_INSUFFICIENT_RESOURCES,
                                 CF_STAGING_ERROR),
                         t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }

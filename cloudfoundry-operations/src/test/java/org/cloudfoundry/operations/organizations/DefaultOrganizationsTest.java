@@ -112,6 +112,8 @@ final class DefaultOrganizationsTest extends AbstractOperationsTest {
     @Test
     void createWithQuota() {
         requestOrganizationQuotaDefinitions(this.cloudFoundryClient, "test-quota-definition-name");
+
+        requestCreateOrganization(this.cloudFoundryClient, TEST_ORGANIZATION_NAME, null);
         requestCreateOrganization(
                 this.cloudFoundryClient,
                 TEST_ORGANIZATION_NAME,
