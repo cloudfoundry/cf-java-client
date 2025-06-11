@@ -51,8 +51,10 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
-    private static final String API_ROOT = "http://api.my.rapid.server.com"; // the ".rAPId." part also contains the string "api".
-    private static final String LOGCACHE = "http://log-cache.my.rapid.server.com"; // only the "api" at the start of
+    private static final String API_ROOT =
+            "http://api.my.rapid.server.com"; // the ".rAPId." part also contains the string "api".
+    private static final String LOGCACHE =
+            "http://log-cache.my.rapid.server.com"; // only the "api" at the start of
     // the url should be replaced.
 
     private final ReactorLogCacheEndpoints logCacheEndpoints =
@@ -110,9 +112,7 @@ class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
         Mono<String> logCacheRoot = examinee.getRoot();
         String rootString = logCacheRoot.block(Duration.ofSeconds(5));
         assertThat(rootString)
-                .isEqualTo(
-                        "http://cache-for-logging.run.pivotal.io:"
-                                + webServerUri.getPort());
+                .isEqualTo("http://cache-for-logging.run.pivotal.io:" + webServerUri.getPort());
     }
 
     @Test
