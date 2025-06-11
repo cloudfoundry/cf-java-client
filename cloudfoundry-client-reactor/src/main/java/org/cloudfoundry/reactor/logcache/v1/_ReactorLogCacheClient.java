@@ -24,7 +24,6 @@ import org.cloudfoundry.logcache.v1.MetaResponse;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
-import org.cloudfoundry.reactor.RootProvider;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
@@ -86,7 +85,7 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
 
     private Mono<String> deriveLogCacheUrl() {
         return getConnectionContext().getRootProvider().getRoot(getConnectionContext())
-            .map(root -> root.replace("api", "log-cache"))
+            .map(root -> root.replaceFirst("://api", "://log-cache"))
             .map(URI::create)
             .delayUntil(uri -> getConnectionContext().trust(uri.getHost(), uri.getPort()))
             .map(URI::toString);

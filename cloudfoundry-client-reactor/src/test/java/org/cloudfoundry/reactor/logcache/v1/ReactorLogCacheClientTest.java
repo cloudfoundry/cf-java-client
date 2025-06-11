@@ -24,7 +24,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Collections;
@@ -52,15 +51,16 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
-    private static final String API_ROOT = "http://api.my.rapid.server.com";
-    private static final String LOGCACHE = "http://log-cache.my.rlog-cached.server.com";
+    private static final String API_ROOT = "http://api.my.rapid.server.com"; // the ".rAPId." part also contains the string "api".
+    private static final String LOGCACHE = "http://log-cache.my.rapid.server.com"; // only the "api" at the start of
+    // the url should be replaced.
 
     private final ReactorLogCacheEndpoints logCacheEndpoints =
             new ReactorLogCacheEndpoints(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
-    void getRootFromFallback() throws IOException {
+    void getRootFromFallback() {
         URI webServerUri = URI.create(this.root.block(Duration.ofSeconds(5)));
         Mono<String> apiRoot = Mono.just(API_ROOT);
         RootProvider rootProvider = mock(RootProvider.class);
@@ -111,7 +111,7 @@ class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
         String rootString = logCacheRoot.block(Duration.ofSeconds(5));
         assertThat(rootString)
                 .isEqualTo(
-                        "http://cache-for-logging.cf.lod-cfcli3.cfrt-sof.sapcloud.io:"
+                        "http://cache-for-logging.run.pivotal.io:"
                                 + webServerUri.getPort());
     }
 
