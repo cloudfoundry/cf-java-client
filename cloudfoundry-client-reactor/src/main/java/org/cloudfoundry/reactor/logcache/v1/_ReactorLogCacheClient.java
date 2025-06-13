@@ -70,7 +70,7 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
 
     @Value.Default
     Mono<String> getRoot() {
-        final Mono<String> cached = getConnectionContext().getRootProvider().getRoot("log-cache", getConnectionContext())
+        final Mono<String> cached = getConnectionContext().getRootProvider().getRoot("log_cache", getConnectionContext())
             .onErrorResume(IllegalArgumentException.class, e -> deriveLogCacheUrl());
 
         return getConnectionContext().getCacheDuration()
@@ -85,7 +85,7 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
 
     private Mono<String> deriveLogCacheUrl() {
         return getConnectionContext().getRootProvider().getRoot(getConnectionContext())
-            .map(root -> root.replace("api", "log-cache"))
+            .map(root -> root.replaceFirst("://api", "://log-cache"))
             .map(URI::create)
             .delayUntil(uri -> getConnectionContext().trust(uri.getHost(), uri.getPort()))
             .map(URI::toString);

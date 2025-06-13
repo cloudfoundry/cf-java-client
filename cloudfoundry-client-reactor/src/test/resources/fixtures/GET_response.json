@@ -25,6 +25,9 @@
     "uaa": {
       "href": "https://uaa.run.pivotal.io"
     },
+    "log_cache": {
+      "href": "https://cache-for-logging.run.pivotal.io"
+    },
     "logging": {
       "href": "wss://doppler.run.pivotal.io:443"
     }
