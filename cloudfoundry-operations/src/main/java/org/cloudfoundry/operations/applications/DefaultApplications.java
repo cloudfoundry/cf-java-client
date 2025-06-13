@@ -715,18 +715,11 @@ public final class DefaultApplications implements Applications {
                                                 .flatMap(
                                                         function(
                                                                 (appId, packageId) ->
-                                                                        buildAndStage(
-                                                                                        cloudFoundryClient,
-                                                                                        manifestApp,
-                                                                                        packageId)
-                                                                                .flatMap(
-                                                                                        dropletId ->
-                                                                                                applyDropletAndWaitForRunning(
-                                                                                                        cloudFoundryClient,
-                                                                                                        manifestApp
-                                                                                                                .getName(),
-                                                                                                        appId,
-                                                                                                        dropletId))))))
+                                                                        buildAndStageAndWaitForRunning(
+                                                                                cloudFoundryClient,
+                                                                                manifestApp,
+                                                                                packageId,
+                                                                                appId)))))
                 .then();
     }
 
@@ -1177,6 +1170,21 @@ public final class DefaultApplications implements Applications {
                                                 ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND),
                                                 t -> Mono.empty()))
                 .then();
+    }
+
+    private static Mono<Void> buildAndStageAndWaitForRunning(
+            CloudFoundryClient cloudFoundryClient,
+            ManifestV3Application manifestApp,
+            String packageId,
+            String appId) {
+        return buildAndStage(cloudFoundryClient, manifestApp, packageId)
+                .flatMap(
+                        dropletId ->
+                                applyDropletAndWaitForRunning(
+                                        cloudFoundryClient,
+                                        manifestApp.getName(),
+                                        appId,
+                                        dropletId));
     }
 
     private static Mono<String> buildAndStage(

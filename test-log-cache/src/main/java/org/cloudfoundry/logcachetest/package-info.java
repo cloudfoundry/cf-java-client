@@ -24,3 +24,5 @@
     typeImmutable = "*"
 )
 package org.cloudfoundry.logcachetest;
+
+import org.immutables.value.Value;
