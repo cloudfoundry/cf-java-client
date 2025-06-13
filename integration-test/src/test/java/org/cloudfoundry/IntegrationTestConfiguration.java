@@ -36,10 +36,11 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Random;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
 import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
@@ -461,11 +462,15 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    Version serverVersion(@Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient
-                .info()
-                .get(GetInfoRequest.builder().build())
-                .map(response -> Version.valueOf(response.getApiVersion()))
+    Version serverVersion(ConnectionContext connectionContext) {
+        Queue<String> keyList =
+                new LinkedList<String>(
+                        Arrays.asList("links", "cloud_controller_v2", "meta", "version"));
+
+        return connectionContext
+                .getRootProvider()
+                .getRootKey(keyList, connectionContext)
+                .map(response -> Version.valueOf(response))
                 .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
                 .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
                 .block();

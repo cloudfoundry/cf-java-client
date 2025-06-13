@@ -41,6 +41,7 @@ import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.cloudfoundry.operations.services.BindRouteServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -154,6 +155,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void createRouteTcpAssignedPort() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String domainName = this.nameFactory.getDomainName();
         Integer port = this.nameFactory.getPort();
 
@@ -171,6 +173,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void createRouteTcpRandomPort() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
@@ -305,6 +308,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void deleteTcpRoute() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String domainName = this.nameFactory.getDomainName();
 
         requestCreateSharedDomain(this.cloudFoundryOperations, domainName, DEFAULT_ROUTER_GROUP)
@@ -522,6 +526,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void mapTcpRoute() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -553,6 +558,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void mapTcpRouteTwice() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 
@@ -680,6 +686,7 @@ public final class RoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void unmapTcpRoute() throws IOException {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
 

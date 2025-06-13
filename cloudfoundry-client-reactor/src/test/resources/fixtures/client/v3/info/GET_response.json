@@ -1,0 +1,19 @@
+{
+  "build": "v40.18.0",
+  "cli_version": {
+    "minimum": "8.0.0",
+    "recommended": ""
+  },
+  "custom": {},
+  "description": "SAP BTP Cloud Foundry environment",
+  "name": "cf-deployment",
+  "version": 40,
+  "links": {
+    "self": {
+      "href": "https://api.cf.lod-cfcli3.cfrt-sof.sapcloud.io/v3/info"
+    },
+    "support": {
+      "href": "http://support.cloudfoundry.com"
+    }
+  }
+}
