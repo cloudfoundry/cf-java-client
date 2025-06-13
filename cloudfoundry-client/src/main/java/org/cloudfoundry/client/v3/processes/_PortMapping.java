@@ -32,6 +32,7 @@ abstract class _PortMapping {
      * The external port
      */
     @JsonProperty("external")
+    @Nullable
     abstract Integer getExternal();
 
     /**
@@ -45,6 +46,7 @@ abstract class _PortMapping {
      * The internal port
      */
     @JsonProperty("internal")
+    @Nullable
     abstract Integer getInternal();
 
     /**
