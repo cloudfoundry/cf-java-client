@@ -32,6 +32,7 @@ import org.cloudfoundry.routing.v1.tcproutes.ListTcpRoutesResponse;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRoute;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteConfiguration;
 import org.cloudfoundry.routing.v1.tcproutes.TcpRouteDeletion;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -49,6 +50,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void create() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -83,6 +85,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void delete() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -137,6 +140,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void events() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();
@@ -173,6 +177,7 @@ public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     @Test
     public void list() {
+        Assumptions.assumeTrue(super.serverUsesRouting());
         String backendIp = this.nameFactory.getIpAddress();
         Integer backendPort = this.nameFactory.getPort();
         Integer port = this.nameFactory.getPort();

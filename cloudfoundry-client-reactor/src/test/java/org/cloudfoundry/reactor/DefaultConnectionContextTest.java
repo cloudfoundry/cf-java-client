@@ -24,7 +24,10 @@ import io.netty.handler.logging.ByteBufFormat;
 import io.netty.handler.logging.LogLevel;
 import java.net.InetSocketAddress;
 import java.time.Duration;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.Optional;
+import java.util.Queue;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import reactor.netty.http.client.HttpClient;
@@ -74,6 +77,38 @@ final class DefaultConnectionContextTest extends AbstractRestTest {
                 .expectNext("http://localhost:8080/uaa")
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getInfoV3() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/GET_response.json")
+                                        .build())
+                        .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(TestRequest.builder().method(GET).path("/v3/info").build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/client/v3/info/GET_response.json")
+                                        .build())
+                        .build());
+
+        Queue<String> keyList = new LinkedList<String>(Arrays.asList("cli_version", "minimum"));
+
+        this.connectionContext
+                .getRootProvider()
+                .getRootKey(keyList, this.connectionContext)
+                .as(StepVerifier::create)
+                .expectNext("8.0.0")
+                .expectComplete()
+                .verify(Duration.ofSeconds(5000));
     }
 
     @Test

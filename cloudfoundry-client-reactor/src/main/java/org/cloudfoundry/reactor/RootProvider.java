@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor;
 
+import java.util.Queue;
 import reactor.core.publisher.Mono;
 
 /**
@@ -32,11 +33,24 @@ public interface RootProvider {
     Mono<String> getRoot(ConnectionContext connectionContext);
 
     /**
-     * The normalized root for a given key
+     * The normalized root for a given key.
+     * The "href" entry for the given key is returned from the root endpoint.
+     * If the endpoint does not provide a port, it will be added at nomalisation.
      *
-     * @param key               the key to look up root from
-     * @param connectionContext a {@link ConnectionContext} to be used if the roo needs to be retrieved via a network request
+     * @param key               the key to look up from root
+     * @param connectionContext a {@link ConnectionContext} to be used if the root needs to be retrieved via a network request
      * @return the normalized API root
      */
     Mono<String> getRoot(String key, ConnectionContext connectionContext);
+
+    /**
+     * The literal String value for a given key. May also access structured fields from the root endpoint,
+     * like "links.cloud_controller_v2.meta.version".
+     * Null values from the endpoint are translated to an empty String.
+     *
+     * @param keyList               the key(s) to look up from root. Nested keys are added at the end of the queue.
+     * @param connectionContext a {@link ConnectionContext} to be used if the root needs to be retrieved via a network request
+     * @return the plain value for the given key
+     */
+    Mono<String> getRootKey(Queue<String> keyList, ConnectionContext connectionContext);
 }

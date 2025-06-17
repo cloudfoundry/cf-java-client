@@ -19,9 +19,11 @@ package org.cloudfoundry.reactor.client;
 import static org.cloudfoundry.util.tuple.TupleUtils.consumer;
 
 import com.github.zafarkhaja.semver.Version;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.info.Info;
+import org.cloudfoundry.reactor.ConnectionContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
@@ -30,16 +32,21 @@ final class CloudFoundryClientCompatibilityChecker {
 
     private final Logger logger = LoggerFactory.getLogger("cloudfoundry-client.compatibility");
 
-    private final Info info;
+    private final ConnectionContext connectionContext;
 
-    CloudFoundryClientCompatibilityChecker(Info info) {
-        this.info = info;
+    CloudFoundryClientCompatibilityChecker(ConnectionContext connectionContext) {
+        this.connectionContext = connectionContext;
     }
 
     void check() {
-        this.info
-                .get(GetInfoRequest.builder().build())
-                .map(response -> Version.valueOf(response.getApiVersion()))
+        Queue<String> keyList =
+                new LinkedList<String>(
+                        Arrays.asList("links", "cloud_controller_v2", "meta", "version"));
+
+        connectionContext
+                .getRootProvider()
+                .getRootKey(keyList, connectionContext)
+                .map(response -> Version.valueOf(response))
                 .zipWith(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
                 .subscribe(
                         consumer(
