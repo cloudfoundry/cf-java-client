@@ -17,7 +17,7 @@ fi
 
 CF_CREDS=$(cat "${ROOT}"/environment/cf-creds.json)
 
-TEST_APIHOST=$(jq -n -r --argjson credentials "${CF_CREDS}" '"$credentials.api_url"')
+TEST_APIHOST=$(jq -n -r --argjson credentials "${CF_CREDS}" '$credentials.api_url')
 export TEST_APIHOST
 
 TEST_ADMIN_USERNAME=$(jq -n -r --argjson credentials "${CF_CREDS}" '$credentials.username')
