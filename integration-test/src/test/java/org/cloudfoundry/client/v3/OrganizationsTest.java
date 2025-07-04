@@ -21,6 +21,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -228,7 +229,9 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
     @Test
-    public void getUsageSummary() {
+    public void getUsageSummary(
+            // We inject the testLogCacheApp to ensure there is _some_ usage in the org
+            @Autowired Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
         this.organizationId
                 .flatMap(
                         organizationId ->
