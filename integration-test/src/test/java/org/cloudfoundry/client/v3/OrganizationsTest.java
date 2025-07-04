@@ -179,7 +179,8 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                                                         .build()))
                 .map(GetOrganizationDefaultDomainResponse::getName)
                 .as(StepVerifier::create)
-                .consumeNextWith(name -> assertThat(name).contains("apps.", ".cf-app.com"))
+                .consumeNextWith(
+                        name -> assertThat(name).contains("apps.", ".shepherd.tanzu.broadcom.net"))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
