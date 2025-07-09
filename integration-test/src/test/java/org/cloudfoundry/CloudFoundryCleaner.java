@@ -116,12 +116,16 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.InitializingBean;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuples;
 import reactor.util.retry.Retry;
 
-final class CloudFoundryCleaner {
+final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
+
+    private static boolean cleanSlateEnvironment = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.test");
 
@@ -160,6 +164,25 @@ final class CloudFoundryCleaner {
         this.networkingClient = networkingClient;
         this.serverVersion = serverVersion;
         this.uaaClient = uaaClient;
+    }
+
+    /**
+     * Once at the beginning of the whole test suite, clean up the environment. It should only ever happen
+     * once, hence the static init variable.
+     */
+    @Override
+    public void afterPropertiesSet() {
+        if (!cleanSlateEnvironment) {
+            LOGGER.info(
+                    "Performing clean slate cleanup. Should happen once per integration test run.");
+            this.clean();
+            cleanSlateEnvironment = true;
+        }
+    }
+
+    @Override
+    public void destroy() {
+        this.clean();
     }
 
     void clean() {

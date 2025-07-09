@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Optional;
 import java.util.function.Predicate;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
@@ -49,6 +50,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@CleanupCloudFoundryAfterClass
 public final class RoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";

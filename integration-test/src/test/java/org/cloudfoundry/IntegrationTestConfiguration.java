@@ -37,7 +37,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Random;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
@@ -243,14 +242,13 @@ public class IntegrationTestConfiguration {
         return nameFactory.getClientSecret();
     }
 
-    @Bean(initMethod = "clean", destroyMethod = "clean")
+    @Bean
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
             @Qualifier("admin") NetworkingClient networkingClient,
             Version serverVersion,
             @Qualifier("admin") UaaClient uaaClient) {
-
         return new CloudFoundryCleaner(
                 cloudFoundryClient, nameFactory, networkingClient, serverVersion, uaaClient);
     }

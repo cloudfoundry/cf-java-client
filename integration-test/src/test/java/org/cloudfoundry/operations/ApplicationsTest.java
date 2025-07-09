@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.logcache.v1.Envelope;
@@ -93,6 +94,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@CleanupCloudFoundryAfterClass
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
@@ -109,7 +111,9 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
     // We ensure it is by loading the serviceBrokerId @Lazy bean.
-    @Qualifier("serviceBrokerId") @Autowired private Mono<String> serviceBrokerId;
+    @Qualifier("serviceBrokerId")
+    @Autowired
+    private Mono<String> serviceBrokerId;
 
     @Test
     public void copySource() throws IOException {
