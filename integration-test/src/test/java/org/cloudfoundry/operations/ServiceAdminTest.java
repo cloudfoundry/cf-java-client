@@ -21,6 +21,7 @@ import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
@@ -34,11 +35,11 @@ import org.cloudfoundry.util.ResourceUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@CleanupCloudFoundryAfterClass
 public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -57,7 +58,9 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
     // We ensure it is by loading the serviceBrokerId @Lazy bean.
-    @Qualifier("serviceBrokerId") @Autowired private Mono<String> serviceBrokerId;
+    @Qualifier("serviceBrokerId")
+    @Autowired
+    private Mono<String> serviceBrokerId;
 
     @Test
     public void disableServiceAccess() {
