@@ -29,20 +29,17 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
-public class LogCacheTest extends AbstractIntegrationTest implements InitializingBean {
+public class LogCacheTest extends AbstractIntegrationTest {
 
     @Autowired LogCacheClient logCacheClient;
-
-
-    @Autowired private Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp;
 
     private ApplicationUtils.ApplicationMetadata testLogCacheAppMetadata;
 
@@ -50,9 +47,9 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
 
     private final Random random = new SecureRandom();
 
-    @Override
-    public void afterPropertiesSet() {
-        this.testLogCacheAppMetadata = this.testLogCacheApp.block();
+    @BeforeEach
+    void setUp(@Autowired Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
+        this.testLogCacheAppMetadata = testLogCacheApp.block();
     }
 
     @Test
