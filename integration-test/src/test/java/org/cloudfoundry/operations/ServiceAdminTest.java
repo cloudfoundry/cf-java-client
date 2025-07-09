@@ -33,6 +33,8 @@ import org.cloudfoundry.operations.serviceadmin.ServiceAccess;
 import org.cloudfoundry.util.ResourceUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
@@ -52,6 +54,10 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     @Autowired private String serviceBrokerName;
 
     @Autowired private String serviceName;
+
+    // To create a service in #pushBindService, the Service Broker must be installed first.
+    // We ensure it is by loading the serviceBrokerId @Lazy bean.
+    @Qualifier("serviceBrokerId") @Autowired private Mono<String> serviceBrokerId;
 
     @Test
     public void disableServiceAccess() {

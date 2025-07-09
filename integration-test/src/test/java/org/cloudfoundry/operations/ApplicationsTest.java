@@ -87,6 +87,7 @@ import org.cloudfoundry.operations.services.ServiceInstance;
 import org.cloudfoundry.util.FluentMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -105,6 +106,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Autowired private String serviceName;
 
     @Autowired private LogCacheClient logCacheClient;
+
+    // To create a service in #pushBindService, the Service Broker must be installed first.
+    // We ensure it is by loading the serviceBrokerId @Lazy bean.
+    @Qualifier("serviceBrokerId") @Autowired private Mono<String> serviceBrokerId;
 
     @Test
     public void copySource() throws IOException {
