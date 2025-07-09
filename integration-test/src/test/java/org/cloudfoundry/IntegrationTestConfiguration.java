@@ -339,8 +339,8 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    RandomNameFactory nameFactory(Random random) {
-        return new RandomNameFactory(random);
+    RandomNameFactory nameFactory() {
+        return new RandomNameFactory(new SecureRandom());
     }
 
     @Bean(initMethod = "block")
@@ -445,11 +445,6 @@ public class IntegrationTestConfiguration {
     @Bean
     String planName(NameFactory nameFactory) {
         return nameFactory.getPlanName();
-    }
-
-    @Bean
-    SecureRandom random() {
-        return new SecureRandom();
     }
 
     @Bean

@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.within;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 
 import java.math.BigInteger;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Random;
 import java.util.function.Predicate;
@@ -40,13 +41,14 @@ public class LogCacheTest extends AbstractIntegrationTest implements Initializin
 
     @Autowired LogCacheClient logCacheClient;
 
-    @Autowired Random random;
 
     @Autowired private Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp;
 
     private ApplicationUtils.ApplicationMetadata testLogCacheAppMetadata;
 
     @Autowired private TestLogCacheEndpoints testLogCacheEndpoints;
+
+    private final Random random = new SecureRandom();
 
     @Override
     public void afterPropertiesSet() {
