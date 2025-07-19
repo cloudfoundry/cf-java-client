@@ -37,10 +37,6 @@ public final class UsersTest extends AbstractIntegrationTest {
     @Autowired
     private CloudFoundryClient cloudFoundryClient;
 
-    public UsersTest(CloudFoundryClient cloudFoundryClient) {
-        this.cloudFoundryClient = cloudFoundryClient;
-    }
-
     private static Mono<CreateUserResponse> createUser(
             CloudFoundryClient cloudFoundryClient, String userId) {
         return cloudFoundryClient

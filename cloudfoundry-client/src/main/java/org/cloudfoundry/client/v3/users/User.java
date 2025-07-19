@@ -29,12 +29,14 @@ public abstract class User extends Resource {
      * The username
      */
     @JsonProperty("username")
+    @Nullable
     public abstract String getUsername();
 
     /**
      * The presentation name
      */
     @JsonProperty("presentation_name")
+    @Nullable
     public abstract String getPresentationName();
 
     /**
