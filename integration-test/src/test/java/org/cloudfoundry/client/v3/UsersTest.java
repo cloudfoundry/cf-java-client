@@ -35,7 +35,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public final class UsersTest extends AbstractIntegrationTest {
 
     @Autowired
-    private final CloudFoundryClient cloudFoundryClient;
+    private CloudFoundryClient cloudFoundryClient;
 
     private static Mono<CreateUserResponse> createUser(
             CloudFoundryClient cloudFoundryClient, String userId) {
