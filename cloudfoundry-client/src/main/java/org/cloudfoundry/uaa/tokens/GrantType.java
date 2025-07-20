@@ -55,9 +55,14 @@ public enum GrantType {
     JWT_BEARER("urn:ietf:params:oauth:grant-type:jwt-bearer"),
 
     /**
-     * The jwt-bearer token grant type
+     * The saml2-bearer token grant type
      */
-    SAML2_BEARER("urn:ietf:params:oauth:grant-type:saml2-bearer");
+    SAML2_BEARER("urn:ietf:params:oauth:grant-type:saml2-bearer"),
+
+    /**
+     * The user token token grant type
+     */
+    USER_TOKEN("user_token");
 
     private final String value;
 
@@ -82,6 +87,8 @@ public enum GrantType {
                 return JWT_BEARER;
             case "urn:ietf:params:oauth:grant-type:saml2-bearer":
                 return SAML2_BEARER;
+            case "user_token":
+                return USER_TOKEN;
             default:
                 throw new IllegalArgumentException(String.format("Unknown grant type: %s", s));
         }
