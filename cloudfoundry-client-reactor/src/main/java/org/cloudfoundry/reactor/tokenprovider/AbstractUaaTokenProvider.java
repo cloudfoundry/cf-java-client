@@ -37,6 +37,8 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -81,6 +83,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens =
+            new ConcurrentHashMap<>(1);
+
+    private final ConcurrentMap<ConnectionContext, Scheduler> tokenSchedulers =
+            new ConcurrentHashMap<>(1);
+
+    private final ConcurrentMap<ConnectionContext, Mono<String>> activeTokenRequests =
             new ConcurrentHashMap<>(1);
 
     /**
@@ -297,30 +305,59 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
         headers.set(AUTHORIZATION, String.format("Basic %s", encoded));
     }
 
-    private Mono<String> token(ConnectionContext connectionContext) {
-        Mono<String> cached =
-                this.refreshTokens
-                        .getOrDefault(connectionContext, Mono.empty())
-                        .flatMap(
-                                refreshToken ->
-                                        refreshToken(connectionContext, refreshToken)
-                                                .doOnSubscribe(
-                                                        s ->
-                                                                LOGGER.debug(
-                                                                        "Negotiating using refresh"
-                                                                                + " token")))
-                        .switchIfEmpty(
-                                primaryToken(connectionContext)
-                                        .doOnSubscribe(
-                                                s ->
-                                                        LOGGER.debug(
-                                                                "Negotiating using token"
-                                                                        + " provider")));
+    private Mono<String> token(final ConnectionContext connectionContext) {
+        // Get or create a single-threaded scheduler for this connection context
+        final Scheduler tokenScheduler = this.tokenSchedulers.computeIfAbsent(
+            connectionContext, 
+            ctx -> Schedulers.newSingle("token-" + ctx.hashCode())
+        );
+        
+        return Mono.defer(() -> {
+            // Check if there's already an active token request
+            final Mono<String> existingRequest = this.activeTokenRequests.get(connectionContext);
+            if (existingRequest != null) {
+                LOGGER.debug("Reusing existing token request for connection context");
+                return existingRequest;
+            }
+            
+            // Create new token request with proper synchronization and cache duration
+            final Mono<String> baseTokenRequest = createTokenRequest(connectionContext)
+                    .publishOn(tokenScheduler) // Ensure execution on single thread
+                    .doOnSubscribe(s -> LOGGER.debug("Starting new token request"))
+                    .doOnSuccess(token -> LOGGER.debug("Token request completed successfully"))
+                    .doOnError(error -> LOGGER.debug("Token request failed", error))
+                    .doFinally(signal -> {
+                        // Clear the active request when done (success or error)
+                        this.activeTokenRequests.remove(connectionContext);
+                        LOGGER.debug("Cleared active token request for connection context");
+                    });
+            
+            // Apply cache duration from connection context
+            final Mono<String> newTokenRequest = connectionContext
+                    .getCacheDuration()
+                    .map(baseTokenRequest::cache)
+                    .orElseGet(baseTokenRequest::cache);
+            
+            // Store the active request atomically
+            final Mono<String> actualRequest = this.activeTokenRequests.putIfAbsent(connectionContext, newTokenRequest);
+            if (actualRequest != null) {
+                // Another thread beat us to it, use their request
+                LOGGER.debug("Another thread created token request first, using theirs");
+                return actualRequest;
+            }
+            
+            // We successfully stored our request, use it
+            return newTokenRequest;
+        });
+    }
 
-        return connectionContext
-                .getCacheDuration()
-                .map(cached::cache)
-                .orElseGet(cached::cache)
+    private Mono<String> createTokenRequest(final ConnectionContext connectionContext) {
+        return this.refreshTokens
+                .getOrDefault(connectionContext, Mono.empty())
+                .flatMap(refreshToken -> refreshToken(connectionContext, refreshToken)
+                        .doOnSubscribe(s -> LOGGER.debug("Negotiating using refresh token")))
+                .switchIfEmpty(primaryToken(connectionContext)
+                        .doOnSubscribe(s -> LOGGER.debug("Negotiating using token provider")))
                 .checkpoint();
     }
 
