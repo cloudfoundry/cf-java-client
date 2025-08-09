@@ -335,16 +335,18 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
                 return existingRequest;
             }
             
-            // Create new token request with proper synchronization
             final Mono<String> baseTokenRequest = createTokenRequest(connectionContext)
-                    .publishOn(connectionContext.getTokenScheduler()) // Ensure execution on single thread
-                    .doOnSubscribe(s -> LOGGER.debug("Starting new token request"))
-                    .doOnSuccess(token -> LOGGER.debug("Token request completed successfully"))
-                    .doOnError(error -> LOGGER.debug("Token request failed", error))
+                    /* 
+                     * Ensure execution on single thread.
+                     * This prevents sending requests to the UAA server with expired refresh tokens.
+                     */
+                    .publishOn(connectionContext.getTokenScheduler()) 
+                    .doOnSubscribe(s -> LOGGER.debug("Starting new UAA JWT token request"))
+                    .doOnSuccess(token -> LOGGER.debug("UAA JWT token request completed successfully"))
+                    .doOnError(error -> LOGGER.debug("UAA JWT token request failed", error))
                     .doFinally(signal -> {
                         // Clear the active request when done (success or error)
                         this.activeTokenRequests.remove(connectionContext);
-                        LOGGER.debug("Cleared active token request for connection context");
                     });
             
             // Apply cache duration from connection context
@@ -356,8 +358,8 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             // Store the active request atomically
             final Mono<String> actualRequest = this.activeTokenRequests.putIfAbsent(connectionContext, newTokenRequest);
             if (actualRequest != null) {
-                // Another thread beat us to it, use their request
-                LOGGER.debug("Another thread created token request first, using theirs");
+                // Another thread beat us to it, use their request. This prevents "wasteful" requests.
+                LOGGER.debug("Another thread created token request first, using theirs instead");
                 return actualRequest;
             }
             
