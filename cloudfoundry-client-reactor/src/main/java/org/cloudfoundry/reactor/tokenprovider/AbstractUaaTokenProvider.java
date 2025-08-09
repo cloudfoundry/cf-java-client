@@ -306,21 +306,47 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
     }
 
     private Mono<String> token(final ConnectionContext connectionContext) {
+        /*
+         * Beware of issue #1146!
+         * There can be both multiple concurrent callers coming here during creation of the Mono
+         * and there can be concurrent callers during the subscription/execution of the Mono:
+         * - The latter is very harmful: This may lead to concurrent execution of the logic
+         *   written in requestToken and hence to multiple requests to the UAA server using
+         *   the same *value for the refresh token*! The UAA server will sequentialize them, 
+         *   one will go through just as normal and a new refresh token gets issued.
+         *   The UAA server invalidates the old refresh token. The second request then arrives 
+         *   with the old refresh token and gets rejected. In an earlier version this led
+         *   to caching the second request, hence to cache an error. This caused deadlocks.
+         * - The first is only "not nice", if the second issue is resolved: It causes that
+         *   we will request two access tokens from the UAA server shortly after the other,
+         *   but having use appropriate refresh tokens sequentially. The second request
+         *   simply is to be considered waste.
+         * 
+         * The coding below fixes both issues: It ensures that the execution of the Mono
+         * is synchronized and it ensures that two threads arriving to fetch the JWT in a 
+         * non-caching situation does not trigger "wasteful" requests to the UAA server.
+         */
+
         // Get or create a single-threaded scheduler for this connection context
         final Scheduler tokenScheduler = this.tokenSchedulers.computeIfAbsent(
             connectionContext, 
             ctx -> Schedulers.newSingle("token-" + ctx.hashCode())
         );
         
+        /*
+         * We use Mono.defer to ensure that the execution of the locking not happens
+         * during creation of the Mono (where it is of little relevance), but
+         * during the execution/subscription.
+         */
         return Mono.defer(() -> {
             // Check if there's already an active token request
             final Mono<String> existingRequest = this.activeTokenRequests.get(connectionContext);
             if (existingRequest != null) {
-                LOGGER.debug("Reusing existing token request for connection context");
+                LOGGER.debug("Reusing existing UAA JWT token request for connection context");
                 return existingRequest;
             }
             
-            // Create new token request with proper synchronization and cache duration
+            // Create new token request with proper synchronization
             final Mono<String> baseTokenRequest = createTokenRequest(connectionContext)
                     .publishOn(tokenScheduler) // Ensure execution on single thread
                     .doOnSubscribe(s -> LOGGER.debug("Starting new token request"))
