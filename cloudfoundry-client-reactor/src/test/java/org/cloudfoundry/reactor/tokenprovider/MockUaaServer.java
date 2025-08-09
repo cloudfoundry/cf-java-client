@@ -88,13 +88,23 @@ class MockUaaServer {
         mockWebServer.shutdown();
     }
     
-    private MockResponse handleTokenRequest(final RecordedRequest request) throws IOException {
+    private MockResponse handleRequest(final RecordedRequest request) throws IOException {
         requestCount.incrementAndGet();
         
-        if (!"/oauth/token".equals(request.getPath())) {
+        final String path = request.getPath();
+        LOGGER.debug("Received request: {} {}", request.getMethod(), path);
+        
+        if ("/v2/info".equals(path)) {
+            return handleInfoRequest();
+        } else if ("/oauth/token".equals(path)) {
+            return handleTokenRequest(request);
+        } else {
+            LOGGER.debug("Unknown path requested: {}", path);
             return new MockResponse().setResponseCode(404);
         }
-        
+    }
+    
+    private MockResponse handleTokenRequest(final RecordedRequest request) throws IOException {
         final String requestBody = request.getBody().readUtf8();
         LOGGER.debug("Received token request: {}", requestBody);
         
@@ -105,6 +115,29 @@ class MockUaaServer {
         
         // Handle other grant types (password, client_credentials, etc.)
         return handlePrimaryTokenRequest();
+    }
+    
+    private MockResponse handleInfoRequest() throws IOException {
+        LOGGER.debug("Handling /v2/info request");
+        
+        final Map<String, Object> infoResponse = new HashMap<>();
+        infoResponse.put("authorization_endpoint", getBaseUrl().replaceAll("/$", ""));
+        infoResponse.put("token_endpoint", getBaseUrl().replaceAll("/$", ""));
+        infoResponse.put("app_ssh_endpoint", "ssh.localhost:2222");
+        infoResponse.put("app_ssh_host_key_fingerprint", "test-fingerprint");
+        infoResponse.put("api_version", "2.165.0");
+        infoResponse.put("name", "test-cf");
+        infoResponse.put("build", "test-build");
+        infoResponse.put("version", 0);
+        infoResponse.put("description", "Unit Test Cloud Foundry");
+        
+        final String responseBody = objectMapper.writeValueAsString(infoResponse);
+        LOGGER.debug("Generated info response: {}", responseBody);
+        
+        return new MockResponse()
+            .setResponseCode(200)
+            .setHeader("Content-Type", "application/json")
+            .setBody(responseBody);
     }
     
     /* Warning! synchronized is really necessary here to ensure no concurrent threads are trying to run into a refresh token handling! */
@@ -189,7 +222,7 @@ class MockUaaServer {
         @Override
         public MockResponse dispatch(final RecordedRequest request) {
             try {
-                return handleTokenRequest(request);
+                return handleRequest(request);
             } catch (final Exception e) {
                 LOGGER.error("Error handling request", e);
                 return new MockResponse().setResponseCode(500);
