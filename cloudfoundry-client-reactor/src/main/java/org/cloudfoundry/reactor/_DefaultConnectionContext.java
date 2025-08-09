@@ -32,6 +32,8 @@ import org.immutables.value.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
+import reactor.core.scheduler.Schedulers;
 import reactor.netty.http.client.HttpClient;
 import reactor.netty.resources.ConnectionProvider;
 import reactor.netty.resources.LoopResources;
@@ -74,6 +76,7 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
     @PreDestroy
     public final void dispose() {
         getConnectionProvider().ifPresent(ConnectionProvider::dispose);
+        getTokenScheduler().dispose();
         getThreadPool().dispose();
 
         try {
@@ -152,6 +155,12 @@ abstract class _DefaultConnectionContext implements ConnectionContext {
         return getSslCertificateTruster()
             .map(t -> t.trust(host, port, Duration.ofSeconds(30)))
             .orElse(Mono.empty());
+    }
+
+    @Override
+    @Value.Derived
+    public Scheduler getTokenScheduler() {
+        return Schedulers.newSingle(String.format("token-provider-%s/%d", getApiHost(), getPort().orElse(DEFAULT_PORT)));
     }
 
     /**

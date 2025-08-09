@@ -37,8 +37,6 @@ import java.util.concurrent.ConcurrentMap;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import java.util.function.Function;
-import reactor.core.scheduler.Scheduler;
-import reactor.core.scheduler.Schedulers;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -83,9 +81,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> refreshTokens =
-            new ConcurrentHashMap<>(1);
-
-    private final ConcurrentMap<ConnectionContext, Scheduler> tokenSchedulers =
             new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, Mono<String>> activeTokenRequests =
@@ -323,16 +318,10 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
          *   simply is to be considered waste.
          * 
          * The coding below fixes both issues: It ensures that the execution of the Mono
-         * is synchronized and it ensures that two threads arriving to fetch the JWT in a 
+         * is synchronized and it ensures that two threads arriving to fetch the JWT in a
          * non-caching situation does not trigger "wasteful" requests to the UAA server.
          */
 
-        // Get or create a single-threaded scheduler for this connection context
-        final Scheduler tokenScheduler = this.tokenSchedulers.computeIfAbsent(
-            connectionContext, 
-            ctx -> Schedulers.newSingle("token-" + ctx.hashCode())
-        );
-        
         /*
          * We use Mono.defer to ensure that the execution of the locking not happens
          * during creation of the Mono (where it is of little relevance), but
@@ -348,7 +337,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             
             // Create new token request with proper synchronization
             final Mono<String> baseTokenRequest = createTokenRequest(connectionContext)
-                    .publishOn(tokenScheduler) // Ensure execution on single thread
+                    .publishOn(connectionContext.getTokenScheduler()) // Ensure execution on single thread
                     .doOnSubscribe(s -> LOGGER.debug("Starting new token request"))
                     .doOnSuccess(token -> LOGGER.debug("Token request completed successfully"))
                     .doOnError(error -> LOGGER.debug("Token request failed", error))

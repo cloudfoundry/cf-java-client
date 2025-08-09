@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.Optional;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Scheduler;
 import reactor.netty.http.client.HttpClient;
 
 /**
@@ -51,6 +52,11 @@ public interface ConnectionContext {
      * The {@link RootProvider} to use
      */
     RootProvider getRootProvider();
+
+    /**
+     * The {@link Scheduler} to use for token operations
+     */
+    Scheduler getTokenScheduler();
 
     /**
      * Attempt to explicitly trust the TLS certificate of an endpoint.  Implementations can choose whether any actual trusting will happen.
