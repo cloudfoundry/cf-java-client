@@ -336,11 +336,6 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             }
             
             final Mono<String> baseTokenRequest = createTokenRequest(connectionContext)
-                    /* 
-                     * Ensure execution on single thread.
-                     * This prevents sending requests to the UAA server with expired refresh tokens.
-                     */
-                    .publishOn(connectionContext.getTokenScheduler()) 
                     .doOnSubscribe(s -> LOGGER.debug("Starting new UAA JWT token request"))
                     .doOnSuccess(token -> LOGGER.debug("UAA JWT token request completed successfully"))
                     .doOnError(error -> LOGGER.debug("UAA JWT token request failed", error))
@@ -353,7 +348,12 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
             final Mono<String> newTokenRequest = connectionContext
                     .getCacheDuration()
                     .map(baseTokenRequest::cache)
-                    .orElseGet(baseTokenRequest::cache);
+                    .orElseGet(baseTokenRequest::cache)
+                    /* 
+                     * Ensure execution on single thread.
+                     * This prevents sending requests to the UAA server with expired refresh tokens.
+                     */
+                    .publishOn(connectionContext.getTokenScheduler());
             
             // Store the active request atomically
             final Mono<String> actualRequest = this.activeTokenRequests.putIfAbsent(connectionContext, newTokenRequest);
