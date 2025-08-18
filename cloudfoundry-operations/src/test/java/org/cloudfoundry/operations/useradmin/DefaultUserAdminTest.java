@@ -704,7 +704,12 @@ final class DefaultUserAdminTest extends AbstractOperationsTest {
                                         .userName("test-username")
                                         .build()))
                 .thenReturn(
-                        Mono.error(new UaaException(409, "test-error", "test-error-description")));
+                        Mono.error(
+                                new UaaException(
+                                        409,
+                                        "test-error",
+                                        "test-error-description",
+                                        "some error payload")));
     }
 
     private static void requestCreateUser(CloudFoundryClient cloudFoundryClient) {

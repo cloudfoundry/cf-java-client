@@ -24,10 +24,12 @@ final class UaaExceptionTest {
 
     @Test
     void test() {
-        assertThat(new UaaException(-1, "test-error", "test-error-description"))
+        assertThat(
+                        new UaaException(
+                                -1, "test-error", "test-error-description", "some error payload"))
                 .hasNoCause()
                 .hasMessage("test-error: test-error-description")
-                .extracting("statusCode", "error", "errorDescription")
-                .containsExactly(-1, "test-error", "test-error-description");
+                .extracting("statusCode", "error", "errorDescription", "payload")
+                .containsExactly(-1, "test-error", "test-error-description", "some error payload");
     }
 }

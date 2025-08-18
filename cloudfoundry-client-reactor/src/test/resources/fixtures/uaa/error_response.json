@@ -1,4 +1,10 @@
 {
   "error": "unauthorized",
-  "error_description": "Bad credentials"
+  "error_description": "Bad credentials",
+  "extra_information": {
+    "some": [
+      "extra",
+      "information"
+    ]
+  }
 }
