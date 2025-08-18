@@ -23,11 +23,13 @@ import org.cloudfoundry.AbstractCloudFoundryException;
  */
 public final class UaaException extends AbstractCloudFoundryException {
 
-    private static final long serialVersionUID = 2191208398880609800L;
+    private static final long serialVersionUID = -474523104186506972L;
 
     private final String error;
 
     private final String errorDescription;
+
+    private final String payload;
 
     /**
      * Creates a new instance
@@ -36,10 +38,11 @@ public final class UaaException extends AbstractCloudFoundryException {
      * @param error            the error
      * @param errorDescription the error description
      */
-    public UaaException(Integer statusCode, String error, String errorDescription) {
+    public UaaException(Integer statusCode, String error, String errorDescription, String payload) {
         super(statusCode, String.format("%s: %s", error, errorDescription));
         this.error = error;
         this.errorDescription = errorDescription;
+        this.payload = payload;
     }
 
     /**
@@ -54,5 +57,12 @@ public final class UaaException extends AbstractCloudFoundryException {
      */
     public String getErrorDescription() {
         return this.errorDescription;
+    }
+
+    /**
+     * Returns the full error payload
+     */
+    public String getPayload() {
+        return payload;
     }
 }
