@@ -25,7 +25,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.junit.jupiter.api.AfterEach;
@@ -33,20 +32,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 
 /**
  * Integration-style tests for AbstractUaaTokenProvider that verify the
  * corrected behavior for concurrent token requests with expired access tokens.
- * 
+ *
  * These tests verify the fix for issue #1146: "Parallel Requests with Expired
  * Access Tokens triggering Refresh Token Flow leads to Broken State".
  */
 class AbstractUaaTokenProviderConcurrencyTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractUaaTokenProviderConcurrencyTest.class);
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(AbstractUaaTokenProviderConcurrencyTest.class);
 
     private MockUaaServer mockUaaServer;
     private ConnectionContext connectionContext;
@@ -61,12 +60,13 @@ class AbstractUaaTokenProviderConcurrencyTest {
         final String baseUrl = mockUaaServer.getBaseUrl();
         final int port = Integer.parseInt(baseUrl.split(":")[2].split("/")[0]);
 
-        connectionContext = DefaultConnectionContext.builder()
-                .apiHost("localhost")
-                .port(port)
-                .secure(false)
-                .cacheDuration(Duration.ofMillis(100)) // Short cache for testing
-                .build();
+        connectionContext =
+                DefaultConnectionContext.builder()
+                        .apiHost("localhost")
+                        .port(port)
+                        .secure(false)
+                        .cacheDuration(Duration.ofMillis(100)) // Short cache for testing
+                        .build();
 
         tokenProvider = new TestTokenProvider();
         executorService = Executors.newFixedThreadPool(10);
@@ -92,7 +92,8 @@ class AbstractUaaTokenProviderConcurrencyTest {
         mockUaaServer.setInitialRefreshToken("initial-refresh-token");
 
         // Get initial token to establish refresh token
-        final String initialToken = tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
+        final String initialToken =
+                tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
         assertThat(initialToken).isNotNull();
 
         // Reset request count to focus on concurrent requests
@@ -107,15 +108,20 @@ class AbstractUaaTokenProviderConcurrencyTest {
         final List<CompletableFuture<String>> futures = new ArrayList<>();
 
         for (int i = 0; i < concurrentRequests; i++) {
-            final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    startLatch.await(5, TimeUnit.SECONDS);
-                    return tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(10));
-                } catch (final Exception e) {
-                    LOGGER.error("Error getting token", e);
-                    throw new RuntimeException(e);
-                }
-            }, executorService);
+            final CompletableFuture<String> future =
+                    CompletableFuture.supplyAsync(
+                            () -> {
+                                try {
+                                    startLatch.await(5, TimeUnit.SECONDS);
+                                    return tokenProvider
+                                            .getToken(connectionContext)
+                                            .block(Duration.ofSeconds(10));
+                                } catch (final Exception e) {
+                                    LOGGER.error("Error getting token", e);
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            executorService);
             futures.add(future);
         }
 
@@ -137,10 +143,13 @@ class AbstractUaaTokenProviderConcurrencyTest {
         }
 
         // Verify that subsequent requests still work (no broken state)
-        final String subsequentToken = tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
+        final String subsequentToken =
+                tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
         assertThat(subsequentToken).isNotNull();
 
-        LOGGER.info("Concurrent test completed successfully. Total UAA requests: {}", mockUaaServer.getRequestCount());
+        LOGGER.info(
+                "Concurrent test completed successfully. Total UAA requests: {}",
+                mockUaaServer.getRequestCount());
     }
 
     /**
@@ -153,7 +162,8 @@ class AbstractUaaTokenProviderConcurrencyTest {
         mockUaaServer.setInitialRefreshToken("initial-refresh-token");
 
         // Get initial token
-        final String initialToken = tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
+        final String initialToken =
+                tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
         assertThat(initialToken).isNotNull();
 
         // Configure server to fail the first few refresh requests
@@ -168,15 +178,20 @@ class AbstractUaaTokenProviderConcurrencyTest {
         final List<CompletableFuture<String>> futures = new ArrayList<>();
 
         for (int i = 0; i < concurrentRequests; i++) {
-            final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    startLatch.await(5, TimeUnit.SECONDS);
-                    return tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(10));
-                } catch (final Exception e) {
-                    LOGGER.error("Error getting token", e);
-                    return null; // Allow some failures
-                }
-            }, executorService);
+            final CompletableFuture<String> future =
+                    CompletableFuture.supplyAsync(
+                            () -> {
+                                try {
+                                    startLatch.await(5, TimeUnit.SECONDS);
+                                    return tokenProvider
+                                            .getToken(connectionContext)
+                                            .block(Duration.ofSeconds(10));
+                                } catch (final Exception e) {
+                                    LOGGER.error("Error getting token", e);
+                                    return null; // Allow some failures
+                                }
+                            },
+                            executorService);
             futures.add(future);
         }
 
@@ -195,11 +210,14 @@ class AbstractUaaTokenProviderConcurrencyTest {
         assertThat(tokens).isNotEmpty();
 
         // Verify system recovers and subsequent requests work
-        final String recoveryToken = tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
+        final String recoveryToken =
+                tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
         assertThat(recoveryToken).isNotNull();
 
-        LOGGER.info("Error handling test completed. Successful tokens: {}, Total UAA requests: {}",
-                tokens.size(), mockUaaServer.getRequestCount());
+        LOGGER.info(
+                "Error handling test completed. Successful tokens: {}, Total UAA requests: {}",
+                tokens.size(),
+                mockUaaServer.getRequestCount());
     }
 
     /**
@@ -212,7 +230,8 @@ class AbstractUaaTokenProviderConcurrencyTest {
         mockUaaServer.setInitialRefreshToken("initial-refresh-token");
 
         // Get initial token
-        final String initialToken = tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
+        final String initialToken =
+                tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(5));
         assertThat(initialToken).isNotNull();
 
         final int initialRequestCount = mockUaaServer.getRequestCount();
@@ -226,15 +245,20 @@ class AbstractUaaTokenProviderConcurrencyTest {
         final List<CompletableFuture<String>> futures = new ArrayList<>();
 
         for (int i = 0; i < concurrentRequests; i++) {
-            final CompletableFuture<String> future = CompletableFuture.supplyAsync(() -> {
-                try {
-                    startLatch.await(5, TimeUnit.SECONDS);
-                    return tokenProvider.getToken(connectionContext).block(Duration.ofSeconds(10));
-                } catch (final Exception e) {
-                    LOGGER.error("Error getting token", e);
-                    throw new RuntimeException(e);
-                }
-            }, executorService);
+            final CompletableFuture<String> future =
+                    CompletableFuture.supplyAsync(
+                            () -> {
+                                try {
+                                    startLatch.await(5, TimeUnit.SECONDS);
+                                    return tokenProvider
+                                            .getToken(connectionContext)
+                                            .block(Duration.ofSeconds(10));
+                                } catch (final Exception e) {
+                                    LOGGER.error("Error getting token", e);
+                                    throw new RuntimeException(e);
+                                }
+                            },
+                            executorService);
             futures.add(future);
         }
 
@@ -253,8 +277,10 @@ class AbstractUaaTokenProviderConcurrencyTest {
         // actual UAA requests should be made due to proper serialization and caching
         assertThat(newRequests).isLessThanOrEqualTo(3); // Allow some margin for timing
 
-        LOGGER.info("Serialization test completed. Concurrent requests: {}, Actual UAA requests: {}",
-                concurrentRequests, newRequests);
+        LOGGER.info(
+                "Serialization test completed. Concurrent requests: {}, Actual UAA requests: {}",
+                concurrentRequests,
+                newRequests);
     }
 
     /**
