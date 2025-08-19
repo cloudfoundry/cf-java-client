@@ -14,23 +14,38 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.roles;
+package org.cloudfoundry.client.v3.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.PaginatedResponse;
-import org.immutables.value.Value;
+import org.cloudfoundry.client.v3.Metadata;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
- * The response payload for the List Roles operation
+ * Base class for responses that are users
  */
-@JsonDeserialize
-@Value.Immutable
-abstract class _ListRolesResponse extends PaginatedResponse<RoleResource> {
+public abstract class User extends Resource {
 
-    @JsonProperty("included")
-    @Nullable
-    public abstract RoleIncluded getIncluded();
+    /**
+     * The metadata
+     */
+    @JsonProperty("metadata")
+    public abstract Metadata getMetadata();
 
+    /**
+     * The username
+     */
+    @JsonProperty("username")
+    public abstract String getUsername();
+
+    /**
+     * The presentation name
+     */
+    @JsonProperty("presentation_name")
+    public abstract String getPresentationName();
+
+    /**
+     * The origin
+     */
+    @JsonProperty("origin")
+    public abstract String getOrigin();
 }

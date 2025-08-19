@@ -32,6 +32,7 @@ import org.cloudfoundry.client.v3.roles.GetRoleRequest;
 import org.cloudfoundry.client.v3.roles.ListRolesRequest;
 import org.cloudfoundry.client.v3.roles.RoleRelationships;
 import org.cloudfoundry.client.v3.roles.RoleResource;
+import org.cloudfoundry.client.v3.users.UserResource;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;
@@ -196,6 +197,34 @@ public final class RolesTest extends AbstractIntegrationTest {
                                                                 .getUser()
                                                                 .getData()
                                                                 .getId()))
+                .as(StepVerifier::create)
+                .expectNext(userId)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void listIncludeUser() {
+        String organizationName = this.nameFactory.getOrganizationName();
+        String userId = this.nameFactory.getUserId();
+
+        createOrganizationId(this.cloudFoundryClient, organizationName)
+                .flatMap(
+                        organizationId ->
+                                requestCreateOrganizationRelationship(
+                                                this.cloudFoundryClient, organizationId, userId)
+                                        .map(CreateRoleResponse::getId))
+                .flatMapMany(
+                        roleId ->
+                                this.cloudFoundryClient
+                                        .rolesV3()
+                                        .list(
+                                                ListRolesRequest.builder()
+                                                        .roleId(roleId)
+                                                        .include("user")
+                                                        .build())
+                                        .flatMapIterable(i -> i.getIncluded().getUsers())
+                                        .map(UserResource::getId))
                 .as(StepVerifier::create)
                 .expectNext(userId)
                 .expectComplete()
