@@ -1,0 +1,10 @@
+{
+  "metadata": {
+    "labels": {
+      "environment": "production"
+    },
+    "annotations": {
+      "note": "detailed information"
+    }
+  }
+}
