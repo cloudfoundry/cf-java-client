@@ -32,4 +32,15 @@ public interface OrganizationQuotaDefinitionsV3 {
      */
     Mono<CreateOrganizationQuotaDefinitionResponse> create(
             CreateOrganizationQuotaDefinitionRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#get-organization-quota-definition">Get Organization Quota Definition</a>
+     * request
+     *
+     * @param request the Get Organization Quota Definition request
+     * @return the response from the Get Organization Quota Definition request
+     */
+    Mono<GetOrganizationQuotaDefinitionResponse> get(
+            GetOrganizationQuotaDefinitionRequest request);
+
 }
