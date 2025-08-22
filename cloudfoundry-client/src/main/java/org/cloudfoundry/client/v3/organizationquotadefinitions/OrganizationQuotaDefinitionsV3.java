@@ -52,4 +52,13 @@ public interface OrganizationQuotaDefinitionsV3 {
      */
     Mono<ListOrganizationQuotaDefinitionsResponse> list(
             ListOrganizationQuotaDefinitionsRequest request);
+
+    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#update-organization-quota-definition">Update Organization Quota Definition</a>
+     * request
+     *
+     * @param request the Update Organization Quota Definition request
+     * @return the response from the Update Organization Quota Definition request
+     */
+    Mono<UpdateOrganizationQuotaDefinitionResponse> update(
+            UpdateOrganizationQuotaDefinitionRequest request);
 }
