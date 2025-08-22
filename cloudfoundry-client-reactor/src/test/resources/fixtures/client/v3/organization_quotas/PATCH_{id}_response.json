@@ -1,0 +1,35 @@
+{
+  "guid": "24637893-3b77-489d-bb79-8466f0d88b52",
+  "created_at": "2016-05-04T17:00:41Z",
+  "updated_at": "2016-05-04T17:00:41Z",
+  "name": "my-quota",
+  "apps": {
+    "total_memory_in_mb": 5120,
+    "per_process_memory_in_mb": 1024,
+    "log_rate_limit_in_bytes_per_second": 1024,
+    "total_instances": 10,
+    "per_app_tasks": 5
+  },
+  "services": {
+    "paid_services_allowed": true,
+    "total_service_instances": 10,
+    "total_service_keys": 20
+  },
+  "routes": {
+    "total_routes": 8,
+    "total_reserved_ports": 4
+  },
+  "domains": {
+    "total_domains": 7
+  },
+  "relationships": {
+    "organizations": {
+      "data": [
+        { "guid": "9b370018-c38e-44c9-86d6-155c76801104" }
+      ]
+    }
+  },
+  "links": {
+    "self": { "href": "https://api.example.org/v3/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52" }
+  }
+}
