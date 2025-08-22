@@ -43,4 +43,13 @@ public interface OrganizationQuotaDefinitionsV3 {
     Mono<GetOrganizationQuotaDefinitionResponse> get(
             GetOrganizationQuotaDefinitionRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#list-organization-quotas">List all Organization Quota Definitions</a>
+     * request
+     *
+     * @param request the List all Organization Quota Definitions request
+     * @return the response from the List all Organization Quota Definitions request
+     */
+    Mono<ListOrganizationQuotaDefinitionsResponse> list(
+            ListOrganizationQuotaDefinitionsRequest request);
 }
