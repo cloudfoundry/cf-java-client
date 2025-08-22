@@ -61,4 +61,14 @@ public interface OrganizationQuotaDefinitionsV3 {
      */
     Mono<UpdateOrganizationQuotaDefinitionResponse> update(
             UpdateOrganizationQuotaDefinitionRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#delete-organization-quota-definition">Delete Organization Quota Definition</a>
+     * request
+     *
+     * @param request the Delete Organization Quota Definition request
+     * @return the response from the Delete Organization Quota Definition request
+     */
+    Mono<String> delete(
+            DeleteOrganizationQuotaDefinitionRequest request);
 }
