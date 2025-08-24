@@ -27,12 +27,12 @@ final class DeleteOrganizationRequestTest {
         assertThrows(
                 IllegalStateException.class,
                 () -> {
-                    GetOrganizationRequest.builder().build();
+                    DeleteOrganizationRequest.builder().build();
                 });
     }
 
     @Test
     void valid() {
-        GetOrganizationRequest.builder().organizationId("test-id").build();
+        DeleteOrganizationRequest.builder().organizationId("test-id").build();
     }
 }
