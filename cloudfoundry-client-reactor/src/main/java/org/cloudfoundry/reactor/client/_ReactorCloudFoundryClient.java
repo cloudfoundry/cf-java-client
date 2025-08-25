@@ -34,6 +34,7 @@ import org.cloudfoundry.client.v2.resourcematch.ResourceMatch;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionsV3;
 import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
@@ -92,6 +93,7 @@ import org.cloudfoundry.reactor.client.v2.resourcematch.ReactorResourceMatch;
 import org.cloudfoundry.reactor.client.v2.routemappings.ReactorRouteMappings;
 import org.cloudfoundry.reactor.client.v2.routes.ReactorRoutes;
 import org.cloudfoundry.reactor.client.v2.securitygroups.ReactorSecurityGroups;
+import org.cloudfoundry.reactor.client.v3.organizationquotadefinitions.ReactorOrganizationQuotaDefinitionsV3;
 import org.cloudfoundry.reactor.client.v3.securitygroups.ReactorSecurityGroupsV3;
 import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
 import org.cloudfoundry.reactor.client.v2.servicebrokers.ReactorServiceBrokers;
@@ -275,6 +277,13 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public OrganizationQuotaDefinitions organizationQuotaDefinitions() {
         return new ReactorOrganizationQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public OrganizationQuotaDefinitionsV3 organizationQuotaDefinitionsV3() {
+        return new ReactorOrganizationQuotaDefinitionsV3(getConnectionContext(), getRootV3(), getTokenProvider(),
                 getRequestTags());
     }
 
