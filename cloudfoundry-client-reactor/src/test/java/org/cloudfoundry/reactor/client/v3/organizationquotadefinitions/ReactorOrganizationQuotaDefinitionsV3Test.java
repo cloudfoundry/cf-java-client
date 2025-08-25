@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.organizationquotadefinitions;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
@@ -42,16 +51,6 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
 
@@ -82,11 +81,9 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                 .create(CreateOrganizationQuotaDefinitionRequest.builder().name("my-quota").build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        CreateOrganizationQuotaDefinitionResponse
-                                .builder()
+                        CreateOrganizationQuotaDefinitionResponse.builder()
                                 .from(expectedOrganizationQuotaDefinitionResource1())
-                                .build()
-                )
+                                .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -127,7 +124,8 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                         .request(
                                 TestRequest.builder()
                                         .method(GET)
-                                        .path("/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52")
+                                        .path(
+                                                "/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52")
                                         .build())
                         .response(
                                 TestResponse.builder()
@@ -140,7 +138,8 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
         this.organizationQuotaDefinitionsV3
                 .get(
                         GetOrganizationQuotaDefinitionRequest.builder()
-                                .organizationQuotaDefinitionId("24637893-3b77-489d-bb79-8466f0d88b52")
+                                .organizationQuotaDefinitionId(
+                                        "24637893-3b77-489d-bb79-8466f0d88b52")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
@@ -155,7 +154,11 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
     void list() {
         mockRequest(
                 InteractionContext.builder()
-                        .request(TestRequest.builder().method(GET).path("/organization_quotas").build())
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/organization_quotas")
+                                        .build())
                         .response(
                                 TestResponse.builder()
                                         .status(OK)
@@ -185,15 +188,15 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                                                 .build())
                                                 .build())
                                 .resource(
-                                        OrganizationQuotaDefinitionResource
-                                                .builder()
-                                                .from(expectedOrganizationQuotaDefinitionResource1()).build()
-                                )
+                                        OrganizationQuotaDefinitionResource.builder()
+                                                .from(
+                                                        expectedOrganizationQuotaDefinitionResource1())
+                                                .build())
                                 .resource(
-                                        OrganizationQuotaDefinitionResource
-                                                .builder()
-                                                .from(expectedOrganizationQuotaDefinitionResource2()).build()
-                                )
+                                        OrganizationQuotaDefinitionResource.builder()
+                                                .from(
+                                                        expectedOrganizationQuotaDefinitionResource2())
+                                                .build())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -206,7 +209,8 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                         .request(
                                 TestRequest.builder()
                                         .method(PATCH)
-                                        .path("/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52")
+                                        .path(
+                                                "/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52")
                                         .payload(
                                                 "fixtures/client/v3/organization_quotas/PATCH_{id}_request.json")
                                         .build())
@@ -221,7 +225,8 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
         this.organizationQuotaDefinitionsV3
                 .update(
                         UpdateOrganizationQuotaDefinitionRequest.builder()
-                                .organizationQuotaDefinitionId("24637893-3b77-489d-bb79-8466f0d88b52")
+                                .organizationQuotaDefinitionId(
+                                        "24637893-3b77-489d-bb79-8466f0d88b52")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
@@ -233,47 +238,50 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
     }
 
     @NotNull
-    private static OrganizationQuotaDefinitionResource expectedOrganizationQuotaDefinitionResource1() {
-        return buildOrganizationQuotaDefinitionResource("24637893-3b77-489d-bb79-8466f0d88b52", "my-quota", "9b370018-c38e-44c9-86d6-155c76801104");
+    private static OrganizationQuotaDefinitionResource
+            expectedOrganizationQuotaDefinitionResource1() {
+        return buildOrganizationQuotaDefinitionResource(
+                "24637893-3b77-489d-bb79-8466f0d88b52",
+                "my-quota",
+                "9b370018-c38e-44c9-86d6-155c76801104");
     }
 
-    private static OrganizationQuotaDefinitionResource expectedOrganizationQuotaDefinitionResource2() {
-        return buildOrganizationQuotaDefinitionResource("bb49bf20-ad98-4729-93ae-38fbc564b630", "my-quota-2", "144251f2-a202-4ffe-ab47-9046c4077e99");
+    private static OrganizationQuotaDefinitionResource
+            expectedOrganizationQuotaDefinitionResource2() {
+        return buildOrganizationQuotaDefinitionResource(
+                "bb49bf20-ad98-4729-93ae-38fbc564b630",
+                "my-quota-2",
+                "144251f2-a202-4ffe-ab47-9046c4077e99");
     }
 
     @NotNull
-    private static OrganizationQuotaDefinitionResource buildOrganizationQuotaDefinitionResource(String id, String name, String relatedOrganizationId) {
+    private static OrganizationQuotaDefinitionResource buildOrganizationQuotaDefinitionResource(
+            String id, String name, String relatedOrganizationId) {
 
-        Apps apps = Apps.builder()
-                .totalMemoryInMb(5120)
-                .perProcessMemoryInMb(1024)
-                .logRateLimitInBytesPerSecond(1024)
-                .totalInstances(10)
-                .perAppTasks(5)
-                .build();
-        Services services = Services.builder()
-                .isPaidServicesAllowed(true)
-                .totalServiceInstances(10)
-                .totalServiceKeys(20)
-                .build();
-        Routes routes = Routes.builder()
-                .totalRoutes(8)
-                .totalReservedPorts(4)
-                .build();
-        Domains domains = Domains.builder()
-                .totalDomains(7)
-                .build();
-        ToManyRelationship organizationRelationships = ToManyRelationship.builder()
-                .data(
-                        Collections.singletonList(
-                                Relationship
-                                        .builder()
-                                        .id(relatedOrganizationId)
-                                        .build()))
-                .build();
+        Apps apps =
+                Apps.builder()
+                        .totalMemoryInMb(5120)
+                        .perProcessMemoryInMb(1024)
+                        .logRateLimitInBytesPerSecond(1024)
+                        .totalInstances(10)
+                        .perAppTasks(5)
+                        .build();
+        Services services =
+                Services.builder()
+                        .isPaidServicesAllowed(true)
+                        .totalServiceInstances(10)
+                        .totalServiceKeys(20)
+                        .build();
+        Routes routes = Routes.builder().totalRoutes(8).totalReservedPorts(4).build();
+        Domains domains = Domains.builder().totalDomains(7).build();
+        ToManyRelationship organizationRelationships =
+                ToManyRelationship.builder()
+                        .data(
+                                Collections.singletonList(
+                                        Relationship.builder().id(relatedOrganizationId).build()))
+                        .build();
         OrganizationQuotaDefinitionRelationships relationships =
-                OrganizationQuotaDefinitionRelationships
-                        .builder()
+                OrganizationQuotaDefinitionRelationships.builder()
                         .organizations(organizationRelationships)
                         .build();
 

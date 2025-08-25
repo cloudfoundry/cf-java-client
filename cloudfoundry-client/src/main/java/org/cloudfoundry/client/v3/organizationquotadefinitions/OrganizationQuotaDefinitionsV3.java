@@ -40,8 +40,7 @@ public interface OrganizationQuotaDefinitionsV3 {
      * @param request the Get Organization Quota Definition request
      * @return the response from the Get Organization Quota Definition request
      */
-    Mono<GetOrganizationQuotaDefinitionResponse> get(
-            GetOrganizationQuotaDefinitionRequest request);
+    Mono<GetOrganizationQuotaDefinitionResponse> get(GetOrganizationQuotaDefinitionRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#list-organization-quotas">List all Organization Quota Definitions</a>
@@ -69,6 +68,5 @@ public interface OrganizationQuotaDefinitionsV3 {
      * @param request the Delete Organization Quota Definition request
      * @return the response from the Delete Organization Quota Definition request
      */
-    Mono<String> delete(
-            DeleteOrganizationQuotaDefinitionRequest request);
+    Mono<String> delete(DeleteOrganizationQuotaDefinitionRequest request);
 }

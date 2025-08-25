@@ -16,9 +16,9 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import org.junit.jupiter.api.Test;
 
 final class DeleteOrganizationQuotaDefinitionRequestTest {
 
@@ -31,6 +31,8 @@ final class DeleteOrganizationQuotaDefinitionRequestTest {
 
     @Test
     void valid() {
-        DeleteOrganizationQuotaDefinitionRequest.builder().organizationQuotaDefinitionId("test-id").build();
+        DeleteOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-id")
+                .build();
     }
 }
