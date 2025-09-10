@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client;
 
+import jakarta.annotation.PostConstruct;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
@@ -34,8 +35,6 @@ import org.cloudfoundry.client.v2.resourcematch.ResourceMatch;
 import org.cloudfoundry.client.v2.routemappings.RouteMappings;
 import org.cloudfoundry.client.v2.routes.Routes;
 import org.cloudfoundry.client.v2.securitygroups.SecurityGroups;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionsV3;
-import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingsV2;
 import org.cloudfoundry.client.v2.servicebrokers.ServiceBrokers;
 import org.cloudfoundry.client.v2.serviceinstances.ServiceInstances;
@@ -60,17 +59,20 @@ import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.resourcematch.ResourceMatchV3;
 import org.cloudfoundry.client.v3.roles.RolesV3;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
-import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
+import org.cloudfoundry.client.v3.securitygroups.SecurityGroupsV3;
 import org.cloudfoundry.client.v3.servicebindings.ServiceBindingsV3;
 import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -93,8 +95,6 @@ import org.cloudfoundry.reactor.client.v2.resourcematch.ReactorResourceMatch;
 import org.cloudfoundry.reactor.client.v2.routemappings.ReactorRouteMappings;
 import org.cloudfoundry.reactor.client.v2.routes.ReactorRoutes;
 import org.cloudfoundry.reactor.client.v2.securitygroups.ReactorSecurityGroups;
-import org.cloudfoundry.reactor.client.v3.organizationquotadefinitions.ReactorOrganizationQuotaDefinitionsV3;
-import org.cloudfoundry.reactor.client.v3.securitygroups.ReactorSecurityGroupsV3;
 import org.cloudfoundry.reactor.client.v2.servicebindings.ReactorServiceBindingsV2;
 import org.cloudfoundry.reactor.client.v2.servicebrokers.ReactorServiceBrokers;
 import org.cloudfoundry.reactor.client.v2.serviceinstances.ReactorServiceInstances;
@@ -119,24 +119,26 @@ import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
+import org.cloudfoundry.reactor.client.v3.organizationquotadefinitions.ReactorOrganizationQuotaDefinitionsV3;
 import org.cloudfoundry.reactor.client.v3.organizations.ReactorOrganizationsV3;
 import org.cloudfoundry.reactor.client.v3.packages.ReactorPackages;
 import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
 import org.cloudfoundry.reactor.client.v3.resourcematch.ReactorResourceMatchV3;
 import org.cloudfoundry.reactor.client.v3.roles.ReactorRolesV3;
 import org.cloudfoundry.reactor.client.v3.routes.ReactorRoutesV3;
+import org.cloudfoundry.reactor.client.v3.securitygroups.ReactorSecurityGroupsV3;
 import org.cloudfoundry.reactor.client.v3.servicebindings.ReactorServiceBindingsV3;
 import org.cloudfoundry.reactor.client.v3.servicebrokers.ReactorServiceBrokersV3;
 import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.serviceofferings.ReactorServiceOfferingsV3;
 import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
+import org.cloudfoundry.reactor.client.v3.spacequotadefinition.ReactorSpaceQuotaDefinitionsV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
-import jakarta.annotation.PostConstruct;
 import java.util.Collections;
 import java.util.Map;
 
@@ -454,6 +456,13 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public SpaceQuotaDefinitions spaceQuotaDefinitions() {
         return new ReactorSpaceQuotaDefinitions(getConnectionContext(), getRootV2(), getTokenProvider(),
+                getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public SpaceQuotaDefinitionsV3 spaceQuotaDefinitionsV3() {
+        return new ReactorSpaceQuotaDefinitionsV3(getConnectionContext(), getRootV3(), getTokenProvider(),
                 getRequestTags());
     }
 
