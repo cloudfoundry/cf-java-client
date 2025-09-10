@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface SpaceQuotaDefinitionsV3 {
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#create-space-quota-definition">Create Space Quota Definition</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#create-a-space-quota">Create Space Quota</a>
      * request
      *
      * @param request the Create Space Quota Definition request
@@ -32,4 +32,14 @@ public interface SpaceQuotaDefinitionsV3 {
      */
     Mono<CreateSpaceQuotaDefinitionResponse> create(
             CreateSpaceQuotaDefinitionRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#get-a-space-quota">Get Space Quota</a>
+     * request
+     *
+     * @param request the Get Space Quota Definition request
+     * @return the response from the Get Space Quota request
+     */
+    Mono<GetSpaceQuotaDefinitionResponse> get(
+            GetSpaceQuotaDefinitionRequest request);
 }
