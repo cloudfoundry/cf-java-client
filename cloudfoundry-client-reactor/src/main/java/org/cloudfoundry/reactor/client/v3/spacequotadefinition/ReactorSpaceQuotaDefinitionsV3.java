@@ -20,6 +20,8 @@ import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefiniti
 import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
+import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
 import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionsV3;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -69,5 +71,13 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
                 .checkpoint();
     }
 
+    @Override
+    public Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request) {
+        return get(
+                request,
+                ListSpaceQuotaDefinitionsResponse.class,
+                builder -> builder.pathSegment("space_quotas"))
+                .checkpoint();
+    }
 
 }
