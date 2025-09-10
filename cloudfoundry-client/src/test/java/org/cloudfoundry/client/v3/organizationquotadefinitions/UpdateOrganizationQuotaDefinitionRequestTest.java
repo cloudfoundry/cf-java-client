@@ -23,7 +23,7 @@ import org.junit.jupiter.api.Test;
 final class UpdateOrganizationQuotaDefinitionRequestTest {
 
     @Test
-    void noOrganizationId() {
+    void noOrganizationQuotaDefinitionId() {
         assertThrows(
                 IllegalStateException.class,
                 () -> UpdateOrganizationQuotaDefinitionRequest.builder().build());

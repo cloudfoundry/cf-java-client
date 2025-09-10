@@ -62,4 +62,11 @@ abstract class _UpdateOrganizationQuotaDefinitionRequest {
     @JsonProperty("routes")
     @Nullable
     abstract Routes getRoutes();
+
+    /**
+     * Quotas that affect domains
+     */
+    @JsonProperty("domains")
+    @Nullable
+    abstract Domains getDomains();
 }

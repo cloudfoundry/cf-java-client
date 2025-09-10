@@ -24,7 +24,7 @@ import reactor.core.publisher.Mono;
 public interface OrganizationQuotaDefinitionsV3 {
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#create-organization-quota-definition">Create Organization Quota Definition</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#create-an-organization-quota">Create Organization Quota Definition</a>
      * request
      *
      * @param request the Create Organization Quota Definition request
@@ -34,7 +34,7 @@ public interface OrganizationQuotaDefinitionsV3 {
             CreateOrganizationQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#get-organization-quota-definition">Get Organization Quota Definition</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#get-an-organization-quota">Get Organization Quota Definition</a>
      * request
      *
      * @param request the Get Organization Quota Definition request
@@ -52,7 +52,7 @@ public interface OrganizationQuotaDefinitionsV3 {
     Mono<ListOrganizationQuotaDefinitionsResponse> list(
             ListOrganizationQuotaDefinitionsRequest request);
 
-    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#update-organization-quota-definition">Update Organization Quota Definition</a>
+    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#update-an-organization-quota">Update Organization Quota Definition</a>
      * request
      *
      * @param request the Update Organization Quota Definition request
@@ -62,7 +62,7 @@ public interface OrganizationQuotaDefinitionsV3 {
             UpdateOrganizationQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#delete-organization-quota-definition">Delete Organization Quota Definition</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#delete-an-organization-quota">Delete Organization Quota Definition</a>
      * request
      *
      * @param request the Delete Organization Quota Definition request
