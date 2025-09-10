@@ -44,12 +44,22 @@ public interface SpaceQuotaDefinitionsV3 {
             GetSpaceQuotaDefinitionRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#list-space-quotas">List all Space Quota Definitions request</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#list-space-quotas">List all Space Quota Definitions</a>
+     * request
      *
      * @param request the List all Space Quota Definitions request
      * @return the response from the Space all Organization Quota Definitions request
      */
     Mono<ListSpaceQuotaDefinitionsResponse> list(
             ListSpaceQuotaDefinitionsRequest request);
+
+    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#update-a-space-quota">Update Space Quota Definition</a>
+     * request
+     *
+     * @param request the Update Space Quota Definition request
+     * @return the response from the Update Space Quota Definition request
+     */
+    Mono<UpdateSpaceQuotaDefinitionResponse> update(
+            UpdateSpaceQuotaDefinitionRequest request);
 
 }

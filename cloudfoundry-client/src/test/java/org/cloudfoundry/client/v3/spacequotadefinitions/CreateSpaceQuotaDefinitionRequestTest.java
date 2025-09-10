@@ -24,7 +24,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-final class SpaceOrganizationQuotaDefinitionRequestTest {
+final class CreateSpaceQuotaDefinitionRequestTest {
 
     @Test
     void noName() {
