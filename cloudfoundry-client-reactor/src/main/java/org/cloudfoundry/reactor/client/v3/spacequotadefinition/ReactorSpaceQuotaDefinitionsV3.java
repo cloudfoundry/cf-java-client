@@ -98,7 +98,7 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
         return delete(
                 request,
                 builder ->
-                        builder.pathSegment("organization_quotas", request.getSpaceQuotaDefinitionId()))
+                        builder.pathSegment("space_quotas", request.getSpaceQuotaDefinitionId()))
                 .checkpoint();
     }
 

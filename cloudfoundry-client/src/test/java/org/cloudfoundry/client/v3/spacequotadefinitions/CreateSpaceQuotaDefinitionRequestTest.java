@@ -17,7 +17,7 @@
 package org.cloudfoundry.client.v3.spacequotadefinitions;
 
 import org.cloudfoundry.client.v3.Relationship;
-import org.cloudfoundry.client.v3.ToManyRelationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.jupiter.api.Test;
 
 import java.util.UUID;
@@ -44,9 +44,9 @@ final class CreateSpaceQuotaDefinitionRequestTest {
     void valid() {
 
         String organizationGuid = UUID.randomUUID().toString();
-        ToManyRelationship organizationsRelationship = ToManyRelationship.builder().data(Relationship.builder().id(organizationGuid).build()).build();
+        ToOneRelationship organizationsRelationship = ToOneRelationship.builder().data(Relationship.builder().id(organizationGuid).build()).build();
         SpaceQuotaDefinitionRelationships relationships = SpaceQuotaDefinitionRelationships.builder()
-                .organizations(organizationsRelationship)
+                .organization(organizationsRelationship)
                 .build();
         CreateSpaceQuotaDefinitionRequest.builder().name("test-quota").relationships(relationships).build();
     }

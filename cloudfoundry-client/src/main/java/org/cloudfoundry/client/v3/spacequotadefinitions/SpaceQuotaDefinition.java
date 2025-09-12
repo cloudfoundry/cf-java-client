@@ -52,11 +52,10 @@ public abstract class SpaceQuotaDefinition extends Resource {
     @Nullable
     abstract Routes getRoutes();
 
-
     /**
-     * A relationship to the organizations where the quota is applied
+     * A relationship to the space where the quota is applied
+     * A space quota must have a relationship to an organization
      */
     @JsonProperty("relationships")
-    @Nullable
     abstract SpaceQuotaDefinitionRelationships getRelationships();
 }
