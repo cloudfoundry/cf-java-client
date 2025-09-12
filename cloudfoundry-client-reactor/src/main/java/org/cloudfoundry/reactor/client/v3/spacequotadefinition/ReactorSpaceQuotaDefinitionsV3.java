@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.client.v3.spacequotadefinition;
 
 import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v3.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
@@ -89,6 +90,15 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
                 UpdateSpaceQuotaDefinitionResponse.class,
                 builder ->
                         builder.pathSegment("space_quotas", request.getSpaceQuotaDefinitionId()))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<String> delete(DeleteSpaceQuotaDefinitionRequest request) {
+        return delete(
+                request,
+                builder ->
+                        builder.pathSegment("organization_quotas", request.getSpaceQuotaDefinitionId()))
                 .checkpoint();
     }
 

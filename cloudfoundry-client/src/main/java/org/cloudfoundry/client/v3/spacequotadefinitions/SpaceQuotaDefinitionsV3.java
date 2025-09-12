@@ -62,4 +62,13 @@ public interface SpaceQuotaDefinitionsV3 {
     Mono<UpdateSpaceQuotaDefinitionResponse> update(
             UpdateSpaceQuotaDefinitionRequest request);
 
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#delete-a-space-quota">Delete Space Quota Definition</a>
+     * request
+     *
+     * @param request the Delete Space Quota Definition request
+     * @return the response from the Space Organization Quota Definition request
+     */
+    Mono<String> delete(
+            DeleteSpaceQuotaDefinitionRequest request);
 }
