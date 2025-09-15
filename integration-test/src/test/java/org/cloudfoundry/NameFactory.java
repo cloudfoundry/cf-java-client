@@ -43,8 +43,6 @@ public interface NameFactory {
 
     String ORGANIZATION_PREFIX = "test-organization-";
 
-    String ORGANIZATION_QUOTA_PREFIX = "test-organization-quota-definition-";
-
     String PASSWORD_PREFIX = "test-password-";
 
     String PATH_PREFIX = "/test-path-";
@@ -189,15 +187,6 @@ public interface NameFactory {
      */
     default String getOrganizationName() {
         return getName(ORGANIZATION_PREFIX);
-    }
-
-    /**
-     * Creates an organization quota name
-     *
-     * @return the organization quota name
-     */
-    default String getOrganizationQuotaName() {
-        return getName(ORGANIZATION_QUOTA_PREFIX);
     }
 
     /**

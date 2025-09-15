@@ -49,7 +49,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @Test
     public void create() {
-        String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
         this.cloudFoundryClient
                 .organizationQuotaDefinitionsV3()
                 .create(
@@ -64,23 +64,21 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .expectNextCount(1)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
-
-        deleteOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName);
     }
 
     @Test
     public void delete() {
-        String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
 
         createOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName)
                 .flatMap(
-                        organizationId ->
+                        organizationQuotaId ->
                                 this.cloudFoundryClient
                                         .organizationQuotaDefinitionsV3()
                                         .delete(
                                                 DeleteOrganizationQuotaDefinitionRequest.builder()
                                                         .organizationQuotaDefinitionId(
-                                                                organizationId)
+                                                                organizationQuotaId)
                                                         .build())
                                         .flatMap(
                                                 job ->
@@ -98,7 +96,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
 
     @Test
     public void get() {
-        String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
 
         createOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName)
                 .flatMap(
@@ -115,15 +113,13 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .expectNext(organizationQuotaName)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
-
-        deleteOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName);
     }
 
     @Test
     public void list() {
-        String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
 
-        requestCreateOrganizationQuota(this.cloudFoundryClient, organizationQuotaName)
+        createOrganizationQuota(this.cloudFoundryClient, organizationQuotaName)
                 .thenMany(
                         PaginationUtils.requestClientV3Resources(
                                 page ->
@@ -139,13 +135,11 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .expectNextCount(1)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
-
-        deleteOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName);
     }
 
     @Test
     public void update() {
-        String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
         int totalMemoryLimit = 64 * 1024; // 64 GB
 
         createOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName)
@@ -196,28 +190,15 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                         })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
-
-        deleteOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName);
     }
 
     private static Mono<String> createOrganizationQuotaId(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
-        return requestCreateOrganizationQuota(cloudFoundryClient, organizationQuotaName)
+        return createOrganizationQuota(cloudFoundryClient, organizationQuotaName)
                 .map(CreateOrganizationQuotaDefinitionResponse::getId);
     }
 
-    private static Mono<String> getOrganizationQuotaId(
-            CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
-        return requestListOrganizationQuotas(cloudFoundryClient, organizationQuotaName)
-                .filter(
-                        organizationQuotaDefinitionResource ->
-                                organizationQuotaName.equals(
-                                        organizationQuotaDefinitionResource.getName()))
-                .single()
-                .map(OrganizationQuotaDefinitionResource::getId);
-    }
-
-    private static Mono<CreateOrganizationQuotaDefinitionResponse> requestCreateOrganizationQuota(
+    private static Mono<CreateOrganizationQuotaDefinitionResponse> createOrganizationQuota(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return cloudFoundryClient
                 .organizationQuotaDefinitionsV3()
@@ -238,27 +219,5 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                                 .name(organizationName)
                                                 .page(page)
                                                 .build()));
-    }
-
-    private static void deleteOrganizationQuotaId(
-            CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
-
-        getOrganizationQuotaId(cloudFoundryClient, organizationQuotaName)
-                .flatMap(
-                        organizationId ->
-                                cloudFoundryClient
-                                        .organizationQuotaDefinitionsV3()
-                                        .delete(
-                                                DeleteOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(
-                                                                organizationId)
-                                                        .build())
-                                        .flatMap(
-                                                job ->
-                                                        JobUtils.waitForCompletion(
-                                                                cloudFoundryClient,
-                                                                Duration.ofMinutes(5),
-                                                                job)))
-                .block(Duration.ofMinutes(5));
     }
 }
