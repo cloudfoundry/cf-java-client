@@ -53,6 +53,13 @@ abstract class _Apps {
     abstract Integer getTotalInstances();
 
     /**
+     * Total log rate limit allowed for all the started processes and running tasks in a space
+     */
+    @JsonProperty("log_rate_limit_in_bytes_per_second")
+    @Nullable
+    abstract Integer getLogRateLimitInBytesPerSecond();
+
+    /**
      * Maximum number of running tasks in a space
      * @return the maximum number of running tasks in a space
      */

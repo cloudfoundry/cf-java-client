@@ -19,9 +19,6 @@ package org.cloudfoundry.client.v3.spacequotadefinitions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Apps;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Routes;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Services;
 import org.immutables.value.Value;
 
 /**
