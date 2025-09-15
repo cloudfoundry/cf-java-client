@@ -200,7 +200,6 @@ public interface NameFactory {
         return getName(ORGANIZATION_QUOTA_PREFIX);
     }
 
-
     /**
      * Creates a password
      *

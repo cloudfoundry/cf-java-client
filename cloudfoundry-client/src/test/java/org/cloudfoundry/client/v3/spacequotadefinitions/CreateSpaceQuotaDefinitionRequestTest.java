@@ -16,13 +16,12 @@
 
 package org.cloudfoundry.client.v3.spacequotadefinitions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
+import java.util.UUID;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.jupiter.api.Test;
-
-import java.util.UUID;
-
-import static org.junit.jupiter.api.Assertions.assertThrows;
 
 final class CreateSpaceQuotaDefinitionRequestTest {
 
@@ -44,10 +43,17 @@ final class CreateSpaceQuotaDefinitionRequestTest {
     void valid() {
 
         String organizationGuid = UUID.randomUUID().toString();
-        ToOneRelationship organizationsRelationship = ToOneRelationship.builder().data(Relationship.builder().id(organizationGuid).build()).build();
-        SpaceQuotaDefinitionRelationships relationships = SpaceQuotaDefinitionRelationships.builder()
-                .organization(organizationsRelationship)
+        ToOneRelationship organizationsRelationship =
+                ToOneRelationship.builder()
+                        .data(Relationship.builder().id(organizationGuid).build())
+                        .build();
+        SpaceQuotaDefinitionRelationships relationships =
+                SpaceQuotaDefinitionRelationships.builder()
+                        .organization(organizationsRelationship)
+                        .build();
+        CreateSpaceQuotaDefinitionRequest.builder()
+                .name("test-quota")
+                .relationships(relationships)
                 .build();
-        CreateSpaceQuotaDefinitionRequest.builder().name("test-quota").relationships(relationships).build();
     }
 }

@@ -30,8 +30,7 @@ public interface SpaceQuotaDefinitionsV3 {
      * @param request the Create Space Quota Definition request
      * @return the response from the Create Space Quota Definition request
      */
-    Mono<CreateSpaceQuotaDefinitionResponse> create(
-            CreateSpaceQuotaDefinitionRequest request);
+    Mono<CreateSpaceQuotaDefinitionResponse> create(CreateSpaceQuotaDefinitionRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#get-a-space-quota">Get Space Quota</a>
@@ -40,8 +39,7 @@ public interface SpaceQuotaDefinitionsV3 {
      * @param request the Get Space Quota Definition request
      * @return the response from the Get Space Quota request
      */
-    Mono<GetSpaceQuotaDefinitionResponse> get(
-            GetSpaceQuotaDefinitionRequest request);
+    Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#list-space-quotas">List all Space Quota Definitions</a>
@@ -50,8 +48,7 @@ public interface SpaceQuotaDefinitionsV3 {
      * @param request the List all Space Quota Definitions request
      * @return the response from the Space all Organization Quota Definitions request
      */
-    Mono<ListSpaceQuotaDefinitionsResponse> list(
-            ListSpaceQuotaDefinitionsRequest request);
+    Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request);
 
     /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#update-a-space-quota">Update Space Quota Definition</a>
      * request
@@ -59,8 +56,7 @@ public interface SpaceQuotaDefinitionsV3 {
      * @param request the Update Space Quota Definition request
      * @return the response from the Update Space Quota Definition request
      */
-    Mono<UpdateSpaceQuotaDefinitionResponse> update(
-            UpdateSpaceQuotaDefinitionRequest request);
+    Mono<UpdateSpaceQuotaDefinitionResponse> update(UpdateSpaceQuotaDefinitionRequest request);
 
     /**
      * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#delete-a-space-quota">Delete Space Quota Definition</a>
@@ -69,6 +65,5 @@ public interface SpaceQuotaDefinitionsV3 {
      * @param request the Delete Space Quota Definition request
      * @return the response from the Space Organization Quota Definition request
      */
-    Mono<String> delete(
-            DeleteSpaceQuotaDefinitionRequest request);
+    Mono<String> delete(DeleteSpaceQuotaDefinitionRequest request);
 }
