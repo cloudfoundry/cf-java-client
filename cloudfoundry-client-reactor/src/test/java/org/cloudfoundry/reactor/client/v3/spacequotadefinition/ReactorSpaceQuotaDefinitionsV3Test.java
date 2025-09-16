@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.reactor.client.v3.spacequotadefinition;
 
+import static io.netty.handler.codec.http.HttpMethod.DELETE;
+import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpMethod.PATCH;
+import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
+import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+
+import java.time.Duration;
+import java.util.Collections;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
@@ -42,16 +51,6 @@ import org.cloudfoundry.reactor.client.AbstractClientApiTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
-
-import java.time.Duration;
-import java.util.Collections;
-
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
 
@@ -80,28 +79,36 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        SpaceQuotaDefinitionRelationships relationships = SpaceQuotaDefinitionRelationships
-                .builder()
-                .organization(ToOneRelationship.builder()
-                        .data(Relationship.builder()
-                                .id("9b370018-c38e-44c9-86d6-155c76801104")
-                                .build())
-                        .build())
-                .spaces(ToManyRelationship.builder()
-                        .data(Collections.singletonList(Relationship.builder()
-                                .id("dcfd6a55-62b9-496e-a26f-0064cec076bf")
-                                .build()))
-                        .build())
-                .build();
+        SpaceQuotaDefinitionRelationships relationships =
+                SpaceQuotaDefinitionRelationships.builder()
+                        .organization(
+                                ToOneRelationship.builder()
+                                        .data(
+                                                Relationship.builder()
+                                                        .id("9b370018-c38e-44c9-86d6-155c76801104")
+                                                        .build())
+                                        .build())
+                        .spaces(
+                                ToManyRelationship.builder()
+                                        .data(
+                                                Collections.singletonList(
+                                                        Relationship.builder()
+                                                                .id(
+                                                                        "dcfd6a55-62b9-496e-a26f-0064cec076bf")
+                                                                .build()))
+                                        .build())
+                        .build();
         this.spaceQuotaDefinitionsV3
-                .create(CreateSpaceQuotaDefinitionRequest.builder().name("my-quota").relationships(relationships).build())
+                .create(
+                        CreateSpaceQuotaDefinitionRequest.builder()
+                                .name("my-quota")
+                                .relationships(relationships)
+                                .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        CreateSpaceQuotaDefinitionResponse
-                                .builder()
+                        CreateSpaceQuotaDefinitionResponse.builder()
                                 .from(expectedSpaceQuotaDefinitionResource1())
-                                .build()
-                )
+                                .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -200,15 +207,13 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                                                 .build())
                                                 .build())
                                 .resource(
-                                        SpaceQuotaDefinitionResource
-                                                .builder()
-                                                .from(expectedSpaceQuotaDefinitionResource1()).build()
-                                )
+                                        SpaceQuotaDefinitionResource.builder()
+                                                .from(expectedSpaceQuotaDefinitionResource1())
+                                                .build())
                                 .resource(
-                                        SpaceQuotaDefinitionResource
-                                                .builder()
-                                                .from(expectedSpaceQuotaDefinitionResource2()).build()
-                                )
+                                        SpaceQuotaDefinitionResource.builder()
+                                                .from(expectedSpaceQuotaDefinitionResource2())
+                                                .build())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -249,53 +254,56 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
 
     @NotNull
     private static SpaceQuotaDefinitionResource expectedSpaceQuotaDefinitionResource1() {
-        return buildSpaceQuotaDefinitionResource(EXPECTED_SPACE_QUOTA_ID_1, "my-quota", "9b370018-c38e-44c9-86d6-155c76801104", "dcfd6a55-62b9-496e-a26f-0064cec076bf");
+        return buildSpaceQuotaDefinitionResource(
+                EXPECTED_SPACE_QUOTA_ID_1,
+                "my-quota",
+                "9b370018-c38e-44c9-86d6-155c76801104",
+                "dcfd6a55-62b9-496e-a26f-0064cec076bf");
     }
 
     private static SpaceQuotaDefinitionResource expectedSpaceQuotaDefinitionResource2() {
-        return buildSpaceQuotaDefinitionResource("bb49bf20-ad98-4729-93ae-38fbc564b630", "my-quota-2", "9b370018-c38e-44c9-86d6-155c76801104", null);
+        return buildSpaceQuotaDefinitionResource(
+                "bb49bf20-ad98-4729-93ae-38fbc564b630",
+                "my-quota-2",
+                "9b370018-c38e-44c9-86d6-155c76801104",
+                null);
     }
 
     @NotNull
-    private static SpaceQuotaDefinitionResource buildSpaceQuotaDefinitionResource(String id, String name, String relatedOrganizationId, String relatedSpaceId) {
+    private static SpaceQuotaDefinitionResource buildSpaceQuotaDefinitionResource(
+            String id, String name, String relatedOrganizationId, String relatedSpaceId) {
 
-        Apps apps = Apps.builder()
-                .totalMemoryInMb(5120)
-                .perProcessMemoryInMb(1024)
-                .totalInstances(10)
-                .perAppTasks(5)
-                .build();
-        Services services = Services.builder()
-                .isPaidServicesAllowed(true)
-                .totalServiceInstances(10)
-                .totalServiceKeys(20)
-                .build();
-        Routes routes = Routes.builder()
-                .totalRoutes(8)
-                .totalReservedPorts(4)
-                .build();
+        Apps apps =
+                Apps.builder()
+                        .totalMemoryInMb(5120)
+                        .perProcessMemoryInMb(1024)
+                        .totalInstances(10)
+                        .perAppTasks(5)
+                        .build();
+        Services services =
+                Services.builder()
+                        .isPaidServicesAllowed(true)
+                        .totalServiceInstances(10)
+                        .totalServiceKeys(20)
+                        .build();
+        Routes routes = Routes.builder().totalRoutes(8).totalReservedPorts(4).build();
 
-        ToOneRelationship organizationRelationship = ToOneRelationship.builder()
-                .data(
-                        Relationship
-                                .builder()
-                                .id(relatedOrganizationId)
-                                .build())
-                .build();
-        ToManyRelationship spaceRelationships = ToManyRelationship.builder().data(Collections.emptyList()).build();
+        ToOneRelationship organizationRelationship =
+                ToOneRelationship.builder()
+                        .data(Relationship.builder().id(relatedOrganizationId).build())
+                        .build();
+        ToManyRelationship spaceRelationships =
+                ToManyRelationship.builder().data(Collections.emptyList()).build();
         if (relatedSpaceId != null) {
-            spaceRelationships = ToManyRelationship.builder()
-                    .data(
-                            Collections.singletonList(
-                                    Relationship
-                                            .builder()
-                                            .id(relatedSpaceId)
-                                            .build()))
-                    .build();
+            spaceRelationships =
+                    ToManyRelationship.builder()
+                            .data(
+                                    Collections.singletonList(
+                                            Relationship.builder().id(relatedSpaceId).build()))
+                            .build();
         }
         SpaceQuotaDefinitionRelationships relationships =
-                SpaceQuotaDefinitionRelationships
-                        .builder()
+                SpaceQuotaDefinitionRelationships.builder()
                         .organization(organizationRelationship)
                         .spaces(spaceRelationships)
                         .build();
@@ -308,9 +316,12 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                         Link.builder()
                                 .href("https://api.example.org/v3/space_quotas/" + id)
                                 .build())
-                .link("organization",
+                .link(
+                        "organization",
                         Link.builder()
-                                .href("https://api.example.org/v3/organizations/" + relatedOrganizationId)
+                                .href(
+                                        "https://api.example.org/v3/organizations/"
+                                                + relatedOrganizationId)
                                 .build())
                 .name(name)
                 .updatedAt("2016-05-04T18:00:41Z")

@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -39,23 +42,23 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
 public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void create() {
         String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
         this.cloudFoundryClient
                 .organizationQuotaDefinitionsV3()
-                .create(CreateOrganizationQuotaDefinitionRequest.builder().name(organizationQuotaName).build())
-                .thenMany(requestListOrganizationQuotas(this.cloudFoundryClient, organizationQuotaName))
+                .create(
+                        CreateOrganizationQuotaDefinitionRequest.builder()
+                                .name(organizationQuotaName)
+                                .build())
+                .thenMany(
+                        requestListOrganizationQuotas(
+                                this.cloudFoundryClient, organizationQuotaName))
                 .single()
                 .as(StepVerifier::create)
                 .expectNextCount(1)
@@ -76,7 +79,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                         .organizationQuotaDefinitionsV3()
                                         .delete(
                                                 DeleteOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(organizationId)
+                                                        .organizationQuotaDefinitionId(
+                                                                organizationId)
                                                         .build())
                                         .flatMap(
                                                 job ->
@@ -84,7 +88,9 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                                                 this.cloudFoundryClient,
                                                                 Duration.ofMinutes(5),
                                                                 job)))
-                .thenMany(requestListOrganizationQuotas(this.cloudFoundryClient, organizationQuotaName))
+                .thenMany(
+                        requestListOrganizationQuotas(
+                                this.cloudFoundryClient, organizationQuotaName))
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -101,7 +107,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                         .organizationQuotaDefinitionsV3()
                                         .get(
                                                 GetOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(organizationQuotaId)
+                                                        .organizationQuotaDefinitionId(
+                                                                organizationQuotaId)
                                                         .build()))
                 .map(GetOrganizationQuotaDefinitionResponse::getName)
                 .as(StepVerifier::create)
@@ -123,7 +130,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                         this.cloudFoundryClient
                                                 .organizationQuotaDefinitionsV3()
                                                 .list(
-                                                        ListOrganizationQuotaDefinitionsRequest.builder()
+                                                        ListOrganizationQuotaDefinitionsRequest
+                                                                .builder()
                                                                 .page(page)
                                                                 .build())))
                 .filter(resource -> organizationQuotaName.equals(resource.getName()))
@@ -138,7 +146,7 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     @Test
     public void update() {
         String organizationQuotaName = this.nameFactory.getOrganizationQuotaName();
-        int totalMemoryLimit = 64 * 1024;    // 64 GB
+        int totalMemoryLimit = 64 * 1024; // 64 GB
 
         createOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName)
                 .flatMap(
@@ -147,18 +155,44 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                         .organizationQuotaDefinitionsV3()
                                         .update(
                                                 UpdateOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(organizationQuotaId)
-                                                        .apps(Apps.builder().totalMemoryInMb(totalMemoryLimit).build())
-                                                        .routes(Routes.builder().totalRoutes(100).build())
-                                                        .services(Services.builder().isPaidServicesAllowed(true).totalServiceInstances(100).build())
+                                                        .organizationQuotaDefinitionId(
+                                                                organizationQuotaId)
+                                                        .apps(
+                                                                Apps.builder()
+                                                                        .totalMemoryInMb(
+                                                                                totalMemoryLimit)
+                                                                        .build())
+                                                        .routes(
+                                                                Routes.builder()
+                                                                        .totalRoutes(100)
+                                                                        .build())
+                                                        .services(
+                                                                Services.builder()
+                                                                        .isPaidServicesAllowed(true)
+                                                                        .totalServiceInstances(100)
+                                                                        .build())
                                                         .build()))
-                .thenMany(requestListOrganizationQuotas(this.cloudFoundryClient, organizationQuotaName))
+                .thenMany(
+                        requestListOrganizationQuotas(
+                                this.cloudFoundryClient, organizationQuotaName))
                 .as(StepVerifier::create)
                 .consumeNextWith(
                         organizationQuotaDefinitionResource -> {
-                            assertThat(organizationQuotaDefinitionResource.getApps().getTotalMemoryInMb()).isEqualTo(totalMemoryLimit);
-                            assertThat(organizationQuotaDefinitionResource.getRoutes().getTotalRoutes()).isEqualTo(100);
-                            assertThat(organizationQuotaDefinitionResource.getServices().getTotalServiceInstances()).isEqualTo(100);
+                            assertThat(
+                                            organizationQuotaDefinitionResource
+                                                    .getApps()
+                                                    .getTotalMemoryInMb())
+                                    .isEqualTo(totalMemoryLimit);
+                            assertThat(
+                                            organizationQuotaDefinitionResource
+                                                    .getRoutes()
+                                                    .getTotalRoutes())
+                                    .isEqualTo(100);
+                            assertThat(
+                                            organizationQuotaDefinitionResource
+                                                    .getServices()
+                                                    .getTotalServiceInstances())
+                                    .isEqualTo(100);
                         })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -175,7 +209,10 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     private static Mono<String> getOrganizationQuotaId(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return requestListOrganizationQuotas(cloudFoundryClient, organizationQuotaName)
-                .filter(organizationQuotaDefinitionResource -> organizationQuotaName.equals(organizationQuotaDefinitionResource.getName()))
+                .filter(
+                        organizationQuotaDefinitionResource ->
+                                organizationQuotaName.equals(
+                                        organizationQuotaDefinitionResource.getName()))
                 .single()
                 .map(OrganizationQuotaDefinitionResource::getId);
     }
@@ -184,7 +221,10 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return cloudFoundryClient
                 .organizationQuotaDefinitionsV3()
-                .create(CreateOrganizationQuotaDefinitionRequest.builder().name(organizationQuotaName).build());
+                .create(
+                        CreateOrganizationQuotaDefinitionRequest.builder()
+                                .name(organizationQuotaName)
+                                .build());
     }
 
     private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(
@@ -200,7 +240,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                                 .build()));
     }
 
-    private static void deleteOrganizationQuotaId(CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
+    private static void deleteOrganizationQuotaId(
+            CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
 
         getOrganizationQuotaId(cloudFoundryClient, organizationQuotaName)
                 .flatMap(
@@ -209,7 +250,8 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                         .organizationQuotaDefinitionsV3()
                                         .delete(
                                                 DeleteOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(organizationId)
+                                                        .organizationQuotaDefinitionId(
+                                                                organizationId)
                                                         .build())
                                         .flatMap(
                                                 job ->

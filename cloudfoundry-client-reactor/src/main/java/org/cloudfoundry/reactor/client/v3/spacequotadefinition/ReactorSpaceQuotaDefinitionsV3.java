@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.spacequotadefinition;
 
+import java.util.Map;
 import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
 import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
 import org.cloudfoundry.client.v3.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
@@ -30,8 +31,6 @@ import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
-
-import java.util.Map;
 
 /**
  * The Reactor-based implementation of {@link ReactorSpaceQuotaDefinitionsV3}
@@ -56,50 +55,54 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
     }
 
     @Override
-    public Mono<CreateSpaceQuotaDefinitionResponse> create(CreateSpaceQuotaDefinitionRequest request) {
+    public Mono<CreateSpaceQuotaDefinitionResponse> create(
+            CreateSpaceQuotaDefinitionRequest request) {
         return post(
-                request,
-                CreateSpaceQuotaDefinitionResponse.class,
-                builder -> builder.pathSegment("space_quotas"))
+                        request,
+                        CreateSpaceQuotaDefinitionResponse.class,
+                        builder -> builder.pathSegment("space_quotas"))
                 .checkpoint();
     }
 
     @Override
     public Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request) {
         return get(
-                request,
-                GetSpaceQuotaDefinitionResponse.class,
-                builder ->
-                        builder.pathSegment("space_quotas", request.getSpaceQuotaDefinitionId()))
+                        request,
+                        GetSpaceQuotaDefinitionResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
                 .checkpoint();
     }
 
     @Override
     public Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request) {
         return get(
-                request,
-                ListSpaceQuotaDefinitionsResponse.class,
-                builder -> builder.pathSegment("space_quotas"))
+                        request,
+                        ListSpaceQuotaDefinitionsResponse.class,
+                        builder -> builder.pathSegment("space_quotas"))
                 .checkpoint();
     }
 
     @Override
-    public Mono<UpdateSpaceQuotaDefinitionResponse> update(UpdateSpaceQuotaDefinitionRequest request) {
+    public Mono<UpdateSpaceQuotaDefinitionResponse> update(
+            UpdateSpaceQuotaDefinitionRequest request) {
         return patch(
-                request,
-                UpdateSpaceQuotaDefinitionResponse.class,
-                builder ->
-                        builder.pathSegment("space_quotas", request.getSpaceQuotaDefinitionId()))
+                        request,
+                        UpdateSpaceQuotaDefinitionResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
                 .checkpoint();
     }
 
     @Override
     public Mono<String> delete(DeleteSpaceQuotaDefinitionRequest request) {
         return delete(
-                request,
-                builder ->
-                        builder.pathSegment("space_quotas", request.getSpaceQuotaDefinitionId()))
+                        request,
+                        builder ->
+                                builder.pathSegment(
+                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
                 .checkpoint();
     }
-
 }
