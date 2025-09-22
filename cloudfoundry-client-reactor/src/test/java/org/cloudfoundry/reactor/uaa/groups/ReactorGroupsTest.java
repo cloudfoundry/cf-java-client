@@ -22,14 +22,21 @@ import static io.netty.handler.codec.http.HttpMethod.POST;
 import static io.netty.handler.codec.http.HttpMethod.PUT;
 import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpResponseStatus.TOO_MANY_REQUESTS;
 import static org.cloudfoundry.uaa.SortOrder.ASCENDING;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.concurrent.TimeoutException;
+import java.util.function.Consumer;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.cloudfoundry.reactor.uaa.AbstractUaaApiTest;
+import org.cloudfoundry.reactor.uaa.UaaThrottler;
 import org.cloudfoundry.uaa.Metadata;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
 import org.cloudfoundry.uaa.groups.AddMemberResponse;
@@ -66,14 +73,22 @@ import org.cloudfoundry.uaa.groups.UserEntity;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Meta;
 import org.cloudfoundry.uaa.users.Name;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 final class ReactorGroupsTest extends AbstractUaaApiTest {
 
     private final ReactorGroups groups =
             new ReactorGroups(
-                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+                    CONNECTION_CONTEXT, super.root, TOKEN_PROVIDER, Collections.emptyMap());
+
+    @BeforeEach
+    void clean() {
+        UaaThrottler.reset();
+    }
 
     @Test
     void addMember() {
@@ -288,6 +303,128 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void exhaustUaaThrottlerTest() {
+        @SuppressWarnings("unchecked")
+        Consumer<TimeoutException> mockHandler = mock(Consumer.class);
+        GetGroupResponse resp1Body =
+                GetGroupResponse.builder()
+                        .id("test-group-id")
+                        .metadata(
+                                Metadata.builder()
+                                        .created("2016-06-03T17:59:30.527Z")
+                                        .lastModified("2016-06-03T17:59:30.561Z")
+                                        .version(1)
+                                        .build())
+                        .description("the cool group")
+                        .displayName("Cooler Group Name for Retrieve")
+                        .member(
+                                MemberSummary.builder()
+                                        .origin("uaa")
+                                        .type(MemberType.USER)
+                                        .memberId("f0e6a061-6e3a-4be9-ace5-142ee24e20b7")
+                                        .build())
+                        .schema("urn:scim:schemas:core:1.0")
+                        .zoneId("uaa")
+                        .build();
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/Groups/test-group-id1")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/uaa/groups/GET_{id}_response.json")
+                                        .build())
+                        .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/Groups/test-group-id2")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/uaa/groups/GET_{id}_response.json")
+                                        .build())
+                        .build());
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/Groups/test-group-id3")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload("fixtures/uaa/groups/GET_{id}_response.json")
+                                        .build())
+                        .build());
+
+        UaaThrottler.setUaaRateLimit(2);
+        UaaThrottler.setMaxDelay(6);
+        UaaThrottler.setTimeoutHandler(mockHandler);
+        UaaThrottler.getInstance();
+
+        Mono<GetGroupResponse> resp1 =
+                groups.get(GetGroupRequest.builder().groupId("test-group-id1").build())
+                        .delayElement(Duration.ofMillis(200))
+                        .doOnSubscribe(s -> System.out.println("Subscribing resp1"))
+                        .doOnNext(v -> System.out.println("resp1 emits: " + v));
+        Mono<GetGroupResponse> resp2 =
+                groups.get(GetGroupRequest.builder().groupId("test-group-id2").build())
+                        .delayElement(Duration.ofMillis(100))
+                        .doOnSubscribe(s -> System.out.println("Subscribing resp2"))
+                        .doOnNext(v -> System.out.println("resp2 emits: " + v));
+        Mono<GetGroupResponse> resp3 =
+                groups.get(GetGroupRequest.builder().groupId("test-group-id3").build())
+                        .delayElement(Duration.ofMillis(400))
+                        .doOnSubscribe(s -> System.out.println("Subscribing resp3"))
+                        .doOnNext(v -> System.out.println("resp3 emits: " + v));
+
+        Flux<GetGroupResponse> merged = Flux.concat(resp1, resp2, resp3);
+
+        StepVerifier.create(merged)
+                .expectNext(resp1Body) // 100ms
+                .expectNext(resp1Body) // 200ms
+                .expectNext(resp1Body) // 400ms
+                .verifyComplete();
+        org.mockito.Mockito.verify(mockHandler, never()).accept(any(TimeoutException.class));
+    }
+
+    @Test
+    void getFailingWithRateLimit() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/Groups/test-group-id")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(TOO_MANY_REQUESTS)
+                                        .payload("fixtures/uaa/groups/GET_429_response.json")
+                                        .build())
+                        .build());
+
+        UaaThrottler.setUaaRateLimit(2);
+        UaaThrottler.setMaxDelay(6);
+        this.groups
+                .get(GetGroupRequest.builder().groupId("test-group-id").build())
+                .as(StepVerifier::create)
+                .expectErrorMessage(
+                        "429 - Too Many Request - Request limited by Rate Limiter configuration:"
+                                + " Name: SCIM Type: CredentialsID: null")
+                .verify(Duration.ofSeconds(60));
     }
 
     @Test

@@ -53,7 +53,7 @@ public abstract class AbstractRestTest {
 
     protected final Mono<String> root;
 
-    final MockWebServer mockWebServer;
+    protected final MockWebServer mockWebServer;
 
     private MultipleRequestDispatcher multipleRequestDispatcher = new MultipleRequestDispatcher();
 
@@ -78,7 +78,7 @@ public abstract class AbstractRestTest {
         this.multipleRequestDispatcher.add(interactionContext);
     }
 
-    private static final class FailingDeserializationProblemHandler
+    public static final class FailingDeserializationProblemHandler
             extends DeserializationProblemHandler {
 
         @Override

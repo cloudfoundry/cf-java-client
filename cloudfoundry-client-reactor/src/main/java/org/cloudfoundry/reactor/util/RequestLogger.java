@@ -34,7 +34,7 @@ public class RequestLogger {
     private long requestSentTime;
 
     public void request(HttpClientRequest request) {
-        request(String.format("%-6s {}", request.method()), request.uri());
+        request(String.format("%-6s {}", request.method()), request.resourceUrl());
     }
 
     public void response(HttpClientResponse response) {
@@ -50,19 +50,19 @@ public class RequestLogger {
                 RESPONSE_LOGGER.debug(
                         "{}    {} ({}, {})",
                         response.status().code(),
-                        response.uri(),
+                        response.resourceUrl(),
                         elapsed,
                         response.responseHeaders().get("X-Vcap-Request-Id"));
             } else {
                 RESPONSE_LOGGER.debug(
-                        "{}    {} ({})", response.status().code(), response.uri(), elapsed);
+                        "{}    {} ({})", response.status().code(), response.resourceUrl(), elapsed);
             }
         } else {
             if (RESPONSE_LOGGER.isTraceEnabled()) {
                 RESPONSE_LOGGER.warn(
                         "{}    {} ({}, {}) [{}]",
                         response.status().code(),
-                        response.uri(),
+                        response.resourceUrl(),
                         elapsed,
                         response.responseHeaders().get("X-Vcap-Request-Id"),
                         String.join(", ", warnings));
@@ -70,7 +70,7 @@ public class RequestLogger {
                 RESPONSE_LOGGER.warn(
                         "{}    {} ({}) [{}]",
                         response.status().code(),
-                        response.uri(),
+                        response.resourceUrl(),
                         elapsed,
                         String.join(", ", warnings));
             }
