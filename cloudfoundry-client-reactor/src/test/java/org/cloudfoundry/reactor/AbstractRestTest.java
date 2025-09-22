@@ -23,7 +23,9 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.DeserializationContext;
 import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import io.netty.handler.codec.http.HttpMethod;
 import java.io.IOException;
+import java.time.Duration;
 import java.util.*;
 import mockwebserver3.Dispatcher;
 import mockwebserver3.MockResponse;
@@ -53,7 +55,7 @@ public abstract class AbstractRestTest {
 
     protected final Mono<String> root;
 
-    final MockWebServer mockWebServer;
+    protected final MockWebServer mockWebServer;
 
     private MultipleRequestDispatcher multipleRequestDispatcher = new MultipleRequestDispatcher();
 
@@ -78,7 +80,12 @@ public abstract class AbstractRestTest {
         this.multipleRequestDispatcher.add(interactionContext);
     }
 
-    private static final class FailingDeserializationProblemHandler
+    protected final void mockRequestParallel(
+            InteractionContext interactionContext, Duration delay) {
+        this.multipleRequestDispatcher.addParallel(interactionContext, delay);
+    }
+
+    public static final class FailingDeserializationProblemHandler
             extends DeserializationProblemHandler {
 
         @Override
@@ -98,35 +105,77 @@ public abstract class AbstractRestTest {
 
     private static final class MultipleRequestDispatcher extends Dispatcher {
 
-        private Queue<InteractionContext> responses = new LinkedList<>();
+        private Queue<InteractionContext> responsesOrdered = new LinkedList<>();
+        private Map<TestRequest, InteractionContext> responsesParallel = new HashMap<>();
+        private Map<TestRequest, Duration> responsesParallelDelays = new HashMap<>();
 
         private List<InteractionContext> verifications = new ArrayList<>();
 
         @Override
         public MockResponse dispatch(RecordedRequest request) {
-            InteractionContext interactionContext = this.responses.poll();
+            InteractionContext interactionContext = this.responsesOrdered.peek();
 
             if (interactionContext == null) {
-                throw new IllegalStateException(
-                        String.format(
-                                "Unexpected request for %s %s received",
-                                request.getMethod(), request.getPath()));
+                return dispatchParallel(request);
             }
-
-            interactionContext.setDone(true);
 
             try {
                 interactionContext.getRequest().assertEquals(request);
+                interactionContext.setDone(true);
+                this.responsesOrdered.poll();
                 return interactionContext.getResponse().getMockResponse();
             } catch (AssertionError e) {
-                e.printStackTrace();
-                return new MockResponse().setResponseCode(400);
+                return dispatchParallel(request);
             }
         }
 
+        private MockResponse dispatchParallel(RecordedRequest request) {
+            TestRequest testRequest =
+                    TestRequest.builder()
+                            .method(HttpMethod.valueOf(request.getMethod()))
+                            .path(request.getPath())
+                            .build();
+            InteractionContext interactionContext = this.responsesParallel.get(testRequest);
+            if (interactionContext != null) {
+                interactionContext.setDone(true);
+                Duration delay = this.responsesParallelDelays.get(testRequest);
+                try {
+                    Thread.sleep(delay.toMillis());
+                } catch (InterruptedException e) {
+                    throw new IllegalStateException(
+                            String.format(
+                                    "Unexpectedly interrupted %s %s",
+                                    request.getMethod(), request.getPath()));
+                }
+                return interactionContext.getResponse().getMockResponse();
+            } else { // implement previous error behavior of responsesOrdered
+                try {
+                    interactionContext = this.responsesOrdered.poll();
+                    if (interactionContext == null) {
+                        throw new IllegalStateException(
+                                String.format(
+                                        "Unexpected request for %s %s received",
+                                        request.getMethod(), request.getPath()));
+                    }
+                    interactionContext.getRequest().assertEquals(request);
+                } catch (AssertionError e) {
+                    e.printStackTrace();
+                    return new MockResponse().setResponseCode(400);
+                }
+            }
+            return new MockResponse().setResponseCode(500);
+        }
+
         private void add(InteractionContext interactionContext) {
-            this.responses.add(interactionContext);
+            this.responsesOrdered.add(interactionContext);
             this.verifications.add(interactionContext);
+        }
+
+        private void addParallel(InteractionContext interactionContext, Duration delay) {
+            TestRequest request = interactionContext.getRequest();
+            this.responsesParallel.put(request, interactionContext);
+            this.verifications.add(interactionContext);
+            this.responsesParallelDelays.put(request, delay);
         }
 
         private void verify() {

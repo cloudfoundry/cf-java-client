@@ -61,6 +61,10 @@ public class Operator extends OperatorContextAware {
         return request(HttpMethod.DELETE);
     }
 
+    protected HttpClient getHttpClient() {
+        return this.httpClient;
+    }
+
     public Operator followRedirects() {
         return new Operator(this.context, this.httpClient.followRedirect(true));
     }
@@ -104,7 +108,7 @@ public class Operator extends OperatorContextAware {
                 this.context.withErrorPayloadMapper(errorPayloadMapper), this.httpClient);
     }
 
-    private static HttpClient attachRequestLogger(HttpClient httpClient) {
+    protected HttpClient attachRequestLogger(HttpClient httpClient) {
         RequestLogger requestLogger = new RequestLogger();
         return httpClient
                 .doAfterRequest((request, connection) -> requestLogger.request(request))
@@ -129,18 +133,30 @@ public class Operator extends OperatorContextAware {
             return send(serialized(payload));
         }
 
+        private BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>>
+                wrapRequestTransformer(
+                        BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> original) {
+            return (req, out) -> Mono.from(original.apply(req, out));
+        }
+
         public ResponseReceiverConstructor send(
                 BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> requestTransformer) {
-            HttpClient.ResponseReceiver<?> responseReceiver =
-                    this.requestSender.send(requestTransformer);
-            return new ResponseReceiverConstructor(this.context, responseReceiver);
+            return new ResponseReceiverConstructor(
+                    this.context,
+                    this.requestSender.send(wrapRequestTransformer(requestTransformer)));
+        }
+
+        BiConsumer<HttpClientRequest, HttpClientForm> wrapFormTransformer(
+                BiConsumer<HttpClientRequest, HttpClientForm> original) {
+
+            return (req, form) -> original.accept(req, form);
         }
 
         public ResponseReceiverConstructor sendForm(
                 BiConsumer<HttpClientRequest, HttpClientForm> requestTransformer) {
-            HttpClient.ResponseReceiver<?> responseReceiver =
-                    this.requestSender.sendForm(requestTransformer);
-            return new ResponseReceiverConstructor(this.context, responseReceiver);
+            return new ResponseReceiverConstructor(
+                    this.context,
+                    this.requestSender.sendForm(wrapFormTransformer(requestTransformer)));
         }
 
         private BiFunction<HttpClientRequest, NettyOutbound, Publisher<Void>> serialized(
