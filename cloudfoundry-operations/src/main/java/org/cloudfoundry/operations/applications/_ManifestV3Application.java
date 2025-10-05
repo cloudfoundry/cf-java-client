@@ -16,10 +16,9 @@
 
 package org.cloudfoundry.operations.applications;
 
-
-import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
+import org.cloudfoundry.client.v3.Metadata;
 
 import java.util.List;
 import java.util.Map;
@@ -32,24 +31,16 @@ import java.util.Map;
 abstract class _ManifestV3Application extends _ApplicationManifestCommon {
 
     /**
-     * The annotations configured for this application
-     */
-    @AllowNulls
-    @Nullable
-    abstract Map<String, String> getAnnotations();
-
-    /**
      * Generate a default route based on the application name
      */
     @Nullable
     abstract Boolean getDefaultRoute();
 
     /**
-     * The labels configured for this application
+     * The metadta for this application
      */
-    @AllowNulls
     @Nullable
-    abstract Map<String, String> getLabels();
+    abstract Metadata getMetadata();
 
     /**
      * The collection of processes configured for this application

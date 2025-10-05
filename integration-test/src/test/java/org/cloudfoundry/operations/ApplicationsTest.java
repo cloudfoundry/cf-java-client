@@ -100,6 +100,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
     @Autowired private CloudFoundryOperations cloudFoundryOperations;
+        @Autowired private org.cloudfoundry.client.CloudFoundryClient cloudFoundryClient;
 
     @Autowired private String organizationName;
 
@@ -785,6 +786,65 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .applications()
                 .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
                 .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
+    public void pushManifestV3WithMetadata() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .buildpack("staticfile_buildpack")
+                                        .disk(512)
+                                        .healthCheckType(ApplicationHealthCheck.PORT)
+                                        .memory(64)
+                                        .name(applicationName)
+                                        .metadata(
+                                                org.cloudfoundry.client.v3.Metadata.builder()
+                                                        .label("test-label", "test-label-value")
+                                                        .annotation("test-annotation", "test-annotation-value")
+                                                        .build()
+                                        )
+                                        .path(
+                                                new ClassPathResource("test-application.zip")
+                                                        .getFile()
+                                                        .toPath())
+                                        .build())
+                        .build();
+
+        this.cloudFoundryOperations
+                .applications()
+                .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
+                .then(
+                        // fetch application id via operations API
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(
+                                        org.cloudfoundry.operations.applications.GetApplicationRequest
+                                                .builder()
+                                                .name(applicationName)
+                                                .build())
+                                .map(org.cloudfoundry.operations.applications.ApplicationDetail::getId))
+                .flatMap(
+                        appId ->
+                                this.cloudFoundryClient
+                                        .applicationsV3()
+                                        .get(
+                                                org.cloudfoundry.client.v3.applications
+                                                        .GetApplicationRequest
+                                                        .builder()
+                                                        .applicationId(appId)
+                                                        .build()))
+                .map(
+                        response ->
+                                response.getMetadata().getLabels().get("test-label"))
+                .as(StepVerifier::create)
+                .expectNext("test-value")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

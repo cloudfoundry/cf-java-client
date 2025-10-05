@@ -5,7 +5,9 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
+import org.cloudfoundry.client.v3.Metadata;
 import org.junit.jupiter.api.Test;
 
 class ApplicationManifestUtilsV3Test {
@@ -54,6 +56,52 @@ class ApplicationManifestUtilsV3Test {
                                 ManifestV3Application.builder()
                                         .name("test-app")
                                         .docker(Docker.builder().image("test-image").build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithMetadata() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .metadata(
+                                                Metadata.builder()
+                                                        .label("test-label", "test-label-value")
+                                                        .annotation("test-annotation", "test-annotation-value")
+                                                        .build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithMetadataOnlyLabel() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .metadata(Metadata.builder().label("test-label", "test-label-value").build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithMetadataOnlyAnnotation() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .metadata(Metadata.builder().annotation("test-annotation", "test-annotation-value").build())
                                         .build())
                         .build();
 
