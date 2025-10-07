@@ -818,7 +818,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                                 .build())
                                                 .build())
                                 .build())
-                .map(manifestm -> manifest.getMetadata())
+                .map(manifest -> manifest.getMetadata())
                 .as(StepVerifier::create)
                 .consumeNextWith(metadata -> {
                     assertThat(metadata.getLabels()).containsAllEntriesOf(labels);
