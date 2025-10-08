@@ -26,14 +26,13 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
-import java.util.HashMap;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
@@ -176,7 +175,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 raw -> getSidecar((Map<String, Object>) raw, variables),
                 builder::sidecar);
 
-        as(application,
+        as(
+                application,
                 "metadata",
                 variables,
                 raw -> getMetadata((Map<String, Object>) raw, variables),
@@ -261,30 +261,16 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         return builder.build();
     }
 
-    private static Metadata getMetadata(
-            Map<String, Object> raw,
-            Map<String, String> variables) {
+    private static Metadata getMetadata(Map<String, Object> raw, Map<String, String> variables) {
 
         if (raw == null) return null;
 
         Map<String, String> labels = new HashMap<>();
         Map<String, String> annotations = new HashMap<>();
 
-        asMap(
-                raw,
-                "labels",
-                variables,
-                String.class::cast,
-                labels::put
-        );
+        asMap(raw, "labels", variables, String.class::cast, labels::put);
 
-        asMap(
-                raw,
-                "annotations",
-                variables,
-                String.class::cast,
-                annotations::put
-        );
+        asMap(raw, "annotations", variables, String.class::cast, annotations::put);
 
         if (labels.isEmpty() && annotations.isEmpty()) {
             return null;
@@ -299,7 +285,6 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         }
         return builder.build();
     }
-
 
     private static Map<String, Object> toYaml(ManifestV3 manifest) {
         Map<String, Object> yaml = new TreeMap<>();

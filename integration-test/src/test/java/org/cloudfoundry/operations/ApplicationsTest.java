@@ -794,7 +794,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     public void pushManifestV3WithMetadata() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Map<String, String> labels = Collections.singletonMap("test-label", "test-label-value");
-        Map<String, String> annotations = Collections.singletonMap("test-annotation", "test-annotation-value");
+        Map<String, String> annotations =
+                Collections.singletonMap("test-annotation", "test-annotation-value");
 
         this.cloudFoundryOperations
                 .applications()
@@ -806,24 +807,32 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                         ManifestV3Application.builder()
                                                                 .buildpack("staticfile_buildpack")
                                                                 .disk(512)
-                                                                .healthCheckType(ApplicationHealthCheck.PORT)
+                                                                .healthCheckType(
+                                                                        ApplicationHealthCheck.PORT)
                                                                 .memory(64)
                                                                 .name(applicationName)
                                                                 .metadata(
-                                                                        org.cloudfoundry.client.v3.Metadata.builder()
+                                                                        org.cloudfoundry.client.v3
+                                                                                .Metadata.builder()
                                                                                 .labels(labels)
-                                                                                .annotations(annotations)
+                                                                                .annotations(
+                                                                                        annotations)
                                                                                 .build())
-                                                                .path(new ClassPathResource("test-application.zip").getFile().toPath())
+                                                                .path(
+                                                                        new ClassPathResource(
+                                                                                        "test-application.zip")
+                                                                                .getFile()
+                                                                                .toPath())
                                                                 .build())
                                                 .build())
                                 .build())
                 .map(manifest -> manifest.getMetadata())
                 .as(StepVerifier::create)
-                .consumeNextWith(metadata -> {
-                    assertThat(metadata.getLabels()).containsAllEntriesOf(labels);
-                    assertThat(metadata.getAnnotations()).containsAllEntriesOf(annotations);
-                })
+                .consumeNextWith(
+                        metadata -> {
+                            assertThat(metadata.getLabels()).containsAllEntriesOf(labels);
+                            assertThat(metadata.getAnnotations()).containsAllEntriesOf(annotations);
+                        })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

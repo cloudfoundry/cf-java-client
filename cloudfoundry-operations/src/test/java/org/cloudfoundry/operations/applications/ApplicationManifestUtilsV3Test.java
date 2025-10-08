@@ -5,9 +5,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-
-import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.cloudfoundry.client.v3.Metadata;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.junit.jupiter.api.Test;
 
 class ApplicationManifestUtilsV3Test {
@@ -72,7 +71,9 @@ class ApplicationManifestUtilsV3Test {
                                         .metadata(
                                                 Metadata.builder()
                                                         .label("test-label", "test-label-value")
-                                                        .annotation("test-annotation", "test-annotation-value")
+                                                        .annotation(
+                                                                "test-annotation",
+                                                                "test-annotation-value")
                                                         .build())
                                         .build())
                         .build();
@@ -87,7 +88,10 @@ class ApplicationManifestUtilsV3Test {
                         .application(
                                 ManifestV3Application.builder()
                                         .name("test-app")
-                                        .metadata(Metadata.builder().label("test-label", "test-label-value").build())
+                                        .metadata(
+                                                Metadata.builder()
+                                                        .label("test-label", "test-label-value")
+                                                        .build())
                                         .build())
                         .build();
 
@@ -101,7 +105,12 @@ class ApplicationManifestUtilsV3Test {
                         .application(
                                 ManifestV3Application.builder()
                                         .name("test-app")
-                                        .metadata(Metadata.builder().annotation("test-annotation", "test-annotation-value").build())
+                                        .metadata(
+                                                Metadata.builder()
+                                                        .annotation(
+                                                                "test-annotation",
+                                                                "test-annotation-value")
+                                                        .build())
                                         .build())
                         .build();
 
