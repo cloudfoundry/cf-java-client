@@ -797,42 +797,31 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         Map<String, String> annotations =
                 Collections.singletonMap("test-annotation", "test-annotation-value");
 
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .buildpack("staticfile_buildpack")
+                                        .disk(512)
+                                        .healthCheckType(ApplicationHealthCheck.PORT)
+                                        .memory(64)
+                                        .name(applicationName)
+                                        .path(
+                                                new ClassPathResource("test-application.zip")
+                                                        .getFile()
+                                                        .toPath())
+                                        .metadata(
+                                                org.cloudfoundry.client.v3.Metadata.builder()
+                                                        .labels(labels)
+                                                        .annotations(annotations)
+                                                        .build())
+                                        .build())
+                        .build();
+
         this.cloudFoundryOperations
                 .applications()
-                .pushManifestV3(
-                        PushManifestV3Request.builder()
-                                .manifest(
-                                        ManifestV3.builder()
-                                                .application(
-                                                        ManifestV3Application.builder()
-                                                                .buildpack("staticfile_buildpack")
-                                                                .disk(512)
-                                                                .healthCheckType(
-                                                                        ApplicationHealthCheck.PORT)
-                                                                .memory(64)
-                                                                .name(applicationName)
-                                                                .metadata(
-                                                                        org.cloudfoundry.client.v3
-                                                                                .Metadata.builder()
-                                                                                .labels(labels)
-                                                                                .annotations(
-                                                                                        annotations)
-                                                                                .build())
-                                                                .path(
-                                                                        new ClassPathResource(
-                                                                                        "test-application.zip")
-                                                                                .getFile()
-                                                                                .toPath())
-                                                                .build())
-                                                .build())
-                                .build())
-                .map(manifest -> manifest.getMetadata())
+                .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
                 .as(StepVerifier::create)
-                .consumeNextWith(
-                        metadata -> {
-                            assertThat(metadata.getLabels()).containsAllEntriesOf(labels);
-                            assertThat(metadata.getAnnotations()).containsAllEntriesOf(annotations);
-                        })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

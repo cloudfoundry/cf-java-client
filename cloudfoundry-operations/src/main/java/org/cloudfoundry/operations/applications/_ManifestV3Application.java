@@ -37,7 +37,7 @@ abstract class _ManifestV3Application extends _ApplicationManifestCommon {
     abstract Boolean getDefaultRoute();
 
     /**
-     * The metadta for this application
+     * The metadata for this application
      */
     @Nullable
     abstract Metadata getMetadata();
