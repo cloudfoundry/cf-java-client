@@ -26,12 +26,14 @@ import java.io.Writer;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
+import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.yaml.snakeyaml.DumperOptions;
@@ -172,8 +174,14 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 variables,
                 raw -> getSidecar((Map<String, Object>) raw, variables),
                 builder::sidecar);
-        as(application, "labels", variables, Map.class::cast, builder::labels);
-        as(application, "annotations", variables, Map.class::cast, builder::annotations);
+
+        as(
+                application,
+                "metadata",
+                variables,
+                raw -> getMetadata((Map<String, Object>) raw, variables),
+                builder::metadata);
+
         asBoolean(application, "default-route", variables, builder::defaultRoute);
 
         return builder;
@@ -253,6 +261,31 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         return builder.build();
     }
 
+    private static Metadata getMetadata(Map<String, Object> raw, Map<String, String> variables) {
+
+        if (raw == null) return null;
+
+        Map<String, String> labels = new HashMap<>();
+        Map<String, String> annotations = new HashMap<>();
+
+        asMap(raw, "labels", variables, String.class::cast, labels::put);
+
+        asMap(raw, "annotations", variables, String.class::cast, annotations::put);
+
+        if (labels.isEmpty() && annotations.isEmpty()) {
+            return null;
+        }
+
+        Metadata.Builder builder = Metadata.builder();
+        if (!labels.isEmpty()) {
+            builder.labels(labels);
+        }
+        if (!annotations.isEmpty()) {
+            builder.annotations(annotations);
+        }
+        return builder.build();
+    }
+
     private static Map<String, Object> toYaml(ManifestV3 manifest) {
         Map<String, Object> yaml = new TreeMap<>();
         yaml.put("version", manifest.getVersion());
@@ -282,8 +315,8 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 "sidecars",
                 convertCollection(
                         application.getSidecars(), ApplicationManifestUtilsV3::toSidecarsYaml));
-        putIfPresent(yaml, "labels", application.getLabels());
-        putIfPresent(yaml, "annotations", application.getAnnotations());
+
+        putIfPresent(yaml, "metadata", toMetadataYaml(application.getMetadata()));
         return yaml;
     }
 
@@ -336,5 +369,13 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
         putIfPresent(yaml, "memory", process.getMemory());
         putIfPresent(yaml, "timeout", process.getTimeout());
         return yaml;
+    }
+
+    private static Map<String, Object> toMetadataYaml(Metadata metadata) {
+        if (metadata == null) return null;
+        Map<String, Object> map = new HashMap<>();
+        putIfPresent(map, "labels", metadata.getLabels());
+        putIfPresent(map, "annotations", metadata.getAnnotations());
+        return map.isEmpty() ? null : map;
     }
 }
