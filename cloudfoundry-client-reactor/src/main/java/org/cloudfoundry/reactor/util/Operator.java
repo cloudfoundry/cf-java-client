@@ -34,6 +34,8 @@ import org.cloudfoundry.reactor.HttpClientResponseWithBody;
 import org.cloudfoundry.reactor.HttpClientResponseWithConnection;
 import org.cloudfoundry.reactor.HttpClientResponseWithParsedBody;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,6 +52,7 @@ import reactor.util.retry.Retry;
 
 public class Operator extends OperatorContextAware {
 
+    private static final Logger log = LoggerFactory.getLogger(Operator.class);
     private final HttpClient httpClient;
 
     public Operator(OperatorContext context, HttpClient httpClient) {
@@ -316,6 +319,7 @@ public class Operator extends OperatorContextAware {
             return inbound.doOnNext(
                     response -> {
                         if (isUnauthorized(response)) {
+                            log.info("✋ UNAUTHORIZED {}", response.getResponse().requestHeaders());
                             this.context
                                     .getTokenProvider()
                                     .ifPresent(
