@@ -50,18 +50,42 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     @Test
     public void create() {
         String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
+        Apps organizationQuotaAppLimits =
+                Apps.builder()
+                        .perProcessMemoryInMb(1024)
+                        .totalMemoryInMb(2048)
+                        .logRateLimitInBytesPerSecond(0)
+                        .build();
+        Services organizationQuotaServiceLimits =
+                Services.builder().isPaidServicesAllowed(false).totalServiceInstances(10).build();
+        Routes organizationQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
         this.cloudFoundryClient
                 .organizationQuotaDefinitionsV3()
                 .create(
                         CreateOrganizationQuotaDefinitionRequest.builder()
                                 .name(organizationQuotaName)
+                                .apps(organizationQuotaAppLimits)
+                                .services(organizationQuotaServiceLimits)
+                                .routes(organizationQuotaRouteLimits)
                                 .build())
                 .thenMany(
                         requestListOrganizationQuotas(
                                 this.cloudFoundryClient, organizationQuotaName))
                 .single()
                 .as(StepVerifier::create)
-                .expectNextCount(1)
+                .assertNext(
+                        organizationQuotaDefinitionResource -> {
+                            assertThat(organizationQuotaDefinitionResource).isNotNull();
+                            assertThat(organizationQuotaDefinitionResource.getId()).isNotNull();
+                            assertThat(organizationQuotaDefinitionResource.getName())
+                                    .isEqualTo(organizationQuotaName);
+                            assertThat(organizationQuotaDefinitionResource.getApps())
+                                    .isEqualTo(organizationQuotaAppLimits);
+                            assertThat(organizationQuotaDefinitionResource.getServices())
+                                    .isEqualTo(organizationQuotaServiceLimits);
+                            assertThat(organizationQuotaDefinitionResource.getRoutes())
+                                    .isEqualTo(organizationQuotaRouteLimits);
+                        })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
