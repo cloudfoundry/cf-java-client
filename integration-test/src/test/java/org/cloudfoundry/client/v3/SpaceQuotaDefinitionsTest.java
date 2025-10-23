@@ -66,12 +66,14 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         SpaceQuotaDefinitionRelationships spaceQuotaDefinitionRelationships =
                 createSpaceQuotaDefinitionRelationships(organizationId);
 
-        Apps spaceQuotaAppLimits = Apps.builder()
-                .perProcessMemoryInMb(1024)
-                .totalMemoryInMb(2048)
-                .logRateLimitInBytesPerSecond(0)
-                .build();
-        Services spaceQuotaServiceLimits = Services.builder().isPaidServicesAllowed(false).totalServiceInstances(10).build();
+        Apps spaceQuotaAppLimits =
+                Apps.builder()
+                        .perProcessMemoryInMb(1024)
+                        .totalMemoryInMb(2048)
+                        .logRateLimitInBytesPerSecond(0)
+                        .build();
+        Services spaceQuotaServiceLimits =
+                Services.builder().isPaidServicesAllowed(false).totalServiceInstances(10).build();
         Routes spaceQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
 
         this.cloudFoundryClient
@@ -178,19 +180,19 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .consumeNextWith(
                         organizationQuotaDefinitionResource -> {
                             assertThat(
-                                    organizationQuotaDefinitionResource
-                                            .getApps()
-                                            .getTotalMemoryInMb())
+                                            organizationQuotaDefinitionResource
+                                                    .getApps()
+                                                    .getTotalMemoryInMb())
                                     .isEqualTo(totalMemoryLimit);
                             assertThat(
-                                    organizationQuotaDefinitionResource
-                                            .getRoutes()
-                                            .getTotalRoutes())
+                                            organizationQuotaDefinitionResource
+                                                    .getRoutes()
+                                                    .getTotalRoutes())
                                     .isEqualTo(100);
                             assertThat(
-                                    organizationQuotaDefinitionResource
-                                            .getServices()
-                                            .getTotalServiceInstances())
+                                            organizationQuotaDefinitionResource
+                                                    .getServices()
+                                                    .getTotalServiceInstances())
                                     .isEqualTo(100);
                         })
                 .expectComplete()
