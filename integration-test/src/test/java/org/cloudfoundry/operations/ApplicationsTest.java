@@ -29,6 +29,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
@@ -108,6 +109,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Autowired private String serviceName;
 
     @Autowired private LogCacheClient logCacheClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
     // We ensure it is by loading the serviceBrokerId @Lazy bean.
@@ -785,6 +787,62 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .applications()
                 .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
                 .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
+    public void pushManifestV3WithMetadata() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        Map<String, String> labels = Collections.singletonMap("test-label", "test-label-value");
+        Map<String, String> annotations =
+                Collections.singletonMap("test-annotation", "test-annotation-value");
+
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .buildpack("staticfile_buildpack")
+                                        .disk(512)
+                                        .healthCheckType(ApplicationHealthCheck.PORT)
+                                        .memory(64)
+                                        .name(applicationName)
+                                        .path(
+                                                new ClassPathResource("test-application.zip")
+                                                        .getFile()
+                                                        .toPath())
+                                        .metadata(
+                                                org.cloudfoundry.client.v3.Metadata.builder()
+                                                        .labels(labels)
+                                                        .annotations(annotations)
+                                                        .build())
+                                        .build())
+                        .build();
+
+        this.cloudFoundryOperations
+                .applications()
+                .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(GetApplicationRequest.builder().name(applicationName).build()))
+                .map(ApplicationDetail::getId)
+                .flatMap(
+                        id ->
+                                this.cloudFoundryClient
+                                        .applicationsV3()
+                                        .get(
+                                                org.cloudfoundry.client.v3.applications
+                                                        .GetApplicationRequest.builder()
+                                                        .applicationId(id)
+                                                        .build()))
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        createdApp ->
+                                labels.equals(createdApp.getMetadata().getLabels())
+                                        && annotations.equals(
+                                                createdApp.getMetadata().getAnnotations()))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

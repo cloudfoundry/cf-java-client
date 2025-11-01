@@ -44,7 +44,7 @@ abstract class AbstractAuthenticationConfiguration
      */
     @JsonProperty("linkText")
     @Nullable
-    abstract Boolean getLinkText();
+    abstract String getLinkText();
 
     /**
      * The client ID which is registered with the external OAuth provider for use by the UAA

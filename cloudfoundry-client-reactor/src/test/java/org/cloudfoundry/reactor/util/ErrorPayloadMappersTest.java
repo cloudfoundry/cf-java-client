@@ -327,11 +327,26 @@ final class ErrorPayloadMappersTest {
                                 assertThat(t)
                                         .isInstanceOf(UaaException.class)
                                         .hasMessage("unauthorized: Bad credentials")
-                                        .extracting("statusCode", "error", "errorDescription")
+                                        .extracting(
+                                                "statusCode",
+                                                "error",
+                                                "errorDescription",
+                                                "payload")
                                         .containsExactly(
                                                 BAD_REQUEST.code(),
                                                 "unauthorized",
-                                                "Bad credentials"))
+                                                "Bad credentials",
+                                                "{\n"
+                                                        + "  \"error\": \"unauthorized\",\n"
+                                                        + "  \"error_description\": \"Bad"
+                                                        + " credentials\",\n"
+                                                        + "  \"extra_information\": {\n"
+                                                        + "    \"some\": [\n"
+                                                        + "      \"extra\",\n"
+                                                        + "      \"information\"\n"
+                                                        + "    ]\n"
+                                                        + "  }\n"
+                                                        + "}\n"))
                 .verify(Duration.ofSeconds(1));
     }
 
@@ -370,11 +385,26 @@ final class ErrorPayloadMappersTest {
                                 assertThat(t)
                                         .isInstanceOf(UaaException.class)
                                         .hasMessage("unauthorized: Bad credentials")
-                                        .extracting("statusCode", "error", "errorDescription")
+                                        .extracting(
+                                                "statusCode",
+                                                "error",
+                                                "errorDescription",
+                                                "payload")
                                         .containsExactly(
                                                 INTERNAL_SERVER_ERROR.code(),
                                                 "unauthorized",
-                                                "Bad credentials"))
+                                                "Bad credentials",
+                                                "{\n"
+                                                        + "  \"error\": \"unauthorized\",\n"
+                                                        + "  \"error_description\": \"Bad"
+                                                        + " credentials\",\n"
+                                                        + "  \"extra_information\": {\n"
+                                                        + "    \"some\": [\n"
+                                                        + "      \"extra\",\n"
+                                                        + "      \"information\"\n"
+                                                        + "    ]\n"
+                                                        + "  }\n"
+                                                        + "}\n"))
                 .verify(Duration.ofSeconds(1));
     }
 

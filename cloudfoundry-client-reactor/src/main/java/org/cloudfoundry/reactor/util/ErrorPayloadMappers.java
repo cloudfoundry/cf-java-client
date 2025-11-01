@@ -101,7 +101,8 @@ public final class ErrorPayloadMappers {
                                     String error = (String) map.get("error");
                                     String errorDescription = (String) map.get("error_description");
 
-                                    return new UaaException(statusCode, error, errorDescription);
+                                    return new UaaException(
+                                            statusCode, error, errorDescription, payload);
                                 }));
     }
 
