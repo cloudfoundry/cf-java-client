@@ -96,4 +96,11 @@ public abstract class Task extends Resource {
     @JsonProperty("log_rate_limit_in_bytes_per_second")
     @Nullable
     public abstract Integer getLogRateLimitInBytesPerSecond();
+
+    /**
+     * The user
+     */
+    @JsonProperty("user")
+    @Nullable
+    public abstract String getUser();
 }
