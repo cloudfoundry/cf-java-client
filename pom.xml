@@ -73,6 +73,7 @@
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
         <spotless.version>2.44.4</spotless.version>
+        <m2e.apt.activation>disabled</m2e.apt.activation><!-- used by Eclipse -->
     </properties>
 
     <dependencyManagement>
@@ -180,18 +181,22 @@
                             <dependency>
                                 <groupId>org.immutables</groupId>
                                 <artifactId>value</artifactId>
+                                <version>${immutables.version}</version>
                             </dependency>
                             <dependency>
                                 <groupId>com.fasterxml.jackson.core</groupId>
                                 <artifactId>jackson-core</artifactId>
+                                <version>${jackson.version}</version>
                             </dependency>
                             <dependency>
                                 <groupId>com.fasterxml.jackson.core</groupId>
                                 <artifactId>jackson-annotations</artifactId>
+                                <version>${jackson.version}</version>
                             </dependency>
                             <dependency>
                                 <groupId>com.fasterxml.jackson.core</groupId>
                                 <artifactId>jackson-databind</artifactId>
+                                <version>${jackson.version}</version>
                             </dependency>
                         </annotationProcessorPaths>
                         <showWarnings>true</showWarnings>
