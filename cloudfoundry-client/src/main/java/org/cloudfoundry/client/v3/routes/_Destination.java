@@ -62,4 +62,18 @@ abstract class _Destination {
     @Nullable
     abstract String getProtocol();
 
+    /**
+     * When the entity was created
+     */
+    @JsonProperty("created_at")
+    @Nullable
+    abstract String getCreatedAt();
+
+    /**
+     * When the entity was updated
+     */
+    @JsonProperty("updated_at")
+    @Nullable
+    abstract String getUpdatedAt();
+
 }
