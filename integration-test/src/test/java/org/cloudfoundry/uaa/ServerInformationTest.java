@@ -18,15 +18,20 @@ package org.cloudfoundry.uaa;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.uaa.serverinformation.AutoLoginRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeRequest;
 import org.cloudfoundry.uaa.serverinformation.GetAutoLoginAuthenticationCodeResponse;
 import org.cloudfoundry.uaa.serverinformation.GetInfoRequest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.converter.json.Jackson2ObjectMapperBuilder;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -41,6 +46,8 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
     @Autowired private UaaClient uaaClient;
 
     @Autowired private String username;
+
+    @Autowired private ConnectionContext context;
 
     @Test
     public void autoLogin() {
@@ -83,6 +90,7 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @DisabledIf(value = "tasSpecificUaaVersion")
     public void getInfo() {
         this.uaaClient
                 .serverInformation()
@@ -123,5 +131,47 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
                                 .password(password)
                                 .username(username)
                                 .build());
+    }
+
+    /**
+     * TAS has a specific line of UAA releases 77.20.x, where x >= 8.
+     * The latest OSS release of that line is <a href="https://github.com/cloudfoundry/uaa/releases/v77.20.7">v77.20.7</a>.
+     * In those proprietary releases, the UAA info response has extra properties and crashes some tests.
+     * We do not want to include those extra fields into the OSS releases of CF-java-client. To have our
+     * integration tests succeed, we exclude these specific UAA releases.
+     */
+    private boolean tasSpecificUaaVersion() {
+        ObjectMapper mapper = Jackson2ObjectMapperBuilder.json().build();
+
+        Boolean hasTasSpecificUaaVersion =
+                context.getRootProvider()
+                        .getRoot("uaa", context)
+                        .map(url -> context.getHttpClient().baseUrl(url))
+                        .flatMap(
+                                client ->
+                                        client.get()
+                                                .uri("/info")
+                                                .responseContent()
+                                                .aggregate()
+                                                .asString())
+                        .map(
+                                r -> {
+                                    try {
+                                        return mapper.readTree(r).at("/app/version").asText();
+                                    } catch (JsonProcessingException e) {
+                                        throw new RuntimeException("Can't parse");
+                                    }
+                                })
+                        .map(
+                                version -> {
+                                    String[] versionParts = version.split("\\.");
+                                    int major = Integer.parseInt(versionParts[0]);
+                                    int minor = Integer.parseInt(versionParts[1]);
+                                    int patch = Integer.parseInt(versionParts[2]);
+                                    return major == 77 && minor == 20 && patch > 8;
+                                })
+                        .onErrorReturn(false)
+                        .block();
+        return Boolean.TRUE.equals(hasTasSpecificUaaVersion);
     }
 }
