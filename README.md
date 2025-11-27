@@ -253,7 +253,7 @@ Beyond that, it is helpful to capture the following information:
 If you open a Github issue with a request for help, please include as much of the information above as possible and do not forget to sanitize any request/response data posted.
 
 ## Development
-The project depends on Java 8. To build from source and install to your local Maven cache, run the following:
+The project depends on Java 8 to 25. To build from source and install to your local Maven cache, run the following:
 
 ```shell
 $ git submodule update --init --recursive
