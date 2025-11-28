@@ -74,6 +74,7 @@ import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
+import org.cloudfoundry.client.v3.users.UsersV3;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.applications.ReactorApplicationsV2;
@@ -133,6 +134,7 @@ import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
+import org.cloudfoundry.reactor.client.v3.users.ReactorUsersV3;
 import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
@@ -498,6 +500,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Users users() {
         return new ReactorUsers(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public UsersV3 usersV3() {
+        return new ReactorUsersV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     /**
