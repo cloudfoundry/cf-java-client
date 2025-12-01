@@ -70,6 +70,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -333,6 +334,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Space Quota Definitions Client API
      */
     SpaceQuotaDefinitions spaceQuotaDefinitions();
+
+    /**
+     * Main entry point to the Cloud Foundry Space Definitions V3 Client API
+     */
+    SpaceQuotaDefinitionsV3 spaceQuotaDefinitionsV3();
 
     /**
      * Main entry point to the Cloud Foundry Spaces V2 Client API
