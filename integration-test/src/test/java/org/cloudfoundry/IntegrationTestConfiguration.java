@@ -211,9 +211,7 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<Tuple2<String, String>> client(
-            @Qualifier("admin") UaaClient uaaClient,
-            @Qualifier("clientId") String clientId,
-            @Qualifier("clientSecret") String clientSecret) {
+            @Qualifier("admin") UaaClient uaaClient, String clientId, String clientSecret) {
         return uaaClient
                 .clients()
                 .create(
@@ -252,14 +250,13 @@ public class IntegrationTestConfiguration {
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
             @Qualifier("admin") NetworkingClient networkingClient,
-            @Qualifier("serverVersion") Version serverVersion,
+            Version serverVersion,
             @Qualifier("admin") UaaClient uaaClient) {
         return new CloudFoundryCleaner(
                 cloudFoundryClient, nameFactory, networkingClient, serverVersion, uaaClient);
     }
 
     @Bean
-    @Qualifier("nonAdmin")
     ReactorCloudFoundryClient cloudFoundryClient(
             ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorCloudFoundryClient.builder()
@@ -270,13 +267,13 @@ public class IntegrationTestConfiguration {
 
     @Bean
     DefaultCloudFoundryOperations cloudFoundryOperations(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
+            CloudFoundryClient cloudFoundryClient,
             DopplerClient dopplerClient,
-            @Qualifier("nonAdmin") NetworkingClient networkingClient,
+            NetworkingClient networkingClient,
             RoutingClient routingClient,
-            @Qualifier("nonAdmin") UaaClient uaaClient,
-            @Qualifier("organizationName") String organizationName,
-            @Qualifier("spaceName") String spaceName) {
+            UaaClient uaaClient,
+            String organizationName,
+            String spaceName) {
         return DefaultCloudFoundryOperations.builder()
                 .cloudFoundryClient(cloudFoundryClient)
                 .dopplerClient(dopplerClient)
@@ -364,9 +361,7 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> metricRegistrarServiceInstance(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
-            @Qualifier("spaceId") Mono<String> spaceId,
-            NameFactory nameFactory) {
+            CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, NameFactory nameFactory) {
         return spaceId.flatMap(
                         spaceIdValue ->
                                 cloudFoundryClient
@@ -382,7 +377,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    @Qualifier("nonAdmin")
     NetworkingClient networkingClient(
             ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorNetworkingClient.builder()
@@ -394,10 +388,10 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
-            @Qualifier("organizationName") String organizationName,
-            @Qualifier("organizationQuotaName") String organizationQuotaName,
-            @Qualifier("userId") Mono<String> userId) {
+            CloudFoundryClient cloudFoundryClient,
+            String organizationName,
+            String organizationQuotaName,
+            Mono<String> userId) {
         return userId.flatMap(
                         userId1 ->
                                 cloudFoundryClient
@@ -491,12 +485,12 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> serviceBrokerId(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
+            CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
-            @Qualifier("planName") String planName,
-            @Qualifier("serviceBrokerName") String serviceBrokerName,
-            @Qualifier("serviceName") String serviceName,
-            @Qualifier("spaceId") Mono<String> spaceId) {
+            String planName,
+            String serviceBrokerName,
+            String serviceName,
+            Mono<String> spaceId) {
         return spaceId.flatMap(
                         spaceId1 ->
                                 ServiceBrokerUtils.createServiceBroker(
@@ -533,9 +527,7 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> spaceId(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
-            @Qualifier("organizationId") Mono<String> organizationId,
-            @Qualifier("spaceName") String spaceName) {
+            CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) {
         return organizationId
                 .flatMap(
                         orgId ->
@@ -560,9 +552,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> stackId(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
-            @Qualifier("stackName") Mono<String> stackName) {
+    Mono<String> stackId(CloudFoundryClient cloudFoundryClient, Mono<String> stackName) {
         return stackName
                 .flux()
                 .flatMap(
@@ -590,7 +580,7 @@ public class IntegrationTestConfiguration {
      */
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> stackName(@Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient) {
+    Mono<String> stackName(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.requestClientV2Resources(
                         page ->
                                 cloudFoundryClient
@@ -608,12 +598,11 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp(
-            @Qualifier("nonAdmin") CloudFoundryClient cloudFoundryClient,
-            @Qualifier("spaceId") Mono<String> spaceId,
-            @Qualifier("metricRegistrarServiceInstance")
-                    Mono<String> metricRegistrarServiceInstance,
-            @Qualifier("testLogCacheAppName") String testLogCacheAppName,
-            @Qualifier("testLogCacheHostName") String testLogCacheHostName,
+            CloudFoundryClient cloudFoundryClient,
+            Mono<String> spaceId,
+            Mono<String> metricRegistrarServiceInstance,
+            String testLogCacheAppName,
+            String testLogCacheHostName,
             Path testLogCacheAppbits) {
         return metricRegistrarServiceInstance
                 .zipWith(spaceId)
@@ -661,10 +650,7 @@ public class IntegrationTestConfiguration {
     @Bean
     @DependsOn({"client", "userId"})
     PasswordGrantTokenProvider tokenProvider(
-            @Qualifier("clientId") String clientId,
-            @Qualifier("clientSecret") String clientSecret,
-            @Qualifier("password") String password,
-            @Qualifier("username") String username) {
+            String clientId, String clientSecret, String password, String username) {
         return PasswordGrantTokenProvider.builder()
                 .clientId(clientId)
                 .clientSecret(clientSecret)
@@ -674,7 +660,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    @Qualifier("nonAdmin")
     ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
         return ReactorUaaClient.builder()
                 .connectionContext(connectionContext)
@@ -684,10 +669,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    Mono<String> userId(
-            @Qualifier("admin") UaaClient uaaClient,
-            @Qualifier("password") String password,
-            @Qualifier("username") String username) {
+    Mono<String> userId(@Qualifier("admin") UaaClient uaaClient, String password, String username) {
         return uaaClient
                 .users()
                 .create(
