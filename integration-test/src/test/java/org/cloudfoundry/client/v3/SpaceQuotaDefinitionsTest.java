@@ -37,6 +37,9 @@ import org.cloudfoundry.client.v3.spacequotadefinitions.Services;
 import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionRelationships;
 import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionResource;
 import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.Space;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.jetbrains.annotations.NotNull;
@@ -53,11 +56,15 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     private String organizationId;
+    private String spaceId;
 
     @BeforeEach
     public void createOrganization() {
         String orgName = this.nameFactory.getOrganizationName();
+        String spaceName = this.nameFactory.getSpaceName();
+
         organizationId = createOrganization(this.cloudFoundryClient, orgName).getId();
+        spaceId = createSpace(this.cloudFoundryClient, organizationId, spaceName).getId();
     }
 
     @Test
@@ -101,6 +108,59 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                                     .isEqualTo(spaceQuotaServiceLimits);
                             assertThat(spaceQuotaDefinitionResource.getRoutes())
                                     .isEqualTo(spaceQuotaRouteLimits);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void createWithSpaceRelationship() {
+        String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
+        SpaceQuotaDefinitionRelationships spaceQuotaDefinitionRelationships =
+                createSpaceQuotaDefinitionRelationships(organizationId, spaceId);
+
+        Apps spaceQuotaAppLimits =
+                Apps.builder()
+                        .perProcessMemoryInMb(1024)
+                        .totalMemoryInMb(2048)
+                        .logRateLimitInBytesPerSecond(0)
+                        .build();
+        Services spaceQuotaServiceLimits =
+                Services.builder().isPaidServicesAllowed(false).totalServiceInstances(10).build();
+        Routes spaceQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
+
+        this.cloudFoundryClient
+                .spaceQuotaDefinitionsV3()
+                .create(
+                        CreateSpaceQuotaDefinitionRequest.builder()
+                                .name(spaceQuotaName)
+                                .apps(spaceQuotaAppLimits)
+                                .services(spaceQuotaServiceLimits)
+                                .routes(spaceQuotaRouteLimits)
+                                .relationships(spaceQuotaDefinitionRelationships)
+                                .build())
+                .thenMany(requestListSpaceQuotas(this.cloudFoundryClient, spaceQuotaName))
+                .single()
+                .as(StepVerifier::create)
+                .assertNext(
+                        spaceQuotaDefinitionResource -> {
+                            assertThat(spaceQuotaDefinitionResource).isNotNull();
+                            assertThat(spaceQuotaDefinitionResource.getId()).isNotNull();
+                            assertThat(spaceQuotaDefinitionResource.getName())
+                                    .isEqualTo(spaceQuotaName);
+                            assertThat(spaceQuotaDefinitionResource.getApps())
+                                    .isEqualTo(spaceQuotaAppLimits);
+                            assertThat(spaceQuotaDefinitionResource.getServices())
+                                    .isEqualTo(spaceQuotaServiceLimits);
+                            assertThat(spaceQuotaDefinitionResource.getRoutes())
+                                    .isEqualTo(spaceQuotaRouteLimits);
+                            assertThat(spaceQuotaDefinitionResource.getRelationships()).isNotNull();
+                            assertThat(spaceQuotaDefinitionResource.getRelationships().getOrganization()).isNotNull();
+                            assertThat(spaceQuotaDefinitionResource.getRelationships().getSpaces()).isNotNull();
+                            assertThat(spaceQuotaDefinitionResource.getRelationships().getOrganization().getData().getId())
+                                    .isEqualTo(organizationId);
+                            assertThat(spaceQuotaDefinitionResource.getRelationships().getSpaces().getData().getFirst().getId())
+                                    .isEqualTo(spaceId);
                         })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -180,19 +240,19 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .consumeNextWith(
                         organizationQuotaDefinitionResource -> {
                             assertThat(
-                                            organizationQuotaDefinitionResource
-                                                    .getApps()
-                                                    .getTotalMemoryInMb())
+                                    organizationQuotaDefinitionResource
+                                            .getApps()
+                                            .getTotalMemoryInMb())
                                     .isEqualTo(totalMemoryLimit);
                             assertThat(
-                                            organizationQuotaDefinitionResource
-                                                    .getRoutes()
-                                                    .getTotalRoutes())
+                                    organizationQuotaDefinitionResource
+                                            .getRoutes()
+                                            .getTotalRoutes())
                                     .isEqualTo(100);
                             assertThat(
-                                            organizationQuotaDefinitionResource
-                                                    .getServices()
-                                                    .getTotalServiceInstances())
+                                    organizationQuotaDefinitionResource
+                                            .getServices()
+                                            .getTotalServiceInstances())
                                     .isEqualTo(100);
                         })
                 .expectComplete()
@@ -232,6 +292,22 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .block(Duration.ofMinutes(5));
     }
 
+    private static Space createSpace(
+            CloudFoundryClient cloudFoundryClient, String orgGuid, String spaceName) {
+        ToOneRelationship organizationRelationship =
+                ToOneRelationship.builder()
+                        .data(Relationship.builder().id(orgGuid).build())
+                        .build();
+        SpaceRelationships spaceRelationships =
+                SpaceRelationships.builder()
+                        .organization(organizationRelationship)
+                        .build();
+        return cloudFoundryClient
+                .spacesV3()
+                .create(CreateSpaceRequest.builder().name(spaceName).relationships(spaceRelationships).build())
+                .block(Duration.ofMinutes(5));
+    }
+
     @NotNull
     private static SpaceQuotaDefinitionRelationships createSpaceQuotaDefinitionRelationships(
             String orgGuid) {
@@ -241,6 +317,22 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                         .build();
         return SpaceQuotaDefinitionRelationships.builder()
                 .organization(organizationRelationship)
+                .build();
+    }
+
+    @NotNull
+    private static SpaceQuotaDefinitionRelationships createSpaceQuotaDefinitionRelationships(
+            String orgGuid, String spaceGuid) {
+        ToOneRelationship organizationRelationship =
+                ToOneRelationship.builder()
+                        .data(Relationship.builder().id(orgGuid).build())
+                        .build();
+        ToManyRelationship spaceRelationships = ToManyRelationship.builder()
+                .data(Relationship.builder().id(spaceGuid).build())
+                .build();
+        return SpaceQuotaDefinitionRelationships.builder()
+                .organization(organizationRelationship)
+                .spaces(spaceRelationships)
                 .build();
     }
 
