@@ -26,7 +26,7 @@
     <logger name="cloudfoundry-client.compatibility"     level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.delay"             level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.operations"        level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
-    <logger name="cloudfoundry-client.request"           level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
+    <logger name="cloudfoundry-client.request"           level="DEBUG"/>
     <logger name="cloudfoundry-client.resource-matching" level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.response"          level="${CLIENT_LOGGING_LEVEL:-INFO}"/>
     <logger name="cloudfoundry-client.test"              level="${TEST_LOGGING_LEVEL:-INFO}"/>
