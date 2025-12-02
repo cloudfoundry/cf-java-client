@@ -27,9 +27,7 @@ final class CreateSpaceQuotaRequestTest {
 
     @Test
     void noName() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> CreateSpaceQuotaRequest.builder().build());
+        assertThrows(IllegalStateException.class, () -> CreateSpaceQuotaRequest.builder().build());
     }
 
     @Test
@@ -48,12 +46,7 @@ final class CreateSpaceQuotaRequestTest {
                         .data(Relationship.builder().id(organizationGuid).build())
                         .build();
         SpaceQuotaRelationships relationships =
-                SpaceQuotaRelationships.builder()
-                        .organization(organizationsRelationship)
-                        .build();
-        CreateSpaceQuotaRequest.builder()
-                .name("test-quota")
-                .relationships(relationships)
-                .build();
+                SpaceQuotaRelationships.builder().organization(organizationsRelationship).build();
+        CreateSpaceQuotaRequest.builder().name("test-quota").relationships(relationships).build();
     }
 }

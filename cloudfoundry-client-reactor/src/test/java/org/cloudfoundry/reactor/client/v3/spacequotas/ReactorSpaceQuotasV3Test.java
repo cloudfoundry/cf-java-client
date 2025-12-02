@@ -148,15 +148,10 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                         .build());
 
         this.spaceQuotasV3
-                .get(
-                        GetSpaceQuotaRequest.builder()
-                                .spaceQuotaId(EXPECTED_SPACE_QUOTA_ID_1)
-                                .build())
+                .get(GetSpaceQuotaRequest.builder().spaceQuotaId(EXPECTED_SPACE_QUOTA_ID_1).build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        GetSpaceQuotaResponse.builder()
-                                .from(expectedSpaceQuotaResource1())
-                                .build())
+                        GetSpaceQuotaResponse.builder().from(expectedSpaceQuotaResource1()).build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }

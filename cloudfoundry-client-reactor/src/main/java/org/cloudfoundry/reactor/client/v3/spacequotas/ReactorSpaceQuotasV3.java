@@ -17,7 +17,6 @@
 package org.cloudfoundry.reactor.client.v3.spacequotas;
 
 import java.util.Map;
-
 import org.cloudfoundry.client.v3.spacequotas.*;
 import org.cloudfoundry.client.v3.spacequotas.CreateSpaceQuotaResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
@@ -28,8 +27,7 @@ import reactor.core.publisher.Mono;
 /**
  * The Reactor-based implementation of {@link ReactorSpaceQuotasV3}
  */
-public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
-        implements SpaceQuotasV3 {
+public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations implements SpaceQuotasV3 {
 
     /**
      * Creates an instance
@@ -48,8 +46,7 @@ public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
     }
 
     @Override
-    public Mono<CreateSpaceQuotaResponse> create(
-            CreateSpaceQuotaRequest request) {
+    public Mono<CreateSpaceQuotaResponse> create(CreateSpaceQuotaRequest request) {
         return post(
                         request,
                         CreateSpaceQuotaResponse.class,
@@ -62,9 +59,7 @@ public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
         return get(
                         request,
                         GetSpaceQuotaResponse.class,
-                        builder ->
-                                builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaId()))
+                        builder -> builder.pathSegment("space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 
@@ -78,14 +73,11 @@ public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
     }
 
     @Override
-    public Mono<UpdateSpaceQuotaResponse> update(
-            UpdateSpaceQuotaRequest request) {
+    public Mono<UpdateSpaceQuotaResponse> update(UpdateSpaceQuotaRequest request) {
         return patch(
                         request,
                         UpdateSpaceQuotaResponse.class,
-                        builder ->
-                                builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaId()))
+                        builder -> builder.pathSegment("space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 
@@ -93,9 +85,7 @@ public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
     public Mono<String> delete(DeleteSpaceQuotaRequest request) {
         return delete(
                         request,
-                        builder ->
-                                builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaId()))
+                        builder -> builder.pathSegment("space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 }

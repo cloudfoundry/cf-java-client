@@ -24,9 +24,7 @@ final class DeleteSpaceQuotaRequestTest {
 
     @Test
     void noSpaceQuotaId() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> DeleteSpaceQuotaRequest.builder().build());
+        assertThrows(IllegalStateException.class, () -> DeleteSpaceQuotaRequest.builder().build());
     }
 
     @Test
