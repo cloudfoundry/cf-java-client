@@ -164,7 +164,7 @@ public final class SpaceQuotasTest extends AbstractIntegrationTest {
                                                     .getRelationships()
                                                     .getSpaces()
                                                     .getData()
-                                                    .getFirst()
+                                                    .get(0)
                                                     .getId())
                                     .isEqualTo(spaceId);
                         })
