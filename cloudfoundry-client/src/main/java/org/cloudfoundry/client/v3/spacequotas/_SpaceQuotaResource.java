@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the List all Space Quota Definitions operation
+ * Base class for resources that contain Space Quota
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListSpaceQuotaDefinitionsResponse extends PaginatedResponse<SpaceQuotaDefinitionResource> {
+abstract class _SpaceQuotaResource extends SpaceQuota {
 
 }
+

@@ -14,21 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.immutables.value.Value;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * The request payload for the Retrieve a Particular Space Quota Definition operation
- */
-@Value.Immutable
-abstract class _GetSpaceQuotaDefinitionRequest {
+import org.junit.jupiter.api.Test;
 
-    /**
-     * The quota definition id
-     */
-    @JsonIgnore
-    abstract String getSpaceQuotaDefinitionId();
+final class DeleteSpaceQuotaRequestTest {
 
+    @Test
+    void noSpaceQuotaId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> DeleteSpaceQuotaRequest.builder().build());
+    }
+
+    @Test
+    void valid() {
+        DeleteSpaceQuotaRequest.builder().spaceQuotaId("test-id").build();
+    }
 }

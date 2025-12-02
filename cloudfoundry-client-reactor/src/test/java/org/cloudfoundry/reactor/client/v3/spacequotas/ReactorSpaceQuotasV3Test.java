@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.spacequotadefinition;
+package org.cloudfoundry.reactor.client.v3.spacequotas;
 
 import static io.netty.handler.codec.http.HttpMethod.DELETE;
 import static io.netty.handler.codec.http.HttpMethod.GET;
@@ -30,20 +30,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Apps;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Routes;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Services;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionRelationships;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionResponse;
+import org.cloudfoundry.client.v3.spacequotas.*;
+import org.cloudfoundry.client.v3.spacequotas.SpaceQuotaResource;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -52,12 +40,12 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
+class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
 
     public static final String EXPECTED_SPACE_QUOTA_ID_1 = "f919ef8a-e333-472a-8172-baaf2c30d301";
 
-    private final ReactorSpaceQuotaDefinitionsV3 spaceQuotaDefinitionsV3 =
-            new ReactorSpaceQuotaDefinitionsV3(
+    private final ReactorSpaceQuotasV3 spaceQuotasV3 =
+            new ReactorSpaceQuotasV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
@@ -79,8 +67,8 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        SpaceQuotaDefinitionRelationships relationships =
-                SpaceQuotaDefinitionRelationships.builder()
+        SpaceQuotaRelationships relationships =
+                SpaceQuotaRelationships.builder()
                         .organization(
                                 ToOneRelationship.builder()
                                         .data(
@@ -98,16 +86,16 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                                                 .build()))
                                         .build())
                         .build();
-        this.spaceQuotaDefinitionsV3
+        this.spaceQuotasV3
                 .create(
-                        CreateSpaceQuotaDefinitionRequest.builder()
+                        CreateSpaceQuotaRequest.builder()
                                 .name("my-quota")
                                 .relationships(relationships)
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        CreateSpaceQuotaDefinitionResponse.builder()
-                                .from(expectedSpaceQuotaDefinitionResource1())
+                        CreateSpaceQuotaResponse.builder()
+                                .from(expectedSpaceQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -131,10 +119,10 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.spaceQuotaDefinitionsV3
+        this.spaceQuotasV3
                 .delete(
-                        DeleteSpaceQuotaDefinitionRequest.builder()
-                                .spaceQuotaDefinitionId("test-space-quota-id")
+                        DeleteSpaceQuotaRequest.builder()
+                                .spaceQuotaId("test-space-quota-id")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext("test-job-id")
@@ -159,15 +147,15 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.spaceQuotaDefinitionsV3
+        this.spaceQuotasV3
                 .get(
-                        GetSpaceQuotaDefinitionRequest.builder()
-                                .spaceQuotaDefinitionId(EXPECTED_SPACE_QUOTA_ID_1)
+                        GetSpaceQuotaRequest.builder()
+                                .spaceQuotaId(EXPECTED_SPACE_QUOTA_ID_1)
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        GetSpaceQuotaDefinitionResponse.builder()
-                                .from(expectedSpaceQuotaDefinitionResource1())
+                        GetSpaceQuotaResponse.builder()
+                                .from(expectedSpaceQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -186,11 +174,11 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.spaceQuotaDefinitionsV3
-                .list(ListSpaceQuotaDefinitionsRequest.builder().build())
+        this.spaceQuotasV3
+                .list(ListSpaceQuotasRequest.builder().build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        ListSpaceQuotaDefinitionsResponse.builder()
+                        ListSpaceQuotasResponse.builder()
                                 .pagination(
                                         Pagination.builder()
                                                 .totalResults(2)
@@ -207,12 +195,12 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                                                 .build())
                                                 .build())
                                 .resource(
-                                        SpaceQuotaDefinitionResource.builder()
-                                                .from(expectedSpaceQuotaDefinitionResource1())
+                                        SpaceQuotaResource.builder()
+                                                .from(expectedSpaceQuotaResource1())
                                                 .build())
                                 .resource(
-                                        SpaceQuotaDefinitionResource.builder()
-                                                .from(expectedSpaceQuotaDefinitionResource2())
+                                        SpaceQuotaResource.builder()
+                                                .from(expectedSpaceQuotaResource2())
                                                 .build())
                                 .build())
                 .expectComplete()
@@ -238,31 +226,31 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.spaceQuotaDefinitionsV3
+        this.spaceQuotasV3
                 .update(
-                        UpdateSpaceQuotaDefinitionRequest.builder()
-                                .spaceQuotaDefinitionId(EXPECTED_SPACE_QUOTA_ID_1)
+                        UpdateSpaceQuotaRequest.builder()
+                                .spaceQuotaId(EXPECTED_SPACE_QUOTA_ID_1)
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        UpdateSpaceQuotaDefinitionResponse.builder()
-                                .from(expectedSpaceQuotaDefinitionResource1())
+                        UpdateSpaceQuotaResponse.builder()
+                                .from(expectedSpaceQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
     @NotNull
-    private static SpaceQuotaDefinitionResource expectedSpaceQuotaDefinitionResource1() {
-        return buildSpaceQuotaDefinitionResource(
+    private static SpaceQuotaResource expectedSpaceQuotaResource1() {
+        return buildSpaceQuotaResource(
                 EXPECTED_SPACE_QUOTA_ID_1,
                 "my-quota",
                 "9b370018-c38e-44c9-86d6-155c76801104",
                 "dcfd6a55-62b9-496e-a26f-0064cec076bf");
     }
 
-    private static SpaceQuotaDefinitionResource expectedSpaceQuotaDefinitionResource2() {
-        return buildSpaceQuotaDefinitionResource(
+    private static SpaceQuotaResource expectedSpaceQuotaResource2() {
+        return buildSpaceQuotaResource(
                 "bb49bf20-ad98-4729-93ae-38fbc564b630",
                 "my-quota-2",
                 "9b370018-c38e-44c9-86d6-155c76801104",
@@ -270,7 +258,7 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
     }
 
     @NotNull
-    private static SpaceQuotaDefinitionResource buildSpaceQuotaDefinitionResource(
+    private static SpaceQuotaResource buildSpaceQuotaResource(
             String id, String name, String relatedOrganizationId, String relatedSpaceId) {
 
         Apps apps =
@@ -302,13 +290,13 @@ class ReactorSpaceQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                             Relationship.builder().id(relatedSpaceId).build()))
                             .build();
         }
-        SpaceQuotaDefinitionRelationships relationships =
-                SpaceQuotaDefinitionRelationships.builder()
+        SpaceQuotaRelationships relationships =
+                SpaceQuotaRelationships.builder()
                         .organization(organizationRelationship)
                         .spaces(spaceRelationships)
                         .build();
 
-        return SpaceQuotaDefinitionResource.builder()
+        return SpaceQuotaResource.builder()
                 .createdAt("2016-05-04T17:00:41Z")
                 .id(id)
                 .link(

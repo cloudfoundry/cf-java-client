@@ -25,18 +25,15 @@ import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.Organization;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Apps;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Routes;
-import org.cloudfoundry.client.v3.spacequotadefinitions.Services;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionRelationships;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionResource;
-import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
+import org.cloudfoundry.client.v3.spacequotas.*;
+import org.cloudfoundry.client.v3.spacequotas.CreateSpaceQuotaResponse;
+import org.cloudfoundry.client.v3.spacequotas.DeleteSpaceQuotaRequest;
+import org.cloudfoundry.client.v3.spacequotas.GetSpaceQuotaRequest;
+import org.cloudfoundry.client.v3.spacequotas.GetSpaceQuotaResponse;
+import org.cloudfoundry.client.v3.spacequotas.ListSpaceQuotasRequest;
+import org.cloudfoundry.client.v3.spacequotas.SpaceQuotaRelationships;
+import org.cloudfoundry.client.v3.spacequotas.SpaceQuotaResource;
+import org.cloudfoundry.client.v3.spacequotas.UpdateSpaceQuotaRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.Space;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
@@ -51,7 +48,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
-public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
+public final class SpaceQuotasTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
@@ -70,8 +67,8 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     @Test
     public void create() {
         String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
-        SpaceQuotaDefinitionRelationships spaceQuotaDefinitionRelationships =
-                createSpaceQuotaDefinitionRelationships(organizationId);
+        SpaceQuotaRelationships spaceQuotaRelationships =
+                createSpaceQuotaRelationships(organizationId);
 
         Apps spaceQuotaAppLimits =
                 Apps.builder()
@@ -84,29 +81,29 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         Routes spaceQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
 
         this.cloudFoundryClient
-                .spaceQuotaDefinitionsV3()
+                .spaceQuotasV3()
                 .create(
-                        CreateSpaceQuotaDefinitionRequest.builder()
+                        CreateSpaceQuotaRequest.builder()
                                 .name(spaceQuotaName)
                                 .apps(spaceQuotaAppLimits)
                                 .services(spaceQuotaServiceLimits)
                                 .routes(spaceQuotaRouteLimits)
-                                .relationships(spaceQuotaDefinitionRelationships)
+                                .relationships(spaceQuotaRelationships)
                                 .build())
                 .thenMany(requestListSpaceQuotas(this.cloudFoundryClient, spaceQuotaName))
                 .single()
                 .as(StepVerifier::create)
                 .assertNext(
-                        spaceQuotaDefinitionResource -> {
-                            assertThat(spaceQuotaDefinitionResource).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getId()).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getName())
+                        spaceQuotaResource -> {
+                            assertThat(spaceQuotaResource).isNotNull();
+                            assertThat(spaceQuotaResource.getId()).isNotNull();
+                            assertThat(spaceQuotaResource.getName())
                                     .isEqualTo(spaceQuotaName);
-                            assertThat(spaceQuotaDefinitionResource.getApps())
+                            assertThat(spaceQuotaResource.getApps())
                                     .isEqualTo(spaceQuotaAppLimits);
-                            assertThat(spaceQuotaDefinitionResource.getServices())
+                            assertThat(spaceQuotaResource.getServices())
                                     .isEqualTo(spaceQuotaServiceLimits);
-                            assertThat(spaceQuotaDefinitionResource.getRoutes())
+                            assertThat(spaceQuotaResource.getRoutes())
                                     .isEqualTo(spaceQuotaRouteLimits);
                         })
                 .expectComplete()
@@ -116,8 +113,8 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     @Test
     public void createWithSpaceRelationship() {
         String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
-        SpaceQuotaDefinitionRelationships spaceQuotaDefinitionRelationships =
-                createSpaceQuotaDefinitionRelationships(organizationId, spaceId);
+        SpaceQuotaRelationships spaceQuotaRelationships =
+                createSpaceQuotaRelationships(organizationId, spaceId);
 
         Apps spaceQuotaAppLimits =
                 Apps.builder()
@@ -130,36 +127,36 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         Routes spaceQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
 
         this.cloudFoundryClient
-                .spaceQuotaDefinitionsV3()
+                .spaceQuotasV3()
                 .create(
-                        CreateSpaceQuotaDefinitionRequest.builder()
+                        CreateSpaceQuotaRequest.builder()
                                 .name(spaceQuotaName)
                                 .apps(spaceQuotaAppLimits)
                                 .services(spaceQuotaServiceLimits)
                                 .routes(spaceQuotaRouteLimits)
-                                .relationships(spaceQuotaDefinitionRelationships)
+                                .relationships(spaceQuotaRelationships)
                                 .build())
                 .thenMany(requestListSpaceQuotas(this.cloudFoundryClient, spaceQuotaName))
                 .single()
                 .as(StepVerifier::create)
                 .assertNext(
-                        spaceQuotaDefinitionResource -> {
-                            assertThat(spaceQuotaDefinitionResource).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getId()).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getName())
+                        spaceQuotaResource -> {
+                            assertThat(spaceQuotaResource).isNotNull();
+                            assertThat(spaceQuotaResource.getId()).isNotNull();
+                            assertThat(spaceQuotaResource.getName())
                                     .isEqualTo(spaceQuotaName);
-                            assertThat(spaceQuotaDefinitionResource.getApps())
+                            assertThat(spaceQuotaResource.getApps())
                                     .isEqualTo(spaceQuotaAppLimits);
-                            assertThat(spaceQuotaDefinitionResource.getServices())
+                            assertThat(spaceQuotaResource.getServices())
                                     .isEqualTo(spaceQuotaServiceLimits);
-                            assertThat(spaceQuotaDefinitionResource.getRoutes())
+                            assertThat(spaceQuotaResource.getRoutes())
                                     .isEqualTo(spaceQuotaRouteLimits);
-                            assertThat(spaceQuotaDefinitionResource.getRelationships()).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getRelationships().getOrganization()).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getRelationships().getSpaces()).isNotNull();
-                            assertThat(spaceQuotaDefinitionResource.getRelationships().getOrganization().getData().getId())
+                            assertThat(spaceQuotaResource.getRelationships()).isNotNull();
+                            assertThat(spaceQuotaResource.getRelationships().getOrganization()).isNotNull();
+                            assertThat(spaceQuotaResource.getRelationships().getSpaces()).isNotNull();
+                            assertThat(spaceQuotaResource.getRelationships().getOrganization().getData().getId())
                                     .isEqualTo(organizationId);
-                            assertThat(spaceQuotaDefinitionResource.getRelationships().getSpaces().getData().getFirst().getId())
+                            assertThat(spaceQuotaResource.getRelationships().getSpaces().getData().getFirst().getId())
                                     .isEqualTo(spaceId);
                         })
                 .expectComplete()
@@ -174,12 +171,12 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .flatMap(
                         spaceQuotaId ->
                                 this.cloudFoundryClient
-                                        .spaceQuotaDefinitionsV3()
+                                        .spaceQuotasV3()
                                         .get(
-                                                GetSpaceQuotaDefinitionRequest.builder()
-                                                        .spaceQuotaDefinitionId(spaceQuotaId)
+                                                GetSpaceQuotaRequest.builder()
+                                                        .spaceQuotaId(spaceQuotaId)
                                                         .build()))
-                .map(GetSpaceQuotaDefinitionResponse::getName)
+                .map(GetSpaceQuotaResponse::getName)
                 .as(StepVerifier::create)
                 .expectNext(spaceQuotaName)
                 .expectComplete()
@@ -195,9 +192,9 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                         PaginationUtils.requestClientV3Resources(
                                 page ->
                                         this.cloudFoundryClient
-                                                .spaceQuotaDefinitionsV3()
+                                                .spaceQuotasV3()
                                                 .list(
-                                                        ListSpaceQuotaDefinitionsRequest.builder()
+                                                        ListSpaceQuotasRequest.builder()
                                                                 .page(page)
                                                                 .build())))
                 .filter(resource -> spaceQuotaName.equals(resource.getName()))
@@ -216,10 +213,10 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .flatMap(
                         spaceQuotaId ->
                                 this.cloudFoundryClient
-                                        .spaceQuotaDefinitionsV3()
+                                        .spaceQuotasV3()
                                         .update(
-                                                UpdateSpaceQuotaDefinitionRequest.builder()
-                                                        .spaceQuotaDefinitionId(spaceQuotaId)
+                                                UpdateSpaceQuotaRequest.builder()
+                                                        .spaceQuotaId(spaceQuotaId)
                                                         .apps(
                                                                 Apps.builder()
                                                                         .totalMemoryInMb(
@@ -238,19 +235,19 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .thenMany(requestListSpaceQuotas(this.cloudFoundryClient, spaceQuotaName))
                 .as(StepVerifier::create)
                 .consumeNextWith(
-                        organizationQuotaDefinitionResource -> {
+                        organizationQuotaResource -> {
                             assertThat(
-                                    organizationQuotaDefinitionResource
+                                    organizationQuotaResource
                                             .getApps()
                                             .getTotalMemoryInMb())
                                     .isEqualTo(totalMemoryLimit);
                             assertThat(
-                                    organizationQuotaDefinitionResource
+                                    organizationQuotaResource
                                             .getRoutes()
                                             .getTotalRoutes())
                                     .isEqualTo(100);
                             assertThat(
-                                    organizationQuotaDefinitionResource
+                                    organizationQuotaResource
                                             .getServices()
                                             .getTotalServiceInstances())
                                     .isEqualTo(100);
@@ -267,10 +264,10 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
                 .flatMap(
                         spaceQuotaId ->
                                 this.cloudFoundryClient
-                                        .spaceQuotaDefinitionsV3()
+                                        .spaceQuotasV3()
                                         .delete(
-                                                DeleteSpaceQuotaDefinitionRequest.builder()
-                                                        .spaceQuotaDefinitionId(spaceQuotaId)
+                                                DeleteSpaceQuotaRequest.builder()
+                                                        .spaceQuotaId(spaceQuotaId)
                                                         .build())
                                         .flatMap(
                                                 job ->
@@ -309,19 +306,19 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     }
 
     @NotNull
-    private static SpaceQuotaDefinitionRelationships createSpaceQuotaDefinitionRelationships(
+    private static SpaceQuotaRelationships createSpaceQuotaRelationships(
             String orgGuid) {
         ToOneRelationship organizationRelationship =
                 ToOneRelationship.builder()
                         .data(Relationship.builder().id(orgGuid).build())
                         .build();
-        return SpaceQuotaDefinitionRelationships.builder()
+        return SpaceQuotaRelationships.builder()
                 .organization(organizationRelationship)
                 .build();
     }
 
     @NotNull
-    private static SpaceQuotaDefinitionRelationships createSpaceQuotaDefinitionRelationships(
+    private static SpaceQuotaRelationships createSpaceQuotaRelationships(
             String orgGuid, String spaceGuid) {
         ToOneRelationship organizationRelationship =
                 ToOneRelationship.builder()
@@ -330,7 +327,7 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
         ToManyRelationship spaceRelationships = ToManyRelationship.builder()
                 .data(Relationship.builder().id(spaceGuid).build())
                 .build();
-        return SpaceQuotaDefinitionRelationships.builder()
+        return SpaceQuotaRelationships.builder()
                 .organization(organizationRelationship)
                 .spaces(spaceRelationships)
                 .build();
@@ -339,30 +336,30 @@ public final class SpaceQuotaDefinitionsTest extends AbstractIntegrationTest {
     private static Mono<String> createSpaceQuotaId(
             CloudFoundryClient cloudFoundryClient, String spaceQuotaName, String orgGuid) {
         return createSpaceQuota(cloudFoundryClient, spaceQuotaName, orgGuid)
-                .map(CreateSpaceQuotaDefinitionResponse::getId);
+                .map(CreateSpaceQuotaResponse::getId);
     }
 
-    private static Mono<CreateSpaceQuotaDefinitionResponse> createSpaceQuota(
+    private static Mono<CreateSpaceQuotaResponse> createSpaceQuota(
             CloudFoundryClient cloudFoundryClient, String spaceQuotaName, String orgGuid) {
-        SpaceQuotaDefinitionRelationships spaceQuotaDefinitionRelationships =
-                createSpaceQuotaDefinitionRelationships(orgGuid);
+        SpaceQuotaRelationships spaceQuotaRelationships =
+                createSpaceQuotaRelationships(orgGuid);
         return cloudFoundryClient
-                .spaceQuotaDefinitionsV3()
+                .spaceQuotasV3()
                 .create(
-                        CreateSpaceQuotaDefinitionRequest.builder()
+                        CreateSpaceQuotaRequest.builder()
                                 .name(spaceQuotaName)
-                                .relationships(spaceQuotaDefinitionRelationships)
+                                .relationships(spaceQuotaRelationships)
                                 .build());
     }
 
-    private static Flux<SpaceQuotaDefinitionResource> requestListSpaceQuotas(
+    private static Flux<SpaceQuotaResource> requestListSpaceQuotas(
             CloudFoundryClient cloudFoundryClient, String spaceName) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .spaceQuotaDefinitionsV3()
+                                .spaceQuotasV3()
                                 .list(
-                                        ListSpaceQuotaDefinitionsRequest.builder()
+                                        ListSpaceQuotasRequest.builder()
                                                 .name(spaceName)
                                                 .page(page)
                                                 .build()));

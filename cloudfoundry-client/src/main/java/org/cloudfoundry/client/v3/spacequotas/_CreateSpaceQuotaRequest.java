@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -22,11 +22,11 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload to creates a new space quota
+ * The request payload to Create a new Space Quota
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _CreateSpaceQuotaDefinitionRequest {
+abstract class _CreateSpaceQuotaRequest {
 
     /**
      * Name of the quota
@@ -38,7 +38,7 @@ abstract class _CreateSpaceQuotaDefinitionRequest {
      * A relationship to the organizations and spaces where the quota is applied
      */
     @JsonProperty("relationships")
-    abstract SpaceQuotaDefinitionRelationships getRelationships();
+    abstract SpaceQuotaRelationships getRelationships();
 
     /**
      * Quotas that affect applications and application sub-resources

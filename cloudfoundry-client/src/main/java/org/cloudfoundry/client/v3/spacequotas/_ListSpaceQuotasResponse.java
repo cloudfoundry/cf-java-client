@@ -14,34 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.immutables.value.Value;
 
 /**
- * The relationships for the SpaceQuotaDefinition entity
+ * The response payload for the List all Space Quotas
  */
-
-@Value.Immutable
 @JsonDeserialize
-abstract class _SpaceQuotaDefinitionRelationships {
-
-    /**
-     * A relationship to the organization where the quota belongs
-     */
-    @JsonProperty("organization")
-    abstract ToOneRelationship getOrganization();
-
-    /**
-     * A relationship to the spaces where the quota is applied
-     */
-    @JsonProperty("spaces")
-    @Nullable
-    abstract ToManyRelationship getSpaces();
+@Value.Immutable
+abstract class _ListSpaceQuotasResponse extends PaginatedResponse<SpaceQuotaResource> {
 
 }

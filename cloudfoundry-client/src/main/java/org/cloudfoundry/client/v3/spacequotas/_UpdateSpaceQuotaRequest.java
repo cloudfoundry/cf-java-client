@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -23,17 +23,17 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload to update an space quota definition
+ * The request payload to update a Space Quota
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _UpdateSpaceQuotaDefinitionRequest {
+abstract class _UpdateSpaceQuotaRequest {
 
     /**
-     * The space quota definition id
+     * The space quota id
      */
     @JsonIgnore
-    abstract String getSpaceQuotaDefinitionId();
+    abstract String getSpaceQuotaId();
 
     /**
      * Name of the quota

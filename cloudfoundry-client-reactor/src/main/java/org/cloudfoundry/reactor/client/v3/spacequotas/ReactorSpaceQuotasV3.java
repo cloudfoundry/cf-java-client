@@ -14,29 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.spacequotadefinition;
+package org.cloudfoundry.reactor.client.v3.spacequotas;
 
 import java.util.Map;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.CreateSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.DeleteSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.GetSpaceQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.ListSpaceQuotaDefinitionsResponse;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionsV3;
-import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.spacequotadefinitions.UpdateSpaceQuotaDefinitionResponse;
+
+import org.cloudfoundry.client.v3.spacequotas.*;
+import org.cloudfoundry.client.v3.spacequotas.CreateSpaceQuotaResponse;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;
 import reactor.core.publisher.Mono;
 
 /**
- * The Reactor-based implementation of {@link ReactorSpaceQuotaDefinitionsV3}
+ * The Reactor-based implementation of {@link ReactorSpaceQuotasV3}
  */
-public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
-        implements SpaceQuotaDefinitionsV3 {
+public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations
+        implements SpaceQuotasV3 {
 
     /**
      * Creates an instance
@@ -46,7 +39,7 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
      * @param tokenProvider     the {@link TokenProvider} to use when communicating with the server
      * @param requestTags       map with custom http headers which will be added to web request
      */
-    public ReactorSpaceQuotaDefinitionsV3(
+    public ReactorSpaceQuotasV3(
             ConnectionContext connectionContext,
             Mono<String> root,
             TokenProvider tokenProvider,
@@ -55,54 +48,54 @@ public class ReactorSpaceQuotaDefinitionsV3 extends AbstractClientV3Operations
     }
 
     @Override
-    public Mono<CreateSpaceQuotaDefinitionResponse> create(
-            CreateSpaceQuotaDefinitionRequest request) {
+    public Mono<CreateSpaceQuotaResponse> create(
+            CreateSpaceQuotaRequest request) {
         return post(
                         request,
-                        CreateSpaceQuotaDefinitionResponse.class,
+                        CreateSpaceQuotaResponse.class,
                         builder -> builder.pathSegment("space_quotas"))
                 .checkpoint();
     }
 
     @Override
-    public Mono<GetSpaceQuotaDefinitionResponse> get(GetSpaceQuotaDefinitionRequest request) {
+    public Mono<GetSpaceQuotaResponse> get(GetSpaceQuotaRequest request) {
         return get(
                         request,
-                        GetSpaceQuotaDefinitionResponse.class,
+                        GetSpaceQuotaResponse.class,
                         builder ->
                                 builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
+                                        "space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 
     @Override
-    public Mono<ListSpaceQuotaDefinitionsResponse> list(ListSpaceQuotaDefinitionsRequest request) {
+    public Mono<ListSpaceQuotasResponse> list(ListSpaceQuotasRequest request) {
         return get(
                         request,
-                        ListSpaceQuotaDefinitionsResponse.class,
+                        ListSpaceQuotasResponse.class,
                         builder -> builder.pathSegment("space_quotas"))
                 .checkpoint();
     }
 
     @Override
-    public Mono<UpdateSpaceQuotaDefinitionResponse> update(
-            UpdateSpaceQuotaDefinitionRequest request) {
+    public Mono<UpdateSpaceQuotaResponse> update(
+            UpdateSpaceQuotaRequest request) {
         return patch(
                         request,
-                        UpdateSpaceQuotaDefinitionResponse.class,
+                        UpdateSpaceQuotaResponse.class,
                         builder ->
                                 builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
+                                        "space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 
     @Override
-    public Mono<String> delete(DeleteSpaceQuotaDefinitionRequest request) {
+    public Mono<String> delete(DeleteSpaceQuotaRequest request) {
         return delete(
                         request,
                         builder ->
                                 builder.pathSegment(
-                                        "space_quotas", request.getSpaceQuotaDefinitionId()))
+                                        "space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
 }

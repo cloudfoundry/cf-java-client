@@ -72,7 +72,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
-import org.cloudfoundry.client.v3.spacequotadefinitions.SpaceQuotaDefinitionsV3;
+import org.cloudfoundry.client.v3.spacequotas.SpaceQuotasV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -132,7 +132,7 @@ import org.cloudfoundry.reactor.client.v3.servicebrokers.ReactorServiceBrokersV3
 import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.serviceofferings.ReactorServiceOfferingsV3;
 import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
-import org.cloudfoundry.reactor.client.v3.spacequotadefinition.ReactorSpaceQuotaDefinitionsV3;
+import org.cloudfoundry.reactor.client.v3.spacequotas.ReactorSpaceQuotasV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
 import org.cloudfoundry.reactor.client.v3.tasks.ReactorTasks;
@@ -461,8 +461,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
-    public SpaceQuotaDefinitionsV3 spaceQuotaDefinitionsV3() {
-        return new ReactorSpaceQuotaDefinitionsV3(getConnectionContext(), getRootV3(), getTokenProvider(),
+    public SpaceQuotasV3 spaceQuotasV3() {
+        return new ReactorSpaceQuotasV3(getConnectionContext(), getRootV3(), getTokenProvider(),
                 getRequestTags());
     }
 

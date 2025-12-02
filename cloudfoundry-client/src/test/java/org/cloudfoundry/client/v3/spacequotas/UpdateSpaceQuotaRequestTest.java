@@ -14,14 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-public class ListSpaceQuotaDefinitionsRequestTest {
+final class UpdateSpaceQuotaRequestTest {
+
+    @Test
+    void noSpaceQuotaId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> UpdateSpaceQuotaRequest.builder().build());
+    }
 
     @Test
     void valid() {
-        ListSpaceQuotaDefinitionsRequest.builder().build();
+        UpdateSpaceQuotaRequest.builder().spaceQuotaId("test-id").build();
     }
 }

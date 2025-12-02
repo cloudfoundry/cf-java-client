@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Update an Space Quota Definition operation
+ * The response payload for the Create a Space Quota
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _UpdateSpaceQuotaDefinitionResponse extends SpaceQuotaDefinition {
+abstract class _CreateSpaceQuotaResponse extends SpaceQuota {
 
 }

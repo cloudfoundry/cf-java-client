@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
- * Base class for responses that are space quota definitions
+ * Base class for responses that are Space Quotas
  */
-public abstract class SpaceQuotaDefinition extends Resource {
+public abstract class SpaceQuota extends Resource {
 
     /**
      * Name of the quota
@@ -57,5 +57,5 @@ public abstract class SpaceQuotaDefinition extends Resource {
      * A space quota must have a relationship to an organization
      */
     @JsonProperty("relationships")
-    abstract SpaceQuotaDefinitionRelationships getRelationships();
+    abstract SpaceQuotaRelationships getRelationships();
 }

@@ -14,36 +14,34 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.ToManyRelationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.immutables.value.Value;
 
 /**
- * Quotas that affect routes
+ * The relationships for the Space Quota entity
  */
-@JsonDeserialize
+
 @Value.Immutable
-abstract class _Routes {
+@JsonDeserialize
+abstract class _SpaceQuotaRelationships {
 
     /**
-     * Total number of routes allowed in a space
-     *
-     * @return the total number of routes allowed in a space
+     * A relationship to the organization where the quota belongs
      */
-    @JsonProperty("total_routes")
-    @Nullable
-    abstract Integer getTotalRoutes();
+    @JsonProperty("organization")
+    abstract ToOneRelationship getOrganization();
 
     /**
-     * Total number of ports that are reservable by routes in a space
-     *
-     * @return the total number of reserved ports allowed in a space
+     * A relationship to the spaces where the quota is applied
      */
-    @JsonProperty("total_reserved_ports")
+    @JsonProperty("spaces")
     @Nullable
-    abstract Integer getTotalReservedPorts();
+    abstract ToManyRelationship getSpaces();
 
 }

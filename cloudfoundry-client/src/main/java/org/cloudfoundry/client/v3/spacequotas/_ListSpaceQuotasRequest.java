@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import org.cloudfoundry.Nullable;
 import org.cloudfoundry.client.v3.FilterParameter;
@@ -24,10 +24,10 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The request payload for the List all Space Quota Definitions operation
+ * The request payload for the List all Space Quotas
  */
 @Value.Immutable
-abstract class _ListSpaceQuotaDefinitionsRequest extends PaginatedRequest {
+abstract class _ListSpaceQuotasRequest extends PaginatedRequest {
 
     /**
      * Comma-delimited list of space quota guids to filter by

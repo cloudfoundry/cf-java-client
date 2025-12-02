@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spacequotadefinitions;
+package org.cloudfoundry.client.v3.spacequotas;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -23,20 +23,20 @@ import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.junit.jupiter.api.Test;
 
-final class CreateSpaceQuotaDefinitionRequestTest {
+final class CreateSpaceQuotaRequestTest {
 
     @Test
     void noName() {
         assertThrows(
                 IllegalStateException.class,
-                () -> CreateSpaceQuotaDefinitionRequest.builder().build());
+                () -> CreateSpaceQuotaRequest.builder().build());
     }
 
     @Test
     void noOrganizationsRelationship() {
         assertThrows(
                 IllegalStateException.class,
-                () -> CreateSpaceQuotaDefinitionRequest.builder().name("test-quota").build());
+                () -> CreateSpaceQuotaRequest.builder().name("test-quota").build());
     }
 
     @Test
@@ -47,11 +47,11 @@ final class CreateSpaceQuotaDefinitionRequestTest {
                 ToOneRelationship.builder()
                         .data(Relationship.builder().id(organizationGuid).build())
                         .build();
-        SpaceQuotaDefinitionRelationships relationships =
-                SpaceQuotaDefinitionRelationships.builder()
+        SpaceQuotaRelationships relationships =
+                SpaceQuotaRelationships.builder()
                         .organization(organizationsRelationship)
                         .build();
-        CreateSpaceQuotaDefinitionRequest.builder()
+        CreateSpaceQuotaRequest.builder()
                 .name("test-quota")
                 .relationships(relationships)
                 .build();
