@@ -62,8 +62,18 @@ public class UaaThrottler {
     public void addLimiterMapping(LimiterMapping mapping) {
         mappings.add(new LimiterMappingWithRunningRequests(mapping));
         int delay = mapping.timeBase();
-        if (minDelay > delay) {
+        if (minDelay > delay && delay > 0) {
             minDelay = delay;
+        }
+        if (mapping.limit() > 10000) {
+            LOGGER.info(
+                    "UaaThrottler: using a huge value for rate limit might slow down execution when"
+                            + " back-pressure is high.");
+            LOGGER.info(
+                    "UaaThrottler: Mapping "
+                            + mapping.name()
+                            + " uses a limit of "
+                            + mapping.limit());
         }
     }
 
@@ -111,7 +121,7 @@ public class UaaThrottler {
      * @param url
      * @return
      */
-    synchronized boolean checkDelayNeededAndResume(String url) {
+    boolean checkDelayNeededAndResume(String url) {
         Instant now = Instant.now();
         Set<Token> removed = new HashSet<>();
         try {
