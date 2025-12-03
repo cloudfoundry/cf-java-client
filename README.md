@@ -253,14 +253,14 @@ Beyond that, it is helpful to capture the following information:
 If you open a Github issue with a request for help, please include as much of the information above as possible and do not forget to sanitize any request/response data posted.
 
 ## Development
-The project depends on Java 8. To build from source and install to your local Maven cache, run the following:
+The project depends on Java 8 to 25. To build from source and install to your local Maven cache, run the following:
 
 ```shell
 $ git submodule update --init --recursive
 $ ./mvnw clean install
 ```
 
-It also depends on [Immutables][i] and won't compile in IDEs like Eclipse or IntelliJ unless you also have an enabled annotation processor. See [this guide][j] for instructions on how to configure your IDE.
+It also depends on [Immutables][i] and won't compile in IDEs like Eclipse or IntelliJ unless you also have an installed annotation processor. See [this guide][j] for instructions on how to configure your IDE.
 
 To run the integration tests, run the following:
 
