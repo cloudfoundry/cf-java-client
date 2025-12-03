@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import org.junit.jupiter.api.Test;
 
-/**
- * The response payload for the Create an Organization Quota
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _CreateOrganizationQuotaResponse extends OrganizationQuota {
+public class ListOrganizationQuotasRequestTest {
 
+    @Test
+    void valid() {
+        ListOrganizationQuotasRequest.builder().build();
+    }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.reactor.client.v3.organizationquotas;
 
 import static io.netty.handler.codec.http.HttpMethod.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
@@ -26,7 +26,7 @@ import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.*;
+import org.cloudfoundry.client.v3.organizationquotas.*;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;

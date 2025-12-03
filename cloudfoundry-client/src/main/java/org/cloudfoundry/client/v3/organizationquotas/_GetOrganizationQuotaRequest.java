@@ -14,14 +14,21 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import org.junit.jupiter.api.Test;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-public class ListOrganizationQuotasRequestTest {
+/**
+ * The request payload for the Retrieve a Particular Organization Quota
+ */
+@Value.Immutable
+abstract class _GetOrganizationQuotaRequest {
 
-    @Test
-    void valid() {
-        ListOrganizationQuotasRequest.builder().build();
-    }
+    /**
+     * The Organization Quota id
+     */
+    @JsonIgnore
+    abstract String getOrganizationQuotaId();
+
 }

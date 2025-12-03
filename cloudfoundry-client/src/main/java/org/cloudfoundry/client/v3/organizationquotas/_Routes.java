@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,18 +22,28 @@ import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * Quotas that affect domains
+ * Quotas that affect routes
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _Domains {
+abstract class _Routes {
 
     /**
-     * Total number of domains that can be scoped to an organization
+     * Total number of routes allowed in an organization
      *
-     * @return the total number of domains that can be scoped to an organization
+     * @return the total number of routes allowed in an organization
      */
-    @JsonProperty("total_domains")
+    @JsonProperty("total_routes")
     @Nullable
-    abstract Integer getTotalDomains();
+    abstract Integer getTotalRoutes();
+
+    /**
+     * Total number of ports that are reservable by routes in an organization
+     *
+     * @return the total number of reserved ports allowed in an organization
+     */
+    @JsonProperty("total_reserved_ports")
+    @Nullable
+    abstract Integer getTotalReservedPorts();
+
 }

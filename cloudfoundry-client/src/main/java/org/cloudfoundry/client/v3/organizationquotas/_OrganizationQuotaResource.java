@@ -14,17 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.PaginatedResponse;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the List all Organization Quota
+ * Base class for resources that contain Organization Quota
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListOrganizationQuotasResponse extends PaginatedResponse<OrganizationQuotaResource> {
+abstract class _OrganizationQuotaResource extends OrganizationQuota {
 
 }
+

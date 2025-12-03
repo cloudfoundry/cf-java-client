@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.reactor.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.reactor.client.v3.organizationquotas;
 
 import java.util.Map;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.*;
+import org.cloudfoundry.client.v3.organizationquotas.*;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v3.AbstractClientV3Operations;

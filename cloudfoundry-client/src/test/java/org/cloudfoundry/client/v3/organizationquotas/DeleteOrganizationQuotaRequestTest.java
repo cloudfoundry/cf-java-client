@@ -14,22 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-final class GetOrganizationQuotaRequestTest {
+final class DeleteOrganizationQuotaRequestTest {
 
     @Test
     void noOrganizationQuotaId() {
         assertThrows(
-                IllegalStateException.class, () -> GetOrganizationQuotaRequest.builder().build());
+                IllegalStateException.class,
+                () -> DeleteOrganizationQuotaRequest.builder().build());
     }
 
     @Test
     void valid() {
-        GetOrganizationQuotaRequest.builder().organizationQuotaId("test-id").build();
+        DeleteOrganizationQuotaRequest.builder().organizationQuotaId("test-id").build();
     }
 }

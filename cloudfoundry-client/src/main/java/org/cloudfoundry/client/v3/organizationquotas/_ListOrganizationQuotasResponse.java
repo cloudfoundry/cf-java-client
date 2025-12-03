@@ -14,23 +14,17 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.immutables.value.Value;
 
-import org.junit.jupiter.api.Test;
+/**
+ * The response payload for the List all Organization Quota
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListOrganizationQuotasResponse extends PaginatedResponse<OrganizationQuotaResource> {
 
-final class DeleteOrganizationQuotaRequestTest {
-
-    @Test
-    void noOrganizationQuotaId() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> DeleteOrganizationQuotaRequest.builder().build());
-    }
-
-    @Test
-    void valid() {
-        DeleteOrganizationQuotaRequest.builder().organizationQuotaId("test-id").build();
-    }
 }

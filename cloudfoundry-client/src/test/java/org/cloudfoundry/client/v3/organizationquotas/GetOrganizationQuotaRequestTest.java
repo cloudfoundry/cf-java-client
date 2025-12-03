@@ -14,21 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import org.immutables.value.Value;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * The request payload for the Delete an Organization Quota
- */
-@Value.Immutable
-abstract class _DeleteOrganizationQuotaRequest {
+import org.junit.jupiter.api.Test;
 
-    /**
-     * The Organization Quota id
-     */
-    @JsonIgnore
-    abstract String getOrganizationQuotaId();
+final class GetOrganizationQuotaRequestTest {
 
+    @Test
+    void noOrganizationQuotaId() {
+        assertThrows(
+                IllegalStateException.class, () -> GetOrganizationQuotaRequest.builder().build());
+    }
+
+    @Test
+    void valid() {
+        GetOrganizationQuotaRequest.builder().organizationQuotaId("test-id").build();
+    }
 }

@@ -57,7 +57,7 @@ import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotasV3;
+import org.cloudfoundry.client.v3.organizationquotas.OrganizationQuotasV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;

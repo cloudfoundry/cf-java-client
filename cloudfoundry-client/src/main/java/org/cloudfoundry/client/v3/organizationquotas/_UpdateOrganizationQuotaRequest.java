@@ -14,24 +14,32 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
- * The request payload to create a new Organization Quota
+ * The request payload to update an Organization Quota
  */
 @JsonSerialize
 @Value.Immutable
-abstract class _CreateOrganizationQuotaRequest {
+abstract class _UpdateOrganizationQuotaRequest {
+
+    /**
+     * The Organization Quota id
+     */
+    @JsonIgnore
+    abstract String getOrganizationQuotaId();
 
     /**
      * Name of the quota
      */
     @JsonProperty("name")
+    @Nullable
     abstract String getName();
 
     /**
@@ -61,12 +69,4 @@ abstract class _CreateOrganizationQuotaRequest {
     @JsonProperty("domains")
     @Nullable
     abstract Domains getDomains();
-
-    /**
-     * A relationship to the organizations where the quota is applied
-     */
-    @JsonProperty("relationships")
-    @Nullable
-    abstract OrganizationQuotaRelationships getRelationships();
-
 }

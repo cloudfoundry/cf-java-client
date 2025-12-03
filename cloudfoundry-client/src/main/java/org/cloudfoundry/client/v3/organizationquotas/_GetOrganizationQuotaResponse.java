@@ -14,21 +14,16 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Retrieve a Particular Organization Quota
+ * The response payload for the Retrieve a Particular Organization Quota
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _GetOrganizationQuotaRequest {
-
-    /**
-     * The Organization Quota id
-     */
-    @JsonIgnore
-    abstract String getOrganizationQuotaId();
+abstract class _GetOrganizationQuotaResponse extends OrganizationQuota {
 
 }

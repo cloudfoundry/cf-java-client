@@ -23,7 +23,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.*;
+import org.cloudfoundry.client.v3.organizationquotas.*;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;

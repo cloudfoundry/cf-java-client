@@ -14,36 +14,40 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.FilterParameter;
+import org.cloudfoundry.client.v3.PaginatedRequest;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
- * Quotas that affect routes
+ * The request payload for the List all Organization Quota
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _Routes {
+abstract class _ListOrganizationQuotasRequest extends PaginatedRequest {
 
     /**
-     * Total number of routes allowed in an organization
-     *
-     * @return the total number of routes allowed in an organization
+     * list of organization quota guids to filter by
      */
-    @JsonProperty("total_routes")
+    @FilterParameter("guids")
     @Nullable
-    abstract Integer getTotalRoutes();
+    abstract List<String> getGuids();
 
     /**
-     * Total number of ports that are reservable by routes in an organization
-     *
-     * @return the total number of reserved ports allowed in an organization
+     * list of organization quota names to filter by
      */
-    @JsonProperty("total_reserved_ports")
+    @FilterParameter("names")
     @Nullable
-    abstract Integer getTotalReservedPorts();
+    abstract List<String> getNames();
+
+    /**
+     *  list of organization guids to filter by
+     */
+    @FilterParameter("organization_guids")
+    @Nullable
+    abstract List<String> getOrganizationGuids();
 
 }

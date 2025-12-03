@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v3.organizationquotas;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.immutables.value.Value;
 
 /**
- * Base class for resources that contain Organization Quota
+ * The relationships for the Organization Quota entity
  */
-@JsonDeserialize
+
 @Value.Immutable
-abstract class _OrganizationQuotaResource extends OrganizationQuota {
+@JsonDeserialize
+abstract class _OrganizationQuotaRelationships {
+
+    /**
+     * The quota relationship
+     */
+    @JsonProperty("organizations")
+    @Nullable
+    abstract ToManyRelationship getOrganizations();
 
 }
-
