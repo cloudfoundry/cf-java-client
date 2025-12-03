@@ -16,10 +16,7 @@
 
 package org.cloudfoundry.reactor.client.v3.organizationquotadefinitions;
 
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
+import static io.netty.handler.codec.http.HttpMethod.*;
 import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
@@ -29,21 +26,7 @@ import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Apps;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Domains;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.ListOrganizationQuotaDefinitionsResponse;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionRelationships;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Routes;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Services;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionResponse;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.*;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
@@ -52,10 +35,10 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.Test;
 import reactor.test.StepVerifier;
 
-class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
+class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
 
-    private final ReactorOrganizationQuotaDefinitionsV3 organizationQuotaDefinitionsV3 =
-            new ReactorOrganizationQuotaDefinitionsV3(
+    private final ReactorOrganizationQuotasV3 organizationQuotasV3 =
+            new ReactorOrganizationQuotasV3(
                     CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
@@ -77,12 +60,12 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.organizationQuotaDefinitionsV3
-                .create(CreateOrganizationQuotaDefinitionRequest.builder().name("my-quota").build())
+        this.organizationQuotasV3
+                .create(CreateOrganizationQuotaRequest.builder().name("my-quota").build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        CreateOrganizationQuotaDefinitionResponse.builder()
-                                .from(expectedOrganizationQuotaDefinitionResource1())
+                        CreateOrganizationQuotaResponse.builder()
+                                .from(expectedOrganizationQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -106,10 +89,10 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.organizationQuotaDefinitionsV3
+        this.organizationQuotasV3
                 .delete(
-                        DeleteOrganizationQuotaDefinitionRequest.builder()
-                                .organizationQuotaDefinitionId("test-organization-quota-id")
+                        DeleteOrganizationQuotaRequest.builder()
+                                .organizationQuotaId("test-organization-quota-id")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext("test-job-id")
@@ -135,16 +118,15 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.organizationQuotaDefinitionsV3
+        this.organizationQuotasV3
                 .get(
-                        GetOrganizationQuotaDefinitionRequest.builder()
-                                .organizationQuotaDefinitionId(
-                                        "24637893-3b77-489d-bb79-8466f0d88b52")
+                        GetOrganizationQuotaRequest.builder()
+                                .organizationQuotaId("24637893-3b77-489d-bb79-8466f0d88b52")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        GetOrganizationQuotaDefinitionResponse.builder()
-                                .from(expectedOrganizationQuotaDefinitionResource1())
+                        GetOrganizationQuotaResponse.builder()
+                                .from(expectedOrganizationQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -167,11 +149,11 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.organizationQuotaDefinitionsV3
-                .list(ListOrganizationQuotaDefinitionsRequest.builder().build())
+        this.organizationQuotasV3
+                .list(ListOrganizationQuotasRequest.builder().build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        ListOrganizationQuotaDefinitionsResponse.builder()
+                        ListOrganizationQuotasResponse.builder()
                                 .pagination(
                                         Pagination.builder()
                                                 .totalResults(2)
@@ -188,14 +170,12 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                                                 .build())
                                                 .build())
                                 .resource(
-                                        OrganizationQuotaDefinitionResource.builder()
-                                                .from(
-                                                        expectedOrganizationQuotaDefinitionResource1())
+                                        OrganizationQuotaResource.builder()
+                                                .from(expectedOrganizationQuotaResource1())
                                                 .build())
                                 .resource(
-                                        OrganizationQuotaDefinitionResource.builder()
-                                                .from(
-                                                        expectedOrganizationQuotaDefinitionResource2())
+                                        OrganizationQuotaResource.builder()
+                                                .from(expectedOrganizationQuotaResource2())
                                                 .build())
                                 .build())
                 .expectComplete()
@@ -222,40 +202,37 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                         .build())
                         .build());
 
-        this.organizationQuotaDefinitionsV3
+        this.organizationQuotasV3
                 .update(
-                        UpdateOrganizationQuotaDefinitionRequest.builder()
-                                .organizationQuotaDefinitionId(
-                                        "24637893-3b77-489d-bb79-8466f0d88b52")
+                        UpdateOrganizationQuotaRequest.builder()
+                                .organizationQuotaId("24637893-3b77-489d-bb79-8466f0d88b52")
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
-                        UpdateOrganizationQuotaDefinitionResponse.builder()
-                                .from(expectedOrganizationQuotaDefinitionResource1())
+                        UpdateOrganizationQuotaResponse.builder()
+                                .from(expectedOrganizationQuotaResource1())
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
     @NotNull
-    private static OrganizationQuotaDefinitionResource
-            expectedOrganizationQuotaDefinitionResource1() {
-        return buildOrganizationQuotaDefinitionResource(
+    private static OrganizationQuotaResource expectedOrganizationQuotaResource1() {
+        return buildOrganizationQuotaResource(
                 "24637893-3b77-489d-bb79-8466f0d88b52",
                 "my-quota",
                 "9b370018-c38e-44c9-86d6-155c76801104");
     }
 
-    private static OrganizationQuotaDefinitionResource
-            expectedOrganizationQuotaDefinitionResource2() {
-        return buildOrganizationQuotaDefinitionResource(
+    private static OrganizationQuotaResource expectedOrganizationQuotaResource2() {
+        return buildOrganizationQuotaResource(
                 "bb49bf20-ad98-4729-93ae-38fbc564b630",
                 "my-quota-2",
                 "144251f2-a202-4ffe-ab47-9046c4077e99");
     }
 
     @NotNull
-    private static OrganizationQuotaDefinitionResource buildOrganizationQuotaDefinitionResource(
+    private static OrganizationQuotaResource buildOrganizationQuotaResource(
             String id, String name, String relatedOrganizationId) {
 
         Apps apps =
@@ -280,12 +257,12 @@ class ReactorOrganizationQuotaDefinitionsV3Test extends AbstractClientApiTest {
                                 Collections.singletonList(
                                         Relationship.builder().id(relatedOrganizationId).build()))
                         .build();
-        OrganizationQuotaDefinitionRelationships relationships =
-                OrganizationQuotaDefinitionRelationships.builder()
+        OrganizationQuotaRelationships relationships =
+                OrganizationQuotaRelationships.builder()
                         .organizations(organizationRelationships)
                         .build();
 
-        return OrganizationQuotaDefinitionResource.builder()
+        return OrganizationQuotaResource.builder()
                 .createdAt("2016-05-04T17:00:41Z")
                 .id(id)
                 .link(

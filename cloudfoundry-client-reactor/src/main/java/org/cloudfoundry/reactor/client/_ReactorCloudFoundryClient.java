@@ -59,7 +59,7 @@ import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionsV3;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotasV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
@@ -119,7 +119,7 @@ import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
-import org.cloudfoundry.reactor.client.v3.organizationquotadefinitions.ReactorOrganizationQuotaDefinitionsV3;
+import org.cloudfoundry.reactor.client.v3.organizationquotadefinitions.ReactorOrganizationQuotasV3;
 import org.cloudfoundry.reactor.client.v3.organizations.ReactorOrganizationsV3;
 import org.cloudfoundry.reactor.client.v3.packages.ReactorPackages;
 import org.cloudfoundry.reactor.client.v3.processes.ReactorProcesses;
@@ -284,8 +284,8 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
-    public OrganizationQuotaDefinitionsV3 organizationQuotaDefinitionsV3() {
-        return new ReactorOrganizationQuotaDefinitionsV3(getConnectionContext(), getRootV3(), getTokenProvider(),
+    public OrganizationQuotasV3 organizationQuotasV3() {
+        return new ReactorOrganizationQuotasV3(getConnectionContext(), getRootV3(), getTokenProvider(),
                 getRequestTags());
     }
 

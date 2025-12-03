@@ -16,23 +16,15 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.immutables.value.Value;
 
-import org.junit.jupiter.api.Test;
+/**
+ * The response payload for the List all Organization Quota
+ */
+@JsonDeserialize
+@Value.Immutable
+abstract class _ListOrganizationQuotasResponse extends PaginatedResponse<OrganizationQuotaResource> {
 
-final class DeleteOrganizationQuotaDefinitionRequestTest {
-
-    @Test
-    void noOrganizationId() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> DeleteOrganizationQuotaDefinitionRequest.builder().build());
-    }
-
-    @Test
-    void valid() {
-        DeleteOrganizationQuotaDefinitionRequest.builder()
-                .organizationQuotaDefinitionId("test-id")
-                .build();
-    }
 }

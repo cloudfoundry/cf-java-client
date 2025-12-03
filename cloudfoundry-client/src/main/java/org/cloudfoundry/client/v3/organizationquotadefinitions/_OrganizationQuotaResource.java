@@ -16,19 +16,15 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Delete an Organization Quota Definition operation
+ * Base class for resources that contain Organization Quota
  */
+@JsonDeserialize
 @Value.Immutable
-abstract class _DeleteOrganizationQuotaDefinitionRequest {
-
-    /**
-     * The quota definition id
-     */
-    @JsonIgnore
-    abstract String getOrganizationQuotaDefinitionId();
+abstract class _OrganizationQuotaResource extends OrganizationQuota {
 
 }
+

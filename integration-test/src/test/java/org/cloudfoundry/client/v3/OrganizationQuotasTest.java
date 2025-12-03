@@ -23,17 +23,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Apps;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.CreateOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.DeleteOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.GetOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.GetOrganizationQuotaDefinitionResponse;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.ListOrganizationQuotaDefinitionsRequest;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionResource;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Routes;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.Services;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.UpdateOrganizationQuotaDefinitionRequest;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.*;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;
@@ -43,7 +33,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_8)
-public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationTest {
+public final class OrganizationQuotasTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
@@ -60,9 +50,9 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 Services.builder().isPaidServicesAllowed(false).totalServiceInstances(10).build();
         Routes organizationQuotaRouteLimits = Routes.builder().totalRoutes(10).build();
         this.cloudFoundryClient
-                .organizationQuotaDefinitionsV3()
+                .organizationQuotasV3()
                 .create(
-                        CreateOrganizationQuotaDefinitionRequest.builder()
+                        CreateOrganizationQuotaRequest.builder()
                                 .name(organizationQuotaName)
                                 .apps(organizationQuotaAppLimits)
                                 .services(organizationQuotaServiceLimits)
@@ -74,16 +64,16 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .single()
                 .as(StepVerifier::create)
                 .assertNext(
-                        organizationQuotaDefinitionResource -> {
-                            assertThat(organizationQuotaDefinitionResource).isNotNull();
-                            assertThat(organizationQuotaDefinitionResource.getId()).isNotNull();
-                            assertThat(organizationQuotaDefinitionResource.getName())
+                        organizationQuotaResource -> {
+                            assertThat(organizationQuotaResource).isNotNull();
+                            assertThat(organizationQuotaResource.getId()).isNotNull();
+                            assertThat(organizationQuotaResource.getName())
                                     .isEqualTo(organizationQuotaName);
-                            assertThat(organizationQuotaDefinitionResource.getApps())
+                            assertThat(organizationQuotaResource.getApps())
                                     .isEqualTo(organizationQuotaAppLimits);
-                            assertThat(organizationQuotaDefinitionResource.getServices())
+                            assertThat(organizationQuotaResource.getServices())
                                     .isEqualTo(organizationQuotaServiceLimits);
-                            assertThat(organizationQuotaDefinitionResource.getRoutes())
+                            assertThat(organizationQuotaResource.getRoutes())
                                     .isEqualTo(organizationQuotaRouteLimits);
                         })
                 .expectComplete()
@@ -98,11 +88,10 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .flatMap(
                         organizationQuotaId ->
                                 this.cloudFoundryClient
-                                        .organizationQuotaDefinitionsV3()
+                                        .organizationQuotasV3()
                                         .delete(
-                                                DeleteOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(
-                                                                organizationQuotaId)
+                                                DeleteOrganizationQuotaRequest.builder()
+                                                        .organizationQuotaId(organizationQuotaId)
                                                         .build())
                                         .flatMap(
                                                 job ->
@@ -126,13 +115,12 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .flatMap(
                         organizationQuotaId ->
                                 this.cloudFoundryClient
-                                        .organizationQuotaDefinitionsV3()
+                                        .organizationQuotasV3()
                                         .get(
-                                                GetOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(
-                                                                organizationQuotaId)
+                                                GetOrganizationQuotaRequest.builder()
+                                                        .organizationQuotaId(organizationQuotaId)
                                                         .build()))
-                .map(GetOrganizationQuotaDefinitionResponse::getName)
+                .map(GetOrganizationQuotaResponse::getName)
                 .as(StepVerifier::create)
                 .expectNext(organizationQuotaName)
                 .expectComplete()
@@ -148,10 +136,9 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                         PaginationUtils.requestClientV3Resources(
                                 page ->
                                         this.cloudFoundryClient
-                                                .organizationQuotaDefinitionsV3()
+                                                .organizationQuotasV3()
                                                 .list(
-                                                        ListOrganizationQuotaDefinitionsRequest
-                                                                .builder()
+                                                        ListOrganizationQuotasRequest.builder()
                                                                 .page(page)
                                                                 .build())))
                 .filter(resource -> organizationQuotaName.equals(resource.getName()))
@@ -170,11 +157,10 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                 .flatMap(
                         organizationQuotaId ->
                                 this.cloudFoundryClient
-                                        .organizationQuotaDefinitionsV3()
+                                        .organizationQuotasV3()
                                         .update(
-                                                UpdateOrganizationQuotaDefinitionRequest.builder()
-                                                        .organizationQuotaDefinitionId(
-                                                                organizationQuotaId)
+                                                UpdateOrganizationQuotaRequest.builder()
+                                                        .organizationQuotaId(organizationQuotaId)
                                                         .apps(
                                                                 Apps.builder()
                                                                         .totalMemoryInMb(
@@ -195,19 +181,13 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
                                 this.cloudFoundryClient, organizationQuotaName))
                 .as(StepVerifier::create)
                 .consumeNextWith(
-                        organizationQuotaDefinitionResource -> {
-                            assertThat(
-                                            organizationQuotaDefinitionResource
-                                                    .getApps()
-                                                    .getTotalMemoryInMb())
+                        organizationQuotaResource -> {
+                            assertThat(organizationQuotaResource.getApps().getTotalMemoryInMb())
                                     .isEqualTo(totalMemoryLimit);
-                            assertThat(
-                                            organizationQuotaDefinitionResource
-                                                    .getRoutes()
-                                                    .getTotalRoutes())
+                            assertThat(organizationQuotaResource.getRoutes().getTotalRoutes())
                                     .isEqualTo(100);
                             assertThat(
-                                            organizationQuotaDefinitionResource
+                                            organizationQuotaResource
                                                     .getServices()
                                                     .getTotalServiceInstances())
                                     .isEqualTo(100);
@@ -219,27 +199,27 @@ public final class OrganizationQuotaDefinitionsTest extends AbstractIntegrationT
     private static Mono<String> createOrganizationQuotaId(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return createOrganizationQuota(cloudFoundryClient, organizationQuotaName)
-                .map(CreateOrganizationQuotaDefinitionResponse::getId);
+                .map(CreateOrganizationQuotaResponse::getId);
     }
 
-    private static Mono<CreateOrganizationQuotaDefinitionResponse> createOrganizationQuota(
+    private static Mono<CreateOrganizationQuotaResponse> createOrganizationQuota(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return cloudFoundryClient
-                .organizationQuotaDefinitionsV3()
+                .organizationQuotasV3()
                 .create(
-                        CreateOrganizationQuotaDefinitionRequest.builder()
+                        CreateOrganizationQuotaRequest.builder()
                                 .name(organizationQuotaName)
                                 .build());
     }
 
-    private static Flux<OrganizationQuotaDefinitionResource> requestListOrganizationQuotas(
+    private static Flux<OrganizationQuotaResource> requestListOrganizationQuotas(
             CloudFoundryClient cloudFoundryClient, String organizationName) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .organizationQuotaDefinitionsV3()
+                                .organizationQuotasV3()
                                 .list(
-                                        ListOrganizationQuotaDefinitionsRequest.builder()
+                                        ListOrganizationQuotasRequest.builder()
                                                 .name(organizationName)
                                                 .page(page)
                                                 .build()));

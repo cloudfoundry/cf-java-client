@@ -16,12 +16,21 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import org.junit.jupiter.api.Test;
 
-public class ListOrganizationQuotaDefinitionsRequestTest {
+final class DeleteOrganizationQuotaRequestTest {
+
+    @Test
+    void noOrganizationQuotaId() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> DeleteOrganizationQuotaRequest.builder().build());
+    }
 
     @Test
     void valid() {
-        ListOrganizationQuotaDefinitionsRequest.builder().build();
+        DeleteOrganizationQuotaRequest.builder().organizationQuotaId("test-id").build();
     }
 }

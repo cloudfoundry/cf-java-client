@@ -16,15 +16,19 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.cloudfoundry.client.v3.PaginatedResponse;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the List all Organization Quota Definitions operation
+ * The request payload for the Delete an Organization Quota
  */
-@JsonDeserialize
 @Value.Immutable
-abstract class _ListOrganizationQuotaDefinitionsResponse extends PaginatedResponse<OrganizationQuotaDefinitionResource> {
+abstract class _DeleteOrganizationQuotaRequest {
+
+    /**
+     * The Organization Quota id
+     */
+    @JsonIgnore
+    abstract String getOrganizationQuotaId();
 
 }

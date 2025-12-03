@@ -24,10 +24,10 @@ import org.immutables.value.Value;
 import java.util.List;
 
 /**
- * The request payload for the List all Organization Quota Definitions operation
+ * The request payload for the List all Organization Quota
  */
 @Value.Immutable
-abstract class _ListOrganizationQuotaDefinitionsRequest extends PaginatedRequest {
+abstract class _ListOrganizationQuotasRequest extends PaginatedRequest {
 
     /**
      * list of organization quota guids to filter by

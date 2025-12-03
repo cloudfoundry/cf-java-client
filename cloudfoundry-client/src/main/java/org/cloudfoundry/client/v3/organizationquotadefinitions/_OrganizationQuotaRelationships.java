@@ -16,14 +16,25 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.ToManyRelationship;
 import org.immutables.value.Value;
 
 /**
- * The response payload for the Create an Organization Quota Definition operation
+ * The relationships for the Organization Quota entity
  */
-@JsonDeserialize
+
 @Value.Immutable
-abstract class _CreateOrganizationQuotaDefinitionResponse extends OrganizationQuotaDefinition {
+@JsonDeserialize
+abstract class _OrganizationQuotaRelationships {
+
+    /**
+     * The quota relationship
+     */
+    @JsonProperty("organizations")
+    @Nullable
+    abstract ToManyRelationship getOrganizations();
 
 }

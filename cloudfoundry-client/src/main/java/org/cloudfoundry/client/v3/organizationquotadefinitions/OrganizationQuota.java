@@ -16,30 +16,19 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
+import org.cloudfoundry.client.v3.Resource;
 
 /**
- * The request payload to update an organization quota
+ * Base class for responses that are organization quota definitions
  */
-@JsonSerialize
-@Value.Immutable
-abstract class _UpdateOrganizationQuotaDefinitionRequest {
-
-    /**
-     * The quota definition id
-     */
-    @JsonIgnore
-    abstract String getOrganizationQuotaDefinitionId();
+public abstract class OrganizationQuota extends Resource {
 
     /**
      * Name of the quota
      */
     @JsonProperty("name")
-    @Nullable
     abstract String getName();
 
     /**
@@ -69,4 +58,11 @@ abstract class _UpdateOrganizationQuotaDefinitionRequest {
     @JsonProperty("domains")
     @Nullable
     abstract Domains getDomains();
+
+    /**
+     * A relationship to the organizations where the quota is applied
+     */
+    @JsonProperty("relationships")
+    @Nullable
+    abstract OrganizationQuotaRelationships getRelationships();
 }

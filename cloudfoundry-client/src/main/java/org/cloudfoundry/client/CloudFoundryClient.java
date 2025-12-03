@@ -57,7 +57,7 @@ import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
-import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotaDefinitionsV3;
+import org.cloudfoundry.client.v3.organizationquotadefinitions.OrganizationQuotasV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
@@ -191,9 +191,9 @@ public interface CloudFoundryClient {
     OrganizationQuotaDefinitions organizationQuotaDefinitions();
 
     /**
-     * Main entry point to the Cloud Foundry Quota Definitions V3 Client API
+     * Main entry point to the Cloud Foundry Quota V3 Client API
      */
-    OrganizationQuotaDefinitionsV3 organizationQuotaDefinitionsV3();
+    OrganizationQuotasV3 organizationQuotasV3();
 
     /**
      * Main entry point to the Cloud Foundry Organizations V2 Client API

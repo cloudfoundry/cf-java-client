@@ -16,14 +16,21 @@
 
 package org.cloudfoundry.client.v3.organizationquotadefinitions;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import org.immutables.value.Value;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-/**
- * The response payload for the Update an Organization Quota Definition operation
- */
-@JsonDeserialize
-@Value.Immutable
-abstract class _UpdateOrganizationQuotaDefinitionResponse extends OrganizationQuotaDefinition {
+import org.junit.jupiter.api.Test;
 
+final class CreateOrganizationQuotaRequestTest {
+
+    @Test
+    void noName() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> CreateOrganizationQuotaRequest.builder().build());
+    }
+
+    @Test
+    void valid() {
+        CreateOrganizationQuotaRequest.builder().name("test-quota").build();
+    }
 }

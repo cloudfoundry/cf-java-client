@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2025 the original author or authors.
+ * Copyright 2013-2021 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,23 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.organizationquotadefinitions;
+package org.cloudfoundry.client.v2.organizationquotadefinitions;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-final class CreateOrganizationQuotaDefinitionRequestTest {
+class DeleteOrganizationQuotaRequestTest {
 
     @Test
-    void noName() {
+    void noOrganizationQuotaDefinitionId() {
         assertThrows(
                 IllegalStateException.class,
-                () -> CreateOrganizationQuotaDefinitionRequest.builder().build());
+                () -> {
+                    DeleteOrganizationQuotaDefinitionRequest.builder().build();
+                });
     }
 
     @Test
     void valid() {
-        CreateOrganizationQuotaDefinitionRequest.builder().name("test-quota").build();
+        DeleteOrganizationQuotaDefinitionRequest.builder()
+                .organizationQuotaDefinitionId("test-organization-quota-definition-id")
+                .build();
     }
 }

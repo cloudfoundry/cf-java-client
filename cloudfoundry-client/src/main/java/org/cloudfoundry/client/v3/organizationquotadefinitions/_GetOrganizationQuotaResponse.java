@@ -20,11 +20,10 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.immutables.value.Value;
 
 /**
- * Base class for resources that contain Organization Quota Definitions
+ * The response payload for the Retrieve a Particular Organization Quota
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _OrganizationQuotaDefinitionResource extends OrganizationQuotaDefinition {
+abstract class _GetOrganizationQuotaResponse extends OrganizationQuota {
 
 }
-
