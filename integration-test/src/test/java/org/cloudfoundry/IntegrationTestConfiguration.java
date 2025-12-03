@@ -65,6 +65,7 @@ import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
+import org.cloudfoundry.uaa.UaaRatelimitInitializer;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
 import org.cloudfoundry.uaa.groups.CreateGroupRequest;
@@ -73,6 +74,7 @@ import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.ratelimit.Ratelimit;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
@@ -243,6 +245,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn("uaaRateLimitInitializer")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -315,8 +318,22 @@ public class IntegrationTestConfiguration {
 
             connectionContext.proxyConfiguration(proxyConfiguration.build());
         }
-
         return connectionContext.build();
+    }
+
+    @Bean
+    public UaaRatelimitInitializer uaaRateLimitInitializer(
+            Ratelimit ratelimitService,
+            @Value("${uaa.api.request.limit:#{null}}") Integer commandlineRequestLimit) {
+        return new UaaRatelimitInitializer(ratelimitService, commandlineRequestLimit);
+    }
+
+    @Bean
+    Ratelimit uaaRatelimit(
+            ConnectionContext connectionContext,
+            @Value("${test.admin.clientId}") String clientId,
+            @Value("${test.admin.clientSecret}") String clientSecret) {
+        return adminUaaClient(connectionContext, clientId, clientSecret).rateLimit();
     }
 
     @Bean
