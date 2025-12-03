@@ -20,20 +20,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Test;
 
-class DeleteOrganizationQuotaRequestTest {
+class UpdateOrganizationQuotaDefinitionRequestTest {
 
     @Test
     void noOrganizationQuotaDefinitionId() {
         assertThrows(
                 IllegalStateException.class,
                 () -> {
-                    DeleteOrganizationQuotaDefinitionRequest.builder().build();
+                    UpdateOrganizationQuotaDefinitionRequest.builder().build();
                 });
     }
 
     @Test
     void valid() {
-        DeleteOrganizationQuotaDefinitionRequest.builder()
+        UpdateOrganizationQuotaDefinitionRequest.builder()
                 .organizationQuotaDefinitionId("test-organization-quota-definition-id")
                 .build();
     }
