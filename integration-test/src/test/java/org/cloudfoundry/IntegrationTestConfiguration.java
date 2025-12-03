@@ -192,18 +192,19 @@ public class IntegrationTestConfiguration {
 
     @Bean
     @Qualifier("admin")
-    ReactorUaaClient adminUaaClient(
+    UaaClient adminUaaClient(
             ConnectionContext connectionContext,
             @Value("${test.admin.clientId}") String clientId,
             @Value("${test.admin.clientSecret}") String clientSecret) {
-        return ReactorUaaClient.builder()
-                .connectionContext(connectionContext)
-                .tokenProvider(
-                        ClientCredentialsGrantTokenProvider.builder()
-                                .clientId(clientId)
-                                .clientSecret(clientSecret)
-                                .build())
-                .build();
+        return new ThrottlingUaaClient(
+                ReactorUaaClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(
+                                ClientCredentialsGrantTokenProvider.builder()
+                                        .clientId(clientId)
+                                        .clientSecret(clientSecret)
+                                        .build())
+                        .build());
     }
 
     @Bean(initMethod = "block")
@@ -643,11 +644,12 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    ReactorUaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
-        return ReactorUaaClient.builder()
-                .connectionContext(connectionContext)
-                .tokenProvider(tokenProvider)
-                .build();
+    UaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+        return new ThrottlingUaaClient(
+                ReactorUaaClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(tokenProvider)
+                        .build());
     }
 
     @Bean(initMethod = "block")
