@@ -1,0 +1,17 @@
+{
+  "name": "my-quota",
+  "relationships": {
+    "organization": {
+      "data": {
+        "guid": "9b370018-c38e-44c9-86d6-155c76801104"
+      }
+    },
+    "spaces": {
+      "data": [
+        {
+          "guid": "dcfd6a55-62b9-496e-a26f-0064cec076bf"
+        }
+      ]
+    }
+  }
+}

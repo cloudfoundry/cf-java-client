@@ -1,0 +1,98 @@
+{
+  "pagination": {
+    "total_results": 2,
+    "total_pages": 1,
+    "first": {
+      "href": "https://api.example.org/v3/space_quotas?page=1&per_page=50"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/space_quotas?page=1&per_page=50"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "f919ef8a-e333-472a-8172-baaf2c30d301",
+      "created_at": "2016-05-04T17:00:41Z",
+      "updated_at": "2016-05-04T18:00:41Z",
+      "name": "my-quota",
+      "apps": {
+        "total_memory_in_mb": 5120,
+        "per_process_memory_in_mb": 1024,
+        "total_instances": 10,
+        "per_app_tasks": 5
+      },
+      "services": {
+        "paid_services_allowed": true,
+        "total_service_instances": 10,
+        "total_service_keys": 20
+      },
+      "routes": {
+        "total_routes": 8,
+        "total_reserved_ports": 4
+      },
+      "relationships": {
+        "organization": {
+          "data": {
+            "guid": "9b370018-c38e-44c9-86d6-155c76801104"
+          }
+        },
+        "spaces": {
+          "data": [
+            {
+              "guid": "dcfd6a55-62b9-496e-a26f-0064cec076bf"
+            }
+          ]
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/space_quotas/f919ef8a-e333-472a-8172-baaf2c30d301"
+        },
+        "organization": {
+          "href": "https://api.example.org/v3/organizations/9b370018-c38e-44c9-86d6-155c76801104"
+        }
+      }
+    },
+    {
+      "guid": "bb49bf20-ad98-4729-93ae-38fbc564b630",
+      "created_at": "2016-05-04T17:00:41Z",
+      "updated_at": "2016-05-04T18:00:41Z",
+      "name": "my-quota-2",
+      "apps": {
+        "total_memory_in_mb": 5120,
+        "per_process_memory_in_mb": 1024,
+        "total_instances": 10,
+        "per_app_tasks": 5
+      },
+      "services": {
+        "paid_services_allowed": true,
+        "total_service_instances": 10,
+        "total_service_keys": 20
+      },
+      "routes": {
+        "total_routes": 8,
+        "total_reserved_ports": 4
+      },
+      "relationships": {
+        "organization": {
+          "data": {
+            "guid": "9b370018-c38e-44c9-86d6-155c76801104"
+          }
+        },
+        "spaces": {
+          "data": []
+        }
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/space_quotas/bb49bf20-ad98-4729-93ae-38fbc564b630"
+        },
+        "organization": {
+          "href": "https://api.example.org/v3/organizations/9b370018-c38e-44c9-86d6-155c76801104"
+        }
+      }
+    }
+  ]
+}
