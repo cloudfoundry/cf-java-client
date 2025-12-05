@@ -17,6 +17,7 @@
 package org.cloudfoundry.operations.buildpacks;
 
 import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.nio.file.Path;
@@ -27,18 +28,18 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.function.Supplier;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.Metadata;
-import org.cloudfoundry.client.v2.buildpacks.BuildpackEntity;
-import org.cloudfoundry.client.v2.buildpacks.BuildpackResource;
-import org.cloudfoundry.client.v2.buildpacks.CreateBuildpackResponse;
-import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackResponse;
-import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
-import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksResponse;
-import org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackResponse;
-import org.cloudfoundry.client.v2.buildpacks.UploadBuildpackResponse;
-import org.cloudfoundry.client.v2.jobs.GetJobRequest;
-import org.cloudfoundry.client.v2.jobs.GetJobResponse;
-import org.cloudfoundry.client.v2.jobs.JobEntity;
+import org.cloudfoundry.client.v3.buildpacks.BuildpackResource;
+import org.cloudfoundry.client.v3.buildpacks.BuildpackState;
+import org.cloudfoundry.client.v3.buildpacks.CreateBuildpackResponse;
+import org.cloudfoundry.client.v3.buildpacks.GetBuildpackRequest;
+import org.cloudfoundry.client.v3.buildpacks.GetBuildpackResponse;
+import org.cloudfoundry.client.v3.buildpacks.ListBuildpacksRequest;
+import org.cloudfoundry.client.v3.buildpacks.ListBuildpacksResponse;
+import org.cloudfoundry.client.v3.buildpacks.UpdateBuildpackResponse;
+import org.cloudfoundry.client.v3.buildpacks.UploadBuildpackResponse;
+import org.cloudfoundry.client.v3.jobs.GetJobRequest;
+import org.cloudfoundry.client.v3.jobs.GetJobResponse;
+import org.cloudfoundry.client.v3.jobs.JobState;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -51,12 +52,10 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
     @Test
     void create() {
+        requestBuildpack(this.cloudFoundryClient);
         requestCreateBuildpack(this.cloudFoundryClient, "test-buildpack", 1, true);
         requestUploadBuildpack(
-                this.cloudFoundryClient,
-                "test-buildpack-id",
-                Paths.get("test-buildpack"),
-                "test-buildpack");
+                this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"));
 
         this.buildpacks
                 .create(
@@ -127,6 +126,7 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
     @Test
     void update() {
+        requestBuildpack(this.cloudFoundryClient);
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", true, true, 5);
 
@@ -145,13 +145,11 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
     @Test
     void updateWithBits() {
+        requestBuildpack(this.cloudFoundryClient);
         requestListBuildpacks(this.cloudFoundryClient, "test-buildpack");
         requestUpdateBuildpack(this.cloudFoundryClient, "test-buildpack-id", true, true, 5);
         requestUploadBuildpack(
-                this.cloudFoundryClient,
-                "test-buildpack-id",
-                Paths.get("test-buildpack"),
-                "test-buildpack");
+                this.cloudFoundryClient, "test-buildpack-id", Paths.get("test-buildpack"));
 
         this.buildpacks
                 .update(
@@ -167,13 +165,25 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
+    private static void requestBuildpack(CloudFoundryClient cloudFoundryClient) {
+        when(cloudFoundryClient.buildpacksV3().get(any(GetBuildpackRequest.class)))
+                .thenReturn(
+                        Mono.just(
+                                fill(GetBuildpackResponse.builder(), "buildpack-")
+                                        .state(BuildpackState.READY)
+                                        .build()));
+    }
+
     private static void requestBuildpacks(CloudFoundryClient cloudFoundryClient) {
-        when(cloudFoundryClient.buildpacks().list(ListBuildpacksRequest.builder().page(1).build()))
+        when(cloudFoundryClient
+                        .buildpacksV3()
+                        .list(ListBuildpacksRequest.builder().page(1).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListBuildpacksResponse.builder())
                                         .resource(
                                                 fill(BuildpackResource.builder(), "buildpack-")
+                                                        .state(BuildpackState.READY)
                                                         .build())
                                         .build()));
     }
@@ -181,9 +191,9 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
     private static void requestCreateBuildpack(
             CloudFoundryClient cloudFoundryClient, String name, Integer position, Boolean enable) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .create(
-                                org.cloudfoundry.client.v2.buildpacks.CreateBuildpackRequest
+                                org.cloudfoundry.client.v3.buildpacks.CreateBuildpackRequest
                                         .builder()
                                         .name(name)
                                         .position(position)
@@ -196,22 +206,17 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
     private static void requestDeleteBuildpack(
             CloudFoundryClient cloudFoundryClient, String buildpackId) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .delete(
-                                org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest
+                                org.cloudfoundry.client.v3.buildpacks.DeleteBuildpackRequest
                                         .builder()
-                                        .async(true)
                                         .buildpackId(buildpackId)
                                         .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(DeleteBuildpackResponse.builder())
-                                        .entity(fill(JobEntity.builder()).id("test-job-id").build())
-                                        .build()));
+                .thenReturn(Mono.just("test-job-id"));
     }
 
     private static void requestJobSuccess(CloudFoundryClient cloudFoundryClient, String jobId) {
-        when(cloudFoundryClient.jobs().get(GetJobRequest.builder().jobId(jobId).build()))
+        when(cloudFoundryClient.jobsV3().get(GetJobRequest.builder().jobId(jobId).build()))
                 .thenReturn(
                         Mono.defer(
                                 new Supplier<Mono<GetJobResponse>>() {
@@ -223,20 +228,10 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
                                                                             GetJobResponse
                                                                                     .builder(),
                                                                             "test-job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .status(
-                                                                                            "running")
-                                                                                    .build())
+                                                                    .state(JobState.PROCESSING)
                                                                     .build(),
                                                             fill(GetJobResponse.builder(), "job-")
-                                                                    .entity(
-                                                                            fill(JobEntity
-                                                                                            .builder())
-                                                                                    .status(
-                                                                                            "finished")
-                                                                                    .build())
+                                                                    .state(JobState.COMPLETE)
                                                                     .build()));
 
                                     @Override
@@ -248,21 +243,15 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
     private static void requestListBuildpacks(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .list(ListBuildpacksRequest.builder().name(name).page(1).build()))
                 .thenReturn(
                         Mono.just(
-                                ListBuildpacksResponse.builder()
+                                fill(ListBuildpacksResponse.builder())
                                         .resource(
-                                                BuildpackResource.builder()
-                                                        .metadata(
-                                                                Metadata.builder()
-                                                                        .id("test-buildpack-id")
-                                                                        .build())
-                                                        .entity(
-                                                                BuildpackEntity.builder()
-                                                                        .name(name)
-                                                                        .build())
+                                                fill(BuildpackResource.builder())
+                                                        .id("test-buildpack-id")
+                                                        .name(name)
                                                         .build())
                                         .build()));
     }
@@ -270,9 +259,9 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
     private static void requestUpdateBuildpack(
             CloudFoundryClient cloudFoundryClient, String buildpackId, String name) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .update(
-                                org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest
+                                org.cloudfoundry.client.v3.buildpacks.UpdateBuildpackRequest
                                         .builder()
                                         .buildpackId(buildpackId)
                                         .name(name)
@@ -287,9 +276,9 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
             boolean locked,
             Integer position) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .update(
-                                org.cloudfoundry.client.v2.buildpacks.UpdateBuildpackRequest
+                                org.cloudfoundry.client.v3.buildpacks.UpdateBuildpackRequest
                                         .builder()
                                         .buildpackId(buildpackId)
                                         .enabled(enabled)
@@ -300,18 +289,14 @@ final class DefaultBuildpacksTest extends AbstractOperationsTest {
     }
 
     private static void requestUploadBuildpack(
-            CloudFoundryClient cloudFoundryClient,
-            String buildpackId,
-            Path buildpack,
-            String filename) {
+            CloudFoundryClient cloudFoundryClient, String buildpackId, Path buildpack) {
         when(cloudFoundryClient
-                        .buildpacks()
+                        .buildpacksV3()
                         .upload(
-                                org.cloudfoundry.client.v2.buildpacks.UploadBuildpackRequest
+                                org.cloudfoundry.client.v3.buildpacks.UploadBuildpackRequest
                                         .builder()
                                         .buildpackId(buildpackId)
-                                        .buildpack(buildpack)
-                                        .filename(filename)
+                                        .bits(buildpack)
                                         .build()))
                 .thenReturn(Mono.just(fill(UploadBuildpackResponse.builder()).build()));
     }
