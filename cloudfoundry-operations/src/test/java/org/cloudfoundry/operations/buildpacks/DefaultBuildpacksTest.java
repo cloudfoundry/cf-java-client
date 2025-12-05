@@ -47,8 +47,7 @@ import reactor.test.scheduler.VirtualTimeScheduler;
 
 final class DefaultBuildpacksTest extends AbstractOperationsTest {
 
-    private final DefaultBuildpacks buildpacks =
-            new DefaultBuildpacks(Mono.just(this.cloudFoundryClient));
+    private final DefaultBuildpacks buildpacks = new DefaultBuildpacks(this.cloudFoundryClient);
 
     @Test
     void create() {

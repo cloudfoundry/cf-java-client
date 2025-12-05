@@ -85,7 +85,11 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Override
     @Value.Derived
     public Buildpacks buildpacks() {
-        return new DefaultBuildpacks(getCloudFoundryClientPublisher());
+        CloudFoundryClient cloudFoundryClient = getCloudFoundryClient();
+        if (cloudFoundryClient == null) {
+            throw new IllegalStateException("CloudFoundryClient must be set");
+        }
+        return new DefaultBuildpacks(cloudFoundryClient);
     }
 
     @Override
