@@ -75,7 +75,7 @@ public final class BuildpacksTest extends AbstractIntegrationTest {
                 .filter(buildpack -> buildpackName.equals(buildpack.getName()))
                 .map(Buildpack::getFilename)
                 .as(StepVerifier::create)
-                .expectNext("test-buildpack.zip")
+                .expectNextMatches(filename -> filename.matches(".*test-buildpack.*\\.zip"))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
