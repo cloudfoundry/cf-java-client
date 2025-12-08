@@ -49,7 +49,7 @@ import reactor.test.StepVerifier;
 final class DefaultDomainsTest extends AbstractOperationsTest {
 
     private final DefaultDomains domains =
-            new DefaultDomains(Mono.just(this.cloudFoundryClient), Mono.just(this.routingClient));
+            new DefaultDomains(this.cloudFoundryClient, this.routingClient);
 
     @Test
     void createDomain() {
