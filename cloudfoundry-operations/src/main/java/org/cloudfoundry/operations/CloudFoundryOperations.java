@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations;
 
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.advanced.Advanced;
 import org.cloudfoundry.operations.applications.Applications;
 import org.cloudfoundry.operations.buildpacks.Buildpacks;
@@ -66,7 +67,9 @@ public interface CloudFoundryOperations {
      * Main entry point to the Cloud Foundry Domains Operations API
      *
      * @return the Cloud Foundry Domains Operations API
+     * @deprecated use {@link CloudFoundryClient#domainsV3()} instead.
      */
+    @Deprecated
     Domains domains();
 
     /**

@@ -64,6 +64,7 @@ public final class DefaultDomains implements Domains {
         this.routingClient = routingClient.block();
     }
 
+    @Deprecated
     @Override
     public Mono<Void> create(CreateDomainRequest request) {
         return getOrganizationId(request.getOrganization())
@@ -73,6 +74,7 @@ public final class DefaultDomains implements Domains {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
         if (request.getRouterGroup() == null) {
@@ -91,6 +93,7 @@ public final class DefaultDomains implements Domains {
         }
     }
 
+    @Deprecated
     @Override
     public Flux<Domain> list() {
         return requestListPrivateDomains()
@@ -100,6 +103,7 @@ public final class DefaultDomains implements Domains {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
     public Flux<RouterGroup> listRouterGroups() {
         return requestListRouterGroups(routingClient)
@@ -109,6 +113,7 @@ public final class DefaultDomains implements Domains {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
         return Mono.zip(
@@ -120,6 +125,7 @@ public final class DefaultDomains implements Domains {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
         return Mono.zip(

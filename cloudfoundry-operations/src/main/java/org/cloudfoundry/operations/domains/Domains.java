@@ -29,7 +29,9 @@ public interface Domains {
      *
      * @param request The Create Domain request
      * @return a completion indicator
+     * @deprecated use {@link #createV3} instead
      */
+    @Deprecated
     Mono<Void> create(CreateDomainRequest request);
 
     /**
@@ -37,7 +39,9 @@ public interface Domains {
      *
      * @param request the Create Shared Domain request
      * @return a completion indicator
+     * @deprecated use {@link #createV3} instead
      */
+    @Deprecated
     Mono<Void> createShared(CreateSharedDomainRequest request);
 
     /**
@@ -59,7 +63,9 @@ public interface Domains {
      *
      * @param request The Share Domain request
      * @return a completion indicator
+     * @deprecated use {@link #update} instead.
      */
+    @Deprecated
     Mono<Void> share(ShareDomainRequest request);
 
     /**
@@ -67,6 +73,8 @@ public interface Domains {
      *
      * @param request The Unshare Domain request
      * @return a completion indicator
+     * @deprecated use {@link #update} instead.
      */
+    @Deprecated
     Mono<Void> unshare(UnshareDomainRequest request);
 }
