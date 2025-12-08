@@ -45,32 +45,29 @@ import reactor.core.publisher.Mono;
 
 public final class DefaultDomains implements Domains {
 
-    private final Mono<CloudFoundryClient> cloudFoundryClient;
+    private final CloudFoundryClient cloudFoundryClient;
 
-    private final Mono<RoutingClient> routingClient;
+    private final RoutingClient routingClient;
 
-    public DefaultDomains(
-            Mono<CloudFoundryClient> cloudFoundryClient, Mono<RoutingClient> routingClient) {
+    public DefaultDomains(CloudFoundryClient cloudFoundryClient, RoutingClient routingClient) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.routingClient = routingClient;
     }
 
+    /**
+     * @deprecated use {@link DefaultDomains(CloudFoundryClient, RoutingClient)} instead.
+     */
+    @Deprecated
+    public DefaultDomains(
+            Mono<CloudFoundryClient> cloudFoundryClient, Mono<RoutingClient> routingClient) {
+        this.cloudFoundryClient = cloudFoundryClient.block();
+        this.routingClient = routingClient.block();
+    }
+
     @Override
     public Mono<Void> create(CreateDomainRequest request) {
-        return this.cloudFoundryClient
-                .flatMap(
-                        cloudFoundryClient ->
-                                Mono.zip(
-                                        Mono.just(cloudFoundryClient),
-                                        getOrganizationId(
-                                                cloudFoundryClient, request.getOrganization())))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, organizationId) ->
-                                        requestCreateDomain(
-                                                cloudFoundryClient,
-                                                request.getDomain(),
-                                                organizationId)))
+        return getOrganizationId(request.getOrganization())
+                .flatMap(organizationId -> requestCreateDomain(request.getDomain(), organizationId))
                 .then()
                 .transform(OperationsLogging.log("Create Domain"))
                 .checkpoint();
@@ -79,31 +76,15 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
         if (request.getRouterGroup() == null) {
-            return this.cloudFoundryClient
-                    .flatMap(
-                            cloudFoundryClient ->
-                                    requestCreateSharedDomain(
-                                            cloudFoundryClient, request.getDomain(), null))
+            return requestCreateSharedDomain(request.getDomain(), null)
                     .then()
                     .transform(OperationsLogging.log("Create Shared Domain"))
                     .checkpoint();
         } else {
-            return Mono.zip(this.cloudFoundryClient, this.routingClient)
+            return getRouterGroupId(routingClient, request.getRouterGroup())
                     .flatMap(
-                            function(
-                                    (cloudFoundryClient, routingClient) ->
-                                            Mono.zip(
-                                                    Mono.just(cloudFoundryClient),
-                                                    getRouterGroupId(
-                                                            routingClient,
-                                                            request.getRouterGroup()))))
-                    .flatMap(
-                            function(
-                                    (cloudFoundryClient, routerGroupId) ->
-                                            requestCreateSharedDomain(
-                                                    cloudFoundryClient,
-                                                    request.getDomain(),
-                                                    routerGroupId)))
+                            routerGroupId ->
+                                    requestCreateSharedDomain(request.getDomain(), routerGroupId))
                     .then()
                     .transform(OperationsLogging.log("Create Shared Domain"))
                     .checkpoint();
@@ -112,22 +93,16 @@ public final class DefaultDomains implements Domains {
 
     @Override
     public Flux<Domain> list() {
-        return this.cloudFoundryClient
-                .flatMapMany(
-                        cloudFoundryClient ->
-                                requestListPrivateDomains(cloudFoundryClient)
-                                        .map(DefaultDomains::toDomain)
-                                        .mergeWith(
-                                                requestListSharedDomains(cloudFoundryClient)
-                                                        .map(DefaultDomains::toDomain)))
+        return requestListPrivateDomains()
+                .map(DefaultDomains::toDomain)
+                .mergeWith(requestListSharedDomains().map(DefaultDomains::toDomain))
                 .transform(OperationsLogging.log("List Domains"))
                 .checkpoint();
     }
 
     @Override
     public Flux<RouterGroup> listRouterGroups() {
-        return this.routingClient
-                .flatMapMany(DefaultDomains::requestListRouterGroups)
+        return requestListRouterGroups(routingClient)
                 .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
                 .map(DefaultDomains::toRouterGroup)
                 .transform(OperationsLogging.log("List Router Groups"))
@@ -136,15 +111,10 @@ public final class DefaultDomains implements Domains {
 
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
-        return this.cloudFoundryClient
-                .flatMap(
-                        cloudFoundryClient ->
-                                Mono.zip(
-                                        Mono.just(cloudFoundryClient),
-                                        getPrivateDomainId(cloudFoundryClient, request.getDomain()),
-                                        getOrganizationId(
-                                                cloudFoundryClient, request.getOrganization())))
-                .flatMap(function(DefaultDomains::requestAssociateOrganizationPrivateDomainRequest))
+        return Mono.zip(
+                        getPrivateDomainId(request.getDomain()),
+                        getOrganizationId(request.getOrganization()))
+                .flatMap(function(this::requestAssociateOrganizationPrivateDomainRequest))
                 .then()
                 .transform(OperationsLogging.log("Share Domain"))
                 .checkpoint();
@@ -152,22 +122,16 @@ public final class DefaultDomains implements Domains {
 
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
-        return this.cloudFoundryClient
-                .flatMap(
-                        cloudFoundryClient ->
-                                Mono.zip(
-                                        Mono.just(cloudFoundryClient),
-                                        getPrivateDomainId(cloudFoundryClient, request.getDomain()),
-                                        getOrganizationId(
-                                                cloudFoundryClient, request.getOrganization())))
-                .flatMap(function(DefaultDomains::requestRemoveOrganizationPrivateDomainRequest))
+        return Mono.zip(
+                        getPrivateDomainId(request.getDomain()),
+                        getOrganizationId(request.getOrganization()))
+                .flatMap(function(this::requestRemoveOrganizationPrivateDomainRequest))
                 .transform(OperationsLogging.log("Unshare Domain"))
                 .checkpoint();
     }
 
-    private static Mono<OrganizationResource> getOrganization(
-            CloudFoundryClient cloudFoundryClient, String organization) {
-        return requestOrganizations(cloudFoundryClient, organization)
+    private Mono<OrganizationResource> getOrganization(String organization) {
+        return requestOrganizations(organization)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -176,14 +140,12 @@ public final class DefaultDomains implements Domains {
                                         "Organization %s does not exist", organization));
     }
 
-    private static Mono<String> getOrganizationId(
-            CloudFoundryClient cloudFoundryClient, String organization) {
-        return getOrganization(cloudFoundryClient, organization).map(ResourceUtils::getId);
+    private Mono<String> getOrganizationId(String organization) {
+        return getOrganization(organization).map(ResourceUtils::getId);
     }
 
-    private static Mono<PrivateDomainResource> getPrivateDomain(
-            CloudFoundryClient cloudFoundryClient, String domain) {
-        return requestListPrivateDomains(cloudFoundryClient, domain)
+    private Mono<PrivateDomainResource> getPrivateDomain(String domain) {
+        return requestListPrivateDomains(domain)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -192,9 +154,8 @@ public final class DefaultDomains implements Domains {
                                         "Private domain %s does not exist", domain));
     }
 
-    private static Mono<String> getPrivateDomainId(
-            CloudFoundryClient cloudFoundryClient, String domain) {
-        return getPrivateDomain(cloudFoundryClient, domain).map(ResourceUtils::getId);
+    private Mono<String> getPrivateDomainId(String domain) {
+        return getPrivateDomain(domain).map(ResourceUtils::getId);
     }
 
     private static Mono<String> getRouterGroupId(RoutingClient routingClient, String routerGroup) {
@@ -205,10 +166,10 @@ public final class DefaultDomains implements Domains {
                 .map(org.cloudfoundry.routing.v1.routergroups.RouterGroup::getRouterGroupId);
     }
 
-    private static Mono<AssociateOrganizationPrivateDomainResponse>
+    private Mono<AssociateOrganizationPrivateDomainResponse>
             requestAssociateOrganizationPrivateDomainRequest(
-                    CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
-        return cloudFoundryClient
+                    String domainId, String organizationId) {
+        return this.cloudFoundryClient
                 .organizations()
                 .associatePrivateDomain(
                         AssociateOrganizationPrivateDomainRequest.builder()
@@ -217,9 +178,9 @@ public final class DefaultDomains implements Domains {
                                 .build());
     }
 
-    private static Mono<CreatePrivateDomainResponse> requestCreateDomain(
-            CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
-        return cloudFoundryClient
+    private Mono<CreatePrivateDomainResponse> requestCreateDomain(
+            String domain, String organizationId) {
+        return this.cloudFoundryClient
                 .privateDomains()
                 .create(
                         CreatePrivateDomainRequest.builder()
@@ -228,9 +189,9 @@ public final class DefaultDomains implements Domains {
                                 .build());
     }
 
-    private static Mono<CreateSharedDomainResponse> requestCreateSharedDomain(
-            CloudFoundryClient cloudFoundryClient, String domain, String routerGroupId) {
-        return cloudFoundryClient
+    private Mono<CreateSharedDomainResponse> requestCreateSharedDomain(
+            String domain, String routerGroupId) {
+        return this.cloudFoundryClient
                 .sharedDomains()
                 .create(
                         org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainRequest.builder()
@@ -239,11 +200,10 @@ public final class DefaultDomains implements Domains {
                                 .build());
     }
 
-    private static Flux<PrivateDomainResource> requestListPrivateDomains(
-            CloudFoundryClient cloudFoundryClient, String domain) {
+    private Flux<PrivateDomainResource> requestListPrivateDomains(String domain) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .privateDomains()
                                 .list(
                                         ListPrivateDomainsRequest.builder()
@@ -252,11 +212,10 @@ public final class DefaultDomains implements Domains {
                                                 .build()));
     }
 
-    private static Flux<PrivateDomainResource> requestListPrivateDomains(
-            CloudFoundryClient cloudFoundryClient) {
+    private Flux<PrivateDomainResource> requestListPrivateDomains() {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .privateDomains()
                                 .list(ListPrivateDomainsRequest.builder().page(page).build()));
     }
@@ -270,20 +229,18 @@ public final class DefaultDomains implements Domains {
                                 .build());
     }
 
-    private static Flux<SharedDomainResource> requestListSharedDomains(
-            CloudFoundryClient cloudFoundryClient) {
+    private Flux<SharedDomainResource> requestListSharedDomains() {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .sharedDomains()
                                 .list(ListSharedDomainsRequest.builder().page(page).build()));
     }
 
-    private static Flux<OrganizationResource> requestOrganizations(
-            CloudFoundryClient cloudFoundryClient, String organization) {
+    private Flux<OrganizationResource> requestOrganizations(String organization) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .organizations()
                                 .list(
                                         ListOrganizationsRequest.builder()
@@ -292,9 +249,9 @@ public final class DefaultDomains implements Domains {
                                                 .build()));
     }
 
-    private static Mono<Void> requestRemoveOrganizationPrivateDomainRequest(
-            CloudFoundryClient cloudFoundryClient, String domainId, String organizationId) {
-        return cloudFoundryClient
+    private Mono<Void> requestRemoveOrganizationPrivateDomainRequest(
+            String domainId, String organizationId) {
+        return this.cloudFoundryClient
                 .organizations()
                 .removePrivateDomain(
                         RemoveOrganizationPrivateDomainRequest.builder()
