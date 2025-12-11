@@ -20,6 +20,7 @@
       "updated_at": "2019-03-08T01:06:19Z",
       "name": "test-domain.com",
       "internal": false,
+      "router_group": { "guid": "5806148f-cce6-4d86-7fbd-aa269e3f6f3f" },
       "metadata": {
         "labels": {},
         "annotations": {}
