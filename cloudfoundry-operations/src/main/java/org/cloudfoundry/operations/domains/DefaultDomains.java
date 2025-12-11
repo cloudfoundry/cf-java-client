@@ -18,22 +18,26 @@ package org.cloudfoundry.operations.domains;
 
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
+import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateOrganizationPrivateDomainResponse;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.organizations.OrganizationResource;
-import org.cloudfoundry.client.v2.organizations.RemoveOrganizationPrivateDomainRequest;
-import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainRequest;
-import org.cloudfoundry.client.v2.privatedomains.CreatePrivateDomainResponse;
 import org.cloudfoundry.client.v2.privatedomains.ListPrivateDomainsRequest;
-import org.cloudfoundry.client.v2.privatedomains.PrivateDomainEntity;
 import org.cloudfoundry.client.v2.privatedomains.PrivateDomainResource;
 import org.cloudfoundry.client.v2.shareddomains.CreateSharedDomainResponse;
 import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
-import org.cloudfoundry.client.v2.shareddomains.SharedDomainEntity;
 import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
+import org.cloudfoundry.client.v3.domains.DomainRelationships;
+import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v3.domains.ShareDomainResponse;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
@@ -66,43 +70,61 @@ public final class DefaultDomains implements Domains {
 
     @Override
     public Mono<Void> create(CreateDomainRequest request) {
-        return getOrganizationId(request.getOrganization())
-                .flatMap(organizationId -> requestCreateDomain(request.getDomain(), organizationId))
+        Mono<Optional<String>> organizationId =
+                Mono.justOrEmpty(request.getOrganization())
+                        .flatMap(this::getOrganization)
+                        .map(OrganizationResource::getId)
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty());
+
+        Mono<Optional<String>> groupId =
+                Mono.justOrEmpty(request.getRouterGroup())
+                        .flatMap(this::getRouterGroupId)
+                        .map(Optional::of)
+                        .defaultIfEmpty(Optional.empty());
+
+        return Mono.zip(organizationId, groupId)
+                .flatMap(
+                        function(
+                                (oId, gId) ->
+                                        requestCreateDomain(
+                                                request.getDomain(),
+                                                oId.orElse(null),
+                                                gId.orElse(null))))
                 .then()
                 .transform(OperationsLogging.log("Create Domain"))
                 .checkpoint();
     }
 
     @Override
+    @Deprecated
     public Mono<Void> createShared(CreateSharedDomainRequest request) {
-        if (request.getRouterGroup() == null) {
-            return requestCreateSharedDomain(request.getDomain(), null)
-                    .then()
-                    .transform(OperationsLogging.log("Create Shared Domain"))
-                    .checkpoint();
-        } else {
-            return getRouterGroupId(routingClient, request.getRouterGroup())
-                    .flatMap(
-                            routerGroupId ->
-                                    requestCreateSharedDomain(request.getDomain(), routerGroupId))
-                    .then()
-                    .transform(OperationsLogging.log("Create Shared Domain"))
-                    .checkpoint();
-        }
+        return create(
+                CreateDomainRequest.builder()
+                        .domain(request.getDomain())
+                        .routerGroup(request.getRouterGroup())
+                        .build());
     }
 
     @Override
     public Flux<Domain> list() {
-        return requestListPrivateDomains()
-                .map(DefaultDomains::toDomain)
-                .mergeWith(requestListSharedDomains().map(DefaultDomains::toDomain))
+        return requestListRouterGroups()
+                .map(ListRouterGroupsResponse::getRouterGroups)
+                .map(DefaultDomains::indexRouterGroupsById)
+                .flatMapMany(
+                        routerGroupsIndexedById ->
+                                requestListDomains()
+                                        .map(
+                                                domain ->
+                                                        DefaultDomains.toDomain(
+                                                                domain, routerGroupsIndexedById)))
                 .transform(OperationsLogging.log("List Domains"))
                 .checkpoint();
     }
 
     @Override
     public Flux<RouterGroup> listRouterGroups() {
-        return requestListRouterGroups(routingClient)
+        return requestListRouterGroups()
                 .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
                 .map(DefaultDomains::toRouterGroup)
                 .transform(OperationsLogging.log("List Router Groups"))
@@ -112,9 +134,9 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> share(ShareDomainRequest request) {
         return Mono.zip(
-                        getPrivateDomainId(request.getDomain()),
+                        getDomainId(request.getDomain()),
                         getOrganizationId(request.getOrganization()))
-                .flatMap(function(this::requestAssociateOrganizationPrivateDomainRequest))
+                .flatMap(function(this::requestShareDomain))
                 .then()
                 .transform(OperationsLogging.log("Share Domain"))
                 .checkpoint();
@@ -123,9 +145,9 @@ public final class DefaultDomains implements Domains {
     @Override
     public Mono<Void> unshare(UnshareDomainRequest request) {
         return Mono.zip(
-                        getPrivateDomainId(request.getDomain()),
+                        getDomainId(request.getDomain()),
                         getOrganizationId(request.getOrganization()))
-                .flatMap(function(this::requestRemoveOrganizationPrivateDomainRequest))
+                .flatMap(function(this::requestUnshareDomain))
                 .transform(OperationsLogging.log("Unshare Domain"))
                 .checkpoint();
     }
@@ -141,7 +163,19 @@ public final class DefaultDomains implements Domains {
     }
 
     private Mono<String> getOrganizationId(String organization) {
-        return getOrganization(organization).map(ResourceUtils::getId);
+        return getOrganization(organization).map(OrganizationResource::getId);
+    }
+
+    private Mono<String> getDomainId(String domain) {
+        return this.requestListDomains()
+                .filter(d -> d.getName().equals(domain))
+                .map(DomainResource::getId)
+                .single()
+                .onErrorResume(
+                        NoSuchElementException.class,
+                        t ->
+                                ExceptionUtils.illegalArgument(
+                                        "Private domain %s does not exist", domain));
     }
 
     private Mono<PrivateDomainResource> getPrivateDomain(String domain) {
@@ -158,35 +192,44 @@ public final class DefaultDomains implements Domains {
         return getPrivateDomain(domain).map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getRouterGroupId(RoutingClient routingClient, String routerGroup) {
-        return requestListRouterGroups(routingClient)
+    private Mono<String> getRouterGroupId(String routerGroup) {
+        return requestListRouterGroups()
                 .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
                 .filter(group -> routerGroup.equals(group.getName()))
                 .single()
                 .map(org.cloudfoundry.routing.v1.routergroups.RouterGroup::getRouterGroupId);
     }
 
-    private Mono<AssociateOrganizationPrivateDomainResponse>
-            requestAssociateOrganizationPrivateDomainRequest(
-                    String domainId, String organizationId) {
+    private Mono<ShareDomainResponse> requestShareDomain(String domainId, String organizationId) {
         return this.cloudFoundryClient
-                .organizations()
-                .associatePrivateDomain(
-                        AssociateOrganizationPrivateDomainRequest.builder()
-                                .organizationId(organizationId)
-                                .privateDomainId(domainId)
+                .domainsV3()
+                .share(
+                        org.cloudfoundry.client.v3.domains.ShareDomainRequest.builder()
+                                .domainId(domainId)
+                                .data(Relationship.builder().id(organizationId).build())
                                 .build());
     }
 
-    private Mono<CreatePrivateDomainResponse> requestCreateDomain(
-            String domain, String organizationId) {
-        return this.cloudFoundryClient
-                .privateDomains()
-                .create(
-                        CreatePrivateDomainRequest.builder()
-                                .name(domain)
-                                .owningOrganizationId(organizationId)
-                                .build());
+    private Mono<CreateDomainResponse> requestCreateDomain(
+            String domain, String organizationId, String routerGroupId) {
+        org.cloudfoundry.client.v3.domains.CreateDomainRequest.Builder createDomainRequest =
+                org.cloudfoundry.client.v3.domains.CreateDomainRequest.builder().name(domain);
+        if (organizationId != null) {
+            createDomainRequest.relationships(
+                    DomainRelationships.builder()
+                            .organization(
+                                    ToOneRelationship.builder()
+                                            .data(Relationship.builder().id(organizationId).build())
+                                            .build())
+                            .build());
+        }
+        if (routerGroupId != null) {
+            createDomainRequest.routerGroup(
+                    org.cloudfoundry.client.v3.domains.RouterGroup.builder()
+                            .id(routerGroupId)
+                            .build());
+        }
+        return this.cloudFoundryClient.domainsV3().create(createDomainRequest.build());
     }
 
     private Mono<CreateSharedDomainResponse> requestCreateSharedDomain(
@@ -212,17 +255,16 @@ public final class DefaultDomains implements Domains {
                                                 .build()));
     }
 
-    private Flux<PrivateDomainResource> requestListPrivateDomains() {
-        return PaginationUtils.requestClientV2Resources(
+    private Flux<DomainResource> requestListDomains() {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
-                                .privateDomains()
-                                .list(ListPrivateDomainsRequest.builder().page(page).build()));
+                                .domainsV3()
+                                .list(ListDomainsRequest.builder().page(page).build()));
     }
 
-    private static Mono<ListRouterGroupsResponse> requestListRouterGroups(
-            RoutingClient routingClient) {
-        return routingClient
+    private Mono<ListRouterGroupsResponse> requestListRouterGroups() {
+        return this.routingClient
                 .routerGroups()
                 .list(
                         org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest.builder()
@@ -238,10 +280,10 @@ public final class DefaultDomains implements Domains {
     }
 
     private Flux<OrganizationResource> requestOrganizations(String organization) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
-                                .organizations()
+                                .organizationsV3()
                                 .list(
                                         ListOrganizationsRequest.builder()
                                                 .name(organization)
@@ -249,36 +291,39 @@ public final class DefaultDomains implements Domains {
                                                 .build()));
     }
 
-    private Mono<Void> requestRemoveOrganizationPrivateDomainRequest(
-            String domainId, String organizationId) {
+    private Mono<Void> requestUnshareDomain(String domainId, String organizationId) {
         return this.cloudFoundryClient
-                .organizations()
-                .removePrivateDomain(
-                        RemoveOrganizationPrivateDomainRequest.builder()
+                .domainsV3()
+                .unshare(
+                        org.cloudfoundry.client.v3.domains.UnshareDomainRequest.builder()
                                 .organizationId(organizationId)
-                                .privateDomainId(domainId)
+                                .domainId(domainId)
                                 .build());
     }
 
-    private static Domain toDomain(PrivateDomainResource resource) {
-        PrivateDomainEntity entity = ResourceUtils.getEntity(resource);
-
+    private static Domain toDomain(DomainResource entity, Map<String, String> type) {
         return Domain.builder()
-                .id(ResourceUtils.getId(resource))
+                .id(entity.getId())
                 .name(entity.getName())
-                .status(Status.OWNED)
+                .status(
+                        entity.getRelationships().getOrganization().getData() != null
+                                ? Status.OWNED
+                                : Status.SHARED)
+                .type(
+                        entity.getRouterGroup() != null
+                                ? type.get(entity.getRouterGroup().getId())
+                                : null)
                 .build();
     }
 
-    private static Domain toDomain(SharedDomainResource resource) {
-        SharedDomainEntity entity = ResourceUtils.getEntity(resource);
-
-        return Domain.builder()
-                .id(ResourceUtils.getId(resource))
-                .name(entity.getName())
-                .status(Status.SHARED)
-                .type(entity.getRouterGroupType())
-                .build();
+    private static Map<String, String> indexRouterGroupsById(
+            List<org.cloudfoundry.routing.v1.routergroups.RouterGroup> routeGroups) {
+        return routeGroups.stream()
+                .collect(
+                        Collectors.toMap(
+                                org.cloudfoundry.routing.v1.routergroups.RouterGroup
+                                        ::getRouterGroupId,
+                                org.cloudfoundry.routing.v1.routergroups.RouterGroup::getType));
     }
 
     private static RouterGroup toRouterGroup(
