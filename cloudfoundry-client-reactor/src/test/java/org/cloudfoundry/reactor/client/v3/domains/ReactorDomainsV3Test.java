@@ -42,6 +42,7 @@ import org.cloudfoundry.client.v3.domains.GetDomainRequest;
 import org.cloudfoundry.client.v3.domains.GetDomainResponse;
 import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v3.domains.ListDomainsResponse;
+import org.cloudfoundry.client.v3.domains.RouterGroup;
 import org.cloudfoundry.client.v3.domains.ShareDomainRequest;
 import org.cloudfoundry.client.v3.domains.ShareDomainResponse;
 import org.cloudfoundry.client.v3.domains.UnshareDomainRequest;
@@ -279,6 +280,11 @@ final class ReactorDomainsV3Test extends AbstractClientApiTest {
                                                 .updatedAt("2019-03-08T01:06:19Z")
                                                 .name("test-domain.com")
                                                 .isInternal(false)
+                                                .routerGroup(
+                                                        RouterGroup.builder()
+                                                                .id(
+                                                                        "5806148f-cce6-4d86-7fbd-aa269e3f6f3f")
+                                                                .build())
                                                 .relationships(
                                                         DomainRelationships.builder()
                                                                 .organization(

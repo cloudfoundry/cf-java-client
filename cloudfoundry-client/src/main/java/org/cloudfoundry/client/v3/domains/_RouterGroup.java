@@ -30,6 +30,6 @@ public abstract class _RouterGroup {
      * The id of the desired router group to route tcp traffic through
      */
     @JsonProperty("guid")
-    public abstract List<String> getId();
+    public abstract String getId();
 
 }

@@ -22,10 +22,13 @@ import static org.cloudfoundry.operations.domains.Status.SHARED;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v3.domains.GetDomainRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
 import org.cloudfoundry.operations.domains.Domain;
+import org.cloudfoundry.operations.domains.RouterGroup;
 import org.cloudfoundry.operations.domains.ShareDomainRequest;
 import org.cloudfoundry.operations.domains.UnshareDomainRequest;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
@@ -40,6 +43,7 @@ public final class DomainsTest extends AbstractIntegrationTest {
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
 
     @Autowired private CloudFoundryOperations cloudFoundryOperations;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Autowired private String organizationName;
 
@@ -112,9 +116,35 @@ public final class DomainsTest extends AbstractIntegrationTest {
                                 .build())
                 .thenMany(requestListDomains(this.cloudFoundryOperations))
                 .filter(domain -> domainName.equals(domain.getName()))
-                .map(Domain::getType)
                 .as(StepVerifier::create)
-                .expectNext("tcp")
+                .expectNextMatches(domain -> domain.getType().equals("tcp"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+
+        this.cloudFoundryOperations
+                .domains()
+                .list()
+                .filter(d -> d.getName().equals(domainName))
+                .single()
+                .flatMap(
+                        d ->
+                                this.cloudFoundryClient
+                                        .domainsV3()
+                                        .get(
+                                                GetDomainRequest.builder()
+                                                        .domainId(d.getId())
+                                                        .build()))
+                .map(d -> d.getRouterGroup().getId())
+                .flatMap(
+                        id ->
+                                this.cloudFoundryOperations
+                                        .domains()
+                                        .listRouterGroups()
+                                        .filter(rg -> rg.getId().equals(id))
+                                        .single())
+                .map(RouterGroup::getName)
+                .as(StepVerifier::create)
+                .expectNext(DEFAULT_ROUTER_GROUP)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
