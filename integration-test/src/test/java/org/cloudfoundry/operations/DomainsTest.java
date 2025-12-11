@@ -17,13 +17,15 @@
 package org.cloudfoundry.operations;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.type;
 import static org.cloudfoundry.operations.domains.Status.OWNED;
 import static org.cloudfoundry.operations.domains.Status.SHARED;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v3.ClientV3Exception;
+import org.cloudfoundry.client.v3.Error;
 import org.cloudfoundry.client.v3.domains.GetDomainRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
@@ -60,10 +62,20 @@ public final class DomainsTest extends AbstractIntegrationTest {
                 .consumeErrorWith(
                         t ->
                                 assertThat(t)
-                                        .isInstanceOf(ClientV2Exception.class)
-                                        .hasMessageMatching(
-                                                "CF-DomainInvalid\\([0-9]+\\): The domain is"
-                                                        + " invalid.*"))
+                                        .asInstanceOf(type(ClientV3Exception.class))
+                                        .extracting(ClientV3Exception::getErrors)
+                                        .asList()
+                                        .hasSize(1)
+                                        .first()
+                                        .isEqualTo(
+                                                Error.builder()
+                                                        .title("CF-UnprocessableEntity")
+                                                        .code(10008)
+                                                        .detail(
+                                                                "Name does not comply with RFC 1035"
+                                                                    + " standards, Name must"
+                                                                    + " contain at least one \".\"")
+                                                        .build()))
                 .verify(Duration.ofMinutes(5));
     }
 

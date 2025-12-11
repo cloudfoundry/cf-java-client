@@ -37,7 +37,9 @@ public interface Domains {
      *
      * @param request the Create Shared Domain request
      * @return a completion indicator
+     * @deprecated use {@link #create} instead
      */
+    @Deprecated
     Mono<Void> createShared(CreateSharedDomainRequest request);
 
     /**
