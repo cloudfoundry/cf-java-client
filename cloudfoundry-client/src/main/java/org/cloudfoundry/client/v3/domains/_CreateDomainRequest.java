@@ -56,4 +56,11 @@ abstract class _CreateDomainRequest {
     @Nullable
     abstract DomainRelationships getRelationships();
 
+    /**
+     * The router group
+     */
+    @JsonProperty("router_group")
+    @Nullable
+    abstract RouterGroup getRouterGroup();
+
 }
