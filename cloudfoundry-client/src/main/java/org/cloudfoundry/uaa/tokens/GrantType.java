@@ -47,7 +47,22 @@ public enum GrantType {
     /**
      * The refresh token grant type
      */
-    REFRESH_TOKEN("refresh_token");
+    REFRESH_TOKEN("refresh_token"),
+
+    /**
+     * The jwt-bearer token grant type
+     */
+    JWT_BEARER("urn:ietf:params:oauth:grant-type:jwt-bearer"),
+
+    /**
+     * The saml2-bearer token grant type
+     */
+    SAML2_BEARER("urn:ietf:params:oauth:grant-type:saml2-bearer"),
+
+    /**
+     * The user token token grant type
+     */
+    USER_TOKEN("user_token");
 
     private final String value;
 
@@ -68,6 +83,12 @@ public enum GrantType {
                 return PASSWORD;
             case "refresh_token":
                 return REFRESH_TOKEN;
+            case "urn:ietf:params:oauth:grant-type:jwt-bearer":
+                return JWT_BEARER;
+            case "urn:ietf:params:oauth:grant-type:saml2-bearer":
+                return SAML2_BEARER;
+            case "user_token":
+                return USER_TOKEN;
             default:
                 throw new IllegalArgumentException(String.format("Unknown grant type: %s", s));
         }
