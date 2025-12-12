@@ -22,11 +22,14 @@ import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 
 import java.time.Duration;
 import java.util.Collections;
+import java.util.Map;
 import org.cloudfoundry.client.v3.Link;
 import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.quotas.*;
+import org.cloudfoundry.client.v3.quotas.Apps;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.Services;
 import org.cloudfoundry.client.v3.quotas.organizations.*;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -51,13 +54,13 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                                         .method(POST)
                                         .path("/organization_quotas")
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/POST_request.json")
+                                                "fixtures/client/v3/quotas/organizations/POST_request.json")
                                         .build())
                         .response(
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/POST_response.json")
+                                                "fixtures/client/v3/quotas/organizations/POST_response.json")
                                         .build())
                         .build());
 
@@ -115,7 +118,7 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/GET_{id}_response.json")
+                                                "fixtures/client/v3/quotas/organizations/GET_{id}_response.json")
                                         .build())
                         .build());
 
@@ -146,7 +149,7 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/GET_response.json")
+                                                "fixtures/client/v3/quotas/organizations/GET_response.json")
                                         .build())
                         .build());
 
@@ -193,13 +196,13 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                                         .path(
                                                 "/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52")
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/PATCH_{id}_request.json")
+                                                "fixtures/client/v3/quotas/organizations/PATCH_{id}_request.json")
                                         .build())
                         .response(
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/organization_quotas/PATCH_{id}_response.json")
+                                                "fixtures/client/v3/quotas/organizations/PATCH_{id}_response.json")
                                         .build())
                         .build());
 
@@ -217,12 +220,75 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                 .verify(Duration.ofSeconds(5));
     }
 
+    @Test
+    void apply() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path(
+                                                "/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52/relationships/organizations")
+                                        .payload(
+                                                "fixtures/client/v3/quotas/organizations/relationships/POST_{id}_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/quotas/organizations/relationships/POST_{id}_response.json")
+                                        .build())
+                        .build());
+
+        Relationship org1 = Relationship.builder().id("org-guid1").build();
+        Relationship org2 = Relationship.builder().id("org-guid2").build();
+
+        ToManyRelationship organizationRelationships =
+                ToManyRelationship.builder().data(org1, org2).build();
+
+        this.organizationQuotasV3
+                .apply(
+                        ApplyOrganizationQuotaRequest.builder()
+                                .organizationQuotaId("24637893-3b77-489d-bb79-8466f0d88b52")
+                                .organizationRelationships(organizationRelationships)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ApplyOrganizationQuotaResponse.builder()
+                                .from(expectedApplyOrganizationQuotaResponse())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
     @NotNull
     private static OrganizationQuotaResource expectedOrganizationQuotaResource1() {
         return buildOrganizationQuotaResource(
                 "24637893-3b77-489d-bb79-8466f0d88b52",
                 "my-quota",
                 "9b370018-c38e-44c9-86d6-155c76801104");
+    }
+
+    @NotNull
+    private static ApplyOrganizationQuotaResponse expectedApplyOrganizationQuotaResponse() {
+
+        Relationship org1 = Relationship.builder().id("org-guid1").build();
+        Relationship org2 = Relationship.builder().id("org-guid2").build();
+        Relationship existingOrg = Relationship.builder().id("previous-org-guid").build();
+
+        ToManyRelationship organizationRelationships =
+                ToManyRelationship.builder().data(org1, org2, existingOrg).build();
+        Link selfLink =
+                Link.builder()
+                        .href(
+                                "https://api.example.org/v3/organization_quotas/24637893-3b77-489d-bb79-8466f0d88b52/relationships/organizations")
+                        .build();
+        Map<String, Link> links = Collections.singletonMap("self", selfLink);
+
+        return ApplyOrganizationQuotaResponse.builder()
+                .organizationRelationships(organizationRelationships)
+                .links(links)
+                .build();
     }
 
     private static OrganizationQuotaResource expectedOrganizationQuotaResource2() {
