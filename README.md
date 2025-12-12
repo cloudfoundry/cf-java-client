@@ -253,7 +253,7 @@ Beyond that, it is helpful to capture the following information:
 If you open a Github issue with a request for help, please include as much of the information above as possible and do not forget to sanitize any request/response data posted.
 
 ## Development
-The project depends on Java 8. To build from source and install to your local Maven cache, run the following:
+The project depends on Java 8 to 21. To build from source and install to your local Maven cache, run the following:
 
 ```shell
 $ git submodule update --init --recursive
@@ -297,6 +297,7 @@ Name | Description
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
+`UAA_API_REQUEST_LIMIT` | _(Optional)_ If your UAA server does rate limiting and returns 429 errors, set this variable to a value smaller than the limit. Defaults to `0` (no limit)
 
 If you do not have access to a CloudFoundry instance with admin access, you can run one locally using [bosh-deployment](https://github.com/cloudfoundry/bosh-deployment) & [cf-deployment](https://github.com/cloudfoundry/cf-deployment/) and Virtualbox.
 

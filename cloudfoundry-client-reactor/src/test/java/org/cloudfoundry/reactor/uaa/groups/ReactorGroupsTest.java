@@ -73,7 +73,7 @@ final class ReactorGroupsTest extends AbstractUaaApiTest {
 
     private final ReactorGroups groups =
             new ReactorGroups(
-                    CONNECTION_CONTEXT, this.root, TOKEN_PROVIDER, Collections.emptyMap());
+                    CONNECTION_CONTEXT, super.root, TOKEN_PROVIDER, Collections.emptyMap());
 
     @Test
     void addMember() {

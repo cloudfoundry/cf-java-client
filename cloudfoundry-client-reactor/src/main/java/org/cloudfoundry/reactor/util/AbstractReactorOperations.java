@@ -58,19 +58,19 @@ public abstract class AbstractReactorOperations {
                 .map(operator -> operator.headersWhen(this::addHeadersWhen));
     }
 
-    private void addHeaders(HttpHeaders httpHeaders) {
+    public void addHeaders(HttpHeaders httpHeaders) {
         UserAgent.setUserAgent(httpHeaders);
         JsonCodec.setDecodeHeaders(httpHeaders);
         this.requestTags.forEach(httpHeaders::set);
     }
 
-    private Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {
+    public Mono<? extends HttpHeaders> addHeadersWhen(HttpHeaders httpHeaders) {
         return this.tokenProvider
                 .getToken(this.connectionContext)
                 .map(token -> httpHeaders.set(AUTHORIZATION, token));
     }
 
-    private OperatorContext buildOperatorContext(String root) {
+    public OperatorContext buildOperatorContext(String root) {
         return OperatorContext.builder()
                 .connectionContext(this.connectionContext)
                 .root(root)
