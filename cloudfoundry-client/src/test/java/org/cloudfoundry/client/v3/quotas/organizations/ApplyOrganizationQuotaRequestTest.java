@@ -36,7 +36,8 @@ final class ApplyOrganizationQuotaRequestTest {
 
     @Test
     void noOrganizationQuotaId() {
-        Relationship organizationRelationship = Relationship.builder().id("test-quota").build();
+        Relationship organizationRelationship =
+                Relationship.builder().id("organization-id").build();
         ToManyRelationship organizationRelationships =
                 ToManyRelationship.builder().data(organizationRelationship).build();
 
@@ -50,7 +51,8 @@ final class ApplyOrganizationQuotaRequestTest {
 
     @Test
     void valid() {
-        Relationship organizationRelationship = Relationship.builder().id("test-quota").build();
+        Relationship organizationRelationship =
+                Relationship.builder().id("organization-id").build();
         ToManyRelationship organizationRelationships =
                 ToManyRelationship.builder().data(organizationRelationship).build();
         ApplyOrganizationQuotaRequest.builder()

@@ -269,6 +269,13 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                 "9b370018-c38e-44c9-86d6-155c76801104");
     }
 
+    private static OrganizationQuotaResource expectedOrganizationQuotaResource2() {
+        return buildOrganizationQuotaResource(
+                "bb49bf20-ad98-4729-93ae-38fbc564b630",
+                "my-quota-2",
+                "144251f2-a202-4ffe-ab47-9046c4077e99");
+    }
+
     @NotNull
     private static ApplyOrganizationQuotaResponse expectedApplyOrganizationQuotaResponse() {
 
@@ -289,13 +296,6 @@ class ReactorOrganizationQuotasV3Test extends AbstractClientApiTest {
                 .organizationRelationships(organizationRelationships)
                 .links(links)
                 .build();
-    }
-
-    private static OrganizationQuotaResource expectedOrganizationQuotaResource2() {
-        return buildOrganizationQuotaResource(
-                "bb49bf20-ad98-4729-93ae-38fbc564b630",
-                "my-quota-2",
-                "144251f2-a202-4ffe-ab47-9046c4077e99");
     }
 
     @NotNull

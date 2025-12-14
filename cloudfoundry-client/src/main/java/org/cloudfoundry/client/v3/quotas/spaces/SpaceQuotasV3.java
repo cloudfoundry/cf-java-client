@@ -66,4 +66,22 @@ public interface SpaceQuotasV3 {
      * @return the response from the Space Organization Quota request
      */
     Mono<String> delete(DeleteSpaceQuotaRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.208.0/index.html#apply-a-space-quota-to-a-space">Apply a Space Quota to a Space </a>
+     * request
+     *
+     * @param request the Apply a Space Quota to a Space request
+     * @return the response from the Apply a Space Quota to a Space request
+     */
+    Mono<ApplySpaceQuotaResponse> apply(ApplySpaceQuotaRequest request);
+
+    /**
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.208.0/index.html#remove-a-space-quota-from-a-space">Remove a Space Quota from a Space </a>
+     * request
+     *
+     * @param request the Remove a Space Quota from a Space request
+     * @return the response from the Remove a Space Quota from a Space request
+     */
+    Mono<Void> remove(RemoveSpaceQuotaRequest request);
 }
