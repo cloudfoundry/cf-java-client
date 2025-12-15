@@ -50,6 +50,7 @@ import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
+import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.routing.RoutingClient;
@@ -154,6 +155,7 @@ public abstract class AbstractOperationsTest {
     protected final SpacesV3 spacesV3 = mock(SpacesV3.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
+    protected final StacksV3 stacksV3 = mock(StacksV3.class, RETURNS_SMART_NULLS);
 
     protected final Tasks tasks = mock(Tasks.class, RETURNS_SMART_NULLS);
 
@@ -203,6 +205,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
         when(this.cloudFoundryClient.spacesV3()).thenReturn(this.spacesV3);
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
+        when(this.cloudFoundryClient.stacksV3()).thenReturn(this.stacksV3);
         when(this.cloudFoundryClient.tasks()).thenReturn(this.tasks);
         when(this.cloudFoundryClient.userProvidedServiceInstances())
                 .thenReturn(this.userProvidedServiceInstances);
