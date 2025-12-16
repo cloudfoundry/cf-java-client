@@ -17,20 +17,45 @@
 package org.cloudfoundry.operations;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
 
+import org.cloudfoundry.client.v3.organizations.ListOrganizationsResponse;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.spaces.ListSpacesResponse;
+import org.cloudfoundry.client.v3.spaces.SpaceResource;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Mono;
 
 final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
 
-    private final DefaultCloudFoundryOperations operations =
-            DefaultCloudFoundryOperations.builder()
-                    .cloudFoundryClient(this.cloudFoundryClient)
-                    .dopplerClient(this.dopplerClient)
-                    .routingClient(this.routingClient)
-                    .organization(TEST_ORGANIZATION_NAME)
-                    .space(TEST_SPACE_NAME)
-                    .uaaClient(this.uaaClient)
-                    .build();
+    private DefaultCloudFoundryOperations operations;
+
+    @BeforeEach
+    void setUp() {
+        ListOrganizationsResponse orgsResponse =
+                fill(ListOrganizationsResponse.builder())
+                        .resource(fill(OrganizationResource.builder()).build())
+                        .build();
+        when(this.organizationsV3.list(any())).thenReturn(Mono.just(orgsResponse));
+        ListSpacesResponse spacesResponse =
+                fill(ListSpacesResponse.builder())
+                        .resource(fill(SpaceResource.builder()).build())
+                        .build();
+        when(this.spacesV3.list(any())).thenReturn(Mono.just(spacesResponse));
+
+        operations =
+                DefaultCloudFoundryOperations.builder()
+                        .cloudFoundryClient(this.cloudFoundryClient)
+                        .dopplerClient(this.dopplerClient)
+                        .routingClient(this.routingClient)
+                        .organization(TEST_ORGANIZATION_NAME)
+                        .space(TEST_SPACE_NAME)
+                        .uaaClient(this.uaaClient)
+                        .build();
+    }
 
     @Test
     void advanced() {

@@ -270,6 +270,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn({"organizationId", "spaceId"})
     DefaultCloudFoundryOperations cloudFoundryOperations(
             CloudFoundryClient cloudFoundryClient,
             DopplerClient dopplerClient,

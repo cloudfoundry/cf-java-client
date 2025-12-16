@@ -79,7 +79,7 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Override
     @Value.Derived
     public Applications applications() {
-        return new DefaultApplications(getCloudFoundryClientPublisher(), getDopplerClientPublisher(), getSpaceId());
+        return new DefaultApplications(getCloudFoundryClient(), getDopplerClient(), getSpaceId().block());
     }
 
     @Override
@@ -318,12 +318,14 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
 
     private static Flux<OrganizationResource> requestOrganizations(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organization) {
         return cloudFoundryClientPublisher
-            .flatMapMany(cloudFoundryClient -> PaginationUtils
-                .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3()
-                    .list(ListOrganizationsRequest.builder()
-                        .name(organization)
-                        .page(page)
-                        .build())));
+                .flatMapMany(cloudFoundryClient -> PaginationUtils
+                        .requestClientV3Resources(page -> cloudFoundryClient.organizationsV3()
+                                .list(ListOrganizationsRequest.builder()
+                                        .name(organization)
+                                        .page(page)
+                                        .build())
+                        )
+                );
     }
 
     private static Flux<SpaceResource> requestSpaces(Mono<CloudFoundryClient> cloudFoundryClientPublisher, String organizationId, String space) {
