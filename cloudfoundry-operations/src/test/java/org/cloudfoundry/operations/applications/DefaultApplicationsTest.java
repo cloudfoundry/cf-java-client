@@ -161,10 +161,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private final DefaultApplications applications =
             new DefaultApplications(
-                    Mono.just(this.cloudFoundryClient),
-                    Mono.just(this.dopplerClient),
-                    this.randomWords,
-                    Mono.just(TEST_SPACE_ID));
+                    this.cloudFoundryClient, this.dopplerClient, this.randomWords, TEST_SPACE_ID);
 
     @Test
     void copySourceNoRestartOrgSpace() {
