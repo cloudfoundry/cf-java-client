@@ -73,6 +73,9 @@ import org.cloudfoundry.uaa.groups.Group;
 import org.cloudfoundry.uaa.groups.ListGroupsRequest;
 import org.cloudfoundry.uaa.groups.ListGroupsResponse;
 import org.cloudfoundry.uaa.groups.MemberType;
+import org.cloudfoundry.uaa.ratelimit.Current;
+import org.cloudfoundry.uaa.ratelimit.RatelimitRequest;
+import org.cloudfoundry.uaa.ratelimit.RatelimitResponse;
 import org.cloudfoundry.uaa.users.CreateUserRequest;
 import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
@@ -195,7 +198,8 @@ public class IntegrationTestConfiguration {
     UaaClient adminUaaClient(
             ConnectionContext connectionContext,
             @Value("${test.admin.clientId}") String clientId,
-            @Value("${test.admin.clientSecret}") String clientSecret) {
+            @Value("${test.admin.clientSecret}") String clientSecret,
+            int uaaLimiterMapping) {
         return new ThrottlingUaaClient(
                 ReactorUaaClient.builder()
                         .connectionContext(connectionContext)
@@ -204,7 +208,8 @@ public class IntegrationTestConfiguration {
                                         .clientId(clientId)
                                         .clientSecret(clientSecret)
                                         .build())
-                        .build());
+                        .build(),
+                uaaLimiterMapping);
     }
 
     @Bean(initMethod = "block")
@@ -244,6 +249,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn("uaaRatelimit")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -318,6 +324,54 @@ public class IntegrationTestConfiguration {
         }
 
         return connectionContext.build();
+    }
+
+    @Bean
+    public Integer uaaLimiterMapping(
+            @Value("${uaa.api.request.limit:#{null}}") Integer environmentRequestLimit) {
+        return environmentRequestLimit;
+    }
+
+    @Bean
+    Boolean uaaRatelimit(
+            ConnectionContext connectionContext, @Qualifier("admin") UaaClient uaaClient) {
+        return uaaClient
+                .rateLimit()
+                .getRatelimit(RatelimitRequest.builder().build())
+                .map(response -> getServerRatelimit(response))
+                .timeout(Duration.ofSeconds(5))
+                .onErrorResume(
+                        ex -> {
+                            logger.error(
+                                    "Warning: could not fetch UAA rate limit, using default"
+                                            + " "
+                                            + 0
+                                            + ". Cause: "
+                                            + ex);
+                            return Mono.just(false);
+                        })
+                .block();
+    }
+
+    private Boolean getServerRatelimit(RatelimitResponse response) {
+        Current curr = response.getCurrentData();
+        if (!"ACTIVE".equals(curr.getStatus())) {
+            logger.debug(
+                    "UaaRatelimitInitializer server ratelimit is not 'ACTIVE', but "
+                            + curr.getStatus()
+                            + ". Ignoring server value for ratelimit.");
+            return false;
+        }
+        Integer result = curr.getLimiterMappings();
+        logger.info(
+                "Server uses uaa rate limiting. There are "
+                        + result
+                        + " mappings declared in file "
+                        + response.getFromSource());
+        logger.info(
+                "If you encounter 429 return codes, configure uaa rate limiting or set variable"
+                        + " 'UAA_API_REQUEST_LIMIT' to a save value.");
+        return true;
     }
 
     @Bean
@@ -644,12 +698,16 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    UaaClient uaaClient(ConnectionContext connectionContext, TokenProvider tokenProvider) {
+    UaaClient uaaClient(
+            ConnectionContext connectionContext,
+            TokenProvider tokenProvider,
+            int uaaLimiterMapping) {
         return new ThrottlingUaaClient(
                 ReactorUaaClient.builder()
                         .connectionContext(connectionContext)
                         .tokenProvider(tokenProvider)
-                        .build());
+                        .build(),
+                uaaLimiterMapping);
     }
 
     @Bean(initMethod = "block")

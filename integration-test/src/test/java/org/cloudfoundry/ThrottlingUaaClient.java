@@ -4,6 +4,7 @@ import io.github.resilience4j.ratelimiter.RateLimiter;
 import io.github.resilience4j.ratelimiter.RateLimiterConfig;
 import io.github.resilience4j.reactor.ratelimiter.operator.RateLimiterOperator;
 import java.time.Duration;
+import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.authorizations.Authorizations;
 import org.cloudfoundry.uaa.clients.Clients;
@@ -36,6 +37,7 @@ import org.cloudfoundry.uaa.groups.UpdateGroupRequest;
 import org.cloudfoundry.uaa.groups.UpdateGroupResponse;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.ratelimit.Ratelimit;
 import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.ChangeUserPasswordRequest;
@@ -61,6 +63,7 @@ import org.cloudfoundry.uaa.users.UserInfoResponse;
 import org.cloudfoundry.uaa.users.Users;
 import org.cloudfoundry.uaa.users.VerifyUserRequest;
 import org.cloudfoundry.uaa.users.VerifyUserResponse;
+import org.immutables.value.Value;
 import reactor.core.publisher.Mono;
 
 public class ThrottlingUaaClient implements UaaClient {
@@ -71,14 +74,21 @@ public class ThrottlingUaaClient implements UaaClient {
     private final ThrottledUsers users;
     private Groups groups;
 
-    public ThrottlingUaaClient(UaaClient delegate) {
+    public ThrottlingUaaClient(ReactorUaaClient delegate, int uaaLimit) {
+        // uaaLimit is calls per second. We need the milliseconds for one call because
+        // resilience4j uses sliced timeslots, while the uaa server uses a sliding window.
+        int timeBasePerRequest = 1000 / uaaLimit;
         this.delegate = delegate;
         RateLimiterConfig config =
                 RateLimiterConfig.custom()
-                        .limitForPeriod(5)
-                        .limitRefreshPeriod(Duration.ofSeconds(1))
+                        .limitForPeriod(1)
+                        .limitRefreshPeriod(
+                                Duration.ofMillis(
+                                        timeBasePerRequest + 20)) // 20 ms to handle clock skew.
+                        .timeoutDuration(Duration.ofSeconds(10))
                         .build();
         this.rateLimiter = RateLimiter.of("uaa", config);
+
         this.users = new ThrottledUsers();
         this.groups = new ThrottledGroups();
     }
@@ -126,6 +136,12 @@ public class ThrottlingUaaClient implements UaaClient {
     @Override
     public Groups groups() {
         return groups;
+    }
+
+    @Override
+    @Value.Derived
+    public Ratelimit rateLimit() {
+        return this.delegate.rateLimit();
     }
 
     public class ThrottledUsers implements Users {

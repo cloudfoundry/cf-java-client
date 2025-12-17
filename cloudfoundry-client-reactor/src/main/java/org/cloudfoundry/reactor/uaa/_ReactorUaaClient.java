@@ -33,6 +33,7 @@ import org.cloudfoundry.uaa.clients.Clients;
 import org.cloudfoundry.uaa.groups.Groups;
 import org.cloudfoundry.uaa.identityproviders.IdentityProviders;
 import org.cloudfoundry.uaa.identityzones.IdentityZones;
+import org.cloudfoundry.uaa.ratelimit.Ratelimit;
 import org.cloudfoundry.uaa.serverinformation.ServerInformation;
 import org.cloudfoundry.uaa.tokens.Tokens;
 import org.cloudfoundry.uaa.users.Users;
@@ -102,6 +103,12 @@ abstract class _ReactorUaaClient implements UaaClient {
     @Value.Derived
     public Users users() {
         return new ReactorUsers(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public Ratelimit rateLimit() {
+        return new ReactorRatelimit(getConnectionContext(), getRoot(), getTokenProvider(), getRequestTags());
     }
 
     /**
