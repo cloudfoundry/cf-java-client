@@ -19,18 +19,26 @@ package org.cloudfoundry.client.v3.roles;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.PaginatedResponse;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.spaces.SpaceResource;
+import org.cloudfoundry.client.v3.users.UserResource;
 import org.immutables.value.Value;
 
-/**
- * The response payload for the List Roles operation
- */
+import java.util.List;
+
+
 @JsonDeserialize
 @Value.Immutable
-abstract class _ListRolesResponse extends PaginatedResponse<RoleResource> {
-
-    @JsonProperty("included")
+public abstract class _RoleIncluded {
+    @JsonProperty("users")
     @Nullable
-    public abstract RoleIncluded getIncluded();
+    public abstract List<UserResource> getUsers();
 
+    @JsonProperty("spaces")
+    @Nullable
+    public abstract List<SpaceResource> getSpaces();
+
+    @JsonProperty("organizations")
+    @Nullable
+    public abstract List<OrganizationResource> getOrganizations();
 }

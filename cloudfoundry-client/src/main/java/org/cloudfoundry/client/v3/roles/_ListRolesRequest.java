@@ -58,4 +58,10 @@ abstract class _ListRolesRequest extends PaginatedRequest {
     @FilterParameter("user_guids")
     abstract List<String> getUserIds();
 
+    /**
+     * The include parameter
+     */
+    @FilterParameter("include")
+    abstract List<String> getInclude();
+
 }
