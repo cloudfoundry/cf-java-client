@@ -245,10 +245,10 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
         return Mono.zip(
-                        getApplicationId(request.getName(), spaceId),
+                        getApplicationId(request.getName()),
                         getApplicationIdFromOrgSpace(
                                 request.getTargetName(),
-                                spaceId,
+                                this.spaceId,
                                 request.getTargetOrganization(),
                                 request.getTargetSpace()))
                 .flatMap(
@@ -292,7 +292,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> disableSsh(DisableApplicationSshRequest request) {
-        return getApplicationIdV3(request.getName(), spaceId)
+        return getApplicationIdV3(request.getName())
                 // TODO dgarnier: is this correct?
                 .filterWhen(applicationId -> getSshEnabled(applicationId))
                 .flatMap(applicationId -> requestUpdateApplicationSsh(applicationId, false))
@@ -303,7 +303,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
-        return getApplicationIdV3(request.getName(), spaceId)
+        return getApplicationIdV3(request.getName())
                 .filterWhen(applicationId -> getSshEnabled(applicationId).map(enabled -> !enabled))
                 .flatMap(applicationId -> requestUpdateApplicationSsh(applicationId, true))
                 .then()
@@ -313,7 +313,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
-        return getApplication(request.getName(), spaceId)
+        return getApplication(request.getName())
                 .flatMap(app -> getAuxiliaryContent(app))
                 .map(function(DefaultApplications::toApplicationDetail))
                 .transform(OperationsLogging.log("Get Application"))
@@ -323,7 +323,7 @@ public final class DefaultApplications implements Applications {
     // TODO dgarnier: manifest v3?
     @Override
     public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 Mono.zip(
@@ -344,7 +344,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationEnvironments> getEnvironments(
             GetApplicationEnvironmentsRequest request) {
-        return getApplicationIdV3(request.getName(), spaceId)
+        return getApplicationIdV3(request.getName())
                 .flatMap(applicationId -> requestApplicationEnvironment(applicationId))
                 .map(DefaultApplications::toApplicationEnvironments)
                 .transform(OperationsLogging.log("Get Application Environments"))
@@ -353,7 +353,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMapMany(
                         applicationId ->
                                 requestEvents(applicationId)
@@ -367,7 +367,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
-        return getApplication(request.getName(), spaceId)
+        return getApplication(request.getName())
                 .map(DefaultApplications::toHealthCheck)
                 .transform(OperationsLogging.log("Get Application Health Check"))
                 .checkpoint();
@@ -375,7 +375,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationSummary> list() {
-        return requestSpaceSummary(spaceId)
+        return requestSpaceSummary()
                 .flatMapMany(DefaultApplications::extractApplications)
                 .map(DefaultApplications::toApplicationSummary)
                 .transform(OperationsLogging.log("List Applications"))
@@ -384,7 +384,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<Task> listTasks(ListApplicationTasksRequest request) {
-        return getApplicationIdV3(request.getName(), spaceId)
+        return getApplicationIdV3(request.getName())
                 .flatMapMany(applicationId -> requestListTasks(applicationId))
                 .map(DefaultApplications::toTask)
                 .transform(OperationsLogging.log("List Application Tasks"))
@@ -393,7 +393,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMapMany(applicationId -> getLogs(applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
@@ -468,7 +468,7 @@ public final class DefaultApplications implements Applications {
     // TODO dgarnier: pass orgId to constructor?
     @Override
     public Mono<Void> pushManifest(PushApplicationManifestRequest request) {
-        return getSpaceOrganizationId(spaceId)
+        return getSpaceOrganizationId(this.spaceId)
                 .flatMap(organizationId -> listAvailableDomains(organizationId))
                 .flatMapMany(
                         availableDomains ->
@@ -480,8 +480,7 @@ public final class DefaultApplications implements Applications {
                                                                 availableDomains,
                                                                 manifest,
                                                                 this.randomWords,
-                                                                request,
-                                                                spaceId);
+                                                                request);
                                                     } else if (!manifest.getDocker()
                                                             .getImage()
                                                             .isEmpty()) {
@@ -489,8 +488,7 @@ public final class DefaultApplications implements Applications {
                                                                 availableDomains,
                                                                 manifest,
                                                                 this.randomWords,
-                                                                request,
-                                                                spaceId);
+                                                                request);
                                                     } else {
                                                         throw new IllegalStateException(
                                                                 "One of application or"
@@ -513,11 +511,11 @@ public final class DefaultApplications implements Applications {
             throw new RuntimeException("Could not serialize manifest", e);
         }
 
-        return applyManifestAndWaitForCompletion(spaceId, manifestSerialized)
+        return applyManifestAndWaitForCompletion(manifestSerialized)
                 .flatMapMany(ignored -> Flux.fromIterable(request.getManifest().getApplications()))
                 .flatMap(
                         manifestApp ->
-                                getApplicationIdV3(manifestApp.getName(), spaceId)
+                                getApplicationIdV3(manifestApp.getName())
                                         .flatMap(
                                                 appId ->
                                                         Mono.zip(
@@ -535,7 +533,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 requestUpdateApplicationName(applicationId, request.getNewName()))
@@ -546,7 +544,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> restage(RestageApplicationRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 restageApplication(
@@ -560,7 +558,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
-        return getApplication(request.getName(), spaceId)
+        return getApplication(request.getName())
                 .flatMap(resource -> stopApplicationIfNotStopped(resource))
                 .flatMap(
                         stoppedApplication ->
@@ -575,7 +573,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 requestTerminateApplicationInstance(
@@ -586,7 +584,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Task> runTask(RunApplicationTaskRequest request) {
-        return getApplicationIdV3(request.getApplicationName(), spaceId)
+        return getApplicationIdV3(request.getApplicationName())
                 .flatMap(applicationId -> requestCreateTask(applicationId, request))
                 .map(DefaultApplications::toTask)
                 .transform(OperationsLogging.log("Run Application Task Instance"))
@@ -598,7 +596,7 @@ public final class DefaultApplications implements Applications {
         if (!areModifiersPresent(request)) {
             return Mono.empty();
         }
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 requestUpdateApplicationScale(
@@ -620,7 +618,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
-        return getApplication(request.getName(), spaceId)
+        return getApplication(request.getName())
                 .flatMap(
                         resource ->
                                 requestUpdateApplicationEnvironment(
@@ -636,7 +634,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 requestUpdateApplicationHealthCheckType(
@@ -648,7 +646,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
-        return getApplicationIdV3(request.getName(), spaceId)
+        return getApplicationIdV3(request.getName())
                 .flatMap(applicationId -> getSshEnabled(applicationId))
                 .transform(OperationsLogging.log("Is Application SSH Enabled"))
                 .checkpoint();
@@ -656,7 +654,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> start(StartApplicationRequest request) {
-        return getApplicationIdWhere(request.getName(), spaceId, isNotIn(STARTED_STATE))
+        return getApplicationIdWhere(request.getName(), isNotIn(STARTED_STATE))
                 .flatMap(
                         applicationId ->
                                 startApplicationAndWait(
@@ -670,7 +668,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> stop(StopApplicationRequest request) {
-        return getApplicationIdWhere(request.getName(), spaceId, isNotIn(STOPPED_STATE))
+        return getApplicationIdWhere(request.getName(), isNotIn(STOPPED_STATE))
                 .flatMap(applicationId -> stopApplication(applicationId))
                 .then()
                 .transform(OperationsLogging.log("Stop Application"))
@@ -679,7 +677,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> terminateTask(TerminateApplicationTaskRequest request) {
-        return getApplicationIdV3(request.getApplicationName(), spaceId)
+        return getApplicationIdV3(request.getApplicationName())
                 .flatMap(applicationId -> getTaskId(applicationId, request.getSequenceId()))
                 .flatMap(taskId -> requestTerminateTask(taskId))
                 .then()
@@ -689,7 +687,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
-        return getApplication(request.getName(), spaceId)
+        return getApplication(request.getName())
                 .flatMap(
                         resource ->
                                 requestUpdateApplicationEnvironment(
@@ -740,14 +738,13 @@ public final class DefaultApplications implements Applications {
                 .then(waitForRunningV3(appname, appId, null));
     }
 
-    private Mono<Void> applyManifestAndWaitForCompletion(
-            String spaceId, byte[] manifestSerialized) {
+    private Mono<Void> applyManifestAndWaitForCompletion(byte[] manifestSerialized) {
         return this.cloudFoundryClient
                 .spacesV3()
                 .applyManifest(
                         ApplyManifestRequest.builder()
                                 .manifest(manifestSerialized)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build())
                 .map(
                         response ->
@@ -773,25 +770,23 @@ public final class DefaultApplications implements Applications {
             String applicationId,
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         return getDefaultDomainId()
                 .flatMapMany(
                         domainId ->
                                 getPushRouteIdFromDomain(
-                                        availableDomains, domainId, manifest, randomWords, spaceId))
+                                        availableDomains, domainId, manifest, randomWords))
                 .flatMap(routeId -> requestAssociateRoute(applicationId, routeId))
                 .map(ResourceUtils::getId);
     }
 
-    private Mono<Void> bindServices(
-            String applicationId, ApplicationManifest manifest, String spaceId) {
+    private Mono<Void> bindServices(String applicationId, ApplicationManifest manifest) {
         if (manifest.getServices() == null || manifest.getServices().size() == 0) {
             return Mono.empty();
         }
 
         return Flux.fromIterable(manifest.getServices())
-                .flatMap(serviceInstanceName -> getServiceId(serviceInstanceName, spaceId))
+                .flatMap(serviceInstanceName -> getServiceId(serviceInstanceName))
                 .flatMap(
                         serviceInstanceId ->
                                 requestCreateServiceBinding(applicationId, serviceInstanceId)
@@ -1002,6 +997,10 @@ public final class DefaultApplications implements Applications {
         return Flux.fromIterable(getSpaceSummaryResponse.getApplications());
     }
 
+    private Mono<AbstractApplicationResource> getApplication(String application) {
+        return getApplication(application, spaceId);
+    }
+
     private Mono<AbstractApplicationResource> getApplication(String application, String spaceId) {
         return requestApplications(application, spaceId)
                 .single()
@@ -1027,13 +1026,16 @@ public final class DefaultApplications implements Applications {
                 .defaultIfEmpty(Collections.emptyList());
     }
 
+    private Mono<String> getApplicationId(String application) {
+        return getApplicationId(application, spaceId);
+    }
+
     private Mono<String> getApplicationId(String application, String spaceId) {
         return getApplication(application, spaceId).map(ResourceUtils::getId);
     }
 
-    private Mono<String> getApplicationId(
-            ApplicationManifest manifest, String spaceId, String stackId) {
-        return requestApplications(manifest.getName(), spaceId)
+    private Mono<String> getApplicationId(ApplicationManifest manifest, String stackId) {
+        return requestApplications(manifest.getName())
                 .singleOrEmpty()
                 .flatMap(
                         application -> {
@@ -1053,8 +1055,7 @@ public final class DefaultApplications implements Applications {
                                     .map(ResourceUtils::getId);
                         })
                 .switchIfEmpty(
-                        requestCreateApplication(manifest, spaceId, stackId)
-                                .map(ResourceUtils::getId));
+                        requestCreateApplication(manifest, stackId).map(ResourceUtils::getId));
     }
 
     private Mono<String> getApplicationIdFromOrgSpace(
@@ -1073,13 +1074,13 @@ public final class DefaultApplications implements Applications {
                 .flatMap(spaceId1 -> getApplicationId(application, spaceId1));
     }
 
-    private Mono<String> getApplicationIdV3(String applicationName, String spaceId) {
-        return getApplicationV3(applicationName, spaceId).map(ApplicationResource::getId);
+    private Mono<String> getApplicationIdV3(String applicationName) {
+        return getApplicationV3(applicationName).map(ApplicationResource::getId);
     }
 
     private Mono<String> getApplicationIdWhere(
-            String application, String spaceId, Predicate<AbstractApplicationResource> predicate) {
-        return getApplication(application, spaceId).filter(predicate).map(ResourceUtils::getId);
+            String application, Predicate<AbstractApplicationResource> predicate) {
+        return getApplication(application).filter(predicate).map(ResourceUtils::getId);
     }
 
     private Mono<ApplicationInstancesResponse> getApplicationInstances(String applicationId) {
@@ -1106,8 +1107,8 @@ public final class DefaultApplications implements Applications {
                         t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
-    private Mono<ApplicationResource> getApplicationV3(String application, String spaceId) {
-        return requestApplicationsV3(application, spaceId)
+    private Mono<ApplicationResource> getApplicationV3(String application) {
+        return requestApplicationsV3(application)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -1263,10 +1264,9 @@ public final class DefaultApplications implements Applications {
             List<DomainSummary> availableDomains,
             String domainId,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         if (isTcpDomain(availableDomains, domainId)) {
-            return requestCreateTcpRoute(domainId, spaceId).map(ResourceUtils::getId).flux();
+            return requestCreateTcpRoute(domainId).map(ResourceUtils::getId).flux();
         }
 
         List<String> hosts;
@@ -1295,16 +1295,14 @@ public final class DefaultApplications implements Applications {
                                                 requestCreateRoute(
                                                                 domainId,
                                                                 host,
-                                                                manifest.getRoutePath(),
-                                                                spaceId)
+                                                                manifest.getRoutePath())
                                                         .map(ResourceUtils::getId)));
     }
 
     private Flux<String> getPushRouteIdFromRoute(
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         return Flux.fromIterable(manifest.getRoutes())
                 .flatMap(
                         route ->
@@ -1317,11 +1315,10 @@ public final class DefaultApplications implements Applications {
                             String domainId =
                                     getDomainId(availableDomains, decomposedRoute.getDomain());
                             if (isTcpDomain(availableDomains, domainId)) {
-                                return getRouteIdForTcpRoute(
-                                        decomposedRoute, domainId, manifest, spaceId);
+                                return getRouteIdForTcpRoute(decomposedRoute, domainId, manifest);
                             } else {
                                 return getRouteIdForHttpRoute(
-                                        decomposedRoute, domainId, manifest, randomWords, spaceId);
+                                        decomposedRoute, domainId, manifest, randomWords);
                             }
                         });
     }
@@ -1342,28 +1339,23 @@ public final class DefaultApplications implements Applications {
             DecomposedRoute decomposedRoute,
             String domainId,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         String derivedHost = deriveHostname(decomposedRoute.getHost(), manifest, randomWords);
         return getRouteId(domainId, derivedHost, decomposedRoute.getPath())
                 .switchIfEmpty(
-                        requestCreateRoute(
-                                        domainId, derivedHost, decomposedRoute.getPath(), spaceId)
+                        requestCreateRoute(domainId, derivedHost, decomposedRoute.getPath())
                                 .map(ResourceUtils::getId));
     }
 
     private Mono<String> getRouteIdForTcpRoute(
-            DecomposedRoute decomposedRoute,
-            String domainId,
-            ApplicationManifest manifest,
-            String spaceId) {
+            DecomposedRoute decomposedRoute, String domainId, ApplicationManifest manifest) {
         if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false)) {
-            return requestCreateTcpRoute(domainId, spaceId).map(ResourceUtils::getId);
+            return requestCreateTcpRoute(domainId).map(ResourceUtils::getId);
         }
 
         return getTcpRouteId(domainId, decomposedRoute.getPort())
                 .switchIfEmpty(
-                        requestCreateTcpRoute(domainId, decomposedRoute.getPort(), spaceId)
+                        requestCreateTcpRoute(domainId, decomposedRoute.getPort())
                                 .map(ResourceUtils::getId));
     }
 
@@ -1374,15 +1366,15 @@ public final class DefaultApplications implements Applications {
     private Mono<Tuple2<Optional<List<org.cloudfoundry.client.v2.routes.Route>>, String>>
             getRoutesAndApplicationId(
                     DeleteApplicationRequest request, String spaceId, boolean deleteRoutes) {
-        return getApplicationId(request.getName(), spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
                                 getOptionalRoutes(deleteRoutes, applicationId)
                                         .zipWith(Mono.just(applicationId)));
     }
 
-    private Mono<String> getServiceId(String serviceInstanceName, String spaceId) {
-        return requestListServiceInstances(serviceInstanceName, spaceId)
+    private Mono<String> getServiceId(String serviceInstanceName) {
+        return requestListServiceInstances(serviceInstanceName)
                 .map(ResourceUtils::getId)
                 .single()
                 .onErrorResume(
@@ -1499,8 +1491,7 @@ public final class DefaultApplications implements Applications {
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
             List<RouteResource> existingRoutes,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
             return Flux.fromIterable(existingRoutes)
                     .map(ResourceUtils::getId)
@@ -1512,7 +1503,7 @@ public final class DefaultApplications implements Applications {
             if (manifest.getDomains() == null) {
                 if (existingRoutes.isEmpty()) {
                     return associateDefaultDomain(
-                                    applicationId, availableDomains, manifest, randomWords, spaceId)
+                                    applicationId, availableDomains, manifest, randomWords)
                             .then();
                 }
                 return Mono.empty(); // A route already exists for the application, do nothing
@@ -1524,8 +1515,7 @@ public final class DefaultApplications implements Applications {
                                                     availableDomains,
                                                     getDomainId(availableDomains, domain),
                                                     manifest,
-                                                    randomWords,
-                                                    spaceId)
+                                                    randomWords)
                                             .flatMap(
                                                     routeId ->
                                                             requestAssociateRoute(
@@ -1536,7 +1526,7 @@ public final class DefaultApplications implements Applications {
         List<String> existingRouteIds =
                 existingRoutes.stream().map(ResourceUtils::getId).collect(Collectors.toList());
 
-        return getPushRouteIdFromRoute(availableDomains, manifest, randomWords, spaceId)
+        return getPushRouteIdFromRoute(availableDomains, manifest, randomWords)
                 .filter(routeId -> !existingRouteIds.contains(routeId))
                 .flatMapSequential(routeId -> requestAssociateRoute(applicationId, routeId), 1)
                 .then();
@@ -1546,11 +1536,10 @@ public final class DefaultApplications implements Applications {
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
             RandomWords randomWords,
-            PushApplicationManifestRequest request,
-            String spaceId) {
+            PushApplicationManifestRequest request) {
 
         return getOptionalStackId(manifest.getStack())
-                .flatMapMany(stackId -> getApplicationId(manifest, spaceId, stackId.orElse(null)))
+                .flatMapMany(stackId -> getApplicationId(manifest, stackId.orElse(null)))
                 .flatMap(
                         applicationId ->
                                 Mono.zip(
@@ -1566,8 +1555,7 @@ public final class DefaultApplications implements Applications {
                                                         availableDomains,
                                                         manifest,
                                                         existingRoutes,
-                                                        randomWords,
-                                                        spaceId)
+                                                        randomWords)
                                                 .thenReturn(
                                                         Tuples.of(
                                                                 applicationId, matchedResources))))
@@ -1575,8 +1563,7 @@ public final class DefaultApplications implements Applications {
                         function(
                                 (applicationId, matchedResources) ->
                                         Mono.when(
-                                                        bindServices(
-                                                                applicationId, manifest, spaceId),
+                                                        bindServices(applicationId, manifest),
                                                         updateBuildpacks(applicationId, manifest),
                                                         uploadApplicationAndWait(
                                                                 applicationId,
@@ -1594,11 +1581,10 @@ public final class DefaultApplications implements Applications {
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
             RandomWords randomWords,
-            PushApplicationManifestRequest request,
-            String spaceId) {
+            PushApplicationManifestRequest request) {
 
         return getOptionalStackId(manifest.getStack())
-                .flatMapMany(stackId -> getApplicationId(manifest, spaceId, stackId.orElse(null)))
+                .flatMapMany(stackId -> getApplicationId(manifest, stackId.orElse(null)))
                 .flatMap(
                         applicationId ->
                                 Mono.zip(
@@ -1612,10 +1598,9 @@ public final class DefaultApplications implements Applications {
                                                         availableDomains,
                                                         manifest,
                                                         existingRoutes,
-                                                        randomWords,
-                                                        spaceId)
+                                                        randomWords)
                                                 .thenReturn(applicationId)))
-                .delayUntil(applicationId -> bindServices(applicationId, manifest, spaceId))
+                .delayUntil(applicationId -> bindServices(applicationId, manifest))
                 .flatMap(
                         applicationId ->
                                 stopAndStartApplication(
@@ -1682,6 +1667,10 @@ public final class DefaultApplications implements Applications {
                 .summary(SummaryApplicationRequest.builder().applicationId(applicationId).build());
     }
 
+    private Flux<AbstractApplicationResource> requestApplications(String application) {
+        return requestApplications(application, spaceId);
+    }
+
     private Flux<AbstractApplicationResource> requestApplications(
             String application, String spaceId) {
         return PaginationUtils.requestClientV2Resources(
@@ -1697,7 +1686,7 @@ public final class DefaultApplications implements Applications {
                 .cast(AbstractApplicationResource.class);
     }
 
-    private Flux<ApplicationResource> requestApplicationsV3(String application, String spaceId) {
+    private Flux<ApplicationResource> requestApplicationsV3(String application) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
@@ -1705,7 +1694,7 @@ public final class DefaultApplications implements Applications {
                                 .list(
                                         ListApplicationsRequest.builder()
                                                 .name(application)
-                                                .spaceId(spaceId)
+                                                .spaceId(this.spaceId)
                                                 .page(page)
                                                 .build()));
     }
@@ -1733,7 +1722,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<CreateApplicationResponse> requestCreateApplication(
-            ApplicationManifest manifest, String spaceId, String stackId) {
+            ApplicationManifest manifest, String stackId) {
         CreateApplicationRequest.Builder builder =
                 CreateApplicationRequest.builder()
                         .command(manifest.getCommand())
@@ -1748,7 +1737,7 @@ public final class DefaultApplications implements Applications {
                         .instances(manifest.getInstances())
                         .memory(manifest.getMemory())
                         .name(manifest.getName())
-                        .spaceId(spaceId)
+                        .spaceId(this.spaceId)
                         .stackId(stackId);
 
         if (manifest.getBuildpacks() != null && manifest.getBuildpacks().size() == 1) {
@@ -1775,7 +1764,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<CreateRouteResponse> requestCreateRoute(
-            String domainId, String host, String routePath, String spaceId) {
+            String domainId, String host, String routePath) {
         return this.cloudFoundryClient
                 .routes()
                 .create(
@@ -1783,7 +1772,7 @@ public final class DefaultApplications implements Applications {
                                 .domainId(domainId)
                                 .host(host)
                                 .path(routePath)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
@@ -1812,26 +1801,25 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private Mono<CreateRouteResponse> requestCreateTcpRoute(String domainId, String spaceId) {
+    private Mono<CreateRouteResponse> requestCreateTcpRoute(String domainId) {
         return this.cloudFoundryClient
                 .routes()
                 .create(
                         org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                                 .domainId(domainId)
                                 .generatePort(true)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
-    private Mono<CreateRouteResponse> requestCreateTcpRoute(
-            String domainId, Integer port, String spaceId) {
+    private Mono<CreateRouteResponse> requestCreateTcpRoute(String domainId, Integer port) {
         return this.cloudFoundryClient
                 .routes()
                 .create(
                         org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                                 .domainId(domainId)
                                 .port(port)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
@@ -1899,7 +1887,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private Flux<UnionServiceInstanceResource> requestListServiceInstances(
-            String serviceInstanceName, String spaceId) {
+            String serviceInstanceName) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
                         this.cloudFoundryClient
@@ -1909,7 +1897,7 @@ public final class DefaultApplications implements Applications {
                                                 .page(page)
                                                 .returnUserProvidedServiceInstances(true)
                                                 .name(serviceInstanceName)
-                                                .spaceId(spaceId)
+                                                .spaceId(this.spaceId)
                                                 .build()));
     }
 
@@ -2037,10 +2025,10 @@ public final class DefaultApplications implements Applications {
                 .get(GetSpaceRequest.builder().spaceId(spaceId).build());
     }
 
-    private Mono<GetSpaceSummaryResponse> requestSpaceSummary(String spaceId) {
+    private Mono<GetSpaceSummaryResponse> requestSpaceSummary() {
         return this.cloudFoundryClient
                 .spaces()
-                .getSummary(GetSpaceSummaryRequest.builder().spaceId(spaceId).build());
+                .getSummary(GetSpaceSummaryRequest.builder().spaceId(this.spaceId).build());
     }
 
     private Mono<GetStackResponse> requestStack(String stackId) {
