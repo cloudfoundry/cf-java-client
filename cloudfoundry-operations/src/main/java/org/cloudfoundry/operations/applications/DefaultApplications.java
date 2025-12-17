@@ -56,7 +56,6 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
@@ -112,10 +111,13 @@ import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
@@ -821,14 +823,15 @@ public final class DefaultApplications implements Applications {
         return manifest.getName().replaceAll("\\.", "");
     }
 
-    private static BiFunction<String, String, String> collectStates() {
+    public static BiFunction<ProcessState, ProcessState, ProcessState> collectStates() {
         return (totalState, instanceState) -> {
-            if ("RUNNING".equals(instanceState) || "RUNNING".equals(totalState)) {
-                return "RUNNING";
+            if (ProcessState.RUNNING.equals(instanceState)
+                    || ProcessState.RUNNING.equals(totalState)) {
+                return ProcessState.RUNNING;
             }
 
-            if ("FLAPPING".equals(instanceState) || "CRASHED".equals(instanceState)) {
-                return "FAILED";
+            if (ProcessState.CRASHED.equals(instanceState)) {
+                return ProcessState.CRASHED;
             }
 
             return totalState;
@@ -1096,7 +1099,8 @@ public final class DefaultApplications implements Applications {
                         t -> Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
-    private Mono<List<RouteResource>> getApplicationRoutes(String applicationId) {
+    private Mono<List<org.cloudfoundry.client.v3.routes.RouteResource>> getApplicationRoutes(
+            String applicationId) {
         return requestApplicationRoutes(applicationId).collectList();
     }
 
@@ -1433,8 +1437,8 @@ public final class DefaultApplications implements Applications {
         return Objects.equals(s, t);
     }
 
-    private static Predicate<String> isInstanceComplete() {
-        return state -> "RUNNING".equals(state) || "FAILED".equals(state);
+    private static Predicate<ProcessState> isInstanceComplete() {
+        return state -> ProcessState.RUNNING.equals(state) || ProcessState.CRASHED.equals(state);
     }
 
     private static Predicate<AbstractApplicationResource> isNotIn(String expectedState) {
@@ -1451,8 +1455,8 @@ public final class DefaultApplications implements Applications {
                 && STARTED_STATE.equals(ResourceUtils.getEntity(applicationResource).getState());
     }
 
-    private static Predicate<String> isRunning() {
-        return "RUNNING"::equals;
+    private static Predicate<ProcessState> isRunning() {
+        return ProcessState.RUNNING::equals;
     }
 
     private static Predicate<String> isStaged() {
@@ -1490,11 +1494,11 @@ public final class DefaultApplications implements Applications {
             String applicationId,
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            List<RouteResource> existingRoutes,
+            List<org.cloudfoundry.client.v3.routes.RouteResource> existingRoutes,
             RandomWords randomWords) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
             return Flux.fromIterable(existingRoutes)
-                    .map(ResourceUtils::getId)
+                    .map(org.cloudfoundry.client.v3.routes.RouteResource::getId)
                     .flatMap(routeId -> requestRemoveRouteFromApplication(applicationId, routeId))
                     .then();
         }
@@ -1524,7 +1528,9 @@ public final class DefaultApplications implements Applications {
         }
 
         List<String> existingRouteIds =
-                existingRoutes.stream().map(ResourceUtils::getId).collect(Collectors.toList());
+                existingRoutes.stream()
+                        .map(org.cloudfoundry.client.v3.routes.RouteResource::getId)
+                        .collect(Collectors.toList());
 
         return getPushRouteIdFromRoute(availableDomains, manifest, randomWords)
                 .filter(routeId -> !existingRouteIds.contains(routeId))
@@ -1640,11 +1646,23 @@ public final class DefaultApplications implements Applications {
                         ApplicationInstancesRequest.builder().applicationId(applicationId).build());
     }
 
-    private Flux<RouteResource> requestApplicationRoutes(String applicationId) {
-        return PaginationUtils.requestClientV2Resources(
+    private Mono<GetApplicationProcessStatisticsResponse> requestApplicationStatisticsV3(
+            String applicationId) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .getProcessStatistics(
+                        GetApplicationProcessStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web")
+                                .build());
+    }
+
+    private Flux<org.cloudfoundry.client.v3.routes.RouteResource> requestApplicationRoutes(
+            String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
-                                .applicationsV2()
+                                .applicationsV3()
                                 .listRoutes(
                                         ListApplicationRoutesRequest.builder()
                                                 .applicationId(applicationId)
@@ -2616,10 +2634,10 @@ public final class DefaultApplications implements Applications {
             String application, String applicationId, Duration startupTimeout) {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
-        return requestApplicationInstances(applicationId)
-                .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
-                .map(ApplicationInstanceInfo::getState)
-                .reduce("UNKNOWN", collectStates())
+        return requestApplicationStatisticsV3(applicationId)
+                .flatMapIterable(GetApplicationProcessStatisticsResponse::getResources)
+                .map(ProcessStatisticsResource::getState)
+                .reduce(ProcessState.STARTING, collectStates())
                 .filter(isInstanceComplete())
                 .repeatWhenEmpty(
                         exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))

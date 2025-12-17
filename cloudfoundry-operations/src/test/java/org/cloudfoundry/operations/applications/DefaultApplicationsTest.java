@@ -16,14 +16,6 @@
 
 package org.cloudfoundry.operations.applications;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
-import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
-import static org.cloudfoundry.operations.TestObjects.fill;
-import static org.mockito.Mockito.RETURNS_SMART_NULLS;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
 import java.io.IOException;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -36,6 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
 import java.util.function.Supplier;
+
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
@@ -55,8 +48,6 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
@@ -124,15 +115,21 @@ import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.processes.ProcessState;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -149,11 +146,20 @@ import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.test.scheduler.VirtualTimeScheduler;
+
+import org.springframework.core.io.ClassPathResource;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
+import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
+import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_SMART_NULLS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 final class DefaultApplicationsTest extends AbstractOperationsTest {
 
@@ -362,7 +368,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(ClientV2Exception.class)
                                         .hasMessage(
                                                 "test-error-details-errorCode(1):"
-                                                        + " test-error-details-description"))
+                                                + " test-error-details-description"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -803,7 +809,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .actor("test-event-actorName")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
-                                                + " environment_json: test-data")
+                                        + " environment_json: test-data")
                                 .event("test-event-type")
                                 .id("test-event-id")
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
@@ -949,7 +955,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .actor("test-event-actorName")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
-                                                + " environment_json: test-data")
+                                        + " environment_json: test-data")
                                 .event("test-event-type")
                                 .id("test-event-id")
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
@@ -3197,7 +3203,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(ClientV2Exception.class)
                                         .hasMessage(
                                                 "test-error-details-errorCode(1):"
-                                                        + " test-error-details-description"))
+                                                + " test-error-details-description"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3296,7 +3302,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
                                                 "Application test-application-name failed during"
-                                                        + " staging"))
+                                                + " staging"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3346,7 +3352,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
                                                 "Application test-application-name failed during"
-                                                        + " start"))
+                                                + " start"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3374,7 +3380,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
                                                 "Application test-application-name timed out during"
-                                                        + " staging"))
+                                                + " staging"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3461,7 +3467,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalArgumentException.class)
                                         .hasMessage(
                                                 "Application test-non-existent-app-name does not"
-                                                        + " exist"))
+                                                + " exist"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3774,7 +3780,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
                                                 "Application test-application-name failed during"
-                                                        + " start"))
+                                                + " start"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3799,7 +3805,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
                                                 "Application test-application-name timed out during"
-                                                        + " start"))
+                                                + " start"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3995,11 +4001,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationEmptyInstance(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 ApplicationInstancesResponse.builder()
@@ -4012,22 +4018,22 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationEmptyStats(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .statistics(
-                                ApplicationStatisticsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .statistics(
+                        ApplicationStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
     private static void requestApplicationEnvironment(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .getEnvironment(
-                                GetApplicationEnvironmentRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV3()
+                .getEnvironment(
+                        GetApplicationEnvironmentRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 GetApplicationEnvironmentResponse.builder()
@@ -4046,19 +4052,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstances(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 ApplicationInstancesResponse.builder()
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .build())
                                         .build()));
     }
@@ -4066,11 +4072,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstancesError(
             CloudFoundryClient cloudFoundryClient, String applicationId, Integer code) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.error(
                                 new ClientV2Exception(
@@ -4083,29 +4089,50 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstancesFailingPartial(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("RUNNING")
                                                         .build())
                                         .instance(
                                                 "instance-1",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("FLAPPING")
+                                                        .build())
+                                        .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resources(
+                                                fill(
+                                                        ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.RUNNING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build(),
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.CRASHED)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4113,22 +4140,36 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstancesFailingTotal(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("FLAPPING")
+                                                        .build())
+                                        .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(
+                                                        ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.CRASHED)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4136,22 +4177,37 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstancesRunning(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("RUNNING")
+                                                        .build())
+                                        .build()));
+
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(
+                                                        ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.RUNNING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4159,22 +4215,36 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationInstancesTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("STARTING")
+                                                        .build())
+                                        .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(
+                                                        ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.STARTING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4182,30 +4252,30 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationNoInstances(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(Mono.just(ApplicationInstancesResponse.builder().build()));
     }
 
     private static void requestApplicationNullStats(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .statistics(
-                                ApplicationStatisticsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .statistics(
+                        ApplicationStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 ApplicationStatisticsResponse.builder()
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                InstanceStatistics.builder(),
-                                                                "instance-statistics-")
+                                                        InstanceStatistics.builder(),
+                                                        "instance-statistics-")
                                                         .statistics(null)
                                                         .build())
                                         .build()));
@@ -4214,24 +4284,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationNullUsage(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .statistics(
-                                ApplicationStatisticsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .statistics(
+                        ApplicationStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 ApplicationStatisticsResponse.builder()
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                InstanceStatistics.builder(),
-                                                                "instance-statistics-")
+                                                        InstanceStatistics.builder(),
+                                                        "instance-statistics-")
                                                         .statistics(
                                                                 fill(
-                                                                                Statistics
-                                                                                        .builder(),
-                                                                                "statistics-")
+                                                                        Statistics
+                                                                                .builder(),
+                                                                        "statistics-")
                                                                         .usage(null)
                                                                         .build())
                                                         .build())
@@ -4241,56 +4311,56 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationRoutes(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .listRoutes(
-                                ListApplicationRoutesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV3()
+                .listRoutes(
+                        org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(ListApplicationRoutesResponse.builder())
+                                fill(org.cloudfoundry.client.v3.applications
+                                        .ListApplicationRoutesResponse.builder())
                                         .resource(
-                                                fill(RouteResource.builder())
-                                                        .metadata(
-                                                                fill(Metadata.builder())
-                                                                        .id(routeId)
-                                                                        .build())
+                                                fill(org.cloudfoundry.client.v3.routes.RouteResource
+                                                        .builder())
+                                                        .id(routeId)
                                                         .build())
-                                        .totalPages(1)
+                                        .pagination(Pagination.builder().totalPages(1).build())
                                         .build()));
     }
 
     private static void requestApplicationRoutesEmpty(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .listRoutes(
-                                ListApplicationRoutesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV3()
+                .listRoutes(
+                        ListApplicationRoutesRequest.builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListApplicationRoutesResponse.builder())
-                                        .totalPages(1)
+                                        .pagination(Pagination.builder().totalPages(1).build())
                                         .build()));
     }
 
     private static void requestApplicationServiceBindings(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .listServiceBindings(
-                                ListApplicationServiceBindingsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV2()
+                .listServiceBindings(
+                        ListApplicationServiceBindingsRequest.builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ListApplicationServiceBindingsResponse.builder(),
-                                                "test-service-binding-")
+                                        ListApplicationServiceBindingsResponse.builder(),
+                                        "test-service-binding-")
                                         .resource(
                                                 fill(ServiceBindingResource.builder())
                                                         .metadata(
@@ -4306,41 +4376,41 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationServiceBindingsEmpty(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .listServiceBindings(
-                                ListApplicationServiceBindingsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV2()
+                .listServiceBindings(
+                        ListApplicationServiceBindingsRequest.builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
     private static void requestApplicationStatistics(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .statistics(
-                                ApplicationStatisticsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .statistics(
+                        ApplicationStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 ApplicationStatisticsResponse.builder()
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                InstanceStatistics.builder(),
-                                                                "instance-statistics-")
+                                                        InstanceStatistics.builder(),
+                                                        "instance-statistics-")
                                                         .statistics(
                                                                 fill(
-                                                                                Statistics
-                                                                                        .builder(),
-                                                                                "statistics-")
+                                                                        Statistics
+                                                                                .builder(),
+                                                                        "statistics-")
                                                                         .usage(
                                                                                 fill(
-                                                                                                Usage
-                                                                                                        .builder(),
-                                                                                                "usage-")
+                                                                                        Usage
+                                                                                                .builder(),
+                                                                                        "usage-")
                                                                                         .build())
                                                                         .build())
                                                         .build())
@@ -4350,11 +4420,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationStatisticsError(
             CloudFoundryClient cloudFoundryClient, String applicationId, Integer code) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .statistics(
-                                ApplicationStatisticsRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .statistics(
+                        ApplicationStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.error(
                                 new ClientV2Exception(
@@ -4367,11 +4437,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummary(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
@@ -4380,17 +4450,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                                         .route(
                                                 fill(
-                                                                org.cloudfoundry.client.v2.routes
-                                                                        .Route.builder(),
-                                                                "route-")
+                                                        org.cloudfoundry.client.v2.routes
+                                                                .Route.builder(),
+                                                        "route-")
                                                         .domain(
                                                                 fill(
-                                                                                org.cloudfoundry
-                                                                                        .client.v2
-                                                                                        .domains
-                                                                                        .Domain
-                                                                                        .builder(),
-                                                                                "domain-")
+                                                                        org.cloudfoundry
+                                                                                .client.v2
+                                                                                .domains
+                                                                                .Domain
+                                                                                .builder(),
+                                                                        "domain-")
                                                                         .build())
                                                         .path("/test-path")
                                                         .port(null)
@@ -4407,27 +4477,27 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummaryDetectedBuildpack(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
                                         .route(
                                                 fill(
-                                                                org.cloudfoundry.client.v2.routes
-                                                                        .Route.builder(),
-                                                                "route-")
+                                                        org.cloudfoundry.client.v2.routes
+                                                                .Route.builder(),
+                                                        "route-")
                                                         .domain(
                                                                 fill(
-                                                                                org.cloudfoundry
-                                                                                        .client.v2
-                                                                                        .domains
-                                                                                        .Domain
-                                                                                        .builder(),
-                                                                                "domain-")
+                                                                        org.cloudfoundry
+                                                                                .client.v2
+                                                                                .domains
+                                                                                .Domain
+                                                                                .builder(),
+                                                                        "domain-")
                                                                         .build())
                                                         .build())
                                         .buildpack(null)
@@ -4438,11 +4508,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummaryDocker(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
@@ -4451,17 +4521,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                                         .route(
                                                 fill(
-                                                                org.cloudfoundry.client.v2.routes
-                                                                        .Route.builder(),
-                                                                "route-")
+                                                        org.cloudfoundry.client.v2.routes
+                                                                .Route.builder(),
+                                                        "route-")
                                                         .domain(
                                                                 fill(
-                                                                                org.cloudfoundry
-                                                                                        .client.v2
-                                                                                        .domains
-                                                                                        .Domain
-                                                                                        .builder(),
-                                                                                "domain-")
+                                                                        org.cloudfoundry
+                                                                                .client.v2
+                                                                                .domains
+                                                                                .Domain
+                                                                                .builder(),
+                                                                        "domain-")
                                                                         .build())
                                                         .path("/test-path")
                                                         .port(null)
@@ -4482,27 +4552,27 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummaryNoBuildpack(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
                                         .route(
                                                 fill(
-                                                                org.cloudfoundry.client.v2.routes
-                                                                        .Route.builder(),
-                                                                "route-")
+                                                        org.cloudfoundry.client.v2.routes
+                                                                .Route.builder(),
+                                                        "route-")
                                                         .domain(
                                                                 fill(
-                                                                                org.cloudfoundry
-                                                                                        .client.v2
-                                                                                        .domains
-                                                                                        .Domain
-                                                                                        .builder(),
-                                                                                "domain-")
+                                                                        org.cloudfoundry
+                                                                                .client.v2
+                                                                                .domains
+                                                                                .Domain
+                                                                                .builder(),
+                                                                        "domain-")
                                                                         .build())
                                                         .build())
                                         .buildpack(null)
@@ -4514,11 +4584,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummaryNoRoutes(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
@@ -4533,11 +4603,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationSummaryTcp(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .summary(
-                                SummaryApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .summary(
+                        SummaryApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(SummaryApplicationResponse.builder(), "application-summary-")
@@ -4546,17 +4616,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .packageUpdatedAt(DateUtils.formatToIso8601(new Date(0)))
                                         .route(
                                                 fill(
-                                                                org.cloudfoundry.client.v2.routes
-                                                                        .Route.builder(),
-                                                                "route-")
+                                                        org.cloudfoundry.client.v2.routes
+                                                                .Route.builder(),
+                                                        "route-")
                                                         .domain(
                                                                 fill(
-                                                                                org.cloudfoundry
-                                                                                        .client.v2
-                                                                                        .domains
-                                                                                        .Domain
-                                                                                        .builder(),
-                                                                                "domain-")
+                                                                        org.cloudfoundry
+                                                                                .client.v2
+                                                                                .domains
+                                                                                .Domain
+                                                                                .builder(),
+                                                                        "domain-")
                                                                         .build())
                                                         .port(999)
                                                         .build())
@@ -4589,13 +4659,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String applicationId,
             Map<String, Object> envResponse) {
         when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .page(1)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .spaces()
+                .listApplications(
+                        ListSpaceApplicationsRequest.builder()
+                                .name(application)
+                                .page(1)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSpaceApplicationsResponse.builder())
@@ -4607,9 +4677,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                         .build())
                                                         .entity(
                                                                 fill(
-                                                                                ApplicationEntity
-                                                                                        .builder(),
-                                                                                "application-")
+                                                                        ApplicationEntity
+                                                                                .builder(),
+                                                                        "application-")
                                                                         .environmentJsons(
                                                                                 envResponse)
                                                                         .healthCheckType(
@@ -4625,26 +4695,26 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationsEmpty(
             CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .page(1)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .spaces()
+                .listApplications(
+                        ListSpaceApplicationsRequest.builder()
+                                .name(application)
+                                .page(1)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(Mono.just(fill(ListSpaceApplicationsResponse.builder()).build()));
     }
 
     private static void requestApplicationsEmptyV3(
             CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .list(
-                                ListApplicationsRequest.builder()
-                                        .name(application)
-                                        .spaceId(spaceId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV3()
+                .list(
+                        ListApplicationsRequest.builder()
+                                .name(application)
+                                .spaceId(spaceId)
+                                .page(1)
+                                .build()))
                 .thenReturn(Mono.just(fill(ListApplicationsResponse.builder()).build()));
     }
 
@@ -4654,13 +4724,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String spaceId,
             String stateReturned) {
         when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .page(1)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .spaces()
+                .listApplications(
+                        ListSpaceApplicationsRequest.builder()
+                                .name(application)
+                                .page(1)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSpaceApplicationsResponse.builder())
@@ -4668,9 +4738,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                 fill(ApplicationResource.builder(), "application-")
                                                         .entity(
                                                                 fill(
-                                                                                ApplicationEntity
-                                                                                        .builder(),
-                                                                                "application-entity-")
+                                                                        ApplicationEntity
+                                                                                .builder(),
+                                                                        "application-entity-")
                                                                         .state(stateReturned)
                                                                         .build())
                                                         .build())
@@ -4683,13 +4753,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String spaceId,
             String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .list(
-                                ListApplicationsRequest.builder()
-                                        .name(application)
-                                        .page(1)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .applicationsV3()
+                .list(
+                        ListApplicationsRequest.builder()
+                                .name(application)
+                                .page(1)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListApplicationsResponse.builder())
@@ -4721,13 +4791,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String spaceId,
             Boolean sshEnabled) {
         when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .spaceId(spaceId)
-                                        .page(1)
-                                        .build()))
+                .spaces()
+                .listApplications(
+                        ListSpaceApplicationsRequest.builder()
+                                .name(application)
+                                .spaceId(spaceId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSpaceApplicationsResponse.builder())
@@ -4739,9 +4809,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                         .build())
                                                         .entity(
                                                                 fill(
-                                                                                ApplicationEntity
-                                                                                        .builder(),
-                                                                                "application-")
+                                                                        ApplicationEntity
+                                                                                .builder(),
+                                                                        "application-")
                                                                         .environmentJson(
                                                                                 "test-var",
                                                                                 "test-value")
@@ -4755,12 +4825,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestAssociateRoute(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .associateRoute(
-                                AssociateApplicationRouteRequest.builder()
-                                        .applicationId(applicationId)
-                                        .routeId(routeId)
-                                        .build()))
+                .applicationsV2()
+                .associateRoute(
+                        AssociateApplicationRouteRequest.builder()
+                                .applicationId(applicationId)
+                                .routeId(routeId)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
@@ -4774,12 +4844,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String sourceApplicationId,
             String targetApplicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .copy(
-                                CopyApplicationRequest.builder()
-                                        .applicationId(targetApplicationId)
-                                        .sourceApplicationId(sourceApplicationId)
-                                        .build()))
+                .applicationsV2()
+                .copy(
+                        CopyApplicationRequest.builder()
+                                .applicationId(targetApplicationId)
+                                .sourceApplicationId(sourceApplicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(fill(CopyApplicationResponse.builder(), "copy-bits-").build()));
     }
@@ -4834,24 +4904,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                         .build());
 
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .create(
-                                requestBuilder
-                                        .command(request.getCommand())
-                                        .diego(true)
-                                        .diskQuota(request.getDiskQuota())
-                                        .dockerImage(request.getDockerImage())
-                                        .healthCheckTimeout(request.getTimeout())
-                                        .healthCheckType(
-                                                Optional.ofNullable(request.getHealthCheckType())
-                                                        .map(ApplicationHealthCheck::getValue)
-                                                        .orElse(null))
-                                        .instances(request.getInstances())
-                                        .memory(request.getMemory())
-                                        .name(request.getName())
-                                        .spaceId(spaceId)
-                                        .stackId(stackId)
-                                        .build()))
+                .applicationsV2()
+                .create(
+                        requestBuilder
+                                .command(request.getCommand())
+                                .diego(true)
+                                .diskQuota(request.getDiskQuota())
+                                .dockerImage(request.getDockerImage())
+                                .healthCheckTimeout(request.getTimeout())
+                                .healthCheckType(
+                                        Optional.ofNullable(request.getHealthCheckType())
+                                                .map(ApplicationHealthCheck::getValue)
+                                                .orElse(null))
+                                .instances(request.getInstances())
+                                .memory(request.getMemory())
+                                .name(request.getName())
+                                .spaceId(spaceId)
+                                .stackId(stackId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(CreateApplicationResponse.builder(), "create-")
@@ -4869,15 +4939,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String spaceId,
             String routeId) {
         when(cloudFoundryClient
-                        .routes()
-                        .create(
-                                CreateRouteRequest.builder()
-                                        .domainId(domainId)
-                                        .host(host)
-                                        .path(path)
-                                        .port(port)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domainId(domainId)
+                                .host(host)
+                                .path(path)
+                                .port(port)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(CreateRouteResponse.builder())
@@ -4894,14 +4964,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String spaceId,
             String routeId) {
         when(cloudFoundryClient
-                        .routes()
-                        .create(
-                                CreateRouteRequest.builder()
-                                        .domainId(domainId)
-                                        .generatePort(generatePort)
-                                        .port(port)
-                                        .spaceId(spaceId)
-                                        .build()))
+                .routes()
+                .create(
+                        CreateRouteRequest.builder()
+                                .domainId(domainId)
+                                .generatePort(generatePort)
+                                .port(port)
+                                .spaceId(spaceId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(CreateRouteResponse.builder())
@@ -4913,23 +4983,23 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestDeleteApplication(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .delete(
-                                org.cloudfoundry.client.v2.applications.DeleteApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .delete(
+                        org.cloudfoundry.client.v2.applications.DeleteApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
     private static void requestDeleteRoute(CloudFoundryClient cloudFoundryClient, String routeId) {
         when(cloudFoundryClient
-                        .routes()
-                        .delete(
-                                org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
-                                        .async(true)
-                                        .routeId(routeId)
-                                        .build()))
+                .routes()
+                .delete(
+                        org.cloudfoundry.client.v2.routes.DeleteRouteRequest.builder()
+                                .async(true)
+                                .routeId(routeId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(DeleteRouteResponse.builder())
@@ -4950,26 +5020,26 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         }
 
         when(cloudFoundryClient
-                        .events()
-                        .list(
-                                ListEventsRequest.builder()
-                                        .actee(applicationId)
-                                        .orderDirection(OrderDirection.DESCENDING)
-                                        .resultsPerPage(50)
-                                        .page(1)
-                                        .build()))
+                .events()
+                .list(
+                        ListEventsRequest.builder()
+                                .actee(applicationId)
+                                .orderDirection(OrderDirection.DESCENDING)
+                                .resultsPerPage(50)
+                                .page(1)
+                                .build()))
                 .thenReturn(Mono.just(responseBuilder.totalPages(1).build()));
     }
 
     private static void requestGetApplication(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .get(
-                                org.cloudfoundry.client.v2.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .get(
+                        org.cloudfoundry.client.v2.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.defer(
                                 new Supplier<Mono<GetApplicationResponse>>() {
@@ -4978,23 +5048,23 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                             new LinkedList<>(
                                                     Arrays.asList(
                                                             fill(
-                                                                            GetApplicationResponse
-                                                                                    .builder(),
-                                                                            "job-")
+                                                                    GetApplicationResponse
+                                                                            .builder(),
+                                                                    "job-")
                                                                     .entity(
                                                                             fill(ApplicationEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .packageState(
                                                                                             "STAGING")
                                                                                     .build())
                                                                     .build(),
                                                             fill(
-                                                                            GetApplicationResponse
-                                                                                    .builder(),
-                                                                            "job-")
+                                                                    GetApplicationResponse
+                                                                            .builder(),
+                                                                    "job-")
                                                                     .entity(
                                                                             fill(ApplicationEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .packageState(
                                                                                             "STAGED")
                                                                                     .build())
@@ -5010,12 +5080,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationFailing(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .get(
-                                org.cloudfoundry.client.v2.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .get(
+                        org.cloudfoundry.client.v2.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetApplicationResponse.builder())
@@ -5029,21 +5099,21 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestInstancesApplicationFailing(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
                                                         .state("FAILED")
                                                         .build())
                                         .build()));
@@ -5052,12 +5122,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .get(
-                                org.cloudfoundry.client.v2.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .get(
+                        org.cloudfoundry.client.v2.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetApplicationResponse.builder())
@@ -5071,12 +5141,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationV3Buildpack(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .get(
-                                org.cloudfoundry.client.v3.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV3()
+                .get(
+                        org.cloudfoundry.client.v3.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 org.cloudfoundry.client.v3.applications.GetApplicationResponse
@@ -5100,12 +5170,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationV3BuildpackMultiple(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .get(
-                                org.cloudfoundry.client.v3.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV3()
+                .get(
+                        org.cloudfoundry.client.v3.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 org.cloudfoundry.client.v3.applications.GetApplicationResponse
@@ -5131,12 +5201,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationV3Docker(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .get(
-                                org.cloudfoundry.client.v3.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV3()
+                .get(
+                        org.cloudfoundry.client.v3.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 org.cloudfoundry.client.v3.applications.GetApplicationResponse
@@ -5157,8 +5227,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetSharedDomain(
             CloudFoundryClient cloudFoundryClient, String domainId) {
         when(cloudFoundryClient
-                        .sharedDomains()
-                        .get(GetSharedDomainRequest.builder().sharedDomainId(domainId).build()))
+                .sharedDomains()
+                .get(GetSharedDomainRequest.builder().sharedDomainId(domainId).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetSharedDomainResponse.builder())
@@ -5178,7 +5248,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                             fill(GetJobResponse.builder(), "job-")
                                                                     .entity(
                                                                             fill(JobEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .status(
                                                                                             "running")
                                                                                     .build())
@@ -5186,12 +5256,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                             fill(GetJobResponse.builder(), "job-")
                                                                     .entity(
                                                                             fill(JobEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .errorDetails(
                                                                                             fill(
-                                                                                                            ErrorDetails
-                                                                                                                    .builder(),
-                                                                                                            "error-details-")
+                                                                                                    ErrorDetails
+                                                                                                            .builder(),
+                                                                                                    "error-details-")
                                                                                                     .build())
                                                                                     .status(
                                                                                             "failed")
@@ -5217,7 +5287,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                             fill(GetJobResponse.builder(), "job-")
                                                                     .entity(
                                                                             fill(JobEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .status(
                                                                                             "running")
                                                                                     .build())
@@ -5225,7 +5295,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                             fill(GetJobResponse.builder(), "job-")
                                                                     .entity(
                                                                             fill(JobEntity
-                                                                                            .builder())
+                                                                                    .builder())
                                                                                     .status(
                                                                                             "finished")
                                                                                     .build())
@@ -5262,17 +5332,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestListTasks(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .listTasks(
-                                org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .build()))
+                .applicationsV3()
+                .listTasks(
+                        org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(org.cloudfoundry.client.v3.applications
-                                                .ListApplicationTasksResponse.builder())
+                                        .ListApplicationTasksResponse.builder())
                                         .resource(fill(TaskResource.builder()).build())
                                         .build()));
     }
@@ -5280,18 +5350,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestListTasks(
             CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .listTasks(
-                                org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .sequenceId(sequenceId.toString())
-                                        .build()))
+                .applicationsV3()
+                .listTasks(
+                        org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .sequenceId(sequenceId.toString())
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(org.cloudfoundry.client.v3.applications
-                                                .ListApplicationTasksResponse.builder())
+                                        .ListApplicationTasksResponse.builder())
                                         .resource(fill(TaskResource.builder()).build())
                                         .build()));
     }
@@ -5299,24 +5369,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestListTasksEmpty(
             CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .listTasks(
-                                org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .page(1)
-                                        .sequenceId(sequenceId.toString())
-                                        .build()))
+                .applicationsV3()
+                .listTasks(
+                        org.cloudfoundry.client.v3.applications.ListApplicationTasksRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .page(1)
+                                .sequenceId(sequenceId.toString())
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(org.cloudfoundry.client.v3.applications
-                                                .ListApplicationTasksResponse.builder())
+                                        .ListApplicationTasksResponse.builder())
                                         .build()));
     }
 
     private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
         when(dopplerClient.recentLogs(
-                        RecentLogsRequest.builder().applicationId(applicationId).build()))
+                RecentLogsRequest.builder().applicationId(applicationId).build()))
                 .thenReturn(
                         Flux.just(
                                 Envelope.builder()
@@ -5342,13 +5412,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestOrganizationSpacesByName(
             CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient
-                        .organizations()
-                        .listSpaces(
-                                ListOrganizationSpacesRequest.builder()
-                                        .organizationId(organizationId)
-                                        .name(space)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .listSpaces(
+                        ListOrganizationSpacesRequest.builder()
+                                .organizationId(organizationId)
+                                .name(space)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListOrganizationSpacesResponse.builder())
@@ -5356,8 +5426,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                 SpaceResource.builder()
                                                         .metadata(
                                                                 fill(
-                                                                                Metadata.builder(),
-                                                                                "space-resource-metadata-")
+                                                                        Metadata.builder(),
+                                                                        "space-resource-metadata-")
                                                                         .build())
                                                         .entity(fill(SpaceEntity.builder()).build())
                                                         .build())
@@ -5368,13 +5438,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestOrganizationSpacesByNameNotFound(
             CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
         when(cloudFoundryClient
-                        .organizations()
-                        .listSpaces(
-                                ListOrganizationSpacesRequest.builder()
-                                        .organizationId(organizationId)
-                                        .name(space)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .listSpaces(
+                        ListOrganizationSpacesRequest.builder()
+                                .organizationId(organizationId)
+                                .name(space)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListOrganizationSpacesResponse.builder())
@@ -5385,12 +5455,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestOrganizations(
             CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient
-                        .organizations()
-                        .list(
-                                ListOrganizationsRequest.builder()
-                                        .name(organization)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .list(
+                        ListOrganizationsRequest.builder()
+                                .name(organization)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListOrganizationsResponse.builder())
@@ -5398,8 +5468,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                 OrganizationResource.builder()
                                                         .metadata(
                                                                 fill(
-                                                                                Metadata.builder(),
-                                                                                "organization-resource-metadata-")
+                                                                        Metadata.builder(),
+                                                                        "organization-resource-metadata-")
                                                                         .build())
                                                         .entity(
                                                                 fill(OrganizationEntity.builder())
@@ -5412,12 +5482,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestOrganizationsNotFound(
             CloudFoundryClient cloudFoundryClient, String organization) {
         when(cloudFoundryClient
-                        .organizations()
-                        .list(
-                                ListOrganizationsRequest.builder()
-                                        .name(organization)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .list(
+                        ListOrganizationsRequest.builder()
+                                .name(organization)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(fill(ListOrganizationsResponse.builder()).totalPages(1).build()));
     }
@@ -5425,13 +5495,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestPrivateDomainNotFound(
             CloudFoundryClient cloudFoundryClient, String domain, String organizationId) {
         when(cloudFoundryClient
-                        .organizations()
-                        .listPrivateDomains(
-                                ListOrganizationPrivateDomainsRequest.builder()
-                                        .name(domain)
-                                        .organizationId(organizationId)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .listPrivateDomains(
+                        ListOrganizationPrivateDomainsRequest.builder()
+                                .name(domain)
+                                .organizationId(organizationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(fill(ListOrganizationPrivateDomainsResponse.builder()).build()));
     }
@@ -5439,12 +5509,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestPrivateDomains(
             CloudFoundryClient cloudFoundryClient, String organizationId, String domainId) {
         when(cloudFoundryClient
-                        .organizations()
-                        .listPrivateDomains(
-                                ListOrganizationPrivateDomainsRequest.builder()
-                                        .organizationId(organizationId)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .listPrivateDomains(
+                        ListOrganizationPrivateDomainsRequest.builder()
+                                .organizationId(organizationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListOrganizationPrivateDomainsResponse.builder())
@@ -5465,12 +5535,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestPrivateDomainsEmpty(
             CloudFoundryClient cloudFoundryClient, String organizationId) {
         when(cloudFoundryClient
-                        .organizations()
-                        .listPrivateDomains(
-                                ListOrganizationPrivateDomainsRequest.builder()
-                                        .organizationId(organizationId)
-                                        .page(1)
-                                        .build()))
+                .organizations()
+                .listPrivateDomains(
+                        ListOrganizationPrivateDomainsRequest.builder()
+                                .organizationId(organizationId)
+                                .page(1)
+                                .build()))
                 .thenReturn(
                         Mono.just(fill(ListOrganizationPrivateDomainsResponse.builder()).build()));
     }
@@ -5478,36 +5548,36 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestRemoveApplicationRoute(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .removeRoute(
-                                RemoveApplicationRouteRequest.builder()
-                                        .applicationId(applicationId)
-                                        .routeId(routeId)
-                                        .build()))
+                .applicationsV2()
+                .removeRoute(
+                        RemoveApplicationRouteRequest.builder()
+                                .applicationId(applicationId)
+                                .routeId(routeId)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
     private static void requestRemoveServiceBinding(
             CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .removeServiceBinding(
-                                RemoveApplicationServiceBindingRequest.builder()
-                                        .applicationId(applicationId)
-                                        .serviceBindingId(serviceBindingId)
-                                        .build()))
+                .applicationsV2()
+                .removeServiceBinding(
+                        RemoveApplicationServiceBindingRequest.builder()
+                                .applicationId(applicationId)
+                                .serviceBindingId(serviceBindingId)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
     private static void requestRestageApplication(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .restage(
-                                org.cloudfoundry.client.v2.applications.RestageApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV2()
+                .restage(
+                        org.cloudfoundry.client.v2.applications.RestageApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(RestageApplicationResponse.builder(), "application-")
@@ -5570,20 +5640,20 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestRunTask(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .tasks()
-                        .create(
-                                CreateTaskRequest.builder()
-                                        .applicationId(applicationId)
-                                        .command("test-command")
-                                        .build()))
+                .tasks()
+                .create(
+                        CreateTaskRequest.builder()
+                                .applicationId(applicationId)
+                                .command("test-command")
+                                .build()))
                 .thenReturn(Mono.just(fill(CreateTaskResponse.builder()).build()));
     }
 
     private static void requestSharedDomain(
             CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
         when(cloudFoundryClient
-                        .sharedDomains()
-                        .list(ListSharedDomainsRequest.builder().page(1).name(domain).build()))
+                .sharedDomains()
+                .list(ListSharedDomainsRequest.builder().page(1).name(domain).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSharedDomainsResponse.builder())
@@ -5604,8 +5674,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestSharedDomains(
             CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
         when(cloudFoundryClient
-                        .sharedDomains()
-                        .list(ListSharedDomainsRequest.builder().page(1).build()))
+                .sharedDomains()
+                .list(ListSharedDomainsRequest.builder().page(1).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSharedDomainsResponse.builder())
@@ -5626,8 +5696,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestSharedDomainsEmpty(CloudFoundryClient cloudFoundryClient) {
         when(cloudFoundryClient
-                        .sharedDomains()
-                        .list(ListSharedDomainsRequest.builder().page(1).build()))
+                .sharedDomains()
+                .list(ListSharedDomainsRequest.builder().page(1).build()))
                 .thenReturn(Mono.just(fill(ListSharedDomainsResponse.builder()).build()));
     }
 
@@ -5646,15 +5716,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestSpaceSummary(CloudFoundryClient cloudFoundryClient, String spaceId) {
         when(cloudFoundryClient
-                        .spaces()
-                        .getSummary(GetSpaceSummaryRequest.builder().spaceId(spaceId).build()))
+                .spaces()
+                .getSummary(GetSpaceSummaryRequest.builder().spaceId(spaceId).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetSpaceSummaryResponse.builder(), "space-summary-")
                                         .application(
                                                 fill(
-                                                                SpaceApplicationSummary.builder(),
-                                                                "application-summary-")
+                                                        SpaceApplicationSummary.builder(),
+                                                        "application-summary-")
                                                         .build())
                                         .build()));
     }
@@ -5672,16 +5742,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestStackIdEmpty(CloudFoundryClient cloudFoundryClient, String stack) {
         when(cloudFoundryClient
-                        .stacks()
-                        .list(ListStacksRequest.builder().name(stack).page(1).build()))
+                .stacks()
+                .list(ListStacksRequest.builder().name(stack).page(1).build()))
                 .thenReturn(Mono.just(fill(ListStacksResponse.builder()).build()));
     }
 
     private static void requestTcpDomains(
             CloudFoundryClient cloudFoundryClient, String domain, String domainId) {
         when(cloudFoundryClient
-                        .sharedDomains()
-                        .list(ListSharedDomainsRequest.builder().page(1).build()))
+                .sharedDomains()
+                .list(ListSharedDomainsRequest.builder().page(1).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListSharedDomainsResponse.builder())
@@ -5703,12 +5773,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestTerminateApplicationInstance(
             CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .terminateInstance(
-                                TerminateApplicationInstanceRequest.builder()
-                                        .applicationId(applicationId)
-                                        .index(instanceIndex)
-                                        .build()))
+                .applicationsV2()
+                .terminateInstance(
+                        TerminateApplicationInstanceRequest.builder()
+                                .applicationId(applicationId)
+                                .index(instanceIndex)
+                                .build()))
                 .thenReturn(Mono.empty());
     }
 
@@ -5734,22 +5804,22 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         }
 
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                builder.applicationId(applicationId)
-                                        .command(manifest.getCommand())
-                                        .diskQuota(manifest.getDisk())
-                                        .environmentJsons(manifest.getEnvironmentVariables())
-                                        .healthCheckTimeout(manifest.getTimeout())
-                                        .healthCheckType(
-                                                Optional.ofNullable(manifest.getHealthCheckType())
-                                                        .map(ApplicationHealthCheck::getValue)
-                                                        .orElse(null))
-                                        .instances(manifest.getInstances())
-                                        .memory(manifest.getMemory())
-                                        .name(manifest.getName())
-                                        .stackId(stackId)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        builder.applicationId(applicationId)
+                                .command(manifest.getCommand())
+                                .diskQuota(manifest.getDisk())
+                                .environmentJsons(manifest.getEnvironmentVariables())
+                                .healthCheckTimeout(manifest.getTimeout())
+                                .healthCheckType(
+                                        Optional.ofNullable(manifest.getHealthCheckType())
+                                                .map(ApplicationHealthCheck::getValue)
+                                                .orElse(null))
+                                .instances(manifest.getInstances())
+                                .memory(manifest.getMemory())
+                                .name(manifest.getName())
+                                .stackId(stackId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
@@ -5763,12 +5833,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String applicationId,
             Map<String, Object> environment) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .environmentJsons(environment)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .environmentJsons(environment)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
@@ -5784,19 +5854,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String applicationId,
             ApplicationHealthCheck type) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .healthCheckType(type.getValue())
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .healthCheckType(type.getValue())
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
                                         .entity(
                                                 fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
+                                                        ApplicationEntity.builder(),
+                                                        "application-entity-")
                                                         .build())
                                         .build()));
     }
@@ -5804,19 +5874,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationRename(
             CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .name(name)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .name(name)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
                                         .entity(
                                                 fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
+                                                        ApplicationEntity.builder(),
+                                                        "application-entity-")
                                                         .build())
                                         .build()));
     }
@@ -5828,14 +5898,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             Integer instances,
             Integer memory) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .diskQuota(disk)
-                                        .instances(instances)
-                                        .memory(memory)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .diskQuota(disk)
+                                .instances(instances)
+                                .memory(memory)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
@@ -5846,19 +5916,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationSsh(
             CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .enableSsh(enabled)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .enableSsh(enabled)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationResponse.builder())
                                         .entity(
                                                 fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
+                                                        ApplicationEntity.builder(),
+                                                        "application-entity-")
                                                         .build())
                                         .build()));
     }
@@ -5867,13 +5937,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
 
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .updateFeature(
-                                UpdateApplicationFeatureRequest.builder()
-                                        .applicationId(applicationId)
-                                        .featureName(APP_FEATURE_SSH)
-                                        .enabled(enabled)
-                                        .build()))
+                .applicationsV3()
+                .updateFeature(
+                        UpdateApplicationFeatureRequest.builder()
+                                .applicationId(applicationId)
+                                .featureName(APP_FEATURE_SSH)
+                                .enabled(enabled)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UpdateApplicationFeatureResponse.builder())
@@ -5886,11 +5956,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetSshEnabled(
             CloudFoundryClient cloudFoundryClient, String applicationId, boolean status) {
         when(cloudFoundryClient
-                        .applicationsV3()
-                        .getSshEnabled(
-                                GetApplicationSshEnabledRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
+                .applicationsV3()
+                .getSshEnabled(
+                        GetApplicationSshEnabledRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetApplicationSshEnabledResponse.builder())
@@ -5910,12 +5980,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String state,
             int instances) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .state(state)
-                                        .build()))
+                .applicationsV2()
+                .update(
+                        UpdateApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .state(state)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 UpdateApplicationResponse.builder()
@@ -5935,13 +6005,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             Path application,
             String jobId) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .upload(
-                                UploadApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .async(true)
-                                        .application(application)
-                                        .build()))
+                .applicationsV2()
+                .upload(
+                        UploadApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .async(true)
+                                .application(application)
+                                .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(UploadApplicationResponse.builder())
