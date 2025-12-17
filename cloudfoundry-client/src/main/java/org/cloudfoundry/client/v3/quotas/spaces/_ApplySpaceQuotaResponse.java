@@ -17,6 +17,10 @@ import java.util.Map;
 @Value.Immutable
 abstract class _ApplySpaceQuotaResponse {
 
+    /**
+     * Relationships to the spaces where the quota is applied
+     * Use of JsonUnwrapped to inline the space relationships as per the API spec
+     */
     @JsonUnwrapped
     abstract ToManyRelationship spaceRelationships();
 

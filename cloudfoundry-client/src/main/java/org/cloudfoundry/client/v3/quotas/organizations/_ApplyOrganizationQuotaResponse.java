@@ -17,6 +17,10 @@ import java.util.Map;
 @Value.Immutable
 abstract class _ApplyOrganizationQuotaResponse {
 
+    /**
+     * Relationships to the organizations where the quota is applied
+     * Use of JsonUnwrapped to inline the organization relationships as per the API spec
+     */
     @JsonUnwrapped
     abstract ToManyRelationship organizationRelationships();
 

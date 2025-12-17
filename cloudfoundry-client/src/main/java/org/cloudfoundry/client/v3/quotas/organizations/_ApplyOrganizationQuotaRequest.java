@@ -20,7 +20,7 @@ abstract class _ApplyOrganizationQuotaRequest {
     abstract String getOrganizationQuotaId();
 
     /**
-     * A relationship to the organizations where the quota is applied
+     * Relationships to the organizations where the quota is applied
      * Use of JsonUnwrapped to inline the organization relationships as per the API spec
      */
     @JsonUnwrapped

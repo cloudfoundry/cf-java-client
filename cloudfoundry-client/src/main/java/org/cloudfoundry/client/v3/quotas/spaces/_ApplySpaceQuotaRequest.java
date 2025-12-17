@@ -20,7 +20,7 @@ abstract class _ApplySpaceQuotaRequest {
     abstract String getSpaceQuotaId();
 
     /**
-     * A relationship to the spaces where the quota is applied
+     * Relationships to the spaces where the quota is applied
      * Use of JsonUnwrapped to inline the space relationships as per the API spec
      */
     @JsonUnwrapped
