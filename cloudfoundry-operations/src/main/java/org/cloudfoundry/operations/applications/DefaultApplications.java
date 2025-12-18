@@ -116,7 +116,6 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
@@ -136,8 +135,6 @@ import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
@@ -2655,61 +2652,7 @@ public final class DefaultApplications implements Applications {
 
     private Mono<Void> waitForRunningV3(
             String applicationName, String applicationId, Duration startupTimeout) {
-        Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
-
-        return PaginationUtils.requestClientV3Resources(
-                        page ->
-                                this.cloudFoundryClient
-                                        .applicationsV3()
-                                        .listProcesses(
-                                                ListApplicationProcessesRequest.builder()
-                                                        .applicationId(applicationId)
-                                                        .page(page)
-                                                        .build()))
-                .filter(p -> p.getInstances() != 0)
-                .flatMap(
-                        process ->
-                                this.cloudFoundryClient
-                                        .processes()
-                                        .getStatistics(
-                                                GetProcessStatisticsRequest.builder()
-                                                        .processId(process.getId())
-                                                        .build())
-                                        .flatMapIterable(GetProcessStatisticsResponse::getResources)
-                                        .map(ProcessStatisticsResource::getState)
-                                        .filter(
-                                                state ->
-                                                        EnumSet.of(
-                                                                        ProcessState.RUNNING,
-                                                                        ProcessState.CRASHED)
-                                                                .contains(state))
-                                        .reduce(
-                                                (totalState, instanceState) ->
-                                                        totalState.ordinal()
-                                                                        < instanceState.ordinal()
-                                                                ? totalState
-                                                                : instanceState) // CRASHED takes
-                                        // precedence over
-                                        // RUNNING
-                                        .repeatWhenEmpty(
-                                                exponentialBackOff(
-                                                        Duration.ofSeconds(1),
-                                                        Duration.ofSeconds(15),
-                                                        timeout))
-                                        .filter(state -> state == ProcessState.RUNNING)
-                                        .switchIfEmpty(
-                                                ExceptionUtils.illegalState(
-                                                        "Process %s of Application %s failed during"
-                                                                + " start",
-                                                        process.getId(), applicationName))
-                                        .onErrorResume(
-                                                DelayTimeoutException.class,
-                                                t ->
-                                                        ExceptionUtils.illegalState(
-                                                                "Process %s of Application %s timed"
-                                                                        + " out during start",
-                                                                process.getId(), applicationName)))
-                .then();
+        return waitForRunning(applicationName, applicationId, startupTimeout);
     }
 
     private Mono<Void> waitForStaging(
