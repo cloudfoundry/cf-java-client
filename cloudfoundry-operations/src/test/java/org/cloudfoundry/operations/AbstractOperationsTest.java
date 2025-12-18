@@ -48,6 +48,7 @@ import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
+import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
@@ -117,6 +118,7 @@ public abstract class AbstractOperationsTest {
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
     protected final OrganizationsV3 organizationsV3 =
             mock(OrganizationsV3.class, RETURNS_SMART_NULLS);
+    protected final Processes processes = mock(Processes.class, RETURNS_SMART_NULLS);
 
     protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
 
@@ -188,6 +190,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.organizationQuotaDefinitions())
                 .thenReturn(this.organizationQuotaDefinitions);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
+        when(this.cloudFoundryClient.processes()).thenReturn(this.processes);
         when(this.cloudFoundryClient.resourceMatch()).thenReturn(this.resourceMatch);
         when(this.cloudFoundryClient.routes()).thenReturn(this.routes);
         when(this.cloudFoundryClient.routesV3()).thenReturn(this.routesV3);
