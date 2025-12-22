@@ -33,7 +33,7 @@ public interface SpaceQuotasV3 {
     Mono<CreateSpaceQuotaResponse> create(CreateSpaceQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#get-a-space-quota">Get Space Quota</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/#get-a-space-quota">Get Space Quota</a>
      * request
      *
      * @param request the Get Space Quota request
@@ -42,7 +42,7 @@ public interface SpaceQuotasV3 {
     Mono<GetSpaceQuotaResponse> get(GetSpaceQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.201.0/#list-space-quotas">List all Space Quota</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/#list-space-quotas">List all Space Quota</a>
      * request
      *
      * @param request the List all Space Quotas request
@@ -50,7 +50,7 @@ public interface SpaceQuotasV3 {
      */
     Mono<ListSpaceQuotasResponse> list(ListSpaceQuotasRequest request);
 
-    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#update-a-space-quota">Update Space Quota</a>
+    /** Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#update-a-space-quota">Update Space Quota</a>
      * request
      *
      * @param request the Update Space Quota request
@@ -59,7 +59,7 @@ public interface SpaceQuotasV3 {
     Mono<UpdateSpaceQuotaResponse> update(UpdateSpaceQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.123.0/index.html#delete-a-space-quota">Delete Space Quota</a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#delete-a-space-quota">Delete Space Quota</a>
      * request
      *
      * @param request the Delete Space Quota request
@@ -68,7 +68,7 @@ public interface SpaceQuotasV3 {
     Mono<String> delete(DeleteSpaceQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.208.0/index.html#apply-a-space-quota-to-a-space">Apply a Space Quota to a Space </a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#apply-a-space-quota-to-a-space">Apply a Space Quota to a Space </a>
      * request
      *
      * @param request the Apply a Space Quota to a Space request
@@ -77,7 +77,7 @@ public interface SpaceQuotasV3 {
     Mono<ApplySpaceQuotaResponse> apply(ApplySpaceQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.208.0/index.html#remove-a-space-quota-from-a-space">Remove a Space Quota from a Space </a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#remove-a-space-quota-from-a-space">Remove a Space Quota from a Space </a>
      * request
      *
      * @param request the Remove a Space Quota from a Space request

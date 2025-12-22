@@ -68,7 +68,7 @@ public interface OrganizationQuotasV3 {
     Mono<String> delete(DeleteOrganizationQuotaRequest request);
 
     /**
-     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.208.0/index.html#apply-an-organization-quota-to-an-organization">Apply an Organization Quota to an Organization </a>
+     * Makes the <a href="https://v3-apidocs.cloudfoundry.org/version/3.200.0/index.html#apply-an-organization-quota-to-an-organization">Apply an Organization Quota to an Organization </a>
      * request
      *
      * @param request the Apply an Organization Quota to an Organization request
