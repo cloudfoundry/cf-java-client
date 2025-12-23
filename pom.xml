@@ -74,6 +74,7 @@
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
         <spotless.version>2.44.4</spotless.version>
+        <resilience4j.version>1.7.0</resilience4j.version>
     </properties>
 
     <dependencyManagement>

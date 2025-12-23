@@ -69,22 +69,29 @@ import reactor.core.publisher.Mono;
 public class ThrottlingUaaClient implements UaaClient {
 
     private final UaaClient delegate;
-
+    private final int maxRequestsPerSecond;
     private final RateLimiter rateLimiter;
     private final ThrottledUsers users;
     private Groups groups;
 
-    public ThrottlingUaaClient(ReactorUaaClient delegate, int uaaLimit) {
+    /**
+     * An {@link UaaClient} implementation that throttles calls to the UAA
+     * {@code /Groups} and {@code /Users} endpoints. It uses a single "bucket"
+     * for throttling requests to both endpoints.
+     *
+     * @see <a href="https://resilience4j.readme.io/docs/ratelimiter">resilience4j docs</a>
+     */
+    public ThrottlingUaaClient(ReactorUaaClient delegate, int maxRequestsPerSecond) {
         // uaaLimit is calls per second. We need the milliseconds for one call because
         // resilience4j uses sliced timeslots, while the uaa server uses a sliding window.
-        int timeBasePerRequest = 1000 / uaaLimit;
+        int clockSkewMillis = 20; // 20ms clock skew is a save value for ~5 requests per second.
+        int rateLimitRefreshPeriodMillis = (1000 / maxRequestsPerSecond) + clockSkewMillis;
         this.delegate = delegate;
+        this.maxRequestsPerSecond = maxRequestsPerSecond;
         RateLimiterConfig config =
                 RateLimiterConfig.custom()
                         .limitForPeriod(1)
-                        .limitRefreshPeriod(
-                                Duration.ofMillis(
-                                        timeBasePerRequest + 20)) // 20 ms to handle clock skew.
+                        .limitRefreshPeriod(Duration.ofMillis(rateLimitRefreshPeriodMillis))
                         .timeoutDuration(Duration.ofSeconds(10))
                         .build();
         this.rateLimiter = RateLimiter.of("uaa", config);
@@ -142,6 +149,10 @@ public class ThrottlingUaaClient implements UaaClient {
     @Value.Derived
     public Ratelimit rateLimit() {
         return this.delegate.rateLimit();
+    }
+
+    public int getMaxRequestsPerSecond() {
+        return maxRequestsPerSecond;
     }
 
     public class ThrottledUsers implements Users {
