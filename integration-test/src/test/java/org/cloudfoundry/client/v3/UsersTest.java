@@ -16,6 +16,9 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
@@ -27,15 +30,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-import java.time.Duration;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v3)
 public final class UsersTest extends AbstractIntegrationTest {
 
-    @Autowired
-    private CloudFoundryClient cloudFoundryClient;
+    @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Test
     public void create() {
@@ -43,10 +41,7 @@ public final class UsersTest extends AbstractIntegrationTest {
 
         this.cloudFoundryClient
                 .usersV3()
-                .create(CreateUserRequest.builder()
-                        .userId(userId)
-                        .build()
-                )
+                .create(CreateUserRequest.builder().userId(userId).build())
                 .single()
                 .as(StepVerifier::create)
                 .expectNextCount(1)
@@ -59,11 +54,11 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createUser(this.cloudFoundryClient, userId)
-                .flatMap(createUserResponse ->
-                        this.cloudFoundryClient.usersV3()
-                                .get(GetUserRequest.builder()
-                                        .userId(userId)
-                                        .build()))
+                .flatMap(
+                        createUserResponse ->
+                                this.cloudFoundryClient
+                                        .usersV3()
+                                        .get(GetUserRequest.builder().userId(userId).build()))
                 .map(GetUserResponse::getId)
                 .as(StepVerifier::create)
                 .expectNext(userId)
@@ -97,19 +92,23 @@ public final class UsersTest extends AbstractIntegrationTest {
         String userId = this.nameFactory.getUserId();
 
         createUser(this.cloudFoundryClient, userId)
-                .flatMap(createUserResponse ->
-                        this.cloudFoundryClient.usersV3()
-                                .update(UpdateUserRequest.builder()
-                                        .userId(userId)
-                                        .metadata(Metadata.builder()
-                                                .annotation(
-                                                        "annotationKey",
-                                                        "annotationValue")
-                                                .label(
-                                                        "labelKey",
-                                                        "labelValue")
-                                                .build())
-                                        .build()))
+                .flatMap(
+                        createUserResponse ->
+                                this.cloudFoundryClient
+                                        .usersV3()
+                                        .update(
+                                                UpdateUserRequest.builder()
+                                                        .userId(userId)
+                                                        .metadata(
+                                                                Metadata.builder()
+                                                                        .annotation(
+                                                                                "annotationKey",
+                                                                                "annotationValue")
+                                                                        .label(
+                                                                                "labelKey",
+                                                                                "labelValue")
+                                                                        .build())
+                                                        .build()))
                 .then(getUser(cloudFoundryClient, userId))
                 .as(StepVerifier::create)
                 .consumeNextWith(
@@ -122,7 +121,6 @@ public final class UsersTest extends AbstractIntegrationTest {
                         })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
-
     }
 
     @Test
@@ -152,8 +150,6 @@ public final class UsersTest extends AbstractIntegrationTest {
 
     private static Mono<GetUserResponse> getUser(
             CloudFoundryClient cloudFoundryClient, String userId) {
-        return cloudFoundryClient
-                .usersV3()
-                .get(GetUserRequest.builder().userId(userId).build());
+        return cloudFoundryClient.usersV3().get(GetUserRequest.builder().userId(userId).build());
     }
 }
