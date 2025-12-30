@@ -36,6 +36,7 @@
     <logger name="example"                               level="DEBUG"/>
     <logger name="reactor.netty"                         level="INFO"/>
     <logger name="stream"                                level="INFO"/>
+    <logger name="org.cloudfoundry.uaa.UaaRatelimitTest" level="INFO"/>
 
     <root level="WARN">
         <appender-ref ref="STDOUT"/>
