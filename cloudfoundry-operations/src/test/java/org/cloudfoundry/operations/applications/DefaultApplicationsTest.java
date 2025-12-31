@@ -127,6 +127,8 @@ import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
@@ -136,6 +138,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
@@ -154,6 +158,8 @@ import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -970,21 +976,27 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @Test
-    void getHealthCheck() {
-        requestApplications(
+    @ParameterizedTest
+    @ValueSource(strings = {"http", "process"})
+    void getHealthCheck(String healthCheckType) {
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
-                "test-metadata-id");
+                "test-application-id");
+        requestApplicationProcesses(
+                this.cloudFoundryClient,
+                "test-application-id",
+                HealthCheckType.from(healthCheckType));
 
         this.applications
                 .getHealthCheck(
                         GetApplicationHealthCheckRequest.builder()
                                 .name("test-application-name")
                                 .build())
+                .map(ApplicationHealthCheck::getValue)
                 .as(StepVerifier::create)
-                .expectNext(ApplicationHealthCheck.PORT)
+                .expectNext(healthCheckType)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -4777,6 +4789,22 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .state(ApplicationState.STOPPED)
                                                         .updatedAt("test-updated-at")
                                                         .build())
+                                        .build()));
+    }
+
+    private static void requestApplicationProcesses(
+            CloudFoundryClient cloudFoundryClient, String applicationId, HealthCheckType type) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .getProcess(
+                                GetApplicationProcessRequest.builder()
+                                        .applicationId(applicationId)
+                                        .type("web")
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(GetApplicationProcessResponse.builder())
+                                        .healthCheck(fill(HealthCheck.builder()).type(type).build())
                                         .build()));
     }
 

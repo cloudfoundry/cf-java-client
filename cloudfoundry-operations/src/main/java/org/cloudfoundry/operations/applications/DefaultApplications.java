@@ -111,6 +111,8 @@ import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
@@ -135,6 +137,8 @@ import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
@@ -366,7 +370,11 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
-        return getApplication(request.getName())
+        return getApplicationV3(request.getName())
+                .map(ApplicationResource::getId)
+                .flatMap(this::requestApplicationWebProcess)
+                .map(GetApplicationProcessResponse::getHealthCheck)
+                .map(HealthCheck::getType)
                 .map(DefaultApplications::toHealthCheck)
                 .transform(OperationsLogging.log("Get Application Health Check"))
                 .checkpoint();
@@ -1654,6 +1662,16 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
+    private Mono<GetApplicationProcessResponse> requestApplicationWebProcess(String applicationId) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .getProcess(
+                        GetApplicationProcessRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web")
+                                .build());
+    }
+
     private Flux<org.cloudfoundry.client.v3.routes.RouteResource> requestApplicationRoutes(
             String applicationId) {
         return PaginationUtils.requestClientV3Resources(
@@ -2417,17 +2435,15 @@ public final class DefaultApplications implements Applications {
                 .build();
     }
 
-    private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
-        String type = resource.getEntity().getHealthCheckType();
-
-        if (ApplicationHealthCheck.HTTP.getValue().equals(type)) {
+    private static ApplicationHealthCheck toHealthCheck(HealthCheckType type) {
+        if (type == HealthCheckType.HTTP) {
             return ApplicationHealthCheck.HTTP;
-        } else if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
-            return ApplicationHealthCheck.NONE;
-        } else if (ApplicationHealthCheck.PORT.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PORT) {
             return ApplicationHealthCheck.PORT;
-        } else if (ApplicationHealthCheck.PROCESS.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PROCESS) {
             return ApplicationHealthCheck.PROCESS;
+        } else if (type == HealthCheckType.NONE) {
+            return ApplicationHealthCheck.NONE;
         } else {
             return null;
         }
