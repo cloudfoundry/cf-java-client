@@ -1,0 +1,33 @@
+{
+  "pagination": {
+    "total_results": 1,
+    "total_pages": 1,
+    "first": {
+      "href": "https://api.example.org/v3/users?page=1&per_page=1"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/users?page=1&per_page=1"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "guid": "3a5d3d89-3f89-4f05-8188-8a2b298c79d5",
+      "created_at": "2019-03-08T01:06:19Z",
+      "updated_at": "2019-03-08T01:06:19Z",
+      "username": "some-name",
+      "presentation_name": "some-name",
+      "origin": "uaa",
+      "metadata": {
+        "labels": {},
+        "annotations": {}
+      },
+      "links": {
+        "self": {
+          "href": "https://api.example.org/v3/users/3a5d3d89-3f89-4f05-8188-8a2b298c79d5"
+        }
+      }
+    }
+  ]
+}
