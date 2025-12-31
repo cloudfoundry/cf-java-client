@@ -16,18 +16,12 @@
 
 package org.cloudfoundry.client.v3.users;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 import org.junit.jupiter.api.Test;
 
 class CreateUserRequestTest {
-    @Test
-    void noUserId() {
-        assertThrows(IllegalStateException.class, () -> CreateUserRequest.builder().build());
-    }
 
     @Test
     void valid() {
-        CreateUserRequest.builder().userId("test-user-id").build();
+        CreateUserRequest.builder().build();
     }
 }

@@ -73,7 +73,6 @@ import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedS
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.RemoveUserProvidedServiceInstanceRouteRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
-import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.Application;
@@ -86,6 +85,7 @@ import org.cloudfoundry.client.v3.spaces.GetSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.GetSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.UpdateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.UpdateSpaceResponse;
+import org.cloudfoundry.client.v3.users.UserResource;
 import org.cloudfoundry.networking.NetworkingClient;
 import org.cloudfoundry.networking.v1.policies.DeletePoliciesRequest;
 import org.cloudfoundry.networking.v1.policies.Destination;
@@ -213,7 +213,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                 cleanSpaceQuotaDefinitions(
                                         this.cloudFoundryClient, this.nameFactory),
                                 cleanStacks(this.cloudFoundryClient, this.nameFactory),
-                                cleanUsers(this.cloudFoundryClient, this.nameFactory)))
+                                cleanUsersV3(this.cloudFoundryClient, this.nameFactory)))
                 .thenMany(
                         Mono.when(
                                 cleanApplicationsV3(
@@ -1043,35 +1043,29 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                                                 t)));
     }
 
-    private static Flux<Void> cleanUsers(
+    private static Flux<Void> cleanUsersV3(
             CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .users()
+                                        .usersV3()
                                         .list(
-                                                org.cloudfoundry.client.v2.users.ListUsersRequest
+                                                org.cloudfoundry.client.v3.users.ListUsersRequest
                                                         .builder()
                                                         .page(page)
                                                         .build()))
                 .filter(resource -> isCleanable(nameFactory, resource))
-                .map(resource -> resource.getMetadata().getId())
+                .map(UserResource::getId)
                 .flatMap(
                         userId ->
                                 cloudFoundryClient
-                                        .users()
+                                        .usersV3()
                                         .delete(
-                                                org.cloudfoundry.client.v2.users.DeleteUserRequest
+                                                org.cloudfoundry.client.v3.users.DeleteUserRequest
                                                         .builder()
-                                                        .async(true)
                                                         .userId(userId)
                                                         .build())
-                                        .flatMapMany(
-                                                job ->
-                                                        JobUtils.waitForCompletion(
-                                                                cloudFoundryClient,
-                                                                Duration.ofMinutes(5),
-                                                                job))
+                                        .then()
                                         .doOnError(
                                                 t ->
                                                         LOGGER.error(
@@ -1150,12 +1144,12 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
             CloudFoundryVersion expectedVersion,
             Version serverVersion,
             Supplier<Flux<Void>> supplier) {
-        return serverVersion.lessThan(expectedVersion.getVersion()) ? Flux.empty() : supplier.get();
+        return serverVersion.isLowerThan(expectedVersion.getVersion()) ? Flux.empty() : supplier.get();
     }
 
     private static boolean isCleanable(NameFactory nameFactory, UserResource resource) {
-        return nameFactory.isUserId(ResourceUtils.getId(resource))
-                || nameFactory.isUserName(ResourceUtils.getEntity(resource).getUsername());
+        return nameFactory.isUserId(resource.getId())
+                || nameFactory.isUserName(resource.getUsername());
     }
 
     private static Flux<Void> removeApplicationServiceBindings(

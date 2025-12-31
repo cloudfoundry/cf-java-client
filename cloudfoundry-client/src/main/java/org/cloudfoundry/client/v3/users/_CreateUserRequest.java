@@ -32,6 +32,7 @@ abstract class _CreateUserRequest {
      * Unique identifier for the user. For UAA users this will match the UAA user ID; in the case of UAA clients, this will match the UAA client ID
      */
     @JsonProperty("guid")
+    @Nullable
     abstract String getUserId();
 
     /**
