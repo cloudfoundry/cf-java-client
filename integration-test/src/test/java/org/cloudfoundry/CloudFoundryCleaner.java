@@ -1144,7 +1144,9 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
             CloudFoundryVersion expectedVersion,
             Version serverVersion,
             Supplier<Flux<Void>> supplier) {
-        return serverVersion.isLowerThan(expectedVersion.getVersion()) ? Flux.empty() : supplier.get();
+        return serverVersion.isLowerThan(expectedVersion.getVersion())
+                ? Flux.empty()
+                : supplier.get();
     }
 
     private static boolean isCleanable(NameFactory nameFactory, UserResource resource) {
