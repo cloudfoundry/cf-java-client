@@ -116,6 +116,7 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
@@ -135,6 +136,8 @@ import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
@@ -366,10 +369,29 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
-        return getApplication(request.getName())
+        return getApplicationV3(request.getName())
+                .map(ApplicationResource::getId)
+                .flatMapMany(this::requestApplicationProcessV3)
+                .collectList()
+                .flatMap(this::getProcessForHealthCheck)
                 .map(DefaultApplications::toHealthCheck)
                 .transform(OperationsLogging.log("Get Application Health Check"))
                 .checkpoint();
+    }
+
+    private Mono<ProcessResource> getProcessForHealthCheck(List<ProcessResource> processResources) {
+        if (processResources.size() == 1) {
+            return Mono.just(processResources.get(0));
+        }
+        Optional<ProcessResource> webProcess =
+                processResources.stream()
+                        .filter(process -> process.getType().equals("web"))
+                        .findFirst();
+        if (webProcess.isPresent()) {
+            return Mono.just(webProcess.get());
+        }
+        return Mono.error(
+                new IllegalStateException("There are multiple processes for this application"));
     }
 
     @Override
@@ -1654,6 +1676,18 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
+    private Flux<ProcessResource> requestApplicationProcessV3(String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
+                page ->
+                        this.cloudFoundryClient
+                                .applicationsV3()
+                                .listProcesses(
+                                        ListApplicationProcessesRequest.builder()
+                                                .applicationId(applicationId)
+                                                .page(page)
+                                                .build()));
+    }
+
     private Flux<org.cloudfoundry.client.v3.routes.RouteResource> requestApplicationRoutes(
             String applicationId) {
         return PaginationUtils.requestClientV3Resources(
@@ -2417,17 +2451,17 @@ public final class DefaultApplications implements Applications {
                 .build();
     }
 
-    private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
-        String type = resource.getEntity().getHealthCheckType();
+    private static ApplicationHealthCheck toHealthCheck(ProcessResource resource) {
+        HealthCheckType type = resource.getHealthCheck().getType();
 
-        if (ApplicationHealthCheck.HTTP.getValue().equals(type)) {
+        if (type == HealthCheckType.HTTP) {
             return ApplicationHealthCheck.HTTP;
-        } else if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
-            return ApplicationHealthCheck.NONE;
-        } else if (ApplicationHealthCheck.PORT.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PORT) {
             return ApplicationHealthCheck.PORT;
-        } else if (ApplicationHealthCheck.PROCESS.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PROCESS) {
             return ApplicationHealthCheck.PROCESS;
+        } else if (type == HealthCheckType.NONE) {
+            return ApplicationHealthCheck.NONE;
         } else {
             return null;
         }

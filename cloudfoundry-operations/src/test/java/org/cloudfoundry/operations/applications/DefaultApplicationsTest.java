@@ -130,12 +130,17 @@ import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ProcessResource;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
@@ -972,11 +977,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getHealthCheck() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
-                "test-metadata-id");
+                "test-application-id");
+        requestApplicationProcesses(this.cloudFoundryClient, "test-application-id", "process");
 
         this.applications
                 .getHealthCheck(
@@ -984,8 +990,49 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-application-name")
                                 .build())
                 .as(StepVerifier::create)
-                .expectNext(ApplicationHealthCheck.PORT)
+                .expectNext(ApplicationHealthCheck.PROCESS)
                 .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getHealthCheckUsesWebProcess() {
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id");
+        requestApplicationProcesses(
+                this.cloudFoundryClient, "test-application-id", "web", "process");
+
+        this.applications
+                .getHealthCheck(
+                        GetApplicationHealthCheckRequest.builder()
+                                .name("test-application-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(ApplicationHealthCheck.HTTP)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getHealthCheckMultipleProcessesErrors() {
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id");
+        requestApplicationProcesses(
+                this.cloudFoundryClient, "test-application-id", "process", "process");
+
+        this.applications
+                .getHealthCheck(
+                        GetApplicationHealthCheckRequest.builder()
+                                .name("test-application-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectError()
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -4778,6 +4825,33 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .updatedAt("test-updated-at")
                                                         .build())
                                         .build()));
+    }
+
+    private static void requestApplicationProcesses(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String... processTypes) {
+        ListApplicationProcessesResponse.Builder responseBuilder =
+                fill(ListApplicationProcessesResponse.builder());
+        for (String processType : processTypes) {
+            responseBuilder.resource(
+                    fill(ProcessResource.builder())
+                            .type(processType)
+                            .healthCheck(
+                                    fill(HealthCheck.builder())
+                                            .type(
+                                                    processType.equals("web")
+                                                            ? HealthCheckType.HTTP
+                                                            : HealthCheckType.PROCESS)
+                                            .build())
+                            .build());
+        }
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .listProcesses(
+                                ListApplicationProcessesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .page(1)
+                                        .build()))
+                .thenReturn(Mono.just(responseBuilder.build()));
     }
 
     private static void requestApplicationsWithSsh(
