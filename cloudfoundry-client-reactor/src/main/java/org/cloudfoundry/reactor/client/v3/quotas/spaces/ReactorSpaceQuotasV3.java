@@ -87,4 +87,33 @@ public class ReactorSpaceQuotasV3 extends AbstractClientV3Operations implements 
                         builder -> builder.pathSegment("space_quotas", request.getSpaceQuotaId()))
                 .checkpoint();
     }
+
+    @Override
+    public Mono<ApplySpaceQuotaResponse> apply(ApplySpaceQuotaRequest request) {
+        return post(
+                        request,
+                        ApplySpaceQuotaResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "space_quotas",
+                                        request.getSpaceQuotaId(),
+                                        "relationships",
+                                        "spaces"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> remove(RemoveSpaceQuotaRequest request) {
+        return delete(
+                        request,
+                        Void.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "space_quotas",
+                                        request.getSpaceQuotaId(),
+                                        "relationships",
+                                        "spaces",
+                                        request.getSpaceId()))
+                .checkpoint();
+    }
 }

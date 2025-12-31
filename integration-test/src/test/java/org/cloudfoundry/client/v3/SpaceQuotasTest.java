@@ -19,13 +19,18 @@ package org.cloudfoundry.client.v3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.Organization;
-import org.cloudfoundry.client.v3.quotas.*;
+import org.cloudfoundry.client.v3.quotas.Apps;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.Services;
 import org.cloudfoundry.client.v3.quotas.spaces.*;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.Space;
@@ -105,7 +110,7 @@ public final class SpaceQuotasTest extends AbstractIntegrationTest {
     public void createWithSpaceRelationship() {
         String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
         SpaceQuotaRelationships spaceQuotaRelationships =
-                createSpaceQuotaRelationships(organizationId, spaceId);
+                createSpaceQuotaRelationships(organizationId, Collections.singletonList(spaceId));
 
         Apps spaceQuotaAppLimits =
                 Apps.builder()
@@ -277,6 +282,72 @@ public final class SpaceQuotasTest extends AbstractIntegrationTest {
                 .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void apply() {
+        String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
+
+        Relationship spaceRelationship1 = Relationship.builder().id(spaceId).build();
+        ToManyRelationship spaceRelationships =
+                ToManyRelationship.builder().data(spaceRelationship1).build();
+
+        createSpaceQuotaId(this.cloudFoundryClient, spaceQuotaName, organizationId)
+                .flatMap(
+                        spaceQuotaId -> {
+                            ApplySpaceQuotaRequest applySpaceQuotaRequest =
+                                    ApplySpaceQuotaRequest.builder()
+                                            .spaceQuotaId(spaceQuotaId)
+                                            .spaceRelationships(spaceRelationships)
+                                            .build();
+                            return this.cloudFoundryClient
+                                    .spaceQuotasV3()
+                                    .apply(applySpaceQuotaRequest);
+                        })
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        applySpaceQuotaResponse -> {
+                            List<Relationship> spaceRelationshipsData =
+                                    applySpaceQuotaResponse.spaceRelationships().getData();
+                            assertThat(spaceRelationshipsData.size()).isEqualTo(1);
+                            assertThat(spaceRelationshipsData.get(0).getId()).isEqualTo(spaceId);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void remove() {
+        String spaceQuotaName = this.nameFactory.getQuotaDefinitionName();
+
+        // create a space quota in org with "organizationId" that is pre-associated to the space
+        // with "spaceId"
+        createSpaceQuotaId(
+                        this.cloudFoundryClient,
+                        spaceQuotaName,
+                        organizationId,
+                        Collections.singletonList(spaceId))
+                .flatMap(
+                        spaceQuotaId -> {
+                            RemoveSpaceQuotaRequest removeSpaceQuotaRequest =
+                                    RemoveSpaceQuotaRequest.builder()
+                                            .spaceQuotaId(spaceQuotaId)
+                                            .spaceId(spaceId)
+                                            .build();
+                            return this.cloudFoundryClient
+                                    .spaceQuotasV3()
+                                    .remove(removeSpaceQuotaRequest);
+                        })
+                .thenMany(requestListSpaceQuotas(this.cloudFoundryClient, spaceQuotaName))
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        spaceQuotaResource -> {
+                            List<Relationship> spaceRelationshipsData =
+                                    spaceQuotaResource.getRelationships().getSpaces().getData();
+                            assertThat(spaceRelationshipsData.size()).isEqualTo(0);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
     private static Organization createOrganization(
             CloudFoundryClient cloudFoundryClient, String orgName) {
         return cloudFoundryClient
@@ -314,15 +385,20 @@ public final class SpaceQuotasTest extends AbstractIntegrationTest {
 
     @NotNull
     private static SpaceQuotaRelationships createSpaceQuotaRelationships(
-            String orgGuid, String spaceGuid) {
+            String orgGuid, List<String> spaceGuids) {
         ToOneRelationship organizationRelationship =
                 ToOneRelationship.builder()
                         .data(Relationship.builder().id(orgGuid).build())
                         .build();
+
+        // iterate over spaceGuids to create Relationship objects
+        List<Relationship> spaceRelationshipsData =
+                spaceGuids.stream()
+                        .map(spaceGuid -> Relationship.builder().id(spaceGuid).build())
+                        .collect(Collectors.toList());
+
         ToManyRelationship spaceRelationships =
-                ToManyRelationship.builder()
-                        .data(Relationship.builder().id(spaceGuid).build())
-                        .build();
+                ToManyRelationship.builder().data(spaceRelationshipsData).build();
         return SpaceQuotaRelationships.builder()
                 .organization(organizationRelationship)
                 .spaces(spaceRelationships)
@@ -338,6 +414,31 @@ public final class SpaceQuotasTest extends AbstractIntegrationTest {
     private static Mono<CreateSpaceQuotaResponse> createSpaceQuota(
             CloudFoundryClient cloudFoundryClient, String spaceQuotaName, String orgGuid) {
         SpaceQuotaRelationships spaceQuotaRelationships = createSpaceQuotaRelationships(orgGuid);
+        return cloudFoundryClient
+                .spaceQuotasV3()
+                .create(
+                        CreateSpaceQuotaRequest.builder()
+                                .name(spaceQuotaName)
+                                .relationships(spaceQuotaRelationships)
+                                .build());
+    }
+
+    private static Mono<String> createSpaceQuotaId(
+            CloudFoundryClient cloudFoundryClient,
+            String spaceQuotaName,
+            String orgGuid,
+            List<String> spaceGuids) {
+        return createSpaceQuota(cloudFoundryClient, spaceQuotaName, orgGuid, spaceGuids)
+                .map(CreateSpaceQuotaResponse::getId);
+    }
+
+    private static Mono<CreateSpaceQuotaResponse> createSpaceQuota(
+            CloudFoundryClient cloudFoundryClient,
+            String spaceQuotaName,
+            String orgGuid,
+            List<String> spaceGuids) {
+        SpaceQuotaRelationships spaceQuotaRelationships =
+                createSpaceQuotaRelationships(orgGuid, spaceGuids);
         return cloudFoundryClient
                 .spaceQuotasV3()
                 .create(
