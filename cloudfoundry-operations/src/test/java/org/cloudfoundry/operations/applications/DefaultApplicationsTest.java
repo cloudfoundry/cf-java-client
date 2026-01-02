@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,6 @@ import java.util.function.Supplier;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
-import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -55,8 +55,6 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsResponse;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
@@ -71,10 +69,6 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
-import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
-import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
@@ -124,15 +118,29 @@ import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.Pagination;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationProcessesResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsResponse;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ProcessResource;
+import org.cloudfoundry.client.v3.processes.ProcessState;
+import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -161,10 +169,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private final DefaultApplications applications =
             new DefaultApplications(
-                    Mono.just(this.cloudFoundryClient),
-                    Mono.just(this.dopplerClient),
-                    this.randomWords,
-                    Mono.just(TEST_SPACE_ID));
+                    this.cloudFoundryClient, this.dopplerClient, this.randomWords, TEST_SPACE_ID);
 
     @Test
     void copySourceNoRestartOrgSpace() {
@@ -539,7 +544,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationManifest.builder()
-                                .buildpacks("test-buildpack-1", "test-buildpack-2")
+                                .buildpacks(
+                                        "test-application-summary-detectedBuildpack-1",
+                                        "test-application-summary-detectedBuildpack-2")
                                 .command("test-application-summary-command")
                                 .disk(1)
                                 .environmentVariables(Collections.emptyMap())
@@ -781,21 +788,21 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEvents() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("instances", 1)
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build());
 
         this.applications
@@ -803,7 +810,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-name")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
                                                 + " environment_json: test-data")
@@ -817,20 +824,20 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsBadTimeSparseMetadata() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("BAD-TIMESTAMP")
-                        .metadata(
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("BAD-TIMESTAMP")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build());
 
         this.applications
@@ -838,7 +845,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-name")
                                 .description(
                                         "memory: 2, state: test-state, environment_json: test-data")
                                 .event("test-event-type")
@@ -850,7 +857,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsFoundZero() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
@@ -862,21 +870,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsLimitZero() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
-                                "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .data("index", 1)
                         .build());
 
         this.applications
@@ -892,13 +893,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsNoRequestMetadata() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata("index", Optional.of(1))
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .data("index", 1)
                         .build());
 
         this.applications
@@ -906,7 +908,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-name")
                                 .description("")
                                 .event("test-event-type")
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
@@ -918,30 +920,27 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsTwo() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("instances", 1)
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build(),
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:49:07Z")
-                        .metadata(
+                fill(AuditEventResource.builder(), "event-")
+                        .createdAt("2016-02-08T15:49:07Z")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("state", "test-state-two")
-                                                .build()))
+                                FluentMap.builder().entry("state", "test-state-two").build())
                         .build());
 
         this.applications
@@ -949,7 +948,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-name")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
                                                 + " environment_json: test-data")
@@ -958,7 +957,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
                                 .build(),
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-name")
                                 .description("state: test-state-two")
                                 .event("test-event-type")
                                 .id("test-event-id")
@@ -970,11 +969,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getHealthCheck() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
-                "test-metadata-id");
+                "test-application-id");
+        requestApplicationProcesses(this.cloudFoundryClient, "test-application-id", "process");
 
         this.applications
                 .getHealthCheck(
@@ -982,8 +982,49 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-application-name")
                                 .build())
                 .as(StepVerifier::create)
-                .expectNext(ApplicationHealthCheck.PORT)
+                .expectNext(ApplicationHealthCheck.PROCESS)
                 .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getHealthCheckUsesWebProcess() {
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id");
+        requestApplicationProcesses(
+                this.cloudFoundryClient, "test-application-id", "web", "process");
+
+        this.applications
+                .getHealthCheck(
+                        GetApplicationHealthCheckRequest.builder()
+                                .name("test-application-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(ApplicationHealthCheck.HTTP)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void getHealthCheckMultipleProcessesErrors() {
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id");
+        requestApplicationProcesses(
+                this.cloudFoundryClient, "test-application-id", "process", "process");
+
+        this.applications
+                .getHealthCheck(
+                        GetApplicationHealthCheckRequest.builder()
+                                .name("test-application-name")
+                                .build())
+                .as(StepVerifier::create)
+                .expectError()
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -1308,7 +1349,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logs() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
@@ -1325,7 +1366,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").build())
@@ -1341,7 +1382,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsRecent() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
@@ -1358,7 +1399,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsRecentNotSet() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
@@ -3206,7 +3247,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void rename() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
         requestUpdateApplicationRename(
                 this.cloudFoundryClient, "test-metadata-id", "test-new-app-name");
@@ -3224,7 +3265,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void renameNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .rename(
@@ -4111,6 +4152,26 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .state("FLAPPING")
                                                         .build())
                                         .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resources(
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.RUNNING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build(),
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.CRASHED)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build())
+                                        .build()));
     }
 
     private static void requestApplicationInstancesFailingTotal(
@@ -4132,6 +4193,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                 ApplicationInstanceInfo.builder(),
                                                                 "application-instance-info-")
                                                         .state("FLAPPING")
+                                                        .build())
+                                        .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.CRASHED)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4157,6 +4231,20 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .state("RUNNING")
                                                         .build())
                                         .build()));
+
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.RUNNING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build())
+                                        .build()));
     }
 
     private static void requestApplicationInstancesTimeout(
@@ -4178,6 +4266,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                 ApplicationInstanceInfo.builder(),
                                                                 "application-instance-info-")
                                                         .state("STARTING")
+                                                        .build())
+                                        .build()));
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resource(
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.STARTING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
                                                         .build())
                                         .build()));
     }
@@ -4244,30 +4345,30 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestApplicationRoutes(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient
-                        .applicationsV2()
+                        .applicationsV3()
                         .listRoutes(
-                                ListApplicationRoutesRequest.builder()
+                                org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest
+                                        .builder()
                                         .applicationId(applicationId)
                                         .page(1)
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(ListApplicationRoutesResponse.builder())
+                                fill(org.cloudfoundry.client.v3.applications
+                                                .ListApplicationRoutesResponse.builder())
                                         .resource(
-                                                fill(RouteResource.builder())
-                                                        .metadata(
-                                                                fill(Metadata.builder())
-                                                                        .id(routeId)
-                                                                        .build())
+                                                fill(org.cloudfoundry.client.v3.routes.RouteResource
+                                                                .builder())
+                                                        .id(routeId)
                                                         .build())
-                                        .totalPages(1)
+                                        .pagination(Pagination.builder().totalPages(1).build())
                                         .build()));
     }
 
     private static void requestApplicationRoutesEmpty(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                        .applicationsV2()
+                        .applicationsV3()
                         .listRoutes(
                                 ListApplicationRoutesRequest.builder()
                                         .applicationId(applicationId)
@@ -4276,7 +4377,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .thenReturn(
                         Mono.just(
                                 fill(ListApplicationRoutesResponse.builder())
-                                        .totalPages(1)
+                                        .pagination(Pagination.builder().totalPages(1).build())
                                         .build()));
     }
 
@@ -4697,25 +4798,39 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                         Mono.just(
                                 fill(ListApplicationsResponse.builder())
                                         .resource(
-                                                org.cloudfoundry.client.v3.applications
-                                                        .ApplicationResource.builder()
-                                                        .createdAt("test-created-at")
+                                                fill(org.cloudfoundry.client.v3.applications
+                                                                .ApplicationResource.builder())
                                                         .id(applicationId)
-                                                        .lifecycle(
-                                                                Lifecycle.builder()
-                                                                        .data(
-                                                                                BuildpackData
-                                                                                        .builder()
-                                                                                        .buildpack(
-                                                                                                "test-buildpack")
-                                                                                        .build())
-                                                                        .type(BUILDPACK)
-                                                                        .build())
-                                                        .name("test-name")
                                                         .state(ApplicationState.STOPPED)
-                                                        .updatedAt("test-updated-at")
                                                         .build())
                                         .build()));
+    }
+
+    private static void requestApplicationProcesses(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String... processTypes) {
+        ListApplicationProcessesResponse.Builder responseBuilder =
+                fill(ListApplicationProcessesResponse.builder());
+        for (String processType : processTypes) {
+            responseBuilder.resource(
+                    fill(ProcessResource.builder())
+                            .type(processType)
+                            .healthCheck(
+                                    fill(HealthCheck.builder())
+                                            .type(
+                                                    processType.equals("web")
+                                                            ? HealthCheckType.HTTP
+                                                            : HealthCheckType.PROCESS)
+                                            .build())
+                            .build());
+        }
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .listProcesses(
+                                ListApplicationProcessesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .page(1)
+                                        .build()))
+                .thenReturn(Mono.just(responseBuilder.build()));
     }
 
     private static void requestApplicationsWithSsh(
@@ -4941,27 +5056,31 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestEvents(
-            CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
-        ListEventsResponse.Builder responseBuilder = fill(ListEventsResponse.builder());
+            CloudFoundryClient cloudFoundryClient,
+            String applicationId,
+            AuditEventResource... entities) {
+        ListAuditEventsResponse.Builder responseBuilder = fill(ListAuditEventsResponse.builder());
+        responseBuilder.resources(entities);
 
-        for (EventEntity entity : entities) {
-            responseBuilder.resource(
-                    EventResource.builder()
-                            .metadata(fill(Metadata.builder()).id("test-event-id").build())
-                            .entity(entity)
-                            .build());
-        }
+        //        for (AuditEventResource entity : entities) {
+        //            HashMap<String, Object> data = new HashMap<>();
+        //            data.put("id", "test-event-id");
+        //        }
 
         when(cloudFoundryClient
-                        .events()
+                        .auditEventsV3()
                         .list(
-                                ListEventsRequest.builder()
-                                        .actee(applicationId)
-                                        .orderDirection(OrderDirection.DESCENDING)
-                                        .resultsPerPage(50)
+                                ListAuditEventsRequest.builder()
+                                        .targetId(applicationId)
+                                        .orderBy("-created_at")
+                                        .perPage(50)
                                         .page(1)
                                         .build()))
-                .thenReturn(Mono.just(responseBuilder.totalPages(1).build()));
+                .thenReturn(
+                        Mono.just(
+                                responseBuilder
+                                        .pagination(Pagination.builder().totalPages(1).build())
+                                        .build()));
     }
 
     private static void requestGetApplication(
@@ -5050,6 +5169,20 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .state("FAILED")
                                                         .build())
                                         .build()));
+
+        when(cloudFoundryClient.applicationsV3().getProcessStatistics(any()))
+                .thenReturn(
+                        Mono.just(
+                                GetApplicationProcessStatisticsResponse.builder()
+                                        .resources(
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .state(ProcessState.CRASHED)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build())
+                                        .build()));
     }
 
     private static void requestGetApplicationTimeout(
@@ -5082,21 +5215,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                org.cloudfoundry.client.v3.applications.GetApplicationResponse
-                                        .builder()
-                                        .createdAt("test-created-at")
+                                fill(org.cloudfoundry.client.v3.applications.GetApplicationResponse
+                                                .builder())
                                         .id(applicationId)
                                         .lifecycle(
-                                                Lifecycle.builder()
+                                                fill(Lifecycle.builder())
                                                         .data(
                                                                 BuildpackData.builder()
                                                                         .buildpack("test-buildpack")
                                                                         .build())
                                                         .type(BUILDPACK)
                                                         .build())
-                                        .name("test-name")
                                         .state(ApplicationState.STOPPED)
-                                        .updatedAt("test-updated-at")
                                         .build()));
     }
 
@@ -5111,23 +5241,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                org.cloudfoundry.client.v3.applications.GetApplicationResponse
-                                        .builder()
-                                        .createdAt("test-created-at")
-                                        .id(applicationId)
+                                fill(org.cloudfoundry.client.v3.applications.GetApplicationResponse
+                                                .builder())
                                         .lifecycle(
                                                 Lifecycle.builder()
                                                         .data(
                                                                 BuildpackData.builder()
                                                                         .buildpacks(
-                                                                                "test-buildpack-1",
-                                                                                "test-buildpack-2")
+                                                                                "test-application-summary-detectedBuildpack-1",
+                                                                                "test-application-summary-detectedBuildpack-2")
                                                                         .build())
                                                         .type(BUILDPACK)
                                                         .build())
-                                        .name("test-name")
                                         .state(ApplicationState.STOPPED)
-                                        .updatedAt("test-updated-at")
                                         .build()));
     }
 
@@ -5142,18 +5268,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                org.cloudfoundry.client.v3.applications.GetApplicationResponse
-                                        .builder()
-                                        .createdAt("test-created-at")
+                                fill(org.cloudfoundry.client.v3.applications.GetApplicationResponse
+                                                .builder())
                                         .id(applicationId)
                                         .lifecycle(
                                                 Lifecycle.builder()
                                                         .data(DockerData.builder().build())
                                                         .type(DOCKER)
                                                         .build())
-                                        .name("test-name")
                                         .state(ApplicationState.STOPPED)
-                                        .updatedAt("test-updated-at")
                                         .build()));
     }
 
@@ -5807,20 +5930,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationRename(
             CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient
-                        .applicationsV2()
+                        .applicationsV3()
                         .update(
-                                UpdateApplicationRequest.builder()
+                                org.cloudfoundry.client.v3.applications.UpdateApplicationRequest
+                                        .builder()
                                         .applicationId(applicationId)
                                         .name(name)
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(UpdateApplicationResponse.builder())
-                                        .entity(
-                                                fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
-                                                        .build())
+                                fill(org.cloudfoundry.client.v3.applications
+                                                .UpdateApplicationResponse.builder())
                                         .build()));
     }
 
