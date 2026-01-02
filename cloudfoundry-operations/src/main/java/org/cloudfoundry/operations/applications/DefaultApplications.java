@@ -398,7 +398,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
-        return getApplicationId(request.getName())
+        return getApplicationIdV3(request.getName())
                 .flatMapMany(applicationId -> getLogs(applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();

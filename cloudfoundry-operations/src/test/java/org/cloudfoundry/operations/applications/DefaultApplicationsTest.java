@@ -1338,7 +1338,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logs() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
@@ -1355,7 +1355,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
                 .logs(LogsRequest.builder().name("test-application-name").build())
@@ -1371,7 +1371,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsRecent() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
@@ -1388,7 +1388,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsRecentNotSet() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
