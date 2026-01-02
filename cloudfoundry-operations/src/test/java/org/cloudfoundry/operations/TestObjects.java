@@ -109,9 +109,12 @@ public abstract class TestObjects {
         return getConfigurationMethods(builderType, builderMethods, builtGetters).stream()
                 .collect(
                         () -> builder,
-                        (b, method) ->
-                                ReflectionUtils.invokeMethod(
-                                        method, b, getConfiguredValue(method, modifier)),
+                        (b, method) -> {
+                            Object configuredValue = getConfiguredValue(method, modifier);
+                            if (configuredValue != null) {
+                                ReflectionUtils.invokeMethod(method, b, configuredValue);
+                            }
+                        },
                         (a, b) -> {});
     }
 
@@ -190,10 +193,19 @@ public abstract class TestObjects {
             return getConfiguredString(configurationMethod, modifier);
         } else if (parameterType.isArray()) {
             return Array.newInstance(parameterType.getComponentType(), 0);
+        } else if (parameterType == Map.Entry.class) {
+            return null;
         } else {
-            throw new IllegalStateException(
-                    String.format("Unable to configure %s", configurationMethod));
+            for (Class<?> implementation :
+                    org.cloudfoundry.operations.ReflectionUtils.findImplementations(
+                            parameterType)) {
+                if (isBuiltType(implementation)) {
+                    return getConfiguredBuilder(implementation, modifier);
+                }
+            }
         }
+        throw new IllegalStateException(
+                String.format("Unable to configure %s", configurationMethod));
     }
 
     private static List<Method> getMethods(Class<?> builderType) {
