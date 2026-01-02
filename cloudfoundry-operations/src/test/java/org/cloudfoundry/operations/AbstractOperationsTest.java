@@ -44,6 +44,7 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
@@ -106,6 +107,7 @@ public abstract class AbstractOperationsTest {
     protected final DopplerClient dopplerClient = mock(DopplerClient.class, RETURNS_SMART_NULLS);
 
     protected final Events events = mock(Events.class, RETURNS_SMART_NULLS);
+    protected final AuditEventsV3 auditEventsV3 = mock(AuditEventsV3.class, RETURNS_SMART_NULLS);
 
     protected final FeatureFlags featureFlags = mock(FeatureFlags.class, RETURNS_SMART_NULLS);
 
@@ -182,6 +184,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.domainsV3()).thenReturn(this.domainsV3);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
+        when(this.cloudFoundryClient.auditEventsV3()).thenReturn(this.auditEventsV3);
         when(this.cloudFoundryClient.featureFlags()).thenReturn(this.featureFlags);
         when(this.cloudFoundryClient.jobs()).thenReturn(this.jobs);
         when(this.cloudFoundryClient.jobsV3()).thenReturn(this.jobsV3);

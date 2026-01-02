@@ -40,7 +40,6 @@ import java.util.function.Supplier;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.ClientV2Exception;
 import org.cloudfoundry.client.v2.Metadata;
-import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
 import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
@@ -70,10 +69,6 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
-import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
-import org.cloudfoundry.client.v2.events.ListEventsRequest;
-import org.cloudfoundry.client.v2.events.ListEventsResponse;
 import org.cloudfoundry.client.v2.jobs.ErrorDetails;
 import org.cloudfoundry.client.v2.jobs.GetJobRequest;
 import org.cloudfoundry.client.v2.jobs.GetJobResponse;
@@ -138,6 +133,10 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.auditevents.AuditEventActor;
+import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsResponse;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
@@ -789,21 +788,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEvents() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("instances", 1)
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build());
 
         this.applications
@@ -811,7 +813,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-actor-name")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
                                                 + " environment_json: test-data")
@@ -825,20 +827,23 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsBadTimeSparseMetadata() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("BAD-TIMESTAMP")
-                        .metadata(
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("BAD-TIMESTAMP")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build());
 
         this.applications
@@ -846,7 +851,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-actor-name")
                                 .description(
                                         "memory: 2, state: test-state, environment_json: test-data")
                                 .event("test-event-type")
@@ -858,7 +863,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsFoundZero() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(this.cloudFoundryClient, "test-metadata-id");
 
         this.applications
@@ -870,21 +876,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsLimitZero() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("instances", 1)
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build());
 
         this.applications
@@ -900,13 +909,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsNoRequestMetadata() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata("index", Optional.of(1))
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data("index", 1)
                         .build());
 
         this.applications
@@ -914,7 +927,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-actor-name")
                                 .description("")
                                 .event("test-event-type")
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
@@ -926,30 +939,33 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void getEventsTwo() {
-        requestApplications(this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-metadata-id");
         requestEvents(
                 this.cloudFoundryClient,
                 "test-metadata-id",
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:45:59Z")
-                        .metadata(
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("2016-02-08T15:45:59Z")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("instances", 1)
-                                                .entry("memory", 2)
-                                                .entry("environment_json", "test-data")
-                                                .entry("state", "test-state")
-                                                .build()))
+                                FluentMap.builder()
+                                        .entry("instances", 1)
+                                        .entry("memory", 2)
+                                        .entry("environment_json", "test-data")
+                                        .entry("state", "test-state")
+                                        .build())
                         .build(),
-                fill(EventEntity.builder(), "event-")
-                        .timestamp("2016-02-08T15:49:07Z")
-                        .metadata(
+                AuditEventResource.builder()
+                        .id("test-event-id")
+                        .createdAt("2016-02-08T15:49:07Z")
+                        .auditEventActor(fill(AuditEventActor.builder(), "event-actor-").build())
+                        .type("test-event-type")
+                        .data(
                                 "request",
-                                Optional.of(
-                                        FluentMap.builder()
-                                                .entry("state", "test-state-two")
-                                                .build()))
+                                FluentMap.builder().entry("state", "test-state-two").build())
                         .build());
 
         this.applications
@@ -957,7 +973,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-actor-name")
                                 .description(
                                         "instances: 1, memory: 2, state: test-state,"
                                                 + " environment_json: test-data")
@@ -966,7 +982,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .time(DateUtils.parseFromIso8601("2016-02-08T15:45:59Z"))
                                 .build(),
                         ApplicationEvent.builder()
-                                .actor("test-event-actorName")
+                                .actor("test-event-actor-name")
                                 .description("state: test-state-two")
                                 .event("test-event-type")
                                 .id("test-event-id")
@@ -5031,27 +5047,31 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestEvents(
-            CloudFoundryClient cloudFoundryClient, String applicationId, EventEntity... entities) {
-        ListEventsResponse.Builder responseBuilder = fill(ListEventsResponse.builder());
+            CloudFoundryClient cloudFoundryClient,
+            String applicationId,
+            AuditEventResource... entities) {
+        ListAuditEventsResponse.Builder responseBuilder = fill(ListAuditEventsResponse.builder());
+        responseBuilder.resources(entities);
 
-        for (EventEntity entity : entities) {
-            responseBuilder.resource(
-                    EventResource.builder()
-                            .metadata(fill(Metadata.builder()).id("test-event-id").build())
-                            .entity(entity)
-                            .build());
-        }
+        //        for (AuditEventResource entity : entities) {
+        //            HashMap<String, Object> data = new HashMap<>();
+        //            data.put("id", "test-event-id");
+        //        }
 
         when(cloudFoundryClient
-                        .events()
+                        .auditEventsV3()
                         .list(
-                                ListEventsRequest.builder()
-                                        .actee(applicationId)
-                                        .orderDirection(OrderDirection.DESCENDING)
-                                        .resultsPerPage(50)
+                                ListAuditEventsRequest.builder()
+                                        .targetId(applicationId)
+                                        .orderBy("-created_at")
+                                        .perPage(50)
                                         .page(1)
                                         .build()))
-                .thenReturn(Mono.just(responseBuilder.totalPages(1).build()));
+                .thenReturn(
+                        Mono.just(
+                                responseBuilder
+                                        .pagination(Pagination.builder().totalPages(1).build())
+                                        .build()));
     }
 
     private static void requestGetApplication(

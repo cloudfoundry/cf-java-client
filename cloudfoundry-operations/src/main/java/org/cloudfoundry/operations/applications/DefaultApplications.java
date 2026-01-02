@@ -40,7 +40,6 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
 import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
@@ -68,9 +67,6 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
-import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
-import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -122,6 +118,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
 import org.cloudfoundry.client.v3.builds.BuildState;
 import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
@@ -356,7 +354,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
-        return getApplicationId(request.getName())
+        return getApplicationIdV3(request.getName())
                 .flatMapMany(
                         applicationId ->
                                 requestEvents(applicationId)
@@ -843,20 +841,19 @@ public final class DefaultApplications implements Applications {
         };
     }
 
-    private static ApplicationEvent convertToApplicationEvent(EventResource resource) {
-        EventEntity entity = resource.getEntity();
+    private static ApplicationEvent convertToApplicationEvent(AuditEventResource entity) {
         Date timestamp = null;
         try {
-            timestamp = DateUtils.parseFromIso8601(entity.getTimestamp());
+            timestamp = DateUtils.parseFromIso8601(entity.getCreatedAt());
         } catch (IllegalArgumentException iae) {
             // do not set time
         }
         return ApplicationEvent.builder()
-                .actor(entity.getActorName())
+                .actor(entity.getAuditEventActor().getName())
                 .description(
                         eventDescription(
                                 getMetadataRequest(entity), getEntryNames(entity.getType())))
-                .id(ResourceUtils.getId(resource))
+                .id(entity.getId())
                 .event(entity.getType())
                 .time(timestamp)
                 .build();
@@ -1210,17 +1207,14 @@ public final class DefaultApplications implements Applications {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> getMetadataRequest(EventEntity entity) {
-        Map<String, Optional<Object>> metadata =
-                Optional.ofNullable(entity.getMetadatas()).orElse(Collections.emptyMap());
+    private static Map<String, Object> getMetadataRequest(AuditEventResource entity) {
+        Map<String, Object> metadata =
+                Optional.ofNullable(entity.getData()).orElse(Collections.emptyMap());
 
         if (metadata.get("request") != null) {
-            return metadata.get("request")
-                    .map(m -> (Map<String, Object>) m)
-                    .orElse(Collections.emptyMap());
+            return (Map<String, Object>) metadata.getOrDefault("request", Collections.emptyMap());
         } else if (metadata.get("instance") != null) {
-            return metadata.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().orElse("")));
+            return Collections.unmodifiableMap(metadata);
         } else {
             return Collections.emptyMap();
         }
@@ -1871,16 +1865,16 @@ public final class DefaultApplications implements Applications {
                 .delete(DeleteRouteRequest.builder().async(true).routeId(routeId).build());
     }
 
-    private Flux<EventResource> requestEvents(String applicationId) {
-        return PaginationUtils.requestClientV2Resources(
+    private Flux<AuditEventResource> requestEvents(String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
-                                .events()
+                                .auditEventsV3()
                                 .list(
-                                        ListEventsRequest.builder()
-                                                .actee(applicationId)
-                                                .orderDirection(OrderDirection.DESCENDING)
-                                                .resultsPerPage(50)
+                                        ListAuditEventsRequest.builder()
+                                                .targetId(applicationId)
+                                                .orderBy("-created_at")
+                                                .perPage(50)
                                                 .page(page)
                                                 .build()));
     }
