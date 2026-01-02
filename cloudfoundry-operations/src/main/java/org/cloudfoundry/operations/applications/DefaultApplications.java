@@ -538,10 +538,12 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
-        return getApplicationId(request.getName())
+        return getApplicationIdV3(request.getName())
                 .flatMap(
                         applicationId ->
-                                requestUpdateApplicationName(applicationId, request.getNewName()))
+                                requestUpdateApplicationV3(
+                                        applicationId,
+                                        builder -> builder.name(request.getNewName())))
                 .then()
                 .transform(OperationsLogging.log("Rename Application"))
                 .checkpoint();
@@ -2145,6 +2147,21 @@ public final class DefaultApplications implements Applications {
                                                 .applicationId(applicationId))
                                 .build())
                 .cast(AbstractApplicationResource.class);
+    }
+
+    private Mono<Void> requestUpdateApplicationV3(
+            String applicationId,
+            UnaryOperator<org.cloudfoundry.client.v3.applications.UpdateApplicationRequest.Builder>
+                    modifier) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .update(
+                        modifier.apply(
+                                        org.cloudfoundry.client.v3.applications
+                                                .UpdateApplicationRequest.builder()
+                                                .applicationId(applicationId))
+                                .build())
+                .then();
     }
 
     private Mono<AbstractApplicationResource> requestUpdateApplicationEnvironment(

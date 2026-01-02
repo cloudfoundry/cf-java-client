@@ -3236,7 +3236,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void rename() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
         requestUpdateApplicationRename(
                 this.cloudFoundryClient, "test-metadata-id", "test-new-app-name");
@@ -3254,7 +3254,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void renameNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID);
 
         this.applications
                 .rename(
@@ -5931,19 +5931,25 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationRename(
             CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
         when(cloudFoundryClient
-                        .applicationsV2()
+                        .applicationsV3()
                         .update(
-                                UpdateApplicationRequest.builder()
+                                org.cloudfoundry.client.v3.applications.UpdateApplicationRequest
+                                        .builder()
                                         .applicationId(applicationId)
                                         .name(name)
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(UpdateApplicationResponse.builder())
-                                        .entity(
-                                                fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
+                                org.cloudfoundry.client.v3.applications.UpdateApplicationResponse
+                                        .builder()
+                                        .id("test-application-id")
+                                        .createdAt("2016-02-08T15:45:59Z")
+                                        .state(ApplicationState.STARTED)
+                                        .name("test-application-name")
+                                        .lifecycle(
+                                                Lifecycle.builder()
+                                                        .data(BuildpackData.builder().build())
+                                                        .type(BUILDPACK)
                                                         .build())
                                         .build()));
     }
