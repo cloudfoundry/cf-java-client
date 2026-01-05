@@ -21,8 +21,10 @@ import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -140,6 +142,8 @@ import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
+import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -3695,13 +3699,15 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void setHealthCheck() {
-        requestApplications(
+        requestApplicationsV3(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-application-id");
+        requestApplicationProcesses(
+                cloudFoundryClient, "test-application-id", HealthCheckType.HTTP);
         requestUpdateApplicationHealthCheck(
-                this.cloudFoundryClient, "test-application-id", ApplicationHealthCheck.PORT);
+                this.cloudFoundryClient, "test-process-id", ApplicationHealthCheck.PORT);
 
         this.applications
                 .setHealthCheck(
@@ -3712,6 +3718,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+
+        verify(this.cloudFoundryClient.processes())
+                .update(
+                        argThat(
+                                argument ->
+                                        argument.getHealthCheck()
+                                                .getType()
+                                                .equals(HealthCheckType.PORT)));
     }
 
     @Test
@@ -4782,7 +4796,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(GetApplicationProcessResponse.builder())
+                                fill(GetApplicationProcessResponse.builder(), "process-")
                                         .healthCheck(fill(HealthCheck.builder()).type(type).build())
                                         .build()));
     }
@@ -5860,25 +5874,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestUpdateApplicationHealthCheck(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            ApplicationHealthCheck type) {
+            CloudFoundryClient cloudFoundryClient, String processId, ApplicationHealthCheck type) {
         when(cloudFoundryClient
-                        .applicationsV2()
+                        .processes()
                         .update(
-                                UpdateApplicationRequest.builder()
-                                        .applicationId(applicationId)
-                                        .healthCheckType(type.getValue())
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(UpdateApplicationResponse.builder())
-                                        .entity(
-                                                fill(
-                                                                ApplicationEntity.builder(),
-                                                                "application-entity-")
+                                UpdateProcessRequest.builder()
+                                        .processId(processId)
+                                        .healthCheck(
+                                                HealthCheck.builder()
+                                                        .type(HealthCheckType.from(type.getValue()))
                                                         .build())
-                                        .build()));
+                                        .build()))
+                .thenReturn(Mono.just(fill(UpdateProcessResponse.builder()).build()));
     }
 
     private static void requestUpdateApplicationRename(

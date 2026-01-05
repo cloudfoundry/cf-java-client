@@ -225,7 +225,7 @@ public interface Applications {
     Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request);
 
     /**
-     * Set the Health Check Type of an application
+     * Set the Health Check Type of the web process of an application
      *
      * @param request the set health check request
      * @return a completion indicator

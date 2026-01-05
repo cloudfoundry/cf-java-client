@@ -139,6 +139,7 @@ import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
@@ -641,12 +642,12 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
-        return getApplicationId(request.getName())
+        return getApplicationIdV3(request.getName())
+                .flatMap(this::requestApplicationWebProcess)
                 .flatMap(
-                        applicationId ->
-                                requestUpdateApplicationHealthCheckType(
-                                        applicationId, request.getType()))
-                .then()
+                        webProcess ->
+                                this.requestUpdateProcessHealthCheckType(
+                                        webProcess.getId(), fromHealthCheck(request.getType())))
                 .transform(OperationsLogging.log("Set Application Health Check"))
                 .checkpoint();
     }
@@ -1668,6 +1669,18 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
+    private Mono<Void> requestUpdateProcessHealthCheckType(
+            String processId, HealthCheckType healthCheckType) {
+        return this.cloudFoundryClient
+                .processes()
+                .update(
+                        UpdateProcessRequest.builder()
+                                .processId(processId)
+                                .healthCheck(HealthCheck.builder().type(healthCheckType).build())
+                                .build())
+                .then();
+    }
+
     private Flux<org.cloudfoundry.client.v3.routes.RouteResource> requestApplicationRoutes(
             String applicationId) {
         return PaginationUtils.requestClientV3Resources(
@@ -2455,6 +2468,20 @@ public final class DefaultApplications implements Applications {
             return ApplicationHealthCheck.PROCESS;
         } else if (type == HealthCheckType.NONE) {
             return ApplicationHealthCheck.NONE;
+        } else {
+            return null;
+        }
+    }
+
+    private static HealthCheckType fromHealthCheck(ApplicationHealthCheck type) {
+        if (type == ApplicationHealthCheck.HTTP) {
+            return HealthCheckType.HTTP;
+        } else if (type == ApplicationHealthCheck.PORT) {
+            return HealthCheckType.PORT;
+        } else if (type == ApplicationHealthCheck.PROCESS) {
+            return HealthCheckType.PROCESS;
+        } else if (type == ApplicationHealthCheck.NONE) {
+            return HealthCheckType.NONE;
         } else {
             return null;
         }
