@@ -117,6 +117,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
 import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
@@ -625,22 +627,6 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
-    public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
-        return getApplication(request.getName())
-                .flatMap(
-                        resource ->
-                                requestUpdateApplicationEnvironment(
-                                        ResourceUtils.getId(resource),
-                                        addToEnvironment(
-                                                getEnvironment(resource),
-                                                request.getVariableName(),
-                                                request.getVariableValue())))
-                .then()
-                .transform(OperationsLogging.log("Set Application Environment Variable"))
-                .checkpoint();
-    }
-
-    @Override
     public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
         return getApplicationIdV3(request.getName())
                 .flatMap(this::requestApplicationWebProcess)
@@ -694,15 +680,21 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
-    public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
-        return getApplication(request.getName())
+    public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
+        return getApplicationIdV3(request.getName())
                 .flatMap(
-                        resource ->
-                                requestUpdateApplicationEnvironment(
-                                        ResourceUtils.getId(resource),
-                                        removeFromEnvironment(
-                                                getEnvironment(resource),
-                                                request.getVariableName())))
+                        id ->
+                                requestSetEnvironmentVariable(
+                                        id, request.getVariableName(), request.getVariableValue()))
+                .then()
+                .transform(OperationsLogging.log("Set Application Environment Variable"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
+        return getApplicationIdV3(request.getName())
+                .flatMap(id -> requestUnsetEnvironmentVariable(id, request.getVariableName()))
                 .then()
                 .transform(OperationsLogging.log("Unset Application Environment Variable"))
                 .checkpoint();
@@ -2177,10 +2169,26 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private Mono<AbstractApplicationResource> requestUpdateApplicationEnvironment(
-            String applicationId, Map<String, Object> environment) {
-        return requestUpdateApplication(
-                applicationId, builder -> builder.environmentJsons(environment));
+    private Mono<UpdateApplicationEnvironmentVariablesResponse> requestSetEnvironmentVariable(
+            String applicationId, String name, String value) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId(applicationId)
+                                .var(name, value)
+                                .build());
+    }
+
+    private Mono<UpdateApplicationEnvironmentVariablesResponse> requestUnsetEnvironmentVariable(
+            String applicationId, String name) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId(applicationId)
+                                .var(name, null)
+                                .build());
     }
 
     private Mono<AbstractApplicationResource> requestUpdateApplicationHealthCheckType(

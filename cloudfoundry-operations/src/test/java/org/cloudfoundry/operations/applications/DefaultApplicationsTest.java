@@ -133,6 +133,8 @@ import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
@@ -3647,21 +3649,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void setEnvironmentVariable() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-app",
-                TEST_SPACE_ID,
-                "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                        .entry("test-var", "test-value")
-                        .entry("test-var2", "test-value2")
-                        .build());
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestUpdateApplicationEnvironment(
                 this.cloudFoundryClient,
-                "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                        .entry("test-var", "test-value")
-                        .entry("test-var2", "test-value2")
+                "test-application-id",
+                FluentMap.<String, String>builder()
                         .entry("test-var-name", "test-var-value")
                         .build());
 
@@ -3679,7 +3672,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void setEnvironmentVariableNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
                 .setEnvironmentVariable(
@@ -3962,23 +3955,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void unsetEnvironmentVariable() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-app",
-                TEST_SPACE_ID,
-                "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                        .entry("test-var", "test-value")
-                        .entry("test-var2", "test-value2")
-                        .entry("test-var-name", "test-var-value")
-                        .build());
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestUpdateApplicationEnvironment(
                 this.cloudFoundryClient,
-                "test-metadata-id",
-                FluentMap.<String, Object>builder()
-                        .entry("test-var2", "test-value2")
-                        .entry("test-var-name", "test-var-value")
-                        .build());
+                "test-application-id",
+                FluentMap.<String, String>builder().entry("test-var", null).build());
 
         this.applications
                 .unsetEnvironmentVariable(
@@ -3993,7 +3975,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void unsetEnvironmentVariableNoApp() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-app", TEST_SPACE_ID);
 
         this.applications
                 .unsetEnvironmentVariable(
@@ -5855,21 +5837,17 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationEnvironment(
             CloudFoundryClient cloudFoundryClient,
             String applicationId,
-            Map<String, Object> environment) {
+            Map<String, String> environment) {
         when(cloudFoundryClient
-                        .applicationsV2()
-                        .update(
-                                UpdateApplicationRequest.builder()
+                        .applicationsV3()
+                        .updateEnvironmentVariables(
+                                UpdateApplicationEnvironmentVariablesRequest.builder()
                                         .applicationId(applicationId)
-                                        .environmentJsons(environment)
+                                        .putAllVars(environment)
                                         .build()))
                 .thenReturn(
                         Mono.just(
-                                fill(UpdateApplicationResponse.builder())
-                                        .entity(
-                                                fill(ApplicationEntity.builder())
-                                                        .environmentJsons(environment)
-                                                        .build())
+                                fill(UpdateApplicationEnvironmentVariablesResponse.builder())
                                         .build()));
     }
 
