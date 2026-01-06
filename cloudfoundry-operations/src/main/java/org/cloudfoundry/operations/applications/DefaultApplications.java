@@ -160,7 +160,6 @@ import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.FileUtils;
-import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceMatchingUtils;
@@ -280,9 +279,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
         return getRoutesAndApplicationId(
-                        request,
-                        spaceId,
-                        Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
+                        request, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
                 .flatMap(
                         function(
                                 (routes, applicationId) ->
@@ -710,14 +707,6 @@ public final class DefaultApplications implements Applications {
                 .map(GetApplicationSshEnabledResponse::getEnabled);
     }
 
-    private static Map<String, Object> addToEnvironment(
-            Map<String, Object> environment, String variableName, Object variableValue) {
-        return FluentMap.<String, Object>builder()
-                .entries(environment)
-                .entry(variableName, variableValue)
-                .build();
-    }
-
     private Mono<Void> applyDropletAndWaitForRunning(
             String appname, String appId, String dropletId) {
         return this.cloudFoundryClient
@@ -987,7 +976,7 @@ public final class DefaultApplications implements Applications {
                 sb.append(", ");
             }
             first = false;
-            sb.append(entryName).append(": ").append(String.valueOf(value));
+            sb.append(entryName).append(": ").append(value);
         }
         return sb.toString();
     }
@@ -1175,10 +1164,6 @@ public final class DefaultApplications implements Applications {
         return type.contains("crash") ? ENTRY_FIELDS_CRASH : ENTRY_FIELDS_NORMAL;
     }
 
-    private static Map<String, Object> getEnvironment(AbstractApplicationResource resource) {
-        return ResourceUtils.getEntity(resource).getEnvironmentJsons();
-    }
-
     private static int getInstances(AbstractApplicationResource resource) {
         return Optional.ofNullable(resource.getEntity())
                 .map(ApplicationEntity::getInstances)
@@ -1362,8 +1347,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<Tuple2<Optional<List<org.cloudfoundry.client.v2.routes.Route>>, String>>
-            getRoutesAndApplicationId(
-                    DeleteApplicationRequest request, String spaceId, boolean deleteRoutes) {
+            getRoutesAndApplicationId(DeleteApplicationRequest request, boolean deleteRoutes) {
         return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
@@ -1605,13 +1589,6 @@ public final class DefaultApplications implements Applications {
                         applicationId ->
                                 stopAndStartApplication(
                                         applicationId, manifest.getName(), request));
-    }
-
-    private static Map<String, Object> removeFromEnvironment(
-            Map<String, Object> environment, String variableName) {
-        Map<String, Object> modified = new HashMap<>(environment);
-        modified.remove(variableName);
-        return modified;
     }
 
     private Mono<Void> removeServiceBindings(String applicationId) {
@@ -2191,17 +2168,6 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private Mono<AbstractApplicationResource> requestUpdateApplicationHealthCheckType(
-            String applicationId, ApplicationHealthCheck type) {
-        return requestUpdateApplication(
-                applicationId, builder -> builder.healthCheckType(type.getValue()));
-    }
-
-    private Mono<AbstractApplicationResource> requestUpdateApplicationName(
-            String applicationId, String name) {
-        return requestUpdateApplication(applicationId, builder -> builder.name(name));
-    }
-
     private Mono<ApplicationFeature> requestUpdateApplicationSsh(
             String applicationId, boolean enabled) {
         return requestUpdateApplicationFeature(
@@ -2226,11 +2192,6 @@ public final class DefaultApplications implements Applications {
         return requestUpdateApplication(
                 applicationId,
                 builder -> builder.diskQuota(disk).instances(instances).memory(memory));
-    }
-
-    private Mono<AbstractApplicationResource> requestUpdateApplicationSsh(
-            String applicationId, Boolean enabled) {
-        return requestUpdateApplication(applicationId, builder -> builder.enableSsh(enabled));
     }
 
     private Mono<AbstractApplicationResource> requestUpdateApplicationState(

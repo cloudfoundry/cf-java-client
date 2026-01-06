@@ -4783,43 +4783,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestApplicationsWithSsh(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String spaceId,
-            Boolean sshEnabled) {
-        when(cloudFoundryClient
-                        .spaces()
-                        .listApplications(
-                                ListSpaceApplicationsRequest.builder()
-                                        .name(application)
-                                        .spaceId(spaceId)
-                                        .page(1)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(ListSpaceApplicationsResponse.builder())
-                                        .resource(
-                                                ApplicationResource.builder()
-                                                        .metadata(
-                                                                fill(Metadata.builder())
-                                                                        .id("test-application-id")
-                                                                        .build())
-                                                        .entity(
-                                                                fill(
-                                                                                ApplicationEntity
-                                                                                        .builder(),
-                                                                                "application-")
-                                                                        .environmentJson(
-                                                                                "test-var",
-                                                                                "test-value")
-                                                                        .enableSsh(sshEnabled)
-                                                                        .build())
-                                                        .build())
-                                        .totalPages(1)
-                                        .build()));
-    }
-
     private static void requestAssociateRoute(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         when(cloudFoundryClient
