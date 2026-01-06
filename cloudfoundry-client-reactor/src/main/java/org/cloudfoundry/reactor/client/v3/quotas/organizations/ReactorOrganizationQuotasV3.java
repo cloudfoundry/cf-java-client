@@ -94,4 +94,18 @@ public class ReactorOrganizationQuotasV3 extends AbstractClientV3Operations
                                         "organization_quotas", request.getOrganizationQuotaId()))
                 .checkpoint();
     }
+
+    @Override
+    public Mono<ApplyOrganizationQuotaResponse> apply(ApplyOrganizationQuotaRequest request) {
+        return post(
+                        request,
+                        ApplyOrganizationQuotaResponse.class,
+                        builder ->
+                                builder.pathSegment(
+                                        "organization_quotas",
+                                        request.getOrganizationQuotaId(),
+                                        "relationships",
+                                        "organizations"))
+                .checkpoint();
+    }
 }

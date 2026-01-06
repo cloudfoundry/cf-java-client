@@ -16,21 +16,16 @@
 
 package org.cloudfoundry.reactor.client.v3.quotas.spaces;
 
-import static io.netty.handler.codec.http.HttpMethod.DELETE;
-import static io.netty.handler.codec.http.HttpMethod.GET;
-import static io.netty.handler.codec.http.HttpMethod.PATCH;
-import static io.netty.handler.codec.http.HttpMethod.POST;
-import static io.netty.handler.codec.http.HttpResponseStatus.ACCEPTED;
-import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpMethod.*;
+import static io.netty.handler.codec.http.HttpResponseStatus.*;
 
 import java.time.Duration;
 import java.util.Collections;
-import org.cloudfoundry.client.v3.Link;
-import org.cloudfoundry.client.v3.Pagination;
-import org.cloudfoundry.client.v3.Relationship;
-import org.cloudfoundry.client.v3.ToManyRelationship;
-import org.cloudfoundry.client.v3.ToOneRelationship;
-import org.cloudfoundry.client.v3.quotas.*;
+import java.util.Map;
+import org.cloudfoundry.client.v3.*;
+import org.cloudfoundry.client.v3.quotas.Apps;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.Services;
 import org.cloudfoundry.client.v3.quotas.spaces.*;
 import org.cloudfoundry.reactor.InteractionContext;
 import org.cloudfoundry.reactor.TestRequest;
@@ -57,13 +52,13 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                                         .method(POST)
                                         .path("/space_quotas")
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/POST_request.json")
+                                                "fixtures/client/v3/quotas/spaces/POST_request.json")
                                         .build())
                         .response(
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/POST_response.json")
+                                                "fixtures/client/v3/quotas/spaces/POST_response.json")
                                         .build())
                         .build());
 
@@ -143,7 +138,7 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/GET_{id}_response.json")
+                                                "fixtures/client/v3/quotas/spaces/GET_{id}_response.json")
                                         .build())
                         .build());
 
@@ -165,7 +160,7 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/GET_response.json")
+                                                "fixtures/client/v3/quotas/spaces/GET_response.json")
                                         .build())
                         .build());
 
@@ -211,13 +206,13 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                                         .method(PATCH)
                                         .path("/space_quotas/" + EXPECTED_SPACE_QUOTA_ID_1)
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/PATCH_{id}_request.json")
+                                                "fixtures/client/v3/quotas/spaces/PATCH_{id}_request.json")
                                         .build())
                         .response(
                                 TestResponse.builder()
                                         .status(OK)
                                         .payload(
-                                                "fixtures/client/v3/space_quotas/PATCH_{id}_response.json")
+                                                "fixtures/client/v3/quotas/spaces/PATCH_{id}_response.json")
                                         .build())
                         .build());
 
@@ -231,6 +226,71 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                         UpdateSpaceQuotaResponse.builder()
                                 .from(expectedSpaceQuotaResource1())
                                 .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void apply() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(POST)
+                                        .path(
+                                                "/space_quotas/24637893-3b77-489d-bb79-8466f0d88b52/relationships/spaces")
+                                        .payload(
+                                                "fixtures/client/v3/quotas/spaces/relationships/POST_{id}_request.json")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/quotas/spaces/relationships/POST_{id}_response.json")
+                                        .build())
+                        .build());
+
+        Relationship space1 = Relationship.builder().id("space-guid1").build();
+        Relationship space2 = Relationship.builder().id("space-guid2").build();
+
+        ToManyRelationship organizationRelationships =
+                ToManyRelationship.builder().data(space1, space2).build();
+
+        this.spaceQuotasV3
+                .apply(
+                        ApplySpaceQuotaRequest.builder()
+                                .spaceQuotaId("24637893-3b77-489d-bb79-8466f0d88b52")
+                                .spaceRelationships(organizationRelationships)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ApplySpaceQuotaResponse.builder()
+                                .from(expectedApplySpaceQuotaResponse())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void remove() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(DELETE)
+                                        .path(
+                                                "/space_quotas/test-space-quota-id/relationships/spaces/test-space-guid")
+                                        .build())
+                        .response(TestResponse.builder().status(NO_CONTENT).build())
+                        .build());
+
+        this.spaceQuotasV3
+                .remove(
+                        RemoveSpaceQuotaRequest.builder()
+                                .spaceQuotaId("test-space-quota-id")
+                                .spaceId("test-space-guid")
+                                .build())
+                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -250,6 +310,28 @@ class ReactorSpaceQuotasV3Test extends AbstractClientApiTest {
                 "my-quota-2",
                 "9b370018-c38e-44c9-86d6-155c76801104",
                 null);
+    }
+
+    @NotNull
+    private static ApplySpaceQuotaResponse expectedApplySpaceQuotaResponse() {
+
+        Relationship space1 = Relationship.builder().id("space-guid1").build();
+        Relationship space2 = Relationship.builder().id("space-guid2").build();
+        Relationship existingSpace = Relationship.builder().id("previous-space-guid").build();
+
+        ToManyRelationship spaceRelationships =
+                ToManyRelationship.builder().data(space1, space2, existingSpace).build();
+        Link selfLink =
+                Link.builder()
+                        .href(
+                                "https://api.example.org/v3/space_quotas/24637893-3b77-489d-bb79-8466f0d88b52/relationships/spaces")
+                        .build();
+        Map<String, Link> links = Collections.singletonMap("self", selfLink);
+
+        return ApplySpaceQuotaResponse.builder()
+                .spaceRelationships(spaceRelationships)
+                .links(links)
+                .build();
     }
 
     @NotNull
