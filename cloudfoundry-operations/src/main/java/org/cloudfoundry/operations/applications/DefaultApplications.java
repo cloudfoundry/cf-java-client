@@ -94,10 +94,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.client.v2.stacks.GetStackRequest;
-import org.cloudfoundry.client.v2.stacks.GetStackResponse;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Relationship;
@@ -144,6 +140,10 @@ import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
+import org.cloudfoundry.client.v3.stacks.GetStackRequest;
+import org.cloudfoundry.client.v3.stacks.GetStackResponse;
+import org.cloudfoundry.client.v3.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v3.stacks.StackResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -1111,7 +1111,7 @@ public final class DefaultApplications implements Applications {
                     Tuple5<
                             List<String>,
                             SummaryApplicationResponse,
-                            GetStackResponse,
+                            String,
                             List<InstanceDetail>,
                             List<String>>>
             getAuxiliaryContent(AbstractApplicationResource applicationResource) {
@@ -1130,7 +1130,7 @@ public final class DefaultApplications implements Applications {
                                         Mono.zip(
                                                 getApplicationBuildpacks(applicationId),
                                                 Mono.just(summaryApplicationResponse),
-                                                requestStack(stackId),
+                                                getStackName(stackId),
                                                 toInstanceDetailList(
                                                         applicationInstancesResponse,
                                                         applicationStatisticsResponse),
@@ -1376,18 +1376,20 @@ public final class DefaultApplications implements Applications {
                 .map(response -> ResourceUtils.getEntity(response).getOrganizationId());
     }
 
-    private Mono<String> getStackId(String stack) {
-        return requestStacks(stack)
-                .map(ResourceUtils::getId)
+    private Mono<String> getStackId(String stackName) {
+        return requestStacks(stackName)
+                .map(StackResource::getId)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
-                        t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
+                        t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stackName));
     }
 
     private Mono<String> getStackName(String stackId) {
-        return requestStack(stackId)
-                .map(getStackResponse -> getStackResponse.getEntity().getName());
+        return this.cloudFoundryClient
+                .stacksV3()
+                .get(GetStackRequest.builder().stackId(stackId).build())
+                .map(GetStackResponse::getName);
     }
 
     private Mono<String> getTaskId(String applicationId, Integer sequenceId) {
@@ -2042,17 +2044,11 @@ public final class DefaultApplications implements Applications {
                 .getSummary(GetSpaceSummaryRequest.builder().spaceId(this.spaceId).build());
     }
 
-    private Mono<GetStackResponse> requestStack(String stackId) {
-        return this.cloudFoundryClient
-                .stacks()
-                .get(GetStackRequest.builder().stackId(stackId).build());
-    }
-
     private Flux<StackResource> requestStacks(String stack) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         this.cloudFoundryClient
-                                .stacks()
+                                .stacksV3()
                                 .list(ListStacksRequest.builder().page(page).name(stack).build()));
     }
 
@@ -2305,7 +2301,7 @@ public final class DefaultApplications implements Applications {
     private static ApplicationDetail toApplicationDetail(
             List<String> buildpacks,
             SummaryApplicationResponse summaryApplicationResponse,
-            GetStackResponse getStackResponse,
+            String stackName,
             List<InstanceDetail> instanceDetails,
             List<String> urls) {
         if (buildpacks.size() == 0) {
@@ -2324,7 +2320,7 @@ public final class DefaultApplications implements Applications {
                 .name(summaryApplicationResponse.getName())
                 .requestedState(summaryApplicationResponse.getState())
                 .runningInstances(summaryApplicationResponse.getRunningInstances())
-                .stack(getStackResponse.getEntity().getName())
+                .stack(stackName)
                 .urls(urls)
                 .build();
     }

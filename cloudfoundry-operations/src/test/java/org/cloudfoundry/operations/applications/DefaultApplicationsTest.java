@@ -112,11 +112,6 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsResponse;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceEntity;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.client.v2.stacks.GetStackRequest;
-import org.cloudfoundry.client.v2.stacks.GetStackResponse;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
-import org.cloudfoundry.client.v2.stacks.StackEntity;
 import org.cloudfoundry.client.v3.BuildpackData;
 import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Lifecycle;
@@ -146,6 +141,9 @@ import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.processes.UpdateProcessResponse;
+import org.cloudfoundry.client.v3.stacks.GetStackRequest;
+import org.cloudfoundry.client.v3.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v3.stacks.ListStacksResponse;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -5699,19 +5697,19 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     private static void requestStack(CloudFoundryClient cloudFoundryClient, String stackId) {
-        when(cloudFoundryClient.stacks().get(GetStackRequest.builder().stackId(stackId).build()))
+        when(cloudFoundryClient.stacksV3().get(GetStackRequest.builder().stackId(stackId).build()))
                 .thenReturn(
                         Mono.just(
-                                fill(GetStackResponse.builder())
-                                        .entity(
-                                                fill(StackEntity.builder(), "stack-entity-")
-                                                        .build())
+                                fill(
+                                                org.cloudfoundry.client.v3.stacks.GetStackResponse
+                                                        .builder(),
+                                                "stack-entity-")
                                         .build()));
     }
 
     private static void requestStackIdEmpty(CloudFoundryClient cloudFoundryClient, String stack) {
         when(cloudFoundryClient
-                        .stacks()
+                        .stacksV3()
                         .list(ListStacksRequest.builder().name(stack).page(1).build()))
                 .thenReturn(Mono.just(fill(ListStacksResponse.builder()).build()));
     }
