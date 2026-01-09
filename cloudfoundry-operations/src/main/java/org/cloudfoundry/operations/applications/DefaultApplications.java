@@ -42,11 +42,6 @@ import java.util.stream.Collectors;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
-import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
@@ -95,7 +90,9 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
 import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.CnbData;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.LifecycleData;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
@@ -137,6 +134,7 @@ import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
 import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
@@ -170,7 +168,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple5;
+import reactor.util.function.Tuple4;
 import reactor.util.function.Tuples;
 
 public final class DefaultApplications implements Applications {
@@ -314,8 +312,8 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
-        return getApplication(request.getName())
-                .flatMap(app -> getAuxiliaryContent(app))
+        return getApplicationV3(request.getName())
+                .flatMap(this::getAuxiliaryContent)
                 .map(function(DefaultApplications::toApplicationDetail))
                 .transform(OperationsLogging.log("Get Application"))
                 .checkpoint();
@@ -1072,29 +1070,9 @@ public final class DefaultApplications implements Applications {
         return getApplication(application).filter(predicate).map(ResourceUtils::getId);
     }
 
-    private Mono<ApplicationInstancesResponse> getApplicationInstances(String applicationId) {
-        return requestApplicationInstances(applicationId)
-                .onErrorResume(
-                        ExceptionUtils.statusCode(
-                                CF_BUILDPACK_COMPILED_FAILED,
-                                CF_INSTANCES_ERROR,
-                                CF_STAGING_NOT_FINISHED,
-                                CF_STAGING_TIME_EXPIRED,
-                                CF_INSUFFICIENT_RESOURCES,
-                                CF_STAGING_ERROR),
-                        t -> Mono.just(ApplicationInstancesResponse.builder().build()));
-    }
-
     private Mono<List<org.cloudfoundry.client.v3.routes.RouteResource>> getApplicationRoutes(
             String applicationId) {
         return requestApplicationRoutes(applicationId).collectList();
-    }
-
-    private Mono<ApplicationStatisticsResponse> getApplicationStatistics(String applicationId) {
-        return requestApplicationStatistics(applicationId)
-                .onErrorResume(
-                        ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR),
-                        t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
     }
 
     private Mono<ApplicationResource> getApplicationV3(String application) {
@@ -1107,34 +1085,25 @@ public final class DefaultApplications implements Applications {
                                         "Application %s does not exist", application));
     }
 
-    private Mono<
-                    Tuple5<
-                            List<String>,
-                            SummaryApplicationResponse,
-                            String,
-                            List<InstanceDetail>,
-                            List<String>>>
-            getAuxiliaryContent(AbstractApplicationResource applicationResource) {
-        String applicationId = ResourceUtils.getId(applicationResource);
-        String stackId = ResourceUtils.getEntity(applicationResource).getStackId();
+    private Mono<Tuple4<List<String>, SummaryApplicationResponse, String, List<InstanceDetail>>>
+            getAuxiliaryContent(ApplicationResource applicationResource) {
+        String applicationId = applicationResource.getId();
+        LifecycleData data = applicationResource.getLifecycle().getData();
+        String stackName = "<UNKNOWN>";
+        if (data instanceof CnbData) {
+            stackName = ((CnbData) data).getStack();
+        } else if (data instanceof BuildpackData) {
+            stackName = ((BuildpackData) data).getStack();
+        }
+
+        Mono<List<InstanceDetail>> appInstanceDetails =
+                requestApplicationStatisticsV3(applicationId).map(this::toInstanceDetailList);
 
         return Mono.zip(
-                        getApplicationStatistics(applicationId),
-                        requestApplicationSummary(applicationId),
-                        getApplicationInstances(applicationId))
-                .flatMap(
-                        function(
-                                (applicationStatisticsResponse,
-                                        summaryApplicationResponse,
-                                        applicationInstancesResponse) ->
-                                        Mono.zip(
-                                                getApplicationBuildpacks(applicationId),
-                                                Mono.just(summaryApplicationResponse),
-                                                getStackName(stackId),
-                                                toInstanceDetailList(
-                                                        applicationInstancesResponse,
-                                                        applicationStatisticsResponse),
-                                                toUrls(summaryApplicationResponse.getRoutes()))));
+                getApplicationBuildpacks(applicationId),
+                requestApplicationSummary(applicationId),
+                Mono.just(stackName),
+                appInstanceDetails);
     }
 
     private Mono<String> getDefaultDomainId() {
@@ -1612,13 +1581,6 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private Mono<ApplicationInstancesResponse> requestApplicationInstances(String applicationId) {
-        return this.cloudFoundryClient
-                .applicationsV2()
-                .instances(
-                        ApplicationInstancesRequest.builder().applicationId(applicationId).build());
-    }
-
     private Mono<GetApplicationProcessStatisticsResponse> requestApplicationStatisticsV3(
             String applicationId) {
         return this.cloudFoundryClient
@@ -1627,7 +1589,25 @@ public final class DefaultApplications implements Applications {
                         GetApplicationProcessStatisticsRequest.builder()
                                 .applicationId(applicationId)
                                 .type("web")
-                                .build());
+                                .build())
+                .onErrorResume(
+                        ExceptionUtils.statusCodeV3(
+                                CF_BUILDPACK_COMPILED_FAILED,
+                                CF_INSTANCES_ERROR,
+                                CF_STAGING_NOT_FINISHED,
+                                CF_STAGING_TIME_EXPIRED,
+                                CF_INSUFFICIENT_RESOURCES,
+                                CF_STAGING_ERROR,
+                                // NOTE: this used to be an error from the v2 API apps/instances
+                                // endpoint. It probably does not apply to the v3 processes/stats
+                                // endpoint, but it is hard to test. Leaving it in, worst case this
+                                // never gets triggered.
+                                CF_APP_STOPPED_STATS_ERROR),
+                        t ->
+                                Mono.just(
+                                        GetApplicationProcessStatisticsResponse.builder()
+                                                .resources()
+                                                .build()));
     }
 
     private Mono<GetApplicationProcessResponse> requestApplicationWebProcess(String applicationId) {
@@ -1663,15 +1643,6 @@ public final class DefaultApplications implements Applications {
                                                 .applicationId(applicationId)
                                                 .page(page)
                                                 .build()));
-    }
-
-    private Mono<ApplicationStatisticsResponse> requestApplicationStatistics(String applicationId) {
-        return this.cloudFoundryClient
-                .applicationsV2()
-                .statistics(
-                        ApplicationStatisticsRequest.builder()
-                                .applicationId(applicationId)
-                                .build());
     }
 
     private Mono<SummaryApplicationResponse> requestApplicationSummary(String applicationId) {
@@ -2302,8 +2273,7 @@ public final class DefaultApplications implements Applications {
             List<String> buildpacks,
             SummaryApplicationResponse summaryApplicationResponse,
             String stackName,
-            List<InstanceDetail> instanceDetails,
-            List<String> urls) {
+            List<InstanceDetail> instanceDetails) {
         if (buildpacks.size() == 0) {
             buildpacks =
                     Collections.singletonList(summaryApplicationResponse.getDetectedBuildpack());
@@ -2321,7 +2291,7 @@ public final class DefaultApplications implements Applications {
                 .requestedState(summaryApplicationResponse.getState())
                 .runningInstances(summaryApplicationResponse.getRunningInstances())
                 .stack(stackName)
-                .urls(urls)
+                .urls(toUrls(summaryApplicationResponse.getRoutes()))
                 .build();
     }
 
@@ -2452,35 +2422,25 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static InstanceDetail toInstanceDetail(
-            Map.Entry<String, ApplicationInstanceInfo> entry,
-            ApplicationStatisticsResponse statisticsResponse) {
-        InstanceStatistics instanceStatistics =
-                Optional.ofNullable(statisticsResponse.getInstances().get(entry.getKey()))
-                        .orElse(emptyInstanceStats());
-        Statistics stats =
-                Optional.ofNullable(instanceStatistics.getStatistics())
-                        .orElse(emptyApplicationStatistics());
-        Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
-
-        return InstanceDetail.builder()
-                .index(entry.getKey())
-                .state(entry.getValue().getState())
-                .since(toDate(entry.getValue().getSince()))
-                .cpu(usage.getCpu())
-                .memoryUsage(usage.getMemory())
-                .diskUsage(usage.getDisk())
-                .diskQuota(stats.getDiskQuota())
-                .memoryQuota(stats.getMemoryQuota())
-                .build();
-    }
-
-    private Mono<List<InstanceDetail>> toInstanceDetailList(
-            ApplicationInstancesResponse instancesResponse,
-            ApplicationStatisticsResponse statisticsResponse) {
-        return Flux.fromIterable(instancesResponse.getInstances().entrySet())
-                .map(entry -> toInstanceDetail(entry, statisticsResponse))
-                .collectList();
+    private List<InstanceDetail> toInstanceDetailList(
+            GetApplicationProcessStatisticsResponse statisticsResponse) {
+        return statisticsResponse.getResources().stream()
+                .map(
+                        statisticsResource -> {
+                            ProcessUsage usage =
+                                    Optional.ofNullable(statisticsResource.getUsage())
+                                            .orElse(ProcessUsage.builder().build());
+                            return InstanceDetail.builder()
+                                    .index(statisticsResource.getIndex().toString())
+                                    .state(statisticsResource.getState().getValue())
+                                    .cpu(usage.getCpu())
+                                    .memoryUsage(usage.getMemory())
+                                    .diskUsage(usage.getDisk())
+                                    .diskQuota(statisticsResource.getDiskQuota())
+                                    .memoryQuota(statisticsResource.getMemoryQuota())
+                                    .build();
+                        })
+                .collect(Collectors.toList());
     }
 
     private static Task toTask(org.cloudfoundry.client.v3.tasks.Task task) {
@@ -2509,8 +2469,8 @@ public final class DefaultApplications implements Applications {
         return sb.toString();
     }
 
-    private Mono<List<String>> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
-        return Flux.fromIterable(routes).map(DefaultApplications::toUrl).collectList();
+    private static List<String> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
+        return routes.stream().map(DefaultApplications::toUrl).collect(Collectors.toList());
     }
 
     private Mono<Void> updateBuildpacks(String applicationId, ApplicationManifest manifest) {

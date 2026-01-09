@@ -17,8 +17,12 @@
 package org.cloudfoundry.util;
 
 import java.util.Arrays;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import org.cloudfoundry.client.v2.ClientV2Exception;
+import org.cloudfoundry.client.v3.ClientV3Exception;
+import org.cloudfoundry.client.v3.Error;
 import reactor.core.publisher.Mono;
 
 /**
@@ -73,5 +77,23 @@ public final class ExceptionUtils {
                                                 ((ClientV2Exception) t)
                                                         .getCode()
                                                         .equals(candidate));
+    }
+
+    /**
+     * A predicate that returns {@code true} if the exception is a {@link ClientV2Exception} and its code matches expectation
+     *
+     * @param codes the codes to match
+     * @return {@code true} if the exception is a {@link ClientV2Exception} and its code matches
+     */
+    public static Predicate<? super Throwable> statusCodeV3(int... codes) {
+        return t -> {
+            if (!(t instanceof ClientV3Exception)) {
+                return false;
+            }
+            ClientV3Exception exception = (ClientV3Exception) t;
+            Set<Integer> errorCodes =
+                    exception.getErrors().stream().map(Error::getCode).collect(Collectors.toSet());
+            return Arrays.stream(codes).anyMatch(errorCodes::contains);
+        };
     }
 }
