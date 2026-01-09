@@ -19,7 +19,6 @@ package org.cloudfoundry.operations.applications;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.util.DelayUtils.exponentialBackOff;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
-import static org.cloudfoundry.util.tuple.TupleUtils.predicate;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -41,14 +40,8 @@ import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
 import org.cloudfoundry.client.v2.applications.ApplicationEntity;
-import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
-import org.cloudfoundry.client.v2.applications.ApplicationStatisticsRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationStatisticsResponse;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
 import org.cloudfoundry.client.v2.applications.CopyApplicationRequest;
@@ -57,7 +50,6 @@ import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
 import org.cloudfoundry.client.v2.applications.DockerCredentials;
 import org.cloudfoundry.client.v2.applications.InstanceStatistics;
-import org.cloudfoundry.client.v2.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationRouteRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
@@ -70,9 +62,6 @@ import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
 import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
 import org.cloudfoundry.client.v2.applications.Usage;
-import org.cloudfoundry.client.v2.events.EventEntity;
-import org.cloudfoundry.client.v2.events.EventResource;
-import org.cloudfoundry.client.v2.events.ListEventsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationPrivateDomainsRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationSpacesRequest;
 import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
@@ -100,12 +89,10 @@ import org.cloudfoundry.client.v2.spaces.ListSpaceApplicationsRequest;
 import org.cloudfoundry.client.v2.spaces.ListSpaceServiceInstancesRequest;
 import org.cloudfoundry.client.v2.spaces.SpaceApplicationSummary;
 import org.cloudfoundry.client.v2.spaces.SpaceResource;
-import org.cloudfoundry.client.v2.stacks.GetStackRequest;
-import org.cloudfoundry.client.v2.stacks.GetStackResponse;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v3.BuildpackData;
+import org.cloudfoundry.client.v3.CnbData;
 import org.cloudfoundry.client.v3.Lifecycle;
+import org.cloudfoundry.client.v3.LifecycleData;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
@@ -113,20 +100,26 @@ import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
-import org.cloudfoundry.client.v3.applications.ListApplicationProcessesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
+import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
+import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
 import org.cloudfoundry.client.v3.builds.BuildState;
 import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
-import org.cloudfoundry.client.v3.domains.DomainResource;
-import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v3.packages.BitsData;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
@@ -137,12 +130,18 @@ import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsRequest;
-import org.cloudfoundry.client.v3.processes.GetProcessStatisticsResponse;
+import org.cloudfoundry.client.v3.processes.HealthCheck;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
 import org.cloudfoundry.client.v3.processes.ProcessStatisticsResource;
+import org.cloudfoundry.client.v3.processes.ProcessUsage;
+import org.cloudfoundry.client.v3.processes.UpdateProcessRequest;
 import org.cloudfoundry.client.v3.resourcematch.MatchedResource;
 import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
+import org.cloudfoundry.client.v3.stacks.GetStackRequest;
+import org.cloudfoundry.client.v3.stacks.GetStackResponse;
+import org.cloudfoundry.client.v3.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v3.stacks.StackResource;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -159,7 +158,6 @@ import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.FileUtils;
-import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceMatchingUtils;
@@ -170,7 +168,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple5;
+import reactor.util.function.Tuple4;
 import reactor.util.function.Tuples;
 
 public final class DefaultApplications implements Applications {
@@ -210,26 +208,35 @@ public final class DefaultApplications implements Applications {
 
     private static final String APP_FEATURE_SSH = "ssh";
 
-    private final Mono<CloudFoundryClient> cloudFoundryClient;
+    private final CloudFoundryClient cloudFoundryClient;
 
-    private final Mono<DopplerClient> dopplerClient;
+    private final DopplerClient dopplerClient;
 
     private final RandomWords randomWords;
 
-    private final Mono<String> spaceId;
+    private final String spaceId;
 
+    public DefaultApplications(
+            CloudFoundryClient cloudFoundryClient, DopplerClient dopplerClient, String spaceId) {
+        this(cloudFoundryClient, dopplerClient, new WordListRandomWords(), spaceId);
+    }
+
+    /**
+     * @deprecated Please use {@link DefaultApplications(CloudFoundryClient, DopplerClient, String)} instead.
+     */
+    @Deprecated
     public DefaultApplications(
             Mono<CloudFoundryClient> cloudFoundryClient,
             Mono<DopplerClient> dopplerClient,
             Mono<String> spaceId) {
-        this(cloudFoundryClient, dopplerClient, new WordListRandomWords(), spaceId);
+        this(cloudFoundryClient.block(), dopplerClient.block(), spaceId.block());
     }
 
     DefaultApplications(
-            Mono<CloudFoundryClient> cloudFoundryClient,
-            Mono<DopplerClient> dopplerClient,
+            CloudFoundryClient cloudFoundryClient,
+            DopplerClient dopplerClient,
             RandomWords randomWords,
-            Mono<String> spaceId) {
+            String spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
         this.randomWords = randomWords;
@@ -238,116 +245,56 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return Mono.zip(
+                        getApplicationId(request.getName()),
+                        getApplicationIdFromOrgSpace(
+                                request.getTargetName(),
+                                this.spaceId,
+                                request.getTargetOrganization(),
+                                request.getTargetSpace()))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId),
-                                                getApplicationIdFromOrgSpace(
-                                                        cloudFoundryClient,
-                                                        request.getTargetName(),
-                                                        spaceId,
-                                                        request.getTargetOrganization(),
-                                                        request.getTargetSpace()))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, sourceApplicationId, targetApplicationId) ->
+                                (sourceApplicationId, targetApplicationId) ->
                                         copyBits(
-                                                        cloudFoundryClient,
                                                         request.getStagingTimeout(),
                                                         sourceApplicationId,
                                                         targetApplicationId)
-                                                .thenReturn(
-                                                        Tuples.of(
-                                                                cloudFoundryClient,
-                                                                targetApplicationId))))
+                                                .thenReturn(targetApplicationId)))
                 .filter(
-                        predicate(
-                                (cloudFoundryClient, targetApplicationId) ->
-                                        Optional.ofNullable(request.getRestart()).orElse(false)))
+                        targetApplicationId ->
+                                Optional.ofNullable(request.getRestart()).orElse(false))
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, targetApplicationId) ->
-                                        restartApplication(
-                                                cloudFoundryClient,
-                                                request.getTargetName(),
-                                                targetApplicationId,
-                                                request.getStagingTimeout(),
-                                                request.getStartupTimeout())))
+                        targetApplicationId ->
+                                restartApplication(
+                                        request.getTargetName(),
+                                        targetApplicationId,
+                                        request.getStagingTimeout(),
+                                        request.getStartupTimeout()))
                 .transform(OperationsLogging.log("Copy Application Source"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Void> delete(DeleteApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getRoutesAndApplicationId(
+                        request, Optional.ofNullable(request.getDeleteRoutes()).orElse(false))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, spaceId) ->
-                                        getRoutesAndApplicationId(
-                                                        cloudFoundryClient,
-                                                        request,
-                                                        spaceId,
-                                                        Optional.ofNullable(
-                                                                        request.getDeleteRoutes())
-                                                                .orElse(false))
-                                                .map(
-                                                        function(
-                                                                (routes, applicationId) ->
-                                                                        Tuples.of(
-                                                                                cloudFoundryClient,
-                                                                                routes,
-                                                                                applicationId)))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, routes, applicationId) ->
-                                        deleteRoutes(
-                                                        cloudFoundryClient,
-                                                        request.getCompletionTimeout(),
-                                                        routes)
-                                                .thenReturn(
-                                                        Tuples.of(
-                                                                cloudFoundryClient,
-                                                                applicationId))))
-                .delayUntil(function(DefaultApplications::removeServiceBindings))
-                .flatMap(function(DefaultApplications::requestDeleteApplication))
+                                (routes, applicationId) ->
+                                        deleteRoutes(request.getCompletionTimeout(), routes)
+                                                .thenReturn(applicationId)))
+                .delayUntil(this::removeServiceBindings)
+                .flatMap(this::requestDeleteApplication)
                 .transform(OperationsLogging.log("Delete Application"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Void> disableSsh(DisableApplicationSshRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                Mono.just(applicationId),
-                                                getSshEnabled(cloudFoundryClient, applicationId))))
-                .filter(
-                        predicate(
-                                (cloudFoundryClient, applicationId, sshEnabled) ->
-                                        sshEnabled.equals(true)))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestUpdateApplicationSsh(
-                                                cloudFoundryClient, applicationId, false)))
+        return getApplicationIdV3(request.getName())
+                // TODO dgarnier: is this correct?
+                .filterWhen(applicationId -> getSshEnabled(applicationId))
+                .flatMap(applicationId -> requestUpdateApplicationSsh(applicationId, false))
                 .then()
                 .transform(OperationsLogging.log("Disable Application SSH"))
                 .checkpoint();
@@ -355,32 +302,9 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> enableSsh(EnableApplicationSshRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                Mono.just(applicationId),
-                                                getSshEnabled(cloudFoundryClient, applicationId))))
-                .filter(
-                        predicate(
-                                (cloudFoundryClient, applicationId, sshEnabled) ->
-                                        sshEnabled.equals(false)))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestUpdateApplicationSsh(
-                                                cloudFoundryClient, applicationId, true)))
+        return getApplicationIdV3(request.getName())
+                .filterWhen(applicationId -> getSshEnabled(applicationId).map(enabled -> !enabled))
+                .flatMap(applicationId -> requestUpdateApplicationSsh(applicationId, true))
                 .then()
                 .transform(OperationsLogging.log("Enable Application SSH"))
                 .checkpoint();
@@ -388,53 +312,30 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplication(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(function(DefaultApplications::getAuxiliaryContent))
+        return getApplicationV3(request.getName())
+                .flatMap(this::getAuxiliaryContent)
                 .map(function(DefaultApplications::toApplicationDetail))
                 .transform(OperationsLogging.log("Get Application"))
                 .checkpoint();
     }
 
+    // TODO dgarnier: manifest v3?
     @Override
     public Mono<ApplicationManifest> getApplicationManifest(GetApplicationManifestRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplicationId(request.getName())
+                .flatMap(
+                        applicationId ->
+                                Mono.zip(
+                                        Mono.just(applicationId),
+                                        requestApplicationSummary(applicationId)))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, spaceId) ->
+                                (applicationId, summary) ->
                                         Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                Mono.just(applicationId),
-                                                requestApplicationSummary(
-                                                        cloudFoundryClient, applicationId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId, response) ->
-                                        Mono.zip(
-                                                getApplicationBuildpacks(
-                                                        cloudFoundryClient, applicationId),
-                                                Mono.just(response),
-                                                getStackName(
-                                                        cloudFoundryClient,
-                                                        response.getStackId()))))
-                .flatMap(function(DefaultApplications::toApplicationManifest))
+                                                getApplicationBuildpacks(applicationId),
+                                                Mono.just(summary),
+                                                getStackName(summary.getStackId()))))
+                .flatMap(function(this::toApplicationManifest))
                 .transform(OperationsLogging.log("Get Application Manifest"))
                 .checkpoint();
     }
@@ -442,17 +343,8 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationEnvironments> getEnvironments(
             GetApplicationEnvironmentsRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(function(DefaultApplications::requestApplicationEnvironment))
+        return getApplicationIdV3(request.getName())
+                .flatMap(applicationId -> requestApplicationEnvironment(applicationId))
                 .map(DefaultApplications::toApplicationEnvironments)
                 .transform(OperationsLogging.log("Get Application Environments"))
                 .checkpoint();
@@ -460,26 +352,13 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationEvent> getEvents(GetApplicationEventsRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
+        return getApplicationIdV3(request.getName())
                 .flatMapMany(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestEvents(applicationId, cloudFoundryClient)
-                                                .take(
-                                                        Optional.ofNullable(
-                                                                        request
-                                                                                .getMaxNumberOfEvents())
-                                                                .orElse(
-                                                                        MAX_NUMBER_OF_RECENT_EVENTS))))
+                        applicationId ->
+                                requestEvents(applicationId)
+                                        .take(
+                                                Optional.ofNullable(request.getMaxNumberOfEvents())
+                                                        .orElse(MAX_NUMBER_OF_RECENT_EVENTS)))
                 .map(DefaultApplications::convertToApplicationEvent)
                 .transform(OperationsLogging.log("Get Application Events"))
                 .checkpoint();
@@ -487,12 +366,11 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<ApplicationHealthCheck> getHealthCheck(GetApplicationHealthCheckRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        getApplication(
-                                                cloudFoundryClient, request.getName(), spaceId)))
+        return getApplicationV3(request.getName())
+                .map(ApplicationResource::getId)
+                .flatMap(this::requestApplicationWebProcess)
+                .map(GetApplicationProcessResponse::getHealthCheck)
+                .map(HealthCheck::getType)
                 .map(DefaultApplications::toHealthCheck)
                 .transform(OperationsLogging.log("Get Application Health Check"))
                 .checkpoint();
@@ -500,8 +378,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationSummary> list() {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(function(DefaultApplications::requestSpaceSummary))
+        return requestSpaceSummary()
                 .flatMapMany(DefaultApplications::extractApplications)
                 .map(DefaultApplications::toApplicationSummary)
                 .transform(OperationsLogging.log("List Applications"))
@@ -510,20 +387,8 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<Task> listTasks(ListApplicationTasksRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMapMany(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestListTasks(cloudFoundryClient, applicationId)))
+        return getApplicationIdV3(request.getName())
+                .flatMapMany(applicationId -> requestListTasks(applicationId))
                 .map(DefaultApplications::toTask)
                 .transform(OperationsLogging.log("List Application Tasks"))
                 .checkpoint();
@@ -531,15 +396,8 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        getApplicationId(
-                                                cloudFoundryClient, request.getName(), spaceId)))
-                .flatMapMany(
-                        applicationId ->
-                                getLogs(this.dopplerClient, applicationId, request.getRecent()))
+        return getApplicationIdV3(request.getName())
+                .flatMapMany(applicationId -> getLogs(applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
     }
@@ -610,55 +468,37 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
+    // TODO dgarnier: pass orgId to constructor?
     @Override
     public Mono<Void> pushManifest(PushApplicationManifestRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getSpaceOrganizationId(cloudFoundryClient, spaceId),
-                                                Mono.just(spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, organizationId, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                listAvailableDomains(
-                                                        cloudFoundryClient, organizationId),
-                                                Mono.just(spaceId))))
+        return getSpaceOrganizationId(this.spaceId)
+                .flatMap(organizationId -> listAvailableDomains(organizationId))
                 .flatMapMany(
-                        function(
-                                (cloudFoundryClient, availableDomains, spaceId) ->
-                                        Flux.fromIterable(request.getManifests())
-                                                .flatMap(
-                                                        manifest -> {
-                                                            if (manifest.getPath() != null) {
-                                                                return pushApplication(
-                                                                        cloudFoundryClient,
-                                                                        availableDomains,
-                                                                        manifest,
-                                                                        this.randomWords,
-                                                                        request,
-                                                                        spaceId);
-                                                            } else if (!manifest.getDocker()
-                                                                    .getImage()
-                                                                    .isEmpty()) {
-                                                                return pushDocker(
-                                                                        cloudFoundryClient,
-                                                                        availableDomains,
-                                                                        manifest,
-                                                                        this.randomWords,
-                                                                        request,
-                                                                        spaceId);
-                                                            } else {
-                                                                throw new IllegalStateException(
-                                                                        "One of application or"
-                                                                            + " dockerImage must be"
-                                                                            + " supplied");
-                                                            }
-                                                        })))
+                        availableDomains ->
+                                Flux.fromIterable(request.getManifests())
+                                        .flatMap(
+                                                manifest -> {
+                                                    if (manifest.getPath() != null) {
+                                                        return pushApplication(
+                                                                availableDomains,
+                                                                manifest,
+                                                                this.randomWords,
+                                                                request);
+                                                    } else if (!manifest.getDocker()
+                                                            .getImage()
+                                                            .isEmpty()) {
+                                                        return pushDocker(
+                                                                availableDomains,
+                                                                manifest,
+                                                                this.randomWords,
+                                                                request);
+                                                    } else {
+                                                        throw new IllegalStateException(
+                                                                "One of application or"
+                                                                        + " dockerImage must be"
+                                                                        + " supplied");
+                                                    }
+                                                }))
                 .then()
                 .transform(OperationsLogging.log("Push Manifest"))
                 .checkpoint();
@@ -674,74 +514,34 @@ public final class DefaultApplications implements Applications {
             throw new RuntimeException("Could not serialize manifest", e);
         }
 
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return applyManifestAndWaitForCompletion(manifestSerialized)
+                .flatMapMany(ignored -> Flux.fromIterable(request.getManifest().getApplications()))
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        applyManifestAndWaitForCompletion(
-                                                        cloudFoundryClient,
-                                                        spaceId,
-                                                        manifestSerialized)
-                                                .then(
-                                                        Mono.just(
-                                                                Tuples.of(
-                                                                        cloudFoundryClient,
-                                                                        spaceId)))))
-                .flatMapMany(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Flux.fromIterable(request.getManifest().getApplications())
-                                                .map(
-                                                        manifestApp ->
-                                                                Tuples.of(
-                                                                        cloudFoundryClient,
-                                                                        spaceId,
-                                                                        manifestApp))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId, manifestApp) ->
-                                        getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        manifestApp.getName(),
-                                                        spaceId)
-                                                .flatMap(
-                                                        appId ->
-                                                                Mono.zip(
-                                                                        Mono.just(appId),
-                                                                        createPackage(
-                                                                                cloudFoundryClient,
-                                                                                appId,
-                                                                                manifestApp)))
-                                                .flatMap(
-                                                        function(
-                                                                (appId, packageId) ->
-                                                                        buildAndStageAndWaitForRunning(
-                                                                                cloudFoundryClient,
-                                                                                manifestApp,
-                                                                                packageId,
-                                                                                appId)))))
+                        manifestApp ->
+                                getApplicationIdV3(manifestApp.getName())
+                                        .flatMap(
+                                                appId ->
+                                                        Mono.zip(
+                                                                Mono.just(appId),
+                                                                createPackage(appId, manifestApp)))
+                                        .flatMap(
+                                                function(
+                                                        (appId, packageId) ->
+                                                                buildAndStageAndWaitForRunning(
+                                                                        manifestApp,
+                                                                        packageId,
+                                                                        appId))))
                 .then();
     }
 
     @Override
     public Mono<Void> rename(RenameApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplicationIdV3(request.getName())
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestUpdateApplicationName(
-                                                cloudFoundryClient,
-                                                applicationId,
-                                                request.getNewName())))
+                        applicationId ->
+                                requestUpdateApplicationV3(
+                                        applicationId,
+                                        builder -> builder.name(request.getNewName())))
                 .then()
                 .transform(OperationsLogging.log("Rename Application"))
                 .checkpoint();
@@ -749,101 +549,48 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> restage(RestageApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        restageApplication(
-                                                cloudFoundryClient,
-                                                request.getName(),
-                                                applicationId,
-                                                request.getStagingTimeout(),
-                                                request.getStartupTimeout())))
+                        applicationId ->
+                                restageApplication(
+                                        request.getName(),
+                                        applicationId,
+                                        request.getStagingTimeout(),
+                                        request.getStartupTimeout()))
                 .transform(OperationsLogging.log("Restage Application"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplication(request.getName())
+                .flatMap(resource -> stopApplicationIfNotStopped(resource))
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplication(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, resource) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                stopApplicationIfNotStopped(
-                                                        cloudFoundryClient, resource))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, stoppedApplication) ->
-                                        startApplicationAndWait(
-                                                cloudFoundryClient,
-                                                request.getName(),
-                                                ResourceUtils.getId(stoppedApplication),
-                                                request.getStagingTimeout(),
-                                                request.getStartupTimeout())))
+                        stoppedApplication ->
+                                startApplicationAndWait(
+                                        request.getName(),
+                                        ResourceUtils.getId(stoppedApplication),
+                                        request.getStagingTimeout(),
+                                        request.getStartupTimeout()))
                 .transform(OperationsLogging.log("Restart Application"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Void> restartInstance(RestartApplicationInstanceRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplicationId(request.getName())
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestTerminateApplicationInstance(
-                                                cloudFoundryClient,
-                                                applicationId,
-                                                String.valueOf(request.getInstanceIndex()))))
+                        applicationId ->
+                                requestTerminateApplicationInstance(
+                                        applicationId, String.valueOf(request.getInstanceIndex())))
                 .transform(OperationsLogging.log("Restart Application Instance"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Task> runTask(RunApplicationTaskRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getApplicationName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestCreateTask(
-                                                cloudFoundryClient, applicationId, request)))
+        return getApplicationIdV3(request.getApplicationName())
+                .flatMap(applicationId -> requestCreateTask(applicationId, request))
                 .map(DefaultApplications::toTask)
                 .transform(OperationsLogging.log("Run Application Task Instance"))
                 .checkpoint();
@@ -851,116 +598,105 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> scale(ScaleApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .filter(predicate((cloudFoundryClient, spaceId) -> areModifiersPresent(request)))
+        if (!areModifiersPresent(request)) {
+            return Mono.empty();
+        }
+        return getApplicationId(request.getName())
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
+                        applicationId ->
+                                requestUpdateApplicationScale(
+                                        applicationId,
+                                        request.getDiskLimit(),
+                                        request.getInstances(),
+                                        request.getMemoryLimit()))
+                .filter(resource -> isRestartRequired(request, resource))
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                requestUpdateApplicationScale(
-                                                        cloudFoundryClient,
-                                                        applicationId,
-                                                        request.getDiskLimit(),
-                                                        request.getInstances(),
-                                                        request.getMemoryLimit()))))
-                .filter(
-                        predicate(
-                                (cloudFoundryClient, resource) ->
-                                        isRestartRequired(request, resource)))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, resource) ->
-                                        restartApplication(
-                                                cloudFoundryClient,
-                                                request.getName(),
-                                                ResourceUtils.getId(resource),
-                                                request.getStagingTimeout(),
-                                                request.getStartupTimeout())))
+                        resource ->
+                                restartApplication(
+                                        request.getName(),
+                                        ResourceUtils.getId(resource),
+                                        request.getStagingTimeout(),
+                                        request.getStartupTimeout()))
                 .transform(OperationsLogging.log("Scale Application"))
                 .checkpoint();
     }
 
     @Override
-    public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplication(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, resource) ->
-                                        requestUpdateApplicationEnvironment(
-                                                cloudFoundryClient,
-                                                ResourceUtils.getId(resource),
-                                                addToEnvironment(
-                                                        getEnvironment(resource),
-                                                        request.getVariableName(),
-                                                        request.getVariableValue()))))
-                .then()
-                .transform(OperationsLogging.log("Set Application Environment Variable"))
-                .checkpoint();
-    }
-
-    @Override
     public Mono<Void> setHealthCheck(SetApplicationHealthCheckRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return getApplicationIdV3(request.getName())
+                .flatMap(this::requestApplicationWebProcess)
                 .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationId(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        requestUpdateApplicationHealthCheckType(
-                                                cloudFoundryClient,
-                                                applicationId,
-                                                request.getType())))
-                .then()
+                        webProcess ->
+                                this.requestUpdateProcessHealthCheckType(
+                                        webProcess.getId(), fromHealthCheck(request.getType())))
                 .transform(OperationsLogging.log("Set Application Health Check"))
                 .checkpoint();
     }
 
     @Override
     public Mono<Boolean> sshEnabled(ApplicationSshEnabledRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(function(DefaultApplications::getSshEnabled))
+        return getApplicationIdV3(request.getName())
+                .flatMap(applicationId -> getSshEnabled(applicationId))
                 .transform(OperationsLogging.log("Is Application SSH Enabled"))
                 .checkpoint();
     }
 
-    private static Mono<Boolean> getSshEnabled(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    @Override
+    public Mono<Void> start(StartApplicationRequest request) {
+        return getApplicationIdWhere(request.getName(), isNotIn(STARTED_STATE))
+                .flatMap(
+                        applicationId ->
+                                startApplicationAndWait(
+                                        request.getName(),
+                                        applicationId,
+                                        request.getStagingTimeout(),
+                                        request.getStartupTimeout()))
+                .transform(OperationsLogging.log("Start Application"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> stop(StopApplicationRequest request) {
+        return getApplicationIdWhere(request.getName(), isNotIn(STOPPED_STATE))
+                .flatMap(applicationId -> stopApplication(applicationId))
+                .then()
+                .transform(OperationsLogging.log("Stop Application"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> terminateTask(TerminateApplicationTaskRequest request) {
+        return getApplicationIdV3(request.getApplicationName())
+                .flatMap(applicationId -> getTaskId(applicationId, request.getSequenceId()))
+                .flatMap(taskId -> requestTerminateTask(taskId))
+                .then()
+                .transform(OperationsLogging.log("Terminate Application Task Instance"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> setEnvironmentVariable(SetEnvironmentVariableApplicationRequest request) {
+        return getApplicationIdV3(request.getName())
+                .flatMap(
+                        id ->
+                                requestSetEnvironmentVariable(
+                                        id, request.getVariableName(), request.getVariableValue()))
+                .then()
+                .transform(OperationsLogging.log("Set Application Environment Variable"))
+                .checkpoint();
+    }
+
+    @Override
+    public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
+        return getApplicationIdV3(request.getName())
+                .flatMap(id -> requestUnsetEnvironmentVariable(id, request.getVariableName()))
+                .then()
+                .transform(OperationsLogging.log("Unset Application Environment Variable"))
+                .checkpoint();
+    }
+
+    private Mono<Boolean> getSshEnabled(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .getSshEnabled(
                         GetApplicationSshEnabledRequest.builder()
@@ -969,115 +705,9 @@ public final class DefaultApplications implements Applications {
                 .map(GetApplicationSshEnabledResponse::getEnabled);
     }
 
-    @Override
-    public Mono<Void> start(StartApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdWhere(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId,
-                                                        isNotIn(STARTED_STATE)))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        startApplicationAndWait(
-                                                cloudFoundryClient,
-                                                request.getName(),
-                                                applicationId,
-                                                request.getStagingTimeout(),
-                                                request.getStartupTimeout())))
-                .transform(OperationsLogging.log("Start Application"))
-                .checkpoint();
-    }
-
-    @Override
-    public Mono<Void> stop(StopApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdWhere(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId,
-                                                        isNotIn(STOPPED_STATE)))))
-                .flatMap(function(DefaultApplications::stopApplication))
-                .then()
-                .transform(OperationsLogging.log("Stop Application"))
-                .checkpoint();
-    }
-
-    @Override
-    public Mono<Void> terminateTask(TerminateApplicationTaskRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplicationIdV3(
-                                                        cloudFoundryClient,
-                                                        request.getApplicationName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, applicationId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getTaskId(
-                                                        cloudFoundryClient,
-                                                        applicationId,
-                                                        request.getSequenceId()))))
-                .flatMap(function(DefaultApplications::requestTerminateTask))
-                .then()
-                .transform(OperationsLogging.log("Terminate Application Task Instance"))
-                .checkpoint();
-    }
-
-    @Override
-    public Mono<Void> unsetEnvironmentVariable(UnsetEnvironmentVariableApplicationRequest request) {
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        Mono.zip(
-                                                Mono.just(cloudFoundryClient),
-                                                getApplication(
-                                                        cloudFoundryClient,
-                                                        request.getName(),
-                                                        spaceId))))
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, resource) ->
-                                        requestUpdateApplicationEnvironment(
-                                                cloudFoundryClient,
-                                                ResourceUtils.getId(resource),
-                                                removeFromEnvironment(
-                                                        getEnvironment(resource),
-                                                        request.getVariableName()))))
-                .then()
-                .transform(OperationsLogging.log("Unset Application Environment Variable"))
-                .checkpoint();
-    }
-
-    private static Map<String, Object> addToEnvironment(
-            Map<String, Object> environment, String variableName, Object variableValue) {
-        return FluentMap.<String, Object>builder()
-                .entries(environment)
-                .entry(variableName, variableValue)
-                .build();
-    }
-
-    private static Mono<Void> applyDropletAndWaitForRunning(
-            CloudFoundryClient cloudFoundryClient, String appname, String appId, String dropletId) {
-        return cloudFoundryClient
+    private Mono<Void> applyDropletAndWaitForRunning(
+            String appname, String appId, String dropletId) {
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .setCurrentDroplet(
                         SetApplicationCurrentDropletRequest.builder()
@@ -1085,24 +715,23 @@ public final class DefaultApplications implements Applications {
                                 .data(Relationship.builder().id(dropletId).build())
                                 .build())
                 .then(
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .applicationsV3()
                                 .restart(
                                         org.cloudfoundry.client.v3.applications
                                                 .RestartApplicationRequest.builder()
                                                 .applicationId(appId)
                                                 .build()))
-                .then(waitForRunningV3(cloudFoundryClient, appname, appId, null));
+                .then(waitForRunningV3(appname, appId, null));
     }
 
-    private static Mono<Void> applyManifestAndWaitForCompletion(
-            CloudFoundryClient cloudFoundryClient, String spaceId, byte[] manifestSerialized) {
-        return cloudFoundryClient
+    private Mono<Void> applyManifestAndWaitForCompletion(byte[] manifestSerialized) {
+        return this.cloudFoundryClient
                 .spacesV3()
                 .applyManifest(
                         ApplyManifestRequest.builder()
                                 .manifest(manifestSerialized)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build())
                 .map(
                         response ->
@@ -1115,7 +744,7 @@ public final class DefaultApplications implements Applications {
                 .flatMap(
                         jobId ->
                                 JobUtils.waitForCompletion(
-                                        cloudFoundryClient, Duration.ofMinutes(5), jobId));
+                                        this.cloudFoundryClient, Duration.ofMinutes(5), jobId));
     }
 
     private static boolean areModifiersPresent(ScaleApplicationRequest request) {
@@ -1124,84 +753,54 @@ public final class DefaultApplications implements Applications {
                 || request.getInstances() != null;
     }
 
-    private static Flux<String> associateDefaultDomain(
-            CloudFoundryClient cloudFoundryClient,
+    private Flux<String> associateDefaultDomain(
             String applicationId,
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
-        return getDefaultDomainId(cloudFoundryClient)
+            RandomWords randomWords) {
+        return getDefaultDomainId()
                 .flatMapMany(
                         domainId ->
                                 getPushRouteIdFromDomain(
-                                        cloudFoundryClient,
-                                        availableDomains,
-                                        domainId,
-                                        manifest,
-                                        randomWords,
-                                        spaceId))
-                .flatMap(
-                        routeId ->
-                                requestAssociateRoute(cloudFoundryClient, applicationId, routeId))
+                                        availableDomains, domainId, manifest, randomWords))
+                .flatMap(routeId -> requestAssociateRoute(applicationId, routeId))
                 .map(ResourceUtils::getId);
     }
 
-    private static Mono<Void> bindServices(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            ApplicationManifest manifest,
-            String spaceId) {
+    private Mono<Void> bindServices(String applicationId, ApplicationManifest manifest) {
         if (manifest.getServices() == null || manifest.getServices().size() == 0) {
             return Mono.empty();
         }
 
         return Flux.fromIterable(manifest.getServices())
-                .flatMap(
-                        serviceInstanceName ->
-                                getServiceId(cloudFoundryClient, serviceInstanceName, spaceId))
+                .flatMap(serviceInstanceName -> getServiceId(serviceInstanceName))
                 .flatMap(
                         serviceInstanceId ->
-                                requestCreateServiceBinding(
-                                                cloudFoundryClient,
-                                                applicationId,
-                                                serviceInstanceId)
+                                requestCreateServiceBinding(applicationId, serviceInstanceId)
                                         .onErrorResume(
                                                 ExceptionUtils.statusCode(CF_SERVICE_ALREADY_BOUND),
                                                 t -> Mono.empty()))
                 .then();
     }
 
-    private static Mono<Void> buildAndStageAndWaitForRunning(
-            CloudFoundryClient cloudFoundryClient,
-            ManifestV3Application manifestApp,
-            String packageId,
-            String appId) {
-        return buildAndStage(cloudFoundryClient, manifestApp, packageId)
+    private Mono<Void> buildAndStageAndWaitForRunning(
+            ManifestV3Application manifestApp, String packageId, String appId) {
+        return buildAndStage(manifestApp, packageId)
                 .flatMap(
                         dropletId ->
                                 applyDropletAndWaitForRunning(
-                                        cloudFoundryClient,
-                                        manifestApp.getName(),
-                                        appId,
-                                        dropletId));
+                                        manifestApp.getName(), appId, dropletId));
     }
 
-    private static Mono<String> buildAndStage(
-            CloudFoundryClient cloudFoundryClient,
-            ManifestV3Application manifestApp,
-            String packageId) {
-        return cloudFoundryClient
+    private Mono<String> buildAndStage(ManifestV3Application manifestApp, String packageId) {
+        return this.cloudFoundryClient
                 .builds()
                 .create(
                         CreateBuildRequest.builder()
                                 .getPackage(Relationship.builder().id(packageId).build())
                                 .build())
                 .map(CreateBuildResponse::getId)
-                .flatMap(
-                        buildId ->
-                                waitForBuildStaging(
-                                        cloudFoundryClient, buildId, manifestApp.getName(), null))
+                .flatMap(buildId -> waitForBuildStaging(buildId, manifestApp.getName(), null))
                 .map(build -> build.getDroplet().getId());
     }
 
@@ -1209,57 +808,51 @@ public final class DefaultApplications implements Applications {
         return manifest.getName().replaceAll("\\.", "");
     }
 
-    private static BiFunction<String, String, String> collectStates() {
+    public static BiFunction<ProcessState, ProcessState, ProcessState> collectStates() {
         return (totalState, instanceState) -> {
-            if ("RUNNING".equals(instanceState) || "RUNNING".equals(totalState)) {
-                return "RUNNING";
+            if (ProcessState.RUNNING.equals(instanceState)
+                    || ProcessState.RUNNING.equals(totalState)) {
+                return ProcessState.RUNNING;
             }
 
-            if ("FLAPPING".equals(instanceState) || "CRASHED".equals(instanceState)) {
-                return "FAILED";
+            if (ProcessState.CRASHED.equals(instanceState)) {
+                return ProcessState.CRASHED;
             }
 
             return totalState;
         };
     }
 
-    private static ApplicationEvent convertToApplicationEvent(EventResource resource) {
-        EventEntity entity = resource.getEntity();
+    private static ApplicationEvent convertToApplicationEvent(AuditEventResource entity) {
         Date timestamp = null;
         try {
-            timestamp = DateUtils.parseFromIso8601(entity.getTimestamp());
+            timestamp = DateUtils.parseFromIso8601(entity.getCreatedAt());
         } catch (IllegalArgumentException iae) {
             // do not set time
         }
         return ApplicationEvent.builder()
-                .actor(entity.getActorName())
+                .actor(entity.getAuditEventActor().getName())
                 .description(
                         eventDescription(
                                 getMetadataRequest(entity), getEntryNames(entity.getType())))
-                .id(ResourceUtils.getId(resource))
+                .id(entity.getId())
                 .event(entity.getType())
                 .time(timestamp)
                 .build();
     }
 
-    private static Mono<Void> copyBits(
-            CloudFoundryClient cloudFoundryClient,
-            Duration completionTimeout,
-            String sourceApplicationId,
-            String targetApplicationId) {
-        return requestCopyBits(cloudFoundryClient, sourceApplicationId, targetApplicationId)
+    private Mono<Void> copyBits(
+            Duration completionTimeout, String sourceApplicationId, String targetApplicationId) {
+        return requestCopyBits(sourceApplicationId, targetApplicationId)
                 .flatMap(
                         job ->
                                 JobUtils.waitForCompletion(
-                                        cloudFoundryClient, completionTimeout, job));
+                                        this.cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<String> createPackage(
-            CloudFoundryClient cloudFoundryClient,
-            String appId,
-            ManifestV3Application manifestApp) {
+    private Mono<String> createPackage(String appId, ManifestV3Application manifestApp) {
         if (manifestApp.getDocker() != null) {
-            return cloudFoundryClient
+            return this.cloudFoundryClient
                     .packages()
                     .create(
                             CreatePackageRequest.builder()
@@ -1283,7 +876,7 @@ public final class DefaultApplications implements Applications {
                                     .build())
                     .map(CreatePackageResponse::getId);
         } else {
-            return cloudFoundryClient
+            return this.cloudFoundryClient
                     .packages()
                     .create(
                             CreatePackageRequest.builder()
@@ -1310,11 +903,10 @@ public final class DefaultApplications implements Applications {
                     .flatMap(
                             packageId ->
                                     ResourceMatchingUtilsV3.getMatchedResources(
-                                                    cloudFoundryClient, manifestApp.getPath())
+                                                    this.cloudFoundryClient, manifestApp.getPath())
                                             .flatMap(
                                                     matchedResources ->
                                                             uploadPackageBitsAndWait(
-                                                                    cloudFoundryClient,
                                                                     packageId,
                                                                     manifestApp.getPath(),
                                                                     matchedResources,
@@ -1323,23 +915,21 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static Mono<Void> deleteRoute(
-            CloudFoundryClient cloudFoundryClient, String routeId, Duration completionTimeout) {
-        return requestDeleteRoute(cloudFoundryClient, routeId)
+    private Mono<Void> deleteRoute(String routeId, Duration completionTimeout) {
+        return requestDeleteRoute(routeId)
                 .flatMap(
                         job ->
                                 JobUtils.waitForCompletion(
-                                        cloudFoundryClient, completionTimeout, job));
+                                        this.cloudFoundryClient, completionTimeout, job));
     }
 
-    private static Mono<Void> deleteRoutes(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> deleteRoutes(
             Duration completionTimeout,
             Optional<List<org.cloudfoundry.client.v2.routes.Route>> routes) {
         return routes.map(Flux::fromIterable)
                 .orElse(Flux.empty())
                 .map(org.cloudfoundry.client.v2.routes.Route::getId)
-                .flatMap(routeId -> deleteRoute(cloudFoundryClient, routeId, completionTimeout))
+                .flatMap(routeId -> deleteRoute(routeId, completionTimeout))
                 .then();
     }
 
@@ -1384,7 +974,7 @@ public final class DefaultApplications implements Applications {
                 sb.append(", ");
             }
             first = false;
-            sb.append(entryName).append(": ").append(String.valueOf(value));
+            sb.append(entryName).append(": ").append(value);
         }
         return sb.toString();
     }
@@ -1394,9 +984,12 @@ public final class DefaultApplications implements Applications {
         return Flux.fromIterable(getSpaceSummaryResponse.getApplications());
     }
 
-    private static Mono<AbstractApplicationResource> getApplication(
-            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        return requestApplications(cloudFoundryClient, application, spaceId)
+    private Mono<AbstractApplicationResource> getApplication(String application) {
+        return getApplication(application, spaceId);
+    }
+
+    private Mono<AbstractApplicationResource> getApplication(String application, String spaceId) {
+        return requestApplications(application, spaceId)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -1405,9 +998,8 @@ public final class DefaultApplications implements Applications {
                                         "Application %s does not exist", application));
     }
 
-    private static Mono<List<String>> getApplicationBuildpacks(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<List<String>> getApplicationBuildpacks(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .get(
                         org.cloudfoundry.client.v3.applications.GetApplicationRequest.builder()
@@ -1421,17 +1013,16 @@ public final class DefaultApplications implements Applications {
                 .defaultIfEmpty(Collections.emptyList());
     }
 
-    private static Mono<String> getApplicationId(
-            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        return getApplication(cloudFoundryClient, application, spaceId).map(ResourceUtils::getId);
+    private Mono<String> getApplicationId(String application) {
+        return getApplicationId(application, spaceId);
     }
 
-    private static Mono<String> getApplicationId(
-            CloudFoundryClient cloudFoundryClient,
-            ApplicationManifest manifest,
-            String spaceId,
-            String stackId) {
-        return requestApplications(cloudFoundryClient, manifest.getName(), spaceId)
+    private Mono<String> getApplicationId(String application, String spaceId) {
+        return getApplication(application, spaceId).map(ResourceUtils::getId);
+    }
+
+    private Mono<String> getApplicationId(ApplicationManifest manifest, String stackId) {
+        return requestApplications(manifest.getName())
                 .singleOrEmpty()
                 .flatMap(
                         application -> {
@@ -1444,7 +1035,6 @@ public final class DefaultApplications implements Applications {
                                     .ifPresent(merge::putAll);
 
                             return requestUpdateApplication(
-                                            cloudFoundryClient,
                                             ResourceUtils.getId(application),
                                             merge,
                                             manifest,
@@ -1452,76 +1042,41 @@ public final class DefaultApplications implements Applications {
                                     .map(ResourceUtils::getId);
                         })
                 .switchIfEmpty(
-                        requestCreateApplication(cloudFoundryClient, manifest, spaceId, stackId)
-                                .map(ResourceUtils::getId));
+                        requestCreateApplication(manifest, stackId).map(ResourceUtils::getId));
     }
 
-    private static Mono<String> getApplicationIdFromOrgSpace(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String spaceId,
-            String organization,
-            String space) {
-        return getSpaceOrganizationId(cloudFoundryClient, spaceId)
+    private Mono<String> getApplicationIdFromOrgSpace(
+            String application, String spaceId, String organization, String space) {
+        return getSpaceOrganizationId(spaceId)
                 .flatMap(
                         organizationId ->
                                 organization != null
-                                        ? getOrganizationId(cloudFoundryClient, organization)
+                                        ? getOrganizationId(organization)
                                         : Mono.just(organizationId))
                 .flatMap(
                         organizationId ->
                                 space != null
-                                        ? getSpaceId(cloudFoundryClient, organizationId, space)
+                                        ? getSpaceId(organizationId, space)
                                         : Mono.just(spaceId))
-                .flatMap(spaceId1 -> getApplicationId(cloudFoundryClient, application, spaceId1));
+                .flatMap(spaceId1 -> getApplicationId(application, spaceId1));
     }
 
-    private static Mono<String> getApplicationIdV3(
-            CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
-        return getApplicationV3(cloudFoundryClient, applicationName, spaceId)
-                .map(ApplicationResource::getId);
+    private Mono<String> getApplicationIdV3(String applicationName) {
+        return getApplicationV3(applicationName).map(ApplicationResource::getId);
     }
 
-    private static Mono<String> getApplicationIdWhere(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String spaceId,
-            Predicate<AbstractApplicationResource> predicate) {
-        return getApplication(cloudFoundryClient, application, spaceId)
-                .filter(predicate)
-                .map(ResourceUtils::getId);
+    private Mono<String> getApplicationIdWhere(
+            String application, Predicate<AbstractApplicationResource> predicate) {
+        return getApplication(application).filter(predicate).map(ResourceUtils::getId);
     }
 
-    private static Mono<ApplicationInstancesResponse> getApplicationInstances(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestApplicationInstances(cloudFoundryClient, applicationId)
-                .onErrorResume(
-                        ExceptionUtils.statusCode(
-                                CF_BUILDPACK_COMPILED_FAILED,
-                                CF_INSTANCES_ERROR,
-                                CF_STAGING_NOT_FINISHED,
-                                CF_STAGING_TIME_EXPIRED,
-                                CF_INSUFFICIENT_RESOURCES,
-                                CF_STAGING_ERROR),
-                        t -> Mono.just(ApplicationInstancesResponse.builder().build()));
+    private Mono<List<org.cloudfoundry.client.v3.routes.RouteResource>> getApplicationRoutes(
+            String applicationId) {
+        return requestApplicationRoutes(applicationId).collectList();
     }
 
-    private static Mono<List<RouteResource>> getApplicationRoutes(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestApplicationRoutes(cloudFoundryClient, applicationId).collectList();
-    }
-
-    private static Mono<ApplicationStatisticsResponse> getApplicationStatistics(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestApplicationStatistics(cloudFoundryClient, applicationId)
-                .onErrorResume(
-                        ExceptionUtils.statusCode(CF_APP_STOPPED_STATS_ERROR),
-                        t -> Mono.just(ApplicationStatisticsResponse.builder().build()));
-    }
-
-    private static Mono<ApplicationResource> getApplicationV3(
-            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
-        return requestApplicationsV3(cloudFoundryClient, application, spaceId)
+    private Mono<ApplicationResource> getApplicationV3(String application) {
+        return requestApplicationsV3(application)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -1530,41 +1085,29 @@ public final class DefaultApplications implements Applications {
                                         "Application %s does not exist", application));
     }
 
-    private static Mono<
-                    Tuple5<
-                            List<String>,
-                            SummaryApplicationResponse,
-                            GetStackResponse,
-                            List<InstanceDetail>,
-                            List<String>>>
-            getAuxiliaryContent(
-                    CloudFoundryClient cloudFoundryClient,
-                    AbstractApplicationResource applicationResource) {
-        String applicationId = ResourceUtils.getId(applicationResource);
-        String stackId = ResourceUtils.getEntity(applicationResource).getStackId();
+    private Mono<Tuple4<List<String>, SummaryApplicationResponse, String, List<InstanceDetail>>>
+            getAuxiliaryContent(ApplicationResource applicationResource) {
+        String applicationId = applicationResource.getId();
+        LifecycleData data = applicationResource.getLifecycle().getData();
+        String stackName = "<UNKNOWN>";
+        if (data instanceof CnbData) {
+            stackName = ((CnbData) data).getStack();
+        } else if (data instanceof BuildpackData) {
+            stackName = ((BuildpackData) data).getStack();
+        }
+
+        Mono<List<InstanceDetail>> appInstanceDetails =
+                requestApplicationStatisticsV3(applicationId).map(this::toInstanceDetailList);
 
         return Mono.zip(
-                        getApplicationStatistics(cloudFoundryClient, applicationId),
-                        requestApplicationSummary(cloudFoundryClient, applicationId),
-                        getApplicationInstances(cloudFoundryClient, applicationId))
-                .flatMap(
-                        function(
-                                (applicationStatisticsResponse,
-                                        summaryApplicationResponse,
-                                        applicationInstancesResponse) ->
-                                        Mono.zip(
-                                                getApplicationBuildpacks(
-                                                        cloudFoundryClient, applicationId),
-                                                Mono.just(summaryApplicationResponse),
-                                                requestStack(cloudFoundryClient, stackId),
-                                                toInstanceDetailList(
-                                                        applicationInstancesResponse,
-                                                        applicationStatisticsResponse),
-                                                toUrls(summaryApplicationResponse.getRoutes()))));
+                getApplicationBuildpacks(applicationId),
+                requestApplicationSummary(applicationId),
+                Mono.just(stackName),
+                appInstanceDetails);
     }
 
-    private static Mono<String> getDefaultDomainId(CloudFoundryClient cloudFoundryClient) {
-        return requestSharedDomains(cloudFoundryClient)
+    private Mono<String> getDefaultDomainId() {
+        return requestSharedDomains()
                 .filter(
                         resource ->
                                 !Optional.ofNullable(
@@ -1590,26 +1133,21 @@ public final class DefaultApplications implements Applications {
         return type.contains("crash") ? ENTRY_FIELDS_CRASH : ENTRY_FIELDS_NORMAL;
     }
 
-    private static Map<String, Object> getEnvironment(AbstractApplicationResource resource) {
-        return ResourceUtils.getEntity(resource).getEnvironmentJsons();
-    }
-
     private static int getInstances(AbstractApplicationResource resource) {
         return Optional.ofNullable(resource.getEntity())
                 .map(ApplicationEntity::getInstances)
                 .orElse(0);
     }
 
-    private static Flux<LogMessage> getLogs(
-            Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
+    private Flux<LogMessage> getLogs(String applicationId, Boolean recent) {
         if (Optional.ofNullable(recent).orElse(false)) {
-            return requestLogsRecent(dopplerClient, applicationId)
+            return requestLogsRecent(applicationId)
                     .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
                     .map(Envelope::getLogMessage)
                     .collectSortedList(LOG_MESSAGE_COMPARATOR)
                     .flatMapIterable(d -> d);
         } else {
-            return requestLogsStream(dopplerClient, applicationId)
+            return requestLogsStream(applicationId)
                     .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
                     .map(Envelope::getLogMessage)
                     .transformDeferred(
@@ -1618,41 +1156,36 @@ public final class DefaultApplications implements Applications {
     }
 
     @SuppressWarnings("unchecked")
-    private static Map<String, Object> getMetadataRequest(EventEntity entity) {
-        Map<String, Optional<Object>> metadata =
-                Optional.ofNullable(entity.getMetadatas()).orElse(Collections.emptyMap());
+    private static Map<String, Object> getMetadataRequest(AuditEventResource entity) {
+        Map<String, Object> metadata =
+                Optional.ofNullable(entity.getData()).orElse(Collections.emptyMap());
 
         if (metadata.get("request") != null) {
-            return metadata.get("request")
-                    .map(m -> (Map<String, Object>) m)
-                    .orElse(Collections.emptyMap());
+            return (Map<String, Object>) metadata.getOrDefault("request", Collections.emptyMap());
         } else if (metadata.get("instance") != null) {
-            return metadata.entrySet().stream()
-                    .collect(Collectors.toMap(Map.Entry::getKey, v -> v.getValue().orElse("")));
+            return Collections.unmodifiableMap(metadata);
         } else {
             return Collections.emptyMap();
         }
     }
 
-    private static Mono<Optional<List<org.cloudfoundry.client.v2.routes.Route>>> getOptionalRoutes(
-            CloudFoundryClient cloudFoundryClient, boolean deleteRoutes, String applicationId) {
+    private Mono<Optional<List<org.cloudfoundry.client.v2.routes.Route>>> getOptionalRoutes(
+            boolean deleteRoutes, String applicationId) {
         if (deleteRoutes) {
-            return getRoutes(cloudFoundryClient, applicationId).map(Optional::of);
+            return getRoutes(applicationId).map(Optional::of);
         } else {
             return Mono.just(Optional.empty());
         }
     }
 
-    private static Mono<Optional<String>> getOptionalStackId(
-            CloudFoundryClient cloudFoundryClient, String stack) {
+    private Mono<Optional<String>> getOptionalStackId(String stack) {
         return Optional.ofNullable(stack)
-                .map(stack1 -> getStackId(cloudFoundryClient, stack1).map(Optional::of))
+                .map(stack1 -> getStackId(stack1).map(Optional::of))
                 .orElse(Mono.just(Optional.empty()));
     }
 
-    private static Mono<OrganizationResource> getOrganization(
-            CloudFoundryClient cloudFoundryClient, String organization) {
-        return requestOrganizations(cloudFoundryClient, organization)
+    private Mono<OrganizationResource> getOrganization(String organization) {
+        return requestOrganizations(organization)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -1661,14 +1194,12 @@ public final class DefaultApplications implements Applications {
                                         "Organization %s not found", organization));
     }
 
-    private static Mono<String> getOrganizationId(
-            CloudFoundryClient cloudFoundryClient, String organization) {
-        return getOrganization(cloudFoundryClient, organization).map(ResourceUtils::getId);
+    private Mono<String> getOrganizationId(String organization) {
+        return getOrganization(organization).map(ResourceUtils::getId);
     }
 
-    private static Mono<SpaceResource> getOrganizationSpaceByName(
-            CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
-        return requestOrganizationSpacesByName(cloudFoundryClient, organizationId, space)
+    private Mono<SpaceResource> getOrganizationSpaceByName(String organizationId, String space) {
+        return requestOrganizationSpacesByName(organizationId, space)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
@@ -1681,17 +1212,13 @@ public final class DefaultApplications implements Applications {
                 .orElse(null);
     }
 
-    private static Flux<String> getPushRouteIdFromDomain(
-            CloudFoundryClient cloudFoundryClient,
+    private Flux<String> getPushRouteIdFromDomain(
             List<DomainSummary> availableDomains,
             String domainId,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         if (isTcpDomain(availableDomains, domainId)) {
-            return requestCreateTcpRoute(cloudFoundryClient, domainId, spaceId)
-                    .map(ResourceUtils::getId)
-                    .flux();
+            return requestCreateTcpRoute(domainId).map(ResourceUtils::getId).flux();
         }
 
         List<String> hosts;
@@ -1715,27 +1242,19 @@ public final class DefaultApplications implements Applications {
         return Flux.fromIterable(hosts)
                 .flatMap(
                         host ->
-                                getRouteId(
-                                                cloudFoundryClient,
-                                                domainId,
-                                                host,
-                                                manifest.getRoutePath())
+                                getRouteId(domainId, host, manifest.getRoutePath())
                                         .switchIfEmpty(
                                                 requestCreateRoute(
-                                                                cloudFoundryClient,
                                                                 domainId,
                                                                 host,
-                                                                manifest.getRoutePath(),
-                                                                spaceId)
+                                                                manifest.getRoutePath())
                                                         .map(ResourceUtils::getId)));
     }
 
-    private static Flux<String> getPushRouteIdFromRoute(
-            CloudFoundryClient cloudFoundryClient,
+    private Flux<String> getPushRouteIdFromRoute(
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         return Flux.fromIterable(manifest.getRoutes())
                 .flatMap(
                         route ->
@@ -1748,27 +1267,16 @@ public final class DefaultApplications implements Applications {
                             String domainId =
                                     getDomainId(availableDomains, decomposedRoute.getDomain());
                             if (isTcpDomain(availableDomains, domainId)) {
-                                return getRouteIdForTcpRoute(
-                                        cloudFoundryClient,
-                                        decomposedRoute,
-                                        domainId,
-                                        manifest,
-                                        spaceId);
+                                return getRouteIdForTcpRoute(decomposedRoute, domainId, manifest);
                             } else {
                                 return getRouteIdForHttpRoute(
-                                        cloudFoundryClient,
-                                        decomposedRoute,
-                                        domainId,
-                                        manifest,
-                                        randomWords,
-                                        spaceId);
+                                        decomposedRoute, domainId, manifest, randomWords);
                             }
                         });
     }
 
-    private static Mono<String> getRouteId(
-            CloudFoundryClient cloudFoundryClient, String domainId, String host, String routePath) {
-        return requestRoutes(cloudFoundryClient, domainId, host, null, routePath)
+    private Mono<String> getRouteId(String domainId, String host, String routePath) {
+        return requestRoutes(domainId, host, null, routePath)
                 .filter(resource -> isIdentical(host, ResourceUtils.getEntity(resource).getHost()))
                 .filter(
                         resource ->
@@ -1779,68 +1287,45 @@ public final class DefaultApplications implements Applications {
                 .map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getRouteIdForHttpRoute(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<String> getRouteIdForHttpRoute(
             DecomposedRoute decomposedRoute,
             String domainId,
             ApplicationManifest manifest,
-            RandomWords randomWords,
-            String spaceId) {
+            RandomWords randomWords) {
         String derivedHost = deriveHostname(decomposedRoute.getHost(), manifest, randomWords);
-        return getRouteId(cloudFoundryClient, domainId, derivedHost, decomposedRoute.getPath())
+        return getRouteId(domainId, derivedHost, decomposedRoute.getPath())
                 .switchIfEmpty(
-                        requestCreateRoute(
-                                        cloudFoundryClient,
-                                        domainId,
-                                        derivedHost,
-                                        decomposedRoute.getPath(),
-                                        spaceId)
+                        requestCreateRoute(domainId, derivedHost, decomposedRoute.getPath())
                                 .map(ResourceUtils::getId));
     }
 
-    private static Mono<String> getRouteIdForTcpRoute(
-            CloudFoundryClient cloudFoundryClient,
-            DecomposedRoute decomposedRoute,
-            String domainId,
-            ApplicationManifest manifest,
-            String spaceId) {
+    private Mono<String> getRouteIdForTcpRoute(
+            DecomposedRoute decomposedRoute, String domainId, ApplicationManifest manifest) {
         if (Optional.ofNullable(manifest.getRandomRoute()).orElse(false)) {
-            return requestCreateTcpRoute(cloudFoundryClient, domainId, spaceId)
-                    .map(ResourceUtils::getId);
+            return requestCreateTcpRoute(domainId).map(ResourceUtils::getId);
         }
 
-        return getTcpRouteId(cloudFoundryClient, domainId, decomposedRoute.getPort())
+        return getTcpRouteId(domainId, decomposedRoute.getPort())
                 .switchIfEmpty(
-                        requestCreateTcpRoute(
-                                        cloudFoundryClient,
-                                        domainId,
-                                        decomposedRoute.getPort(),
-                                        spaceId)
+                        requestCreateTcpRoute(domainId, decomposedRoute.getPort())
                                 .map(ResourceUtils::getId));
     }
 
-    private static Mono<List<org.cloudfoundry.client.v2.routes.Route>> getRoutes(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestApplicationSummary(cloudFoundryClient, applicationId)
-                .map(SummaryApplicationResponse::getRoutes);
+    private Mono<List<org.cloudfoundry.client.v2.routes.Route>> getRoutes(String applicationId) {
+        return requestApplicationSummary(applicationId).map(SummaryApplicationResponse::getRoutes);
     }
 
-    private static Mono<Tuple2<Optional<List<org.cloudfoundry.client.v2.routes.Route>>, String>>
-            getRoutesAndApplicationId(
-                    CloudFoundryClient cloudFoundryClient,
-                    DeleteApplicationRequest request,
-                    String spaceId,
-                    boolean deleteRoutes) {
-        return getApplicationId(cloudFoundryClient, request.getName(), spaceId)
+    private Mono<Tuple2<Optional<List<org.cloudfoundry.client.v2.routes.Route>>, String>>
+            getRoutesAndApplicationId(DeleteApplicationRequest request, boolean deleteRoutes) {
+        return getApplicationId(request.getName())
                 .flatMap(
                         applicationId ->
-                                getOptionalRoutes(cloudFoundryClient, deleteRoutes, applicationId)
+                                getOptionalRoutes(deleteRoutes, applicationId)
                                         .zipWith(Mono.just(applicationId)));
     }
 
-    private static Mono<String> getServiceId(
-            CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
-        return requestListServiceInstances(cloudFoundryClient, serviceInstanceName, spaceId)
+    private Mono<String> getServiceId(String serviceInstanceName) {
+        return requestListServiceInstances(serviceInstanceName)
                 .map(ResourceUtils::getId)
                 .single()
                 .onErrorResume(
@@ -1851,36 +1336,33 @@ public final class DefaultApplications implements Applications {
                                         serviceInstanceName));
     }
 
-    private static Mono<String> getSpaceId(
-            CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
-        return getOrganizationSpaceByName(cloudFoundryClient, organizationId, space)
-                .map(ResourceUtils::getId);
+    private Mono<String> getSpaceId(String organizationId, String space) {
+        return getOrganizationSpaceByName(organizationId, space).map(ResourceUtils::getId);
     }
 
-    private static Mono<String> getSpaceOrganizationId(
-            CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return requestSpace(cloudFoundryClient, spaceId)
+    private Mono<String> getSpaceOrganizationId(String spaceId) {
+        return requestSpace(spaceId)
                 .map(response -> ResourceUtils.getEntity(response).getOrganizationId());
     }
 
-    private static Mono<String> getStackId(CloudFoundryClient cloudFoundryClient, String stack) {
-        return requestStacks(cloudFoundryClient, stack)
-                .map(ResourceUtils::getId)
+    private Mono<String> getStackId(String stackName) {
+        return requestStacks(stackName)
+                .map(StackResource::getId)
                 .single()
                 .onErrorResume(
                         NoSuchElementException.class,
-                        t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stack));
+                        t -> ExceptionUtils.illegalArgument("Stack %s does not exist", stackName));
     }
 
-    private static Mono<String> getStackName(
-            CloudFoundryClient cloudFoundryClient, String stackId) {
-        return requestStack(cloudFoundryClient, stackId)
-                .map(getStackResponse -> getStackResponse.getEntity().getName());
+    private Mono<String> getStackName(String stackId) {
+        return this.cloudFoundryClient
+                .stacksV3()
+                .get(GetStackRequest.builder().stackId(stackId).build())
+                .map(GetStackResponse::getName);
     }
 
-    private static Mono<String> getTaskId(
-            CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
-        return listTasks(cloudFoundryClient, applicationId, sequenceId)
+    private Mono<String> getTaskId(String applicationId, Integer sequenceId) {
+        return listTasks(applicationId, sequenceId)
                 .single()
                 .map(Resource::getId)
                 .onErrorResume(
@@ -1890,11 +1372,8 @@ public final class DefaultApplications implements Applications {
                                         "Task with sequence id of %s does not exist", sequenceId));
     }
 
-    private static Mono<String> getTcpRouteId(
-            CloudFoundryClient cloudFoundryClient, String domainId, Integer port) {
-        return requestRoutes(cloudFoundryClient, domainId, null, port, null)
-                .singleOrEmpty()
-                .map(ResourceUtils::getId);
+    private Mono<String> getTcpRouteId(String domainId, Integer port) {
+        return requestRoutes(domainId, null, port, null).singleOrEmpty().map(ResourceUtils::getId);
     }
 
     private static String getUsername(DockerCredentials dockerCredentials) {
@@ -1907,8 +1386,8 @@ public final class DefaultApplications implements Applications {
         return Objects.equals(s, t);
     }
 
-    private static Predicate<String> isInstanceComplete() {
-        return state -> "RUNNING".equals(state) || "FAILED".equals(state);
+    private static Predicate<ProcessState> isInstanceComplete() {
+        return state -> ProcessState.RUNNING.equals(state) || ProcessState.CRASHED.equals(state);
     }
 
     private static Predicate<AbstractApplicationResource> isNotIn(String expectedState) {
@@ -1925,8 +1404,8 @@ public final class DefaultApplications implements Applications {
                 && STARTED_STATE.equals(ResourceUtils.getEntity(applicationResource).getState());
     }
 
-    private static Predicate<String> isRunning() {
-        return "RUNNING"::equals;
+    private static Predicate<ProcessState> isRunning() {
+        return ProcessState.RUNNING::equals;
     }
 
     private static Predicate<String> isStaged() {
@@ -1947,37 +1426,29 @@ public final class DefaultApplications implements Applications {
         return tcpDomainIds.contains(domainId);
     }
 
-    private static Mono<List<DomainSummary>> listAvailableDomains(
-            CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return requestListPrivateDomains(cloudFoundryClient, organizationId)
+    private Mono<List<DomainSummary>> listAvailableDomains(String organizationId) {
+        return requestListPrivateDomains(organizationId)
                 .map(DefaultApplications::toDomain)
-                .mergeWith(
-                        requestListSharedDomains(cloudFoundryClient)
-                                .map(DefaultApplications::toDomain))
+                .mergeWith(requestListSharedDomains().map(DefaultApplications::toDomain))
                 .collectList();
     }
 
-    private static Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(
-            CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
-        return requestListTasks(cloudFoundryClient, applicationId, sequenceId)
+    private Flux<org.cloudfoundry.client.v3.tasks.Task> listTasks(
+            String applicationId, Integer sequenceId) {
+        return requestListTasks(applicationId, sequenceId)
                 .cast(org.cloudfoundry.client.v3.tasks.Task.class);
     }
 
-    private static Mono<Void> prepareDomainsAndRoutes(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> prepareDomainsAndRoutes(
             String applicationId,
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
-            List<RouteResource> existingRoutes,
-            RandomWords randomWords,
-            String spaceId) {
+            List<org.cloudfoundry.client.v3.routes.RouteResource> existingRoutes,
+            RandomWords randomWords) {
         if (Optional.ofNullable(manifest.getNoRoute()).orElse(false)) {
             return Flux.fromIterable(existingRoutes)
-                    .map(ResourceUtils::getId)
-                    .flatMap(
-                            routeId ->
-                                    requestRemoveRouteFromApplication(
-                                            cloudFoundryClient, applicationId, routeId))
+                    .map(org.cloudfoundry.client.v3.routes.RouteResource::getId)
+                    .flatMap(routeId -> requestRemoveRouteFromApplication(applicationId, routeId))
                     .then();
         }
 
@@ -1985,12 +1456,7 @@ public final class DefaultApplications implements Applications {
             if (manifest.getDomains() == null) {
                 if (existingRoutes.isEmpty()) {
                     return associateDefaultDomain(
-                                    cloudFoundryClient,
-                                    applicationId,
-                                    availableDomains,
-                                    manifest,
-                                    randomWords,
-                                    spaceId)
+                                    applicationId, availableDomains, manifest, randomWords)
                             .then();
                 }
                 return Mono.empty(); // A route already exists for the application, do nothing
@@ -1999,68 +1465,52 @@ public final class DefaultApplications implements Applications {
                     .flatMap(
                             domain ->
                                     getPushRouteIdFromDomain(
-                                                    cloudFoundryClient,
                                                     availableDomains,
                                                     getDomainId(availableDomains, domain),
                                                     manifest,
-                                                    randomWords,
-                                                    spaceId)
+                                                    randomWords)
                                             .flatMap(
                                                     routeId ->
                                                             requestAssociateRoute(
-                                                                    cloudFoundryClient,
-                                                                    applicationId,
-                                                                    routeId)))
+                                                                    applicationId, routeId)))
                     .then();
         }
 
         List<String> existingRouteIds =
-                existingRoutes.stream().map(ResourceUtils::getId).collect(Collectors.toList());
+                existingRoutes.stream()
+                        .map(org.cloudfoundry.client.v3.routes.RouteResource::getId)
+                        .collect(Collectors.toList());
 
-        return getPushRouteIdFromRoute(
-                        cloudFoundryClient, availableDomains, manifest, randomWords, spaceId)
+        return getPushRouteIdFromRoute(availableDomains, manifest, randomWords)
                 .filter(routeId -> !existingRouteIds.contains(routeId))
-                .flatMapSequential(
-                        routeId ->
-                                requestAssociateRoute(cloudFoundryClient, applicationId, routeId),
-                        1)
+                .flatMapSequential(routeId -> requestAssociateRoute(applicationId, routeId), 1)
                 .then();
     }
 
-    private static Flux<Void> pushApplication(
-            CloudFoundryClient cloudFoundryClient,
+    private Flux<Void> pushApplication(
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
             RandomWords randomWords,
-            PushApplicationManifestRequest request,
-            String spaceId) {
+            PushApplicationManifestRequest request) {
 
-        return getOptionalStackId(cloudFoundryClient, manifest.getStack())
-                .flatMapMany(
-                        stackId ->
-                                getApplicationId(
-                                        cloudFoundryClient,
-                                        manifest,
-                                        spaceId,
-                                        stackId.orElse(null)))
+        return getOptionalStackId(manifest.getStack())
+                .flatMapMany(stackId -> getApplicationId(manifest, stackId.orElse(null)))
                 .flatMap(
                         applicationId ->
                                 Mono.zip(
                                         Mono.just(applicationId),
-                                        getApplicationRoutes(cloudFoundryClient, applicationId),
+                                        getApplicationRoutes(applicationId),
                                         ResourceMatchingUtils.getMatchedResources(
-                                                cloudFoundryClient, manifest.getPath())))
+                                                this.cloudFoundryClient, manifest.getPath())))
                 .flatMap(
                         function(
                                 (applicationId, existingRoutes, matchedResources) ->
                                         prepareDomainsAndRoutes(
-                                                        cloudFoundryClient,
                                                         applicationId,
                                                         availableDomains,
                                                         manifest,
                                                         existingRoutes,
-                                                        randomWords,
-                                                        spaceId)
+                                                        randomWords)
                                                 .thenReturn(
                                                         Tuples.of(
                                                                 applicationId, matchedResources))))
@@ -2068,17 +1518,9 @@ public final class DefaultApplications implements Applications {
                         function(
                                 (applicationId, matchedResources) ->
                                         Mono.when(
-                                                        bindServices(
-                                                                cloudFoundryClient,
-                                                                applicationId,
-                                                                manifest,
-                                                                spaceId),
-                                                        updateBuildpacks(
-                                                                cloudFoundryClient,
-                                                                applicationId,
-                                                                manifest),
+                                                        bindServices(applicationId, manifest),
+                                                        updateBuildpacks(applicationId, manifest),
                                                         uploadApplicationAndWait(
-                                                                cloudFoundryClient,
                                                                 applicationId,
                                                                 manifest.getPath(),
                                                                 matchedResources,
@@ -2087,78 +1529,51 @@ public final class DefaultApplications implements Applications {
                 .flatMap(
                         applicationId ->
                                 stopAndStartApplication(
-                                        cloudFoundryClient,
-                                        applicationId,
-                                        manifest.getName(),
-                                        request));
+                                        applicationId, manifest.getName(), request));
     }
 
-    private static Flux<Void> pushDocker(
-            CloudFoundryClient cloudFoundryClient,
+    private Flux<Void> pushDocker(
             List<DomainSummary> availableDomains,
             ApplicationManifest manifest,
             RandomWords randomWords,
-            PushApplicationManifestRequest request,
-            String spaceId) {
+            PushApplicationManifestRequest request) {
 
-        return getOptionalStackId(cloudFoundryClient, manifest.getStack())
-                .flatMapMany(
-                        stackId ->
-                                getApplicationId(
-                                        cloudFoundryClient,
-                                        manifest,
-                                        spaceId,
-                                        stackId.orElse(null)))
+        return getOptionalStackId(manifest.getStack())
+                .flatMapMany(stackId -> getApplicationId(manifest, stackId.orElse(null)))
                 .flatMap(
                         applicationId ->
                                 Mono.zip(
                                         Mono.just(applicationId),
-                                        getApplicationRoutes(cloudFoundryClient, applicationId)))
+                                        getApplicationRoutes(applicationId)))
                 .flatMap(
                         function(
                                 (applicationId, existingRoutes) ->
                                         prepareDomainsAndRoutes(
-                                                        cloudFoundryClient,
                                                         applicationId,
                                                         availableDomains,
                                                         manifest,
                                                         existingRoutes,
-                                                        randomWords,
-                                                        spaceId)
+                                                        randomWords)
                                                 .thenReturn(applicationId)))
-                .delayUntil(
-                        applicationId ->
-                                bindServices(cloudFoundryClient, applicationId, manifest, spaceId))
+                .delayUntil(applicationId -> bindServices(applicationId, manifest))
                 .flatMap(
                         applicationId ->
                                 stopAndStartApplication(
-                                        cloudFoundryClient,
-                                        applicationId,
-                                        manifest.getName(),
-                                        request));
+                                        applicationId, manifest.getName(), request));
     }
 
-    private static Map<String, Object> removeFromEnvironment(
-            Map<String, Object> environment, String variableName) {
-        Map<String, Object> modified = new HashMap<>(environment);
-        modified.remove(variableName);
-        return modified;
-    }
-
-    private static Mono<Void> removeServiceBindings(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestListServiceBindings(cloudFoundryClient, applicationId)
+    private Mono<Void> removeServiceBindings(String applicationId) {
+        return requestListServiceBindings(applicationId)
                 .map(ResourceUtils::getId)
                 .flatMap(
                         serviceBindingId ->
-                                requestRemoveServiceBinding(
-                                        cloudFoundryClient, applicationId, serviceBindingId))
+                                requestRemoveServiceBinding(applicationId, serviceBindingId))
                 .then();
     }
 
-    private static Mono<GetApplicationEnvironmentResponse> requestApplicationEnvironment(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<GetApplicationEnvironmentResponse> requestApplicationEnvironment(
+            String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .getEnvironment(
                         GetApplicationEnvironmentRequest.builder()
@@ -2166,20 +1581,63 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<ApplicationInstancesResponse> requestApplicationInstances(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
-                .applicationsV2()
-                .instances(
-                        ApplicationInstancesRequest.builder().applicationId(applicationId).build());
+    private Mono<GetApplicationProcessStatisticsResponse> requestApplicationStatisticsV3(
+            String applicationId) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .getProcessStatistics(
+                        GetApplicationProcessStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web")
+                                .build())
+                .onErrorResume(
+                        ExceptionUtils.statusCodeV3(
+                                CF_BUILDPACK_COMPILED_FAILED,
+                                CF_INSTANCES_ERROR,
+                                CF_STAGING_NOT_FINISHED,
+                                CF_STAGING_TIME_EXPIRED,
+                                CF_INSUFFICIENT_RESOURCES,
+                                CF_STAGING_ERROR,
+                                // NOTE: this used to be an error from the v2 API apps/instances
+                                // endpoint. It probably does not apply to the v3 processes/stats
+                                // endpoint, but it is hard to test. Leaving it in, worst case this
+                                // never gets triggered.
+                                CF_APP_STOPPED_STATS_ERROR),
+                        t ->
+                                Mono.just(
+                                        GetApplicationProcessStatisticsResponse.builder()
+                                                .resources()
+                                                .build()));
     }
 
-    private static Flux<RouteResource> requestApplicationRoutes(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.requestClientV2Resources(
+    private Mono<GetApplicationProcessResponse> requestApplicationWebProcess(String applicationId) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .getProcess(
+                        GetApplicationProcessRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web")
+                                .build());
+    }
+
+    private Mono<Void> requestUpdateProcessHealthCheckType(
+            String processId, HealthCheckType healthCheckType) {
+        return this.cloudFoundryClient
+                .processes()
+                .update(
+                        UpdateProcessRequest.builder()
+                                .processId(processId)
+                                .healthCheck(HealthCheck.builder().type(healthCheckType).build())
+                                .build())
+                .then();
+    }
+
+    private Flux<org.cloudfoundry.client.v3.routes.RouteResource> requestApplicationRoutes(
+            String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
-                                .applicationsV2()
+                        this.cloudFoundryClient
+                                .applicationsV3()
                                 .listRoutes(
                                         ListApplicationRoutesRequest.builder()
                                                 .applicationId(applicationId)
@@ -2187,28 +1645,21 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Mono<ApplicationStatisticsResponse> requestApplicationStatistics(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
-                .applicationsV2()
-                .statistics(
-                        ApplicationStatisticsRequest.builder()
-                                .applicationId(applicationId)
-                                .build());
-    }
-
-    private static Mono<SummaryApplicationResponse> requestApplicationSummary(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<SummaryApplicationResponse> requestApplicationSummary(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .summary(SummaryApplicationRequest.builder().applicationId(applicationId).build());
     }
 
-    private static Flux<AbstractApplicationResource> requestApplications(
-            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private Flux<AbstractApplicationResource> requestApplications(String application) {
+        return requestApplications(application, spaceId);
+    }
+
+    private Flux<AbstractApplicationResource> requestApplications(
+            String application, String spaceId) {
         return PaginationUtils.requestClientV2Resources(
                         page ->
-                                cloudFoundryClient
+                                this.cloudFoundryClient
                                         .spaces()
                                         .listApplications(
                                                 ListSpaceApplicationsRequest.builder()
@@ -2219,23 +1670,22 @@ public final class DefaultApplications implements Applications {
                 .cast(AbstractApplicationResource.class);
     }
 
-    private static Flux<ApplicationResource> requestApplicationsV3(
-            CloudFoundryClient cloudFoundryClient, String application, String spaceId) {
+    private Flux<ApplicationResource> requestApplicationsV3(String application) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .applicationsV3()
                                 .list(
                                         ListApplicationsRequest.builder()
                                                 .name(application)
-                                                .spaceId(spaceId)
+                                                .spaceId(this.spaceId)
                                                 .page(page)
                                                 .build()));
     }
 
-    private static Mono<AssociateApplicationRouteResponse> requestAssociateRoute(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient
+    private Mono<AssociateApplicationRouteResponse> requestAssociateRoute(
+            String applicationId, String routeId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .associateRoute(
                         AssociateApplicationRouteRequest.builder()
@@ -2244,11 +1694,9 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<CopyApplicationResponse> requestCopyBits(
-            CloudFoundryClient cloudFoundryClient,
-            String sourceApplicationId,
-            String targetApplicationId) {
-        return cloudFoundryClient
+    private Mono<CopyApplicationResponse> requestCopyBits(
+            String sourceApplicationId, String targetApplicationId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .copy(
                         CopyApplicationRequest.builder()
@@ -2257,11 +1705,8 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<CreateApplicationResponse> requestCreateApplication(
-            CloudFoundryClient cloudFoundryClient,
-            ApplicationManifest manifest,
-            String spaceId,
-            String stackId) {
+    private Mono<CreateApplicationResponse> requestCreateApplication(
+            ApplicationManifest manifest, String stackId) {
         CreateApplicationRequest.Builder builder =
                 CreateApplicationRequest.builder()
                         .command(manifest.getCommand())
@@ -2276,7 +1721,7 @@ public final class DefaultApplications implements Applications {
                         .instances(manifest.getInstances())
                         .memory(manifest.getMemory())
                         .name(manifest.getName())
-                        .spaceId(spaceId)
+                        .spaceId(this.spaceId)
                         .stackId(stackId);
 
         if (manifest.getBuildpacks() != null && manifest.getBuildpacks().size() == 1) {
@@ -2299,29 +1744,25 @@ public final class DefaultApplications implements Applications {
                             });
         }
 
-        return cloudFoundryClient.applicationsV2().create(builder.build());
+        return this.cloudFoundryClient.applicationsV2().create(builder.build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateRoute(
-            CloudFoundryClient cloudFoundryClient,
-            String domainId,
-            String host,
-            String routePath,
-            String spaceId) {
-        return cloudFoundryClient
+    private Mono<CreateRouteResponse> requestCreateRoute(
+            String domainId, String host, String routePath) {
+        return this.cloudFoundryClient
                 .routes()
                 .create(
                         org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                                 .domainId(domainId)
                                 .host(host)
                                 .path(routePath)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
-    private static Mono<CreateServiceBindingResponse> requestCreateServiceBinding(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String serviceInstanceId) {
-        return cloudFoundryClient
+    private Mono<CreateServiceBindingResponse> requestCreateServiceBinding(
+            String applicationId, String serviceInstanceId) {
+        return this.cloudFoundryClient
                 .serviceBindingsV2()
                 .create(
                         CreateServiceBindingRequest.builder()
@@ -2330,11 +1771,9 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<CreateTaskResponse> requestCreateTask(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            RunApplicationTaskRequest request) {
-        return cloudFoundryClient
+    private Mono<CreateTaskResponse> requestCreateTask(
+            String applicationId, RunApplicationTaskRequest request) {
+        return this.cloudFoundryClient
                 .tasks()
                 .create(
                         CreateTaskRequest.builder()
@@ -2346,33 +1785,30 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateTcpRoute(
-            CloudFoundryClient cloudFoundryClient, String domainId, String spaceId) {
-        return cloudFoundryClient
+    private Mono<CreateRouteResponse> requestCreateTcpRoute(String domainId) {
+        return this.cloudFoundryClient
                 .routes()
                 .create(
                         org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                                 .domainId(domainId)
                                 .generatePort(true)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
-    private static Mono<CreateRouteResponse> requestCreateTcpRoute(
-            CloudFoundryClient cloudFoundryClient, String domainId, Integer port, String spaceId) {
-        return cloudFoundryClient
+    private Mono<CreateRouteResponse> requestCreateTcpRoute(String domainId, Integer port) {
+        return this.cloudFoundryClient
                 .routes()
                 .create(
                         org.cloudfoundry.client.v2.routes.CreateRouteRequest.builder()
                                 .domainId(domainId)
                                 .port(port)
-                                .spaceId(spaceId)
+                                .spaceId(this.spaceId)
                                 .build());
     }
 
-    private static Mono<Void> requestDeleteApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<Void> requestDeleteApplication(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .delete(
                         org.cloudfoundry.client.v2.applications.DeleteApplicationRequest.builder()
@@ -2380,31 +1816,28 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<DeleteRouteResponse> requestDeleteRoute(
-            CloudFoundryClient cloudFoundryClient, String routeId) {
-        return cloudFoundryClient
+    private Mono<DeleteRouteResponse> requestDeleteRoute(String routeId) {
+        return this.cloudFoundryClient
                 .routes()
                 .delete(DeleteRouteRequest.builder().async(true).routeId(routeId).build());
     }
 
-    private static Flux<EventResource> requestEvents(
-            String applicationId, CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(
+    private Flux<AuditEventResource> requestEvents(String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
-                                .events()
+                        this.cloudFoundryClient
+                                .auditEventsV3()
                                 .list(
-                                        ListEventsRequest.builder()
-                                                .actee(applicationId)
-                                                .orderDirection(OrderDirection.DESCENDING)
-                                                .resultsPerPage(50)
+                                        ListAuditEventsRequest.builder()
+                                                .targetId(applicationId)
+                                                .orderBy("-created_at")
+                                                .perPage(50)
                                                 .page(page)
                                                 .build()));
     }
 
-    private static Mono<AbstractApplicationResource> requestGetApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<AbstractApplicationResource> requestGetApplication(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .get(
                         org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
@@ -2413,20 +1846,10 @@ public final class DefaultApplications implements Applications {
                 .cast(AbstractApplicationResource.class);
     }
 
-    private static Flux<DomainResource> requestListDomains(
-            CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils.requestClientV3Resources(
-                page ->
-                        cloudFoundryClient
-                                .domainsV3()
-                                .list(ListDomainsRequest.builder().page(page).build()));
-    }
-
-    private static Flux<PrivateDomainResource> requestListPrivateDomains(
-            CloudFoundryClient cloudFoundryClient, String organizationId) {
+    private Flux<PrivateDomainResource> requestListPrivateDomains(String organizationId) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .organizations()
                                 .listPrivateDomains(
                                         ListOrganizationPrivateDomainsRequest.builder()
@@ -2435,11 +1858,10 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Flux<ServiceBindingResource> requestListServiceBindings(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private Flux<ServiceBindingResource> requestListServiceBindings(String applicationId) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .applicationsV2()
                                 .listServiceBindings(
                                         ListApplicationServiceBindingsRequest.builder()
@@ -2448,35 +1870,33 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Flux<UnionServiceInstanceResource> requestListServiceInstances(
-            CloudFoundryClient cloudFoundryClient, String serviceInstanceName, String spaceId) {
+    private Flux<UnionServiceInstanceResource> requestListServiceInstances(
+            String serviceInstanceName) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .spaces()
                                 .listServiceInstances(
                                         ListSpaceServiceInstancesRequest.builder()
                                                 .page(page)
                                                 .returnUserProvidedServiceInstances(true)
                                                 .name(serviceInstanceName)
-                                                .spaceId(spaceId)
+                                                .spaceId(this.spaceId)
                                                 .build()));
     }
 
-    private static Flux<SharedDomainResource> requestListSharedDomains(
-            CloudFoundryClient cloudFoundryClient) {
+    private Flux<SharedDomainResource> requestListSharedDomains() {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .sharedDomains()
                                 .list(ListSharedDomainsRequest.builder().page(page).build()));
     }
 
-    private static Flux<TaskResource> requestListTasks(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
+    private Flux<TaskResource> requestListTasks(String applicationId) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .applicationsV3()
                                 .listTasks(
                                         org.cloudfoundry.client.v3.applications
@@ -2486,11 +1906,10 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Flux<TaskResource> requestListTasks(
-            CloudFoundryClient cloudFoundryClient, String applicationId, Integer sequenceId) {
+    private Flux<TaskResource> requestListTasks(String applicationId, Integer sequenceId) {
         return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .applicationsV3()
                                 .listTasks(
                                         org.cloudfoundry.client.v3.applications
@@ -2501,27 +1920,20 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Flux<Envelope> requestLogsRecent(
-            Mono<DopplerClient> dopplerClient, String applicationId) {
-        return dopplerClient.flatMapMany(
-                client ->
-                        client.recentLogs(
-                                RecentLogsRequest.builder().applicationId(applicationId).build()));
+    private Flux<Envelope> requestLogsRecent(String applicationId) {
+        return dopplerClient.recentLogs(
+                RecentLogsRequest.builder().applicationId(applicationId).build());
     }
 
-    private static Flux<Envelope> requestLogsStream(
-            Mono<DopplerClient> dopplerClient, String applicationId) {
-        return dopplerClient.flatMapMany(
-                client ->
-                        client.stream(
-                                StreamRequest.builder().applicationId(applicationId).build()));
+    private Flux<Envelope> requestLogsStream(String applicationId) {
+        return dopplerClient.stream(StreamRequest.builder().applicationId(applicationId).build());
     }
 
-    private static Flux<SpaceResource> requestOrganizationSpacesByName(
-            CloudFoundryClient cloudFoundryClient, String organizationId, String space) {
+    private Flux<SpaceResource> requestOrganizationSpacesByName(
+            String organizationId, String space) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .organizations()
                                 .listSpaces(
                                         ListOrganizationSpacesRequest.builder()
@@ -2531,11 +1943,10 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Flux<OrganizationResource> requestOrganizations(
-            CloudFoundryClient cloudFoundryClient, String organization) {
+    private Flux<OrganizationResource> requestOrganizations(String organization) {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .organizations()
                                 .list(
                                         ListOrganizationsRequest.builder()
@@ -2544,9 +1955,8 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private static Mono<Void> requestRemoveRouteFromApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
-        return cloudFoundryClient
+    private Mono<Void> requestRemoveRouteFromApplication(String applicationId, String routeId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .removeRoute(
                         RemoveApplicationRouteRequest.builder()
@@ -2555,9 +1965,8 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<Void> requestRemoveServiceBinding(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String serviceBindingId) {
-        return cloudFoundryClient
+    private Mono<Void> requestRemoveServiceBinding(String applicationId, String serviceBindingId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .removeServiceBinding(
                         RemoveApplicationServiceBindingRequest.builder()
@@ -2566,9 +1975,8 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<RestageApplicationResponse> requestRestageApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
+    private Mono<RestageApplicationResponse> requestRestageApplication(String applicationId) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .restage(
                         org.cloudfoundry.client.v2.applications.RestageApplicationRequest.builder()
@@ -2576,59 +1984,48 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Flux<RouteResource> requestRoutes(
-            CloudFoundryClient cloudFoundryClient,
-            String domainId,
-            String host,
-            Integer port,
-            String routePath) {
+    private Flux<RouteResource> requestRoutes(
+            String domainId, String host, Integer port, String routePath) {
         ListRoutesRequest.Builder requestBuilder = ListRoutesRequest.builder().domainId(domainId);
         Optional.ofNullable(host).ifPresent(requestBuilder::host);
         Optional.ofNullable(routePath).ifPresent(requestBuilder::path);
         Optional.ofNullable(port).ifPresent(requestBuilder::port);
 
         return PaginationUtils.requestClientV2Resources(
-                page -> cloudFoundryClient.routes().list(requestBuilder.page(page).build()));
+                page -> this.cloudFoundryClient.routes().list(requestBuilder.page(page).build()));
     }
 
-    private static Flux<SharedDomainResource> requestSharedDomains(
-            CloudFoundryClient cloudFoundryClient) {
+    private Flux<SharedDomainResource> requestSharedDomains() {
         return PaginationUtils.requestClientV2Resources(
                 page ->
-                        cloudFoundryClient
+                        this.cloudFoundryClient
                                 .sharedDomains()
                                 .list(ListSharedDomainsRequest.builder().page(page).build()));
     }
 
-    private static Mono<GetSpaceResponse> requestSpace(
-            CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return cloudFoundryClient.spaces().get(GetSpaceRequest.builder().spaceId(spaceId).build());
-    }
-
-    private static Mono<GetSpaceSummaryResponse> requestSpaceSummary(
-            CloudFoundryClient cloudFoundryClient, String spaceId) {
-        return cloudFoundryClient
+    private Mono<GetSpaceResponse> requestSpace(String spaceId) {
+        return this.cloudFoundryClient
                 .spaces()
-                .getSummary(GetSpaceSummaryRequest.builder().spaceId(spaceId).build());
+                .get(GetSpaceRequest.builder().spaceId(spaceId).build());
     }
 
-    private static Mono<GetStackResponse> requestStack(
-            CloudFoundryClient cloudFoundryClient, String stackId) {
-        return cloudFoundryClient.stacks().get(GetStackRequest.builder().stackId(stackId).build());
+    private Mono<GetSpaceSummaryResponse> requestSpaceSummary() {
+        return this.cloudFoundryClient
+                .spaces()
+                .getSummary(GetSpaceSummaryRequest.builder().spaceId(this.spaceId).build());
     }
 
-    private static Flux<StackResource> requestStacks(
-            CloudFoundryClient cloudFoundryClient, String stack) {
-        return PaginationUtils.requestClientV2Resources(
+    private Flux<StackResource> requestStacks(String stack) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
-                        cloudFoundryClient
-                                .stacks()
+                        this.cloudFoundryClient
+                                .stacksV3()
                                 .list(ListStacksRequest.builder().page(page).name(stack).build()));
     }
 
-    private static Mono<Void> requestTerminateApplicationInstance(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String instanceIndex) {
-        return cloudFoundryClient
+    private Mono<Void> requestTerminateApplicationInstance(
+            String applicationId, String instanceIndex) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .terminateInstance(
                         TerminateApplicationInstanceRequest.builder()
@@ -2637,21 +2034,18 @@ public final class DefaultApplications implements Applications {
                                 .build());
     }
 
-    private static Mono<CancelTaskResponse> requestTerminateTask(
-            CloudFoundryClient cloudFoundryClient, String taskId) {
-        return cloudFoundryClient
+    private Mono<CancelTaskResponse> requestTerminateTask(String taskId) {
+        return this.cloudFoundryClient
                 .tasks()
                 .cancel(CancelTaskRequest.builder().taskId(taskId).build());
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplication(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<AbstractApplicationResource> requestUpdateApplication(
             String applicationId,
             Map<String, Object> environmentJsons,
             ApplicationManifest manifest,
             String stackId) {
         return requestUpdateApplication(
-                cloudFoundryClient,
                 applicationId,
                 builder -> {
                     builder.command(manifest.getCommand())
@@ -2692,11 +2086,9 @@ public final class DefaultApplications implements Applications {
                 });
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplication(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
-        return cloudFoundryClient
+    private Mono<AbstractApplicationResource> requestUpdateApplication(
+            String applicationId, UnaryOperator<UpdateApplicationRequest.Builder> modifier) {
+        return this.cloudFoundryClient
                 .applicationsV2()
                 .update(
                         modifier.apply(
@@ -2706,45 +2098,52 @@ public final class DefaultApplications implements Applications {
                 .cast(AbstractApplicationResource.class);
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationEnvironment(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> requestUpdateApplicationV3(
             String applicationId,
-            Map<String, Object> environment) {
-        return requestUpdateApplication(
-                cloudFoundryClient,
-                applicationId,
-                builder -> builder.environmentJsons(environment));
+            UnaryOperator<org.cloudfoundry.client.v3.applications.UpdateApplicationRequest.Builder>
+                    modifier) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .update(
+                        modifier.apply(
+                                        org.cloudfoundry.client.v3.applications
+                                                .UpdateApplicationRequest.builder()
+                                                .applicationId(applicationId))
+                                .build())
+                .then();
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationHealthCheckType(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            ApplicationHealthCheck type) {
-        return requestUpdateApplication(
-                cloudFoundryClient,
-                applicationId,
-                builder -> builder.healthCheckType(type.getValue()));
+    private Mono<UpdateApplicationEnvironmentVariablesResponse> requestSetEnvironmentVariable(
+            String applicationId, String name, String value) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId(applicationId)
+                                .var(name, value)
+                                .build());
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationName(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String name) {
-        return requestUpdateApplication(
-                cloudFoundryClient, applicationId, builder -> builder.name(name));
+    private Mono<UpdateApplicationEnvironmentVariablesResponse> requestUnsetEnvironmentVariable(
+            String applicationId, String name) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
+                                .applicationId(applicationId)
+                                .var(name, null)
+                                .build());
     }
 
-    private static Mono<ApplicationFeature> requestUpdateApplicationSsh(
-            CloudFoundryClient cloudFoundryClient, String applicationId, boolean enabled) {
+    private Mono<ApplicationFeature> requestUpdateApplicationSsh(
+            String applicationId, boolean enabled) {
         return requestUpdateApplicationFeature(
-                cloudFoundryClient,
-                applicationId,
-                builder -> builder.featureName(APP_FEATURE_SSH).enabled(enabled));
+                applicationId, builder -> builder.featureName(APP_FEATURE_SSH).enabled(enabled));
     }
 
-    private static Mono<ApplicationFeature> requestUpdateApplicationFeature(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
-        return cloudFoundryClient
+    private Mono<ApplicationFeature> requestUpdateApplicationFeature(
+            String applicationId, UnaryOperator<UpdateApplicationFeatureRequest.Builder> modifier) {
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .updateFeature(
                         modifier.apply(
@@ -2755,32 +2154,19 @@ public final class DefaultApplications implements Applications {
                 .cast(ApplicationFeature.class);
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationScale(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            Integer disk,
-            Integer instances,
-            Integer memory) {
+    private Mono<AbstractApplicationResource> requestUpdateApplicationScale(
+            String applicationId, Integer disk, Integer instances, Integer memory) {
         return requestUpdateApplication(
-                cloudFoundryClient,
                 applicationId,
                 builder -> builder.diskQuota(disk).instances(instances).memory(memory));
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationSsh(
-            CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
-        return requestUpdateApplication(
-                cloudFoundryClient, applicationId, builder -> builder.enableSsh(enabled));
+    private Mono<AbstractApplicationResource> requestUpdateApplicationState(
+            String applicationId, String state) {
+        return requestUpdateApplication(applicationId, builder -> builder.state(state));
     }
 
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationState(
-            CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
-        return requestUpdateApplication(
-                cloudFoundryClient, applicationId, builder -> builder.state(state));
-    }
-
-    private static Mono<UploadApplicationResponse> requestUploadApplication(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<UploadApplicationResponse> requestUploadApplication(
             String applicationId,
             Path application,
             List<ResourceMatchingUtils.ArtifactMetadata> matchedResources) {
@@ -2803,15 +2189,12 @@ public final class DefaultApplications implements Applications {
                                 (a, b) -> a)
                         .build();
 
-        return cloudFoundryClient.applicationsV2().upload(request);
+        return this.cloudFoundryClient.applicationsV2().upload(request);
     }
 
-    private static Mono<Void> requestUploadPackage(
-            CloudFoundryClient cloudFoundryClient,
-            String packageId,
-            Path bits,
-            List<MatchedResource> matchedResources) {
-        return cloudFoundryClient
+    private Mono<Void> requestUploadPackage(
+            String packageId, Path bits, List<MatchedResource> matchedResources) {
+        return this.cloudFoundryClient
                 .packages()
                 .upload(
                         UploadPackageRequest.builder()
@@ -2822,39 +2205,25 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private static Mono<Void> restageApplication(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> restageApplication(
             String application,
             String applicationId,
             Duration stagingTimeout,
             Duration startupTimeout) {
-        return requestRestageApplication(cloudFoundryClient, applicationId)
-                .flatMap(
-                        response ->
-                                waitForStaging(
-                                        cloudFoundryClient,
-                                        application,
-                                        applicationId,
-                                        stagingTimeout))
-                .then(
-                        waitForRunning(
-                                cloudFoundryClient, application, applicationId, startupTimeout));
+        return requestRestageApplication(applicationId)
+                .flatMap(response -> waitForStaging(application, applicationId, stagingTimeout))
+                .then(waitForRunning(application, applicationId, startupTimeout));
     }
 
-    private static Mono<Void> restartApplication(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> restartApplication(
             String application,
             String applicationId,
             Duration stagingTimeout,
             Duration startupTimeout) {
-        return stopApplication(cloudFoundryClient, applicationId)
+        return stopApplication(applicationId)
                 .then(
                         startApplicationAndWait(
-                                cloudFoundryClient,
-                                application,
-                                applicationId,
-                                stagingTimeout,
-                                startupTimeout));
+                                application, applicationId, stagingTimeout, startupTimeout));
     }
 
     private static boolean shouldStartApplication(
@@ -2866,60 +2235,45 @@ public final class DefaultApplications implements Applications {
         return !Optional.ofNullable(request.getNoStart()).orElse(false);
     }
 
-    private static Mono<Void> startApplicationAndWait(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> startApplicationAndWait(
             String application,
             String applicationId,
             Duration stagingTimeout,
             Duration startupTimeout) {
-        return requestUpdateApplicationState(cloudFoundryClient, applicationId, STARTED_STATE)
-                .flatMap(
-                        response ->
-                                waitForStaging(
-                                        cloudFoundryClient,
-                                        application,
-                                        applicationId,
-                                        stagingTimeout))
-                .then(
-                        waitForRunning(
-                                cloudFoundryClient, application, applicationId, startupTimeout));
+        return requestUpdateApplicationState(applicationId, STARTED_STATE)
+                .flatMap(response -> waitForStaging(application, applicationId, stagingTimeout))
+                .then(waitForRunning(application, applicationId, startupTimeout));
     }
 
-    private static Mono<Void> stopAndStartApplication(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            String name,
-            PushApplicationManifestRequest request) {
-        return stopApplication(cloudFoundryClient, applicationId)
+    private Mono<Void> stopAndStartApplication(
+            String applicationId, String name, PushApplicationManifestRequest request) {
+        return stopApplication(applicationId)
                 .filter(resource -> shouldStartApplication(request, resource))
                 .flatMap(
                         resource ->
                                 startApplicationAndWait(
-                                        cloudFoundryClient,
                                         name,
                                         applicationId,
                                         request.getStagingTimeout(),
                                         request.getStartupTimeout()));
     }
 
-    private static Mono<AbstractApplicationResource> stopApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestUpdateApplicationState(cloudFoundryClient, applicationId, STOPPED_STATE);
+    private Mono<AbstractApplicationResource> stopApplication(String applicationId) {
+        return requestUpdateApplicationState(applicationId, STOPPED_STATE);
     }
 
-    private static Mono<AbstractApplicationResource> stopApplicationIfNotStopped(
-            CloudFoundryClient cloudFoundryClient, AbstractApplicationResource resource) {
+    private Mono<AbstractApplicationResource> stopApplicationIfNotStopped(
+            AbstractApplicationResource resource) {
         return isNotIn(resource, STOPPED_STATE)
-                ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource))
+                ? stopApplication(ResourceUtils.getId(resource))
                 : Mono.just(resource);
     }
 
     private static ApplicationDetail toApplicationDetail(
             List<String> buildpacks,
             SummaryApplicationResponse summaryApplicationResponse,
-            GetStackResponse getStackResponse,
-            List<InstanceDetail> instanceDetails,
-            List<String> urls) {
+            String stackName,
+            List<InstanceDetail> instanceDetails) {
         if (buildpacks.size() == 0) {
             buildpacks =
                     Collections.singletonList(summaryApplicationResponse.getDetectedBuildpack());
@@ -2936,8 +2290,8 @@ public final class DefaultApplications implements Applications {
                 .name(summaryApplicationResponse.getName())
                 .requestedState(summaryApplicationResponse.getState())
                 .runningInstances(summaryApplicationResponse.getRunningInstances())
-                .stack(getStackResponse.getEntity().getName())
-                .urls(urls)
+                .stack(stackName)
+                .urls(toUrls(summaryApplicationResponse.getRoutes()))
                 .build();
     }
 
@@ -2951,7 +2305,7 @@ public final class DefaultApplications implements Applications {
                 .build();
     }
 
-    private static Mono<ApplicationManifest> toApplicationManifest(
+    private Mono<ApplicationManifest> toApplicationManifest(
             List<String> buildpacks, SummaryApplicationResponse response, String stackName) {
         ApplicationManifest.Builder builder =
                 ApplicationManifest.builder()
@@ -3040,51 +2394,53 @@ public final class DefaultApplications implements Applications {
                 .build();
     }
 
-    private static ApplicationHealthCheck toHealthCheck(AbstractApplicationResource resource) {
-        String type = resource.getEntity().getHealthCheckType();
-
-        if (ApplicationHealthCheck.HTTP.getValue().equals(type)) {
+    private static ApplicationHealthCheck toHealthCheck(HealthCheckType type) {
+        if (type == HealthCheckType.HTTP) {
             return ApplicationHealthCheck.HTTP;
-        } else if (ApplicationHealthCheck.NONE.getValue().equals(type)) {
-            return ApplicationHealthCheck.NONE;
-        } else if (ApplicationHealthCheck.PORT.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PORT) {
             return ApplicationHealthCheck.PORT;
-        } else if (ApplicationHealthCheck.PROCESS.getValue().equals(type)) {
+        } else if (type == HealthCheckType.PROCESS) {
             return ApplicationHealthCheck.PROCESS;
+        } else if (type == HealthCheckType.NONE) {
+            return ApplicationHealthCheck.NONE;
         } else {
             return null;
         }
     }
 
-    private static InstanceDetail toInstanceDetail(
-            Map.Entry<String, ApplicationInstanceInfo> entry,
-            ApplicationStatisticsResponse statisticsResponse) {
-        InstanceStatistics instanceStatistics =
-                Optional.ofNullable(statisticsResponse.getInstances().get(entry.getKey()))
-                        .orElse(emptyInstanceStats());
-        Statistics stats =
-                Optional.ofNullable(instanceStatistics.getStatistics())
-                        .orElse(emptyApplicationStatistics());
-        Usage usage = Optional.ofNullable(stats.getUsage()).orElse(emptyApplicationUsage());
-
-        return InstanceDetail.builder()
-                .index(entry.getKey())
-                .state(entry.getValue().getState())
-                .since(toDate(entry.getValue().getSince()))
-                .cpu(usage.getCpu())
-                .memoryUsage(usage.getMemory())
-                .diskUsage(usage.getDisk())
-                .diskQuota(stats.getDiskQuota())
-                .memoryQuota(stats.getMemoryQuota())
-                .build();
+    private static HealthCheckType fromHealthCheck(ApplicationHealthCheck type) {
+        if (type == ApplicationHealthCheck.HTTP) {
+            return HealthCheckType.HTTP;
+        } else if (type == ApplicationHealthCheck.PORT) {
+            return HealthCheckType.PORT;
+        } else if (type == ApplicationHealthCheck.PROCESS) {
+            return HealthCheckType.PROCESS;
+        } else if (type == ApplicationHealthCheck.NONE) {
+            return HealthCheckType.NONE;
+        } else {
+            return null;
+        }
     }
 
-    private static Mono<List<InstanceDetail>> toInstanceDetailList(
-            ApplicationInstancesResponse instancesResponse,
-            ApplicationStatisticsResponse statisticsResponse) {
-        return Flux.fromIterable(instancesResponse.getInstances().entrySet())
-                .map(entry -> toInstanceDetail(entry, statisticsResponse))
-                .collectList();
+    private List<InstanceDetail> toInstanceDetailList(
+            GetApplicationProcessStatisticsResponse statisticsResponse) {
+        return statisticsResponse.getResources().stream()
+                .map(
+                        statisticsResource -> {
+                            ProcessUsage usage =
+                                    Optional.ofNullable(statisticsResource.getUsage())
+                                            .orElse(ProcessUsage.builder().build());
+                            return InstanceDetail.builder()
+                                    .index(statisticsResource.getIndex().toString())
+                                    .state(statisticsResource.getState().getValue())
+                                    .cpu(usage.getCpu())
+                                    .memoryUsage(usage.getMemory())
+                                    .diskUsage(usage.getDisk())
+                                    .diskQuota(statisticsResource.getDiskQuota())
+                                    .memoryQuota(statisticsResource.getMemoryQuota())
+                                    .build();
+                        })
+                .collect(Collectors.toList());
     }
 
     private static Task toTask(org.cloudfoundry.client.v3.tasks.Task task) {
@@ -3113,19 +2469,16 @@ public final class DefaultApplications implements Applications {
         return sb.toString();
     }
 
-    private static Mono<List<String>> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
-        return Flux.fromIterable(routes).map(DefaultApplications::toUrl).collectList();
+    private static List<String> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
+        return routes.stream().map(DefaultApplications::toUrl).collect(Collectors.toList());
     }
 
-    private static Mono<Void> updateBuildpacks(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            ApplicationManifest manifest) {
+    private Mono<Void> updateBuildpacks(String applicationId, ApplicationManifest manifest) {
         if (manifest.getBuildpacks() == null || manifest.getBuildpacks().size() < 2) {
             return Mono.empty();
         }
 
-        return cloudFoundryClient
+        return this.cloudFoundryClient
                 .applicationsV3()
                 .update(
                         org.cloudfoundry.client.v3.applications.UpdateApplicationRequest.builder()
@@ -3143,8 +2496,7 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private static Mono<Void> uploadApplicationAndWait(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<Void> uploadApplicationAndWait(
             String applicationId,
             Path application,
             List<ResourceMatchingUtils.ArtifactMetadata> matchedResources,
@@ -3153,10 +2505,7 @@ public final class DefaultApplications implements Applications {
                         () -> {
                             if (matchedResources.isEmpty()) {
                                 return requestUploadApplication(
-                                        cloudFoundryClient,
-                                        applicationId,
-                                        application,
-                                        matchedResources);
+                                        applicationId, application, matchedResources);
                             } else {
                                 List<String> paths =
                                         matchedResources.stream()
@@ -3169,7 +2518,6 @@ public final class DefaultApplications implements Applications {
                                         .flatMap(
                                                 filteredApplication ->
                                                         requestUploadApplication(
-                                                                        cloudFoundryClient,
                                                                         applicationId,
                                                                         filteredApplication,
                                                                         matchedResources)
@@ -3188,11 +2536,12 @@ public final class DefaultApplications implements Applications {
                             }
                         })
                 .flatMap(
-                        job -> JobUtils.waitForCompletion(cloudFoundryClient, stagingTimeout, job));
+                        job ->
+                                JobUtils.waitForCompletion(
+                                        this.cloudFoundryClient, stagingTimeout, job));
     }
 
-    private static Mono<GetPackageResponse> uploadPackageBitsAndWait(
-            CloudFoundryClient cloudFoundryClient,
+    private Mono<GetPackageResponse> uploadPackageBitsAndWait(
             String packageId,
             Path application,
             List<MatchedResource> matchedResources,
@@ -3201,10 +2550,7 @@ public final class DefaultApplications implements Applications {
                         () -> {
                             if (matchedResources.isEmpty()) {
                                 return requestUploadPackage(
-                                        cloudFoundryClient,
-                                        packageId,
-                                        application,
-                                        matchedResources);
+                                        packageId, application, matchedResources);
                             } else {
                                 List<String> paths =
                                         matchedResources.stream()
@@ -3215,7 +2561,6 @@ public final class DefaultApplications implements Applications {
                                         .flatMap(
                                                 filteredApplication ->
                                                         requestUploadPackage(
-                                                                        cloudFoundryClient,
                                                                         packageId,
                                                                         filteredApplication,
                                                                         matchedResources)
@@ -3233,18 +2578,13 @@ public final class DefaultApplications implements Applications {
                                                                         }));
                             }
                         })
-                .then(
-                        waitForUploadProcessingCompleted(
-                                cloudFoundryClient, packageId, processingTimeout));
+                .then(waitForUploadProcessingCompleted(packageId, processingTimeout));
     }
 
-    private static Mono<GetBuildResponse> waitForBuildStaging(
-            CloudFoundryClient cloudFoundryClient,
-            String buildId,
-            String applicationName,
-            Duration stagingTimeout) {
+    private Mono<GetBuildResponse> waitForBuildStaging(
+            String buildId, String applicationName, Duration stagingTimeout) {
         Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
-        return cloudFoundryClient
+        return this.cloudFoundryClient
                 .builds()
                 .get(GetBuildRequest.builder().buildId(buildId).build())
                 .filter(
@@ -3266,17 +2606,14 @@ public final class DefaultApplications implements Applications {
                                         buildId, applicationName));
     }
 
-    private static Mono<Void> waitForRunning(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String applicationId,
-            Duration startupTimeout) {
+    private Mono<Void> waitForRunning(
+            String application, String applicationId, Duration startupTimeout) {
         Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
 
-        return requestApplicationInstances(cloudFoundryClient, applicationId)
-                .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
-                .map(ApplicationInstanceInfo::getState)
-                .reduce("UNKNOWN", collectStates())
+        return requestApplicationStatisticsV3(applicationId)
+                .flatMapIterable(GetApplicationProcessStatisticsResponse::getResources)
+                .map(ProcessStatisticsResource::getState)
+                .reduce(ProcessState.STARTING, collectStates())
                 .filter(isInstanceComplete())
                 .repeatWhenEmpty(
                         exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
@@ -3292,76 +2629,16 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private static Mono<Void> waitForRunningV3(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationName,
-            String applicationId,
-            Duration startupTimeout) {
-        Duration timeout = Optional.ofNullable(startupTimeout).orElse(Duration.ofMinutes(5));
-
-        return PaginationUtils.requestClientV3Resources(
-                        page ->
-                                cloudFoundryClient
-                                        .applicationsV3()
-                                        .listProcesses(
-                                                ListApplicationProcessesRequest.builder()
-                                                        .applicationId(applicationId)
-                                                        .page(page)
-                                                        .build()))
-                .filter(p -> p.getInstances() != 0)
-                .flatMap(
-                        process ->
-                                cloudFoundryClient
-                                        .processes()
-                                        .getStatistics(
-                                                GetProcessStatisticsRequest.builder()
-                                                        .processId(process.getId())
-                                                        .build())
-                                        .flatMapIterable(GetProcessStatisticsResponse::getResources)
-                                        .map(ProcessStatisticsResource::getState)
-                                        .filter(
-                                                state ->
-                                                        EnumSet.of(
-                                                                        ProcessState.RUNNING,
-                                                                        ProcessState.CRASHED)
-                                                                .contains(state))
-                                        .reduce(
-                                                (totalState, instanceState) ->
-                                                        totalState.ordinal()
-                                                                        < instanceState.ordinal()
-                                                                ? totalState
-                                                                : instanceState) // CRASHED takes
-                                        // precedence over
-                                        // RUNNING
-                                        .repeatWhenEmpty(
-                                                exponentialBackOff(
-                                                        Duration.ofSeconds(1),
-                                                        Duration.ofSeconds(15),
-                                                        timeout))
-                                        .filter(state -> state == ProcessState.RUNNING)
-                                        .switchIfEmpty(
-                                                ExceptionUtils.illegalState(
-                                                        "Process %s of Application %s failed during"
-                                                                + " start",
-                                                        process.getId(), applicationName))
-                                        .onErrorResume(
-                                                DelayTimeoutException.class,
-                                                t ->
-                                                        ExceptionUtils.illegalState(
-                                                                "Process %s of Application %s timed"
-                                                                        + " out during start",
-                                                                process.getId(), applicationName)))
-                .then();
+    private Mono<Void> waitForRunningV3(
+            String applicationName, String applicationId, Duration startupTimeout) {
+        return waitForRunning(applicationName, applicationId, startupTimeout);
     }
 
-    private static Mono<Void> waitForStaging(
-            CloudFoundryClient cloudFoundryClient,
-            String application,
-            String applicationId,
-            Duration stagingTimeout) {
+    private Mono<Void> waitForStaging(
+            String application, String applicationId, Duration stagingTimeout) {
         Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
 
-        return requestGetApplication(cloudFoundryClient, applicationId)
+        return requestGetApplication(applicationId)
                 .map(response -> ResourceUtils.getEntity(response).getPackageState())
                 .filter(isStagingComplete())
                 .repeatWhenEmpty(
@@ -3378,9 +2655,9 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private static Mono<GetPackageResponse> waitForUploadProcessingCompleted(
-            CloudFoundryClient cloudFoundryClient, String packageId, Duration processingTimeout) {
-        return cloudFoundryClient
+    private Mono<GetPackageResponse> waitForUploadProcessingCompleted(
+            String packageId, Duration processingTimeout) {
+        return this.cloudFoundryClient
                 .packages()
                 .get(GetPackageRequest.builder().packageId(packageId).build())
                 .filter(
