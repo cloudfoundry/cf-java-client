@@ -168,7 +168,7 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple4;
+import reactor.util.function.Tuple5;
 import reactor.util.function.Tuples;
 
 public final class DefaultApplications implements Applications {
@@ -1085,7 +1085,13 @@ public final class DefaultApplications implements Applications {
                                         "Application %s does not exist", application));
     }
 
-    private Mono<Tuple4<List<String>, SummaryApplicationResponse, String, List<InstanceDetail>>>
+    private Mono<
+                    Tuple5<
+                            List<String>,
+                            SummaryApplicationResponse,
+                            String,
+                            List<InstanceDetail>,
+                            ApplicationResource>>
             getAuxiliaryContent(ApplicationResource applicationResource) {
         String applicationId = applicationResource.getId();
         LifecycleData data = applicationResource.getLifecycle().getData();
@@ -1103,7 +1109,8 @@ public final class DefaultApplications implements Applications {
                 getApplicationBuildpacks(applicationId),
                 requestApplicationSummary(applicationId),
                 Mono.just(stackName),
-                appInstanceDetails);
+                appInstanceDetails,
+                Mono.just(applicationResource));
     }
 
     private Mono<String> getDefaultDomainId() {
@@ -2273,7 +2280,8 @@ public final class DefaultApplications implements Applications {
             List<String> buildpacks,
             SummaryApplicationResponse summaryApplicationResponse,
             String stackName,
-            List<InstanceDetail> instanceDetails) {
+            List<InstanceDetail> instanceDetails,
+            ApplicationResource application) {
         Long runningInstances =
                 instanceDetails.stream()
                         .filter(
@@ -2285,19 +2293,16 @@ public final class DefaultApplications implements Applications {
 
         return ApplicationDetail.builder()
                 .buildpacks(buildpacks)
-                .id(summaryApplicationResponse.getId()) // TODO: app id
-                .name(summaryApplicationResponse.getName()) // TODO: app name
-                .requestedState(summaryApplicationResponse.getState()) // TODO: app state
+                .id(application.getId())
+                .name(application.getName())
+                .requestedState(application.getState().getValue())
                 .instanceDetails(instanceDetails)
                 .instances(instanceDetails.size())
                 .runningInstances(runningInstances.intValue())
                 .diskQuota(summaryApplicationResponse.getDiskQuota())
                 .memoryLimit(summaryApplicationResponse.getMemory())
-                .lastUploaded(
-                        toDate(
-                                summaryApplicationResponse
-                                        .getPackageUpdatedAt())) // TODO: package object
-                .urls(toUrls(summaryApplicationResponse.getRoutes())) // TODO: ??
+                .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
+                .urls(toUrls(summaryApplicationResponse.getRoutes()))
                 .stack(stackName)
                 .build();
     }
