@@ -710,6 +710,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
                                 .instances(0)
                                 .runningInstances(0)
                                 .buildpack("test-buildpack")
@@ -993,6 +995,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
                                 .instances(0)
                                 .runningInstances(0)
                                 .buildpack("test-buildpack")
@@ -1064,6 +1068,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
                                 .instances(0)
                                 .runningInstances(0)
                                 .buildpack("test-buildpack")
@@ -1092,6 +1100,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
                                 .instances(0)
                                 .runningInstances(0)
                                 .buildpack("test-buildpack")
@@ -1120,6 +1130,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .diskQuota(-1)
+                                .memoryLimit(-1)
                                 .instances(0)
                                 .runningInstances(0)
                                 .buildpack("test-buildpack")

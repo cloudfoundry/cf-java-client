@@ -1090,7 +1090,7 @@ public final class DefaultApplications implements Applications {
                             List<String>,
                             SummaryApplicationResponse,
                             String,
-                            List<InstanceDetail>,
+                            GetApplicationProcessStatisticsResponse,
                             ApplicationResource>>
             getAuxiliaryContent(ApplicationResource applicationResource) {
         String applicationId = applicationResource.getId();
@@ -1102,14 +1102,11 @@ public final class DefaultApplications implements Applications {
             stackName = ((BuildpackData) data).getStack();
         }
 
-        Mono<List<InstanceDetail>> appInstanceDetails =
-                requestApplicationStatisticsV3(applicationId).map(this::toInstanceDetailList);
-
         return Mono.zip(
                 getApplicationBuildpacks(applicationId),
                 requestApplicationSummary(applicationId),
                 Mono.just(stackName),
-                appInstanceDetails,
+                requestApplicationStatisticsV3(applicationId),
                 Mono.just(applicationResource));
     }
 
@@ -2280,16 +2277,24 @@ public final class DefaultApplications implements Applications {
             List<String> buildpacks,
             SummaryApplicationResponse summaryApplicationResponse,
             String stackName,
-            List<InstanceDetail> instanceDetails,
+            GetApplicationProcessStatisticsResponse processStats,
             ApplicationResource application) {
-        Long runningInstances =
-                instanceDetails.stream()
+        List<InstanceDetail> instanceDetails = toInstanceDetailList(processStats);
+        long runningInstances =
+                processStats.getResources().stream()
                         .filter(
                                 details ->
-                                        details.getState().equals(ProcessState.RUNNING.getValue())
-                                                || details.getState()
-                                                        .equals(ProcessState.STARTING.getValue()))
+                                        details.getState() == ProcessState.RUNNING
+                                                || details.getState() == ProcessState.STARTING)
                         .count();
+
+        // TODO: we should use the `/v3/apps/:guid/manifest` endpoint to get the requested quotas
+        long diskQuota = -1;
+        long memoryLimit = -1;
+        if (!instanceDetails.isEmpty()) {
+            diskQuota = instanceDetails.get(0).getDiskQuota();
+            memoryLimit = instanceDetails.get(0).getMemoryQuota();
+        }
 
         return ApplicationDetail.builder()
                 .buildpacks(buildpacks)
@@ -2297,10 +2302,10 @@ public final class DefaultApplications implements Applications {
                 .name(application.getName())
                 .requestedState(application.getState().getValue())
                 .instanceDetails(instanceDetails)
-                .instances(instanceDetails.size())
-                .runningInstances(runningInstances.intValue())
-                .diskQuota(summaryApplicationResponse.getDiskQuota())
-                .memoryLimit(summaryApplicationResponse.getMemory())
+                .instances(processStats.getResources().size())
+                .runningInstances((int) runningInstances)
+                .diskQuota((int) diskQuota)
+                .memoryLimit((int) memoryLimit)
                 .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
                 .urls(toUrls(summaryApplicationResponse.getRoutes()))
                 .stack(stackName)
@@ -2434,7 +2439,7 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private List<InstanceDetail> toInstanceDetailList(
+    private static List<InstanceDetail> toInstanceDetailList(
             GetApplicationProcessStatisticsResponse statisticsResponse) {
         return statisticsResponse.getResources().stream()
                 .map(
