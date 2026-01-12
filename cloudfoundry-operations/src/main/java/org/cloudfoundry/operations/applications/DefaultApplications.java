@@ -2274,24 +2274,31 @@ public final class DefaultApplications implements Applications {
             SummaryApplicationResponse summaryApplicationResponse,
             String stackName,
             List<InstanceDetail> instanceDetails) {
-        if (buildpacks.size() == 0) {
-            buildpacks =
-                    Collections.singletonList(summaryApplicationResponse.getDetectedBuildpack());
-        }
+        Long runningInstances =
+                instanceDetails.stream()
+                        .filter(
+                                details ->
+                                        details.getState().equals(ProcessState.RUNNING.getValue())
+                                                || details.getState()
+                                                        .equals(ProcessState.STARTING.getValue()))
+                        .count();
 
         return ApplicationDetail.builder()
                 .buildpacks(buildpacks)
-                .diskQuota(summaryApplicationResponse.getDiskQuota())
-                .id(summaryApplicationResponse.getId())
+                .id(summaryApplicationResponse.getId()) // TODO: app id
+                .name(summaryApplicationResponse.getName()) // TODO: app name
+                .requestedState(summaryApplicationResponse.getState()) // TODO: app state
                 .instanceDetails(instanceDetails)
-                .instances(summaryApplicationResponse.getInstances())
-                .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
+                .instances(instanceDetails.size())
+                .runningInstances(runningInstances.intValue())
+                .diskQuota(summaryApplicationResponse.getDiskQuota())
                 .memoryLimit(summaryApplicationResponse.getMemory())
-                .name(summaryApplicationResponse.getName())
-                .requestedState(summaryApplicationResponse.getState())
-                .runningInstances(summaryApplicationResponse.getRunningInstances())
+                .lastUploaded(
+                        toDate(
+                                summaryApplicationResponse
+                                        .getPackageUpdatedAt())) // TODO: package object
+                .urls(toUrls(summaryApplicationResponse.getRoutes())) // TODO: ??
                 .stack(stackName)
-                .urls(toUrls(summaryApplicationResponse.getRoutes()))
                 .build();
     }
 

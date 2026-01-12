@@ -521,12 +521,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                         fill(ApplicationDetail.builder())
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
-                                .instanceDetail(
+                                .instanceDetails(
                                         fill(InstanceDetail.builder())
                                                 .since(null)
                                                 .index("1")
                                                 .state("RUNNING")
+                                                .build(),
+                                        fill(InstanceDetail.builder())
+                                                .since(null)
+                                                .index("2")
+                                                .state("STARTING")
+                                                .build(),
+                                        fill(InstanceDetail.builder())
+                                                .since(null)
+                                                .index("3")
+                                                .state("DOWN")
                                                 .build())
+                                .runningInstances(2)
+                                .instances(3)
                                 .lastUploaded(new Date(0))
                                 .name("test-application-summary-name")
                                 .requestedState("test-application-summary-state")
@@ -698,40 +710,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .instances(0)
+                                .runningInstances(0)
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
-                                .lastUploaded(new Date(0))
-                                .name("test-application-summary-name")
-                                .requestedState("test-application-summary-state")
-                                .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
-                                .build())
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    void getDetectedBuildpack() {
-        requestApplicationsV3(
-                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-        requestApplicationProcessStatistics(this.cloudFoundryClient, "test-application-id");
-        requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummaryDetectedBuildpack(this.cloudFoundryClient, "test-application-id");
-        requestGetApplicationV3Docker(this.cloudFoundryClient, "test-application-id");
-
-        this.applications
-                .get(GetApplicationRequest.builder().name("test-app").build())
-                .as(StepVerifier::create)
-                .expectNext(
-                        fill(ApplicationDetail.builder())
-                                .buildpack("test-application-summary-detectedBuildpack")
-                                .id("test-application-summary-id")
-                                .instanceDetail(
-                                        fill(InstanceDetail.builder())
-                                                .since(null)
-                                                .index("1")
-                                                .state("RUNNING")
-                                                .build())
                                 .lastUploaded(new Date(0))
                                 .name("test-application-summary-name")
                                 .requestedState("test-application-summary-state")
@@ -1011,6 +993,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .instances(0)
+                                .runningInstances(0)
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
                                 .lastUploaded(new Date(0))
@@ -1037,15 +1021,26 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
-                                .buildpack(null)
                                 .id("test-application-summary-id")
-                                .instanceDetail(
+                                .instanceDetails(
                                         fill(InstanceDetail.builder())
                                                 .since(null)
                                                 .index("1")
                                                 .state("RUNNING")
+                                                .build(),
+                                        fill(InstanceDetail.builder())
+                                                .since(null)
+                                                .index("2")
+                                                .state("STARTING")
+                                                .build(),
+                                        fill(InstanceDetail.builder())
+                                                .since(null)
+                                                .index("3")
+                                                .state("DOWN")
                                                 .build())
                                 .lastUploaded(new Date(0))
+                                .runningInstances(2)
+                                .instances(3)
                                 .name("test-application-summary-name")
                                 .requestedState("test-application-summary-state")
                                 .stack("test-stack")
@@ -1069,6 +1064,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .instances(0)
+                                .runningInstances(0)
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
                                 .lastUploaded(new Date(0))
@@ -1095,6 +1092,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .instances(0)
+                                .runningInstances(0)
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
                                 .lastUploaded(new Date(0))
@@ -1121,6 +1120,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectNext(
                         fill(ApplicationDetail.builder())
+                                .instances(0)
+                                .runningInstances(0)
                                 .buildpack("test-buildpack")
                                 .id("test-application-summary-id")
                                 .lastUploaded(new Date(0))
@@ -4533,7 +4534,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 GetApplicationProcessStatisticsResponse.builder()
                                         .resources(
                                                 fill(ProcessStatisticsResource.builder())
+                                                        .index(1)
                                                         .state(ProcessState.RUNNING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build(),
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .index(2)
+                                                        .state(ProcessState.STARTING)
+                                                        .type("web")
+                                                        .uptime(1L)
+                                                        .fileDescriptorQuota(1L)
+                                                        .host("test-host")
+                                                        .build(),
+                                                fill(ProcessStatisticsResource.builder())
+                                                        .index(3)
+                                                        .state(ProcessState.DOWN)
                                                         .type("web")
                                                         .uptime(1L)
                                                         .fileDescriptorQuota(1L)
