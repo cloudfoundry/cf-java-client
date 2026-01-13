@@ -25,6 +25,7 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -133,6 +134,7 @@ import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
+import org.cloudfoundry.client.v3.applications.StopApplicationResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
@@ -3782,7 +3784,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void stopInvalidApplication() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+        requestApplicationsEmptyV3(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
                 .stop(StopApplicationRequest.builder().name("test-application-name").build())
@@ -3798,27 +3800,36 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void stopStartedApplication() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STARTED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id");
+        requestStopApplication(this.cloudFoundryClient, "test-application-id");
 
         this.applications
                 .stop(StopApplicationRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+        verify(this.cloudFoundryClient.applicationsV3()).stop(any());
     }
 
     @Test
     void stopStoppedApplication() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-application-id",
+                ApplicationState.STOPPED);
 
         this.applications
                 .stop(StopApplicationRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+        verifyNoInteractions(this.cloudFoundryClient.applicationsV3().stop(any()));
     }
 
     @Test
@@ -4738,6 +4749,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             String application,
             String spaceId,
             String applicationId) {
+        requestApplicationsV3(
+                cloudFoundryClient, application, spaceId, applicationId, ApplicationState.STARTED);
+    }
+
+    private static void requestApplicationsV3(
+            CloudFoundryClient cloudFoundryClient,
+            String application,
+            String spaceId,
+            String applicationId,
+            ApplicationState state) {
         when(cloudFoundryClient
                         .applicationsV3()
                         .list(
@@ -4763,7 +4784,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                                         .build())
                                                                         .build())
                                                         .id(applicationId)
-                                                        .state(ApplicationState.STARTED)
+                                                        .state(state)
                                                         .build())
                                         .build()));
     }
@@ -5975,6 +5996,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestUpdateApplicationState(
             CloudFoundryClient cloudFoundryClient, String applicationId, String state) {
         requestUpdateApplicationState(cloudFoundryClient, applicationId, state, 1);
+    }
+
+    private static void requestStopApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .stop(
+                                org.cloudfoundry.client.v3.applications.StopApplicationRequest
+                                        .builder()
+                                        .applicationId(applicationId)
+                                        .build()))
+                .thenReturn(Mono.just(fill(StopApplicationResponse.builder()).build()));
     }
 
     private static void requestUpdateApplicationState(

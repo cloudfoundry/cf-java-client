@@ -98,6 +98,7 @@ import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
+import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessRequest;
@@ -658,8 +659,8 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> stop(StopApplicationRequest request) {
-        return getApplicationIdWhere(request.getName(), isNotIn(STOPPED_STATE))
-                .flatMap(applicationId -> stopApplication(applicationId))
+        return getApplicationV3(request.getName())
+                .flatMap(this::stopApplicationV3)
                 .then()
                 .transform(OperationsLogging.log("Stop Application"))
                 .checkpoint();
@@ -2342,6 +2343,19 @@ public final class DefaultApplications implements Applications {
 
     private Mono<AbstractApplicationResource> stopApplication(String applicationId) {
         return requestUpdateApplicationState(applicationId, STOPPED_STATE);
+    }
+
+    private Mono<Void> stopApplicationV3(ApplicationResource application) {
+        if (application.getState() == ApplicationState.STOPPED) {
+            return Mono.empty();
+        }
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .stop(
+                        org.cloudfoundry.client.v3.applications.StopApplicationRequest.builder()
+                                .applicationId(application.getId())
+                                .build())
+                .then();
     }
 
     private Mono<AbstractApplicationResource> stopApplicationIfNotStopped(
