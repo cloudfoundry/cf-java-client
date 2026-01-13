@@ -168,7 +168,6 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.util.function.Tuple2;
-import reactor.util.function.Tuple5;
 import reactor.util.function.Tuples;
 
 public final class DefaultApplications implements Applications {
@@ -313,8 +312,7 @@ public final class DefaultApplications implements Applications {
     @Override
     public Mono<ApplicationDetail> get(GetApplicationRequest request) {
         return getApplicationV3(request.getName())
-                .flatMap(this::getAuxiliaryContent)
-                .map(function(DefaultApplications::toApplicationDetail))
+                .flatMap(this::getApplicationDetails)
                 .transform(OperationsLogging.log("Get Application"))
                 .checkpoint();
     }
@@ -1085,29 +1083,72 @@ public final class DefaultApplications implements Applications {
                                         "Application %s does not exist", application));
     }
 
-    private Mono<
-                    Tuple5<
-                            List<String>,
-                            SummaryApplicationResponse,
-                            String,
-                            GetApplicationProcessStatisticsResponse,
-                            ApplicationResource>>
-            getAuxiliaryContent(ApplicationResource applicationResource) {
+    private Mono<ApplicationDetail> getApplicationDetails(ApplicationResource applicationResource) {
         String applicationId = applicationResource.getId();
         LifecycleData data = applicationResource.getLifecycle().getData();
-        String stackName = "<UNKNOWN>";
+        String s = "<UNKNOWN>";
         if (data instanceof CnbData) {
-            stackName = ((CnbData) data).getStack();
+            s = ((CnbData) data).getStack();
         } else if (data instanceof BuildpackData) {
-            stackName = ((BuildpackData) data).getStack();
+            s = ((BuildpackData) data).getStack();
         }
+        String stackName = s;
 
         return Mono.zip(
-                getApplicationBuildpacks(applicationId),
-                requestApplicationSummary(applicationId),
-                Mono.just(stackName),
-                requestApplicationStatisticsV3(applicationId),
-                Mono.just(applicationResource));
+                        getApplicationBuildpacks(applicationId),
+                        requestApplicationSummary(applicationId),
+                        requestApplicationStatisticsV3(applicationId))
+                .map(
+                        function(
+                                (buildpacks, summaryApplicationResponse, processStats) -> {
+                                    List<InstanceDetail> instanceDetails =
+                                            toInstanceDetailList(processStats);
+                                    long runningInstanceCount =
+                                            processStats.getResources().stream()
+                                                    .filter(
+                                                            details ->
+                                                                    details.getState()
+                                                                                    == ProcessState
+                                                                                            .RUNNING
+                                                                            || details.getState()
+                                                                                    == ProcessState
+                                                                                            .STARTING)
+                                                    .count();
+
+                                    // TODO: we should use the `/v3/apps/:guid/manifest` endpoint to
+                                    // get the requested quotas
+                                    long diskQuota = -1;
+                                    long memoryLimit = -1;
+                                    if (!instanceDetails.isEmpty()) {
+                                        diskQuota =
+                                                instanceDetails.get(0).getDiskQuota() != null
+                                                        ? instanceDetails.get(0).getDiskQuota()
+                                                        : -1;
+                                        memoryLimit =
+                                                instanceDetails.get(0).getMemoryQuota() != null
+                                                        ? instanceDetails.get(0).getMemoryQuota()
+                                                        : -1;
+                                    }
+
+                                    return ApplicationDetail.builder()
+                                            .buildpacks(buildpacks)
+                                            .id(applicationResource.getId())
+                                            .name(applicationResource.getName())
+                                            .requestedState(
+                                                    applicationResource.getState().getValue())
+                                            .instanceDetails(instanceDetails)
+                                            .instances(processStats.getResources().size())
+                                            .runningInstances((int) runningInstanceCount)
+                                            .diskQuota((int) diskQuota)
+                                            .memoryLimit((int) memoryLimit)
+                                            .lastUploaded(
+                                                    toDate(
+                                                            summaryApplicationResponse
+                                                                    .getPackageUpdatedAt()))
+                                            .urls(toUrls(summaryApplicationResponse.getRoutes()))
+                                            .stack(stackName)
+                                            .build();
+                                }));
     }
 
     private Mono<String> getDefaultDomainId() {
@@ -2271,45 +2312,6 @@ public final class DefaultApplications implements Applications {
         return isNotIn(resource, STOPPED_STATE)
                 ? stopApplication(ResourceUtils.getId(resource))
                 : Mono.just(resource);
-    }
-
-    private static ApplicationDetail toApplicationDetail(
-            List<String> buildpacks,
-            SummaryApplicationResponse summaryApplicationResponse,
-            String stackName,
-            GetApplicationProcessStatisticsResponse processStats,
-            ApplicationResource application) {
-        List<InstanceDetail> instanceDetails = toInstanceDetailList(processStats);
-        long runningInstances =
-                processStats.getResources().stream()
-                        .filter(
-                                details ->
-                                        details.getState() == ProcessState.RUNNING
-                                                || details.getState() == ProcessState.STARTING)
-                        .count();
-
-        // TODO: we should use the `/v3/apps/:guid/manifest` endpoint to get the requested quotas
-        long diskQuota = -1;
-        long memoryLimit = -1;
-        if (!instanceDetails.isEmpty()) {
-            diskQuota = instanceDetails.get(0).getDiskQuota();
-            memoryLimit = instanceDetails.get(0).getMemoryQuota();
-        }
-
-        return ApplicationDetail.builder()
-                .buildpacks(buildpacks)
-                .id(application.getId())
-                .name(application.getName())
-                .requestedState(application.getState().getValue())
-                .instanceDetails(instanceDetails)
-                .instances(processStats.getResources().size())
-                .runningInstances((int) runningInstances)
-                .diskQuota((int) diskQuota)
-                .memoryLimit((int) memoryLimit)
-                .lastUploaded(toDate(summaryApplicationResponse.getPackageUpdatedAt()))
-                .urls(toUrls(summaryApplicationResponse.getRoutes()))
-                .stack(stackName)
-                .build();
     }
 
     private static ApplicationEnvironments toApplicationEnvironments(
