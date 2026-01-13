@@ -453,7 +453,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .then(
                         createApplicationTcp(
                                 this.cloudFoundryOperations, applicationName, domainName))
-                .thenMany(
+                .then(
                         this.cloudFoundryOperations
                                 .applications()
                                 .get(GetApplicationRequest.builder().name(applicationName).build()))

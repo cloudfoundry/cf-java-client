@@ -127,6 +127,8 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
@@ -138,6 +140,7 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
 import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
 import org.cloudfoundry.client.v3.auditevents.ListAuditEventsResponse;
+import org.cloudfoundry.client.v3.packages.PackageResource;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
@@ -511,7 +514,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationProcessStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
@@ -543,7 +547,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -701,7 +705,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsV3(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestProcessStatisticsError(this.cloudFoundryClient, "test-application-id", 170004);
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
@@ -720,7 +725,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -986,7 +991,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsV3(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestProcessStatisticsError(this.cloudFoundryClient, "test-application-id", 220001);
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
@@ -1005,7 +1011,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -1017,7 +1023,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationProcessStatistics(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummaryNoBuildpack(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3Docker(this.cloudFoundryClient, "test-application-id");
 
         this.applications
@@ -1048,7 +1055,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -1059,7 +1066,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsV3(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
+
         requestProcessStatisticsError(this.cloudFoundryClient, "test-application-id", 170002);
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
@@ -1080,7 +1089,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -1091,7 +1100,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsV3(
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
+
         requestProcessStatisticsError(this.cloudFoundryClient, "test-application-id", 200003);
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
@@ -1110,7 +1121,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -1122,7 +1133,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
         requestApplicationProcessStatisticsEmpty(this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
@@ -1140,7 +1152,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -1153,7 +1165,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationProcessStatisticsNullUsage(
                 this.cloudFoundryClient, "test-application-id");
         requestStack(this.cloudFoundryClient, "test-application-stackId");
-        requestApplicationSummary(this.cloudFoundryClient, "test-application-id");
+        requestListPackages(this.cloudFoundryClient, "test-application-id");
+        requestListRoutes(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3Buildpack(this.cloudFoundryClient, "test-application-id");
 
         this.applications
@@ -1175,7 +1188,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                 .name("test-name")
                                 .requestedState("STARTED")
                                 .stack("test-stack")
-                                .url("test-route-host.test-domain-name/test-path")
+                                .urls("app.example.com", "alt-app.example.com")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -5181,6 +5194,28 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
+    private static void requestListPackages(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .listPackages(
+                                ListApplicationPackagesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .orderBy("-updated_at")
+                                        .page(1)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ListApplicationPackagesResponse.builder())
+                                        .resource(
+                                                fill(PackageResource.builder())
+                                                        .updatedAt(
+                                                                DateUtils.formatToIso8601(
+                                                                        new Date(0)))
+                                                        .build())
+                                        .build()));
+    }
+
     private static void requestGetSharedDomain(
             CloudFoundryClient cloudFoundryClient, String domainId) {
         when(cloudFoundryClient
@@ -5592,6 +5627,31 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
         when(cloudFoundryClient.routes().list(requestBuilder.page(1).build()))
                 .thenReturn(Mono.just(fill(ListRoutesResponse.builder()).build()));
+    }
+
+    private static void requestListRoutes(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .listRoutes(
+                                org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest
+                                        .builder()
+                                        .applicationId(applicationId)
+                                        .page(1)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ListApplicationRoutesResponse.builder())
+                                        .resources(
+                                                fill(org.cloudfoundry.client.v3.routes.RouteResource
+                                                                .builder())
+                                                        .url("app.example.com")
+                                                        .build(),
+                                                fill(org.cloudfoundry.client.v3.routes.RouteResource
+                                                                .builder())
+                                                        .url("alt-app.example.com")
+                                                        .build())
+                                        .build()));
     }
 
     private static void requestRunTask(

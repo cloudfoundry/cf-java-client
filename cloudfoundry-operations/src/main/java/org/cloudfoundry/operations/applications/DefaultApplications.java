@@ -107,6 +107,7 @@ import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRe
 import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
@@ -127,6 +128,7 @@ import org.cloudfoundry.client.v3.packages.DockerData;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
 import org.cloudfoundry.client.v3.packages.PackageRelationships;
+import org.cloudfoundry.client.v3.packages.PackageResource;
 import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
@@ -164,6 +166,7 @@ import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.cloudfoundry.util.ResourceMatchingUtilsV3;
 import org.cloudfoundry.util.ResourceUtils;
 import org.cloudfoundry.util.SortingUtils;
+import org.springframework.util.StringUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -1096,11 +1099,10 @@ public final class DefaultApplications implements Applications {
 
         return Mono.zip(
                         getApplicationBuildpacks(applicationId),
-                        requestApplicationSummary(applicationId),
                         requestApplicationStatisticsV3(applicationId))
                 .map(
                         function(
-                                (buildpacks, summaryApplicationResponse, processStats) -> {
+                                (buildpacks, processStats) -> {
                                     List<InstanceDetail> instanceDetails =
                                             toInstanceDetailList(processStats);
                                     long runningInstanceCount =
@@ -1141,14 +1143,49 @@ public final class DefaultApplications implements Applications {
                                             .runningInstances((int) runningInstanceCount)
                                             .diskQuota((int) diskQuota)
                                             .memoryLimit((int) memoryLimit)
-                                            .lastUploaded(
-                                                    toDate(
-                                                            summaryApplicationResponse
-                                                                    .getPackageUpdatedAt()))
-                                            .urls(toUrls(summaryApplicationResponse.getRoutes()))
-                                            .stack(stackName)
-                                            .build();
-                                }));
+                                            .stack(stackName);
+                                }))
+                .flatMap(
+                        builder ->
+                                this.getLatestPackage(applicationId)
+                                        .map(
+                                                pkg -> {
+                                                    if (StringUtils.hasText(pkg.getUpdatedAt())) {
+                                                        builder.lastUploaded(
+                                                                toDate(pkg.getUpdatedAt()));
+                                                    }
+                                                    return builder;
+                                                })
+                                        .defaultIfEmpty(builder))
+                .flatMap(
+                        builder ->
+                                this.requestApplicationRoutes(applicationId)
+                                        .map(
+                                                org.cloudfoundry.client.v3.routes.RouteResource
+                                                        ::getUrl)
+                                        .collectList()
+                                        .map(
+                                                routes -> {
+                                                    builder.urls(routes);
+                                                    return builder;
+                                                })
+                                        .defaultIfEmpty(builder))
+                .map(ApplicationDetail.Builder::build);
+    }
+
+    private Mono<PackageResource> getLatestPackage(String applicationId) {
+        return PaginationUtils.requestClientV3Resources(
+                        page ->
+                                this.cloudFoundryClient
+                                        .applicationsV3()
+                                        .listPackages(
+                                                ListApplicationPackagesRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .orderBy("-updated_at")
+                                                        .page(page)
+                                                        .build()))
+                .take(1)
+                .singleOrEmpty();
     }
 
     private Mono<String> getDefaultDomainId() {
