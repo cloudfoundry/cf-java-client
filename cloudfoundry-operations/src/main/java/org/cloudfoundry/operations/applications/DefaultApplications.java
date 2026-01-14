@@ -565,13 +565,13 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> restart(RestartApplicationRequest request) {
-        return getApplication(request.getName())
-                .flatMap(resource -> stopApplicationIfNotStopped(resource))
+        return getApplicationV3(request.getName())
+                .flatMap(application -> stopApplicationV3(application).thenReturn(application))
                 .flatMap(
                         stoppedApplication ->
                                 startApplicationAndWait(
                                         request.getName(),
-                                        ResourceUtils.getId(stoppedApplication),
+                                        stoppedApplication.getId(),
                                         request.getStagingTimeout(),
                                         request.getStartupTimeout()))
                 .transform(OperationsLogging.log("Restart Application"))

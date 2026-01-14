@@ -3311,9 +3311,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void restartFailurePartial() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-app-name",
+                TEST_SPACE_ID,
+                "test-application-id",
+                ApplicationState.STARTED);
+        requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
@@ -3331,9 +3335,13 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void restartFailureTotal() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-app-name",
+                TEST_SPACE_ID,
+                "test-application-id",
+                ApplicationState.STARTED);
+        requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
@@ -3377,7 +3385,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void restartNoApp() {
-        requestApplicationsEmpty(
+        requestApplicationsEmptyV3(
                 this.cloudFoundryClient, "test-non-existent-app-name", TEST_SPACE_ID);
 
         this.applications
@@ -3397,30 +3405,14 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void restartNotStartedAndNotStopped() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "unknown-state");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
-        requestGetApplication(this.cloudFoundryClient, "test-application-id");
-        requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
-
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.applications.restart(
-                                        RestartApplicationRequest.builder()
-                                                .name("test-app-name")
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
     void restartStarted() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STARTED");
-        requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-app-name",
+                TEST_SPACE_ID,
+                "test-application-id",
+                ApplicationState.STARTED);
+        requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -3438,8 +3430,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void restartStopped() {
-        requestApplicationsSpecificState(
-                this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "STOPPED");
+        requestApplicationsV3(
+                this.cloudFoundryClient,
+                "test-app-name",
+                TEST_SPACE_ID,
+                "test-application-id",
+                ApplicationState.STOPPED);
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
