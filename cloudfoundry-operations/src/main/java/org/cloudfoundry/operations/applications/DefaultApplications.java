@@ -96,6 +96,7 @@ import org.cloudfoundry.client.v3.LifecycleData;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.Resource;
 import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.ApplicationFeature;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
@@ -206,8 +207,6 @@ public final class DefaultApplications implements Applications {
     private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
 
     private static final String STARTED_STATE = "STARTED";
-
-    private static final String STOPPED_STATE = "STOPPED";
 
     private static final String APP_FEATURE_SSH = "ssh";
 
@@ -2303,7 +2302,7 @@ public final class DefaultApplications implements Applications {
             String applicationId,
             Duration stagingTimeout,
             Duration startupTimeout) {
-        return stopApplication(applicationId)
+        return stopApplicationV3(applicationId)
                 .then(
                         startApplicationAndWait(
                                 application, applicationId, stagingTimeout, startupTimeout));
@@ -2330,7 +2329,15 @@ public final class DefaultApplications implements Applications {
 
     private Mono<Void> stopAndStartApplication(
             String applicationId, String name, PushApplicationManifestRequest request) {
-        return stopApplication(applicationId)
+        return stopApplicationV3(applicationId)
+                .then(
+                        this.cloudFoundryClient
+                                .applicationsV2()
+                                .get(
+                                        org.cloudfoundry.client.v2.applications
+                                                .GetApplicationRequest.builder()
+                                                .applicationId(applicationId)
+                                                .build()))
                 .filter(resource -> shouldStartApplication(request, resource))
                 .flatMap(
                         resource ->
@@ -2341,11 +2348,17 @@ public final class DefaultApplications implements Applications {
                                         request.getStartupTimeout()));
     }
 
-    private Mono<AbstractApplicationResource> stopApplication(String applicationId) {
-        return requestUpdateApplicationState(applicationId, STOPPED_STATE);
+    private Mono<Void> stopApplicationV3(String applicationId) {
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .get(
+                        org.cloudfoundry.client.v3.applications.GetApplicationRequest.builder()
+                                .applicationId(applicationId)
+                                .build())
+                .flatMap(this::stopApplicationV3);
     }
 
-    private Mono<Void> stopApplicationV3(ApplicationResource application) {
+    private Mono<Void> stopApplicationV3(Application application) {
         if (application.getState() == ApplicationState.STOPPED) {
             return Mono.empty();
         }
@@ -2356,13 +2369,6 @@ public final class DefaultApplications implements Applications {
                                 .applicationId(application.getId())
                                 .build())
                 .then();
-    }
-
-    private Mono<AbstractApplicationResource> stopApplicationIfNotStopped(
-            AbstractApplicationResource resource) {
-        return isNotIn(resource, STOPPED_STATE)
-                ? stopApplication(ResourceUtils.getId(resource))
-                : Mono.just(resource);
     }
 
     private static ApplicationEnvironments toApplicationEnvironments(
@@ -2428,10 +2434,6 @@ public final class DefaultApplications implements Applications {
 
     private static Date toDate(String date) {
         return date == null ? null : DateUtils.parseFromIso8601(date);
-    }
-
-    private static Date toDate(Double date) {
-        return date == null ? null : DateUtils.parseSecondsFromEpoch(date);
     }
 
     private static Docker toDocker(SummaryApplicationResponse response) {
