@@ -46,9 +46,11 @@ import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
 import org.cloudfoundry.client.v3.auditevents.AuditEventsV3;
 import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
+import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
+import org.cloudfoundry.client.v3.packages.Packages;
 import org.cloudfoundry.client.v3.processes.Processes;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
@@ -97,6 +99,7 @@ public abstract class AbstractOperationsTest {
 
     protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
     protected final BuildpacksV3 buildpacksV3 = mock(BuildpacksV3.class, RETURNS_SMART_NULLS);
+    protected final Builds builds = mock(Builds.class, RETURNS_SMART_NULLS);
 
     protected final CloudFoundryClient cloudFoundryClient =
             mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
@@ -120,6 +123,7 @@ public abstract class AbstractOperationsTest {
     protected final Organizations organizations = mock(Organizations.class, RETURNS_SMART_NULLS);
     protected final OrganizationsV3 organizationsV3 =
             mock(OrganizationsV3.class, RETURNS_SMART_NULLS);
+    protected final Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
     protected final Processes processes = mock(Processes.class, RETURNS_SMART_NULLS);
 
     protected final PrivateDomains privateDomains = mock(PrivateDomains.class, RETURNS_SMART_NULLS);
@@ -181,6 +185,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.applicationsV3()).thenReturn(this.applicationsV3);
         when(this.cloudFoundryClient.buildpacks()).thenReturn(this.buildpacks);
         when(this.cloudFoundryClient.buildpacksV3()).thenReturn(this.buildpacksV3);
+        when(this.cloudFoundryClient.builds()).thenReturn(this.builds);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.domainsV3()).thenReturn(this.domainsV3);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
@@ -192,6 +197,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.organizationsV3()).thenReturn(this.organizationsV3);
         when(this.cloudFoundryClient.organizationQuotaDefinitions())
                 .thenReturn(this.organizationQuotaDefinitions);
+        when(this.cloudFoundryClient.packages()).thenReturn(this.packages);
         when(this.cloudFoundryClient.privateDomains()).thenReturn(this.privateDomains);
         when(this.cloudFoundryClient.processes()).thenReturn(this.processes);
         when(this.cloudFoundryClient.resourceMatch()).thenReturn(this.resourceMatch);

@@ -110,6 +110,7 @@ import org.cloudfoundry.client.v3.applications.GetApplicationResponse;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationSshEnabledResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationPackagesRequest;
+import org.cloudfoundry.client.v3.applications.ListApplicationPackagesResponse;
 import org.cloudfoundry.client.v3.applications.ListApplicationRoutesRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
@@ -123,12 +124,17 @@ import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
+import org.cloudfoundry.client.v3.droplets.DropletResource;
+import org.cloudfoundry.client.v3.droplets.DropletState;
 import org.cloudfoundry.client.v3.packages.BitsData;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
 import org.cloudfoundry.client.v3.packages.DockerData;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
+import org.cloudfoundry.client.v3.packages.ListPackageDropletsRequest;
+import org.cloudfoundry.client.v3.packages.ListPackageDropletsResponse;
+import org.cloudfoundry.client.v3.packages.Package;
 import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageResource;
 import org.cloudfoundry.client.v3.packages.PackageState;
@@ -529,7 +535,7 @@ public final class DefaultApplications implements Applications {
                                                 function(
                                                         (appId, packageId) ->
                                                                 buildAndStageAndWaitForRunning(
-                                                                        manifestApp,
+                                                                        manifestApp.getName(),
                                                                         packageId,
                                                                         appId))))
                 .then();
@@ -707,7 +713,7 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<Void> applyDropletAndWaitForRunning(
-            String appname, String appId, String dropletId) {
+            String appname, String appId, String dropletId, Duration startupTimeout) {
         return this.cloudFoundryClient
                 .applicationsV3()
                 .setCurrentDroplet(
@@ -723,7 +729,7 @@ public final class DefaultApplications implements Applications {
                                                 .RestartApplicationRequest.builder()
                                                 .applicationId(appId)
                                                 .build()))
-                .then(waitForRunningV3(appname, appId, null));
+                .then(waitForRunning(appname, appId, startupTimeout));
     }
 
     private Mono<Void> applyManifestAndWaitForCompletion(byte[] manifestSerialized) {
@@ -785,15 +791,14 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<Void> buildAndStageAndWaitForRunning(
-            ManifestV3Application manifestApp, String packageId, String appId) {
-        return buildAndStage(manifestApp, packageId)
+            String appName, String packageId, String appId) {
+        return buildAndStage(appName, packageId)
                 .flatMap(
                         dropletId ->
-                                applyDropletAndWaitForRunning(
-                                        manifestApp.getName(), appId, dropletId));
+                                applyDropletAndWaitForRunning(appName, appId, dropletId, null));
     }
 
-    private Mono<String> buildAndStage(ManifestV3Application manifestApp, String packageId) {
+    private Mono<String> buildAndStage(String appName, String packageId) {
         return this.cloudFoundryClient
                 .builds()
                 .create(
@@ -801,7 +806,7 @@ public final class DefaultApplications implements Applications {
                                 .getPackage(Relationship.builder().id(packageId).build())
                                 .build())
                 .map(CreateBuildResponse::getId)
-                .flatMap(buildId -> waitForBuildStaging(buildId, manifestApp.getName(), null))
+                .flatMap(buildId -> waitForBuildStaging(buildId, appName, null))
                 .map(build -> build.getDroplet().getId());
     }
 
@@ -1174,16 +1179,14 @@ public final class DefaultApplications implements Applications {
     }
 
     private Mono<PackageResource> getLatestPackage(String applicationId) {
-        return PaginationUtils.requestClientV3Resources(
-                        page ->
-                                this.cloudFoundryClient
-                                        .applicationsV3()
-                                        .listPackages(
-                                                ListApplicationPackagesRequest.builder()
-                                                        .applicationId(applicationId)
-                                                        .orderBy("-updated_at")
-                                                        .page(page)
-                                                        .build()))
+        return this.cloudFoundryClient
+                .applicationsV3()
+                .listPackages(
+                        ListApplicationPackagesRequest.builder()
+                                .applicationId(applicationId)
+                                .orderBy("-updated_at")
+                                .build())
+                .flatMapIterable(ListApplicationPackagesResponse::getResources)
                 .take(1)
                 .singleOrEmpty();
     }
@@ -1918,14 +1921,18 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
-    private Mono<AbstractApplicationResource> requestGetApplication(String applicationId) {
+    private Mono<Package> requestLatestPackage(String applicationId) {
         return this.cloudFoundryClient
-                .applicationsV2()
-                .get(
-                        org.cloudfoundry.client.v2.applications.GetApplicationRequest.builder()
+                .applicationsV3()
+                .listPackages(
+                        ListApplicationPackagesRequest.builder()
                                 .applicationId(applicationId)
+                                .orderBy("-updated_at")
                                 .build())
-                .cast(AbstractApplicationResource.class);
+                .flatMapIterable(ListApplicationPackagesResponse::getResources)
+                .take(1)
+                .singleOrEmpty()
+                .cast(Package.class);
     }
 
     private Flux<PrivateDomainResource> requestListPrivateDomains(String organizationId) {
@@ -2293,8 +2300,13 @@ public final class DefaultApplications implements Applications {
             Duration stagingTimeout,
             Duration startupTimeout) {
         return requestRestageApplication(applicationId)
-                .flatMap(response -> waitForStaging(application, applicationId, stagingTimeout))
-                .then(waitForRunning(application, applicationId, startupTimeout));
+                .flatMap(
+                        response ->
+                                waitForDropletStating(application, applicationId, stagingTimeout))
+                .flatMap(
+                        dropletId ->
+                                applyDropletAndWaitForRunning(
+                                        application, applicationId, dropletId, startupTimeout));
     }
 
     private Mono<Void> restartApplication(
@@ -2323,8 +2335,13 @@ public final class DefaultApplications implements Applications {
             Duration stagingTimeout,
             Duration startupTimeout) {
         return requestUpdateApplicationState(applicationId, STARTED_STATE)
-                .flatMap(response -> waitForStaging(application, applicationId, stagingTimeout))
-                .then(waitForRunning(application, applicationId, startupTimeout));
+                .flatMap(
+                        response ->
+                                waitForDropletStating(application, applicationId, stagingTimeout))
+                .flatMap(
+                        dropletId ->
+                                applyDropletAndWaitForRunning(
+                                        application, applicationId, dropletId, startupTimeout));
     }
 
     private Mono<Void> stopAndStartApplication(
@@ -2541,10 +2558,6 @@ public final class DefaultApplications implements Applications {
         return sb.toString();
     }
 
-    private static List<String> toUrls(List<org.cloudfoundry.client.v2.routes.Route> routes) {
-        return routes.stream().map(DefaultApplications::toUrl).collect(Collectors.toList());
-    }
-
     private Mono<Void> updateBuildpacks(String applicationId, ApplicationManifest manifest) {
         if (manifest.getBuildpacks() == null || manifest.getBuildpacks().size() < 2) {
             return Mono.empty();
@@ -2701,30 +2714,56 @@ public final class DefaultApplications implements Applications {
                 .then();
     }
 
-    private Mono<Void> waitForRunningV3(
-            String applicationName, String applicationId, Duration startupTimeout) {
-        return waitForRunning(applicationName, applicationId, startupTimeout);
-    }
-
-    private Mono<Void> waitForStaging(
-            String application, String applicationId, Duration stagingTimeout) {
+    private Mono<String> waitForDropletStating(
+            String applicationName, String applicationId, Duration stagingTimeout) {
         Duration timeout = Optional.ofNullable(stagingTimeout).orElse(Duration.ofMinutes(15));
 
-        return requestGetApplication(applicationId)
-                .map(response -> ResourceUtils.getEntity(response).getPackageState())
-                .filter(isStagingComplete())
+        return requestLatestPackage(applicationId)
+                .filter(
+                        p ->
+                                p.getState().equals(PackageState.READY)
+                                        || p.getState().equals(PackageState.FAILED))
                 .repeatWhenEmpty(
                         exponentialBackOff(Duration.ofSeconds(1), Duration.ofSeconds(15), timeout))
-                .filter(isStaged())
+                .flatMap(
+                        pkg ->
+                                requestDroplet(pkg.getId())
+                                        .filter(
+                                                p ->
+                                                        p.getState().equals(DropletState.STAGED)
+                                                                || p.getState()
+                                                                        .equals(
+                                                                                DropletState
+                                                                                        .FAILED))
+                                        .map(DropletResource::getId)
+                                        .repeatWhenEmpty(
+                                                exponentialBackOff(
+                                                        Duration.ofSeconds(1),
+                                                        Duration.ofSeconds(15),
+                                                        timeout))
+                                        .switchIfEmpty(buildAndStage(applicationName, pkg.getId())))
                 .switchIfEmpty(
                         ExceptionUtils.illegalState(
-                                "Application %s failed during staging", application))
+                                "Application %s failed during staging", applicationName))
                 .onErrorResume(
                         DelayTimeoutException.class,
                         t ->
                                 ExceptionUtils.illegalState(
-                                        "Application %s timed out during staging", application))
-                .then();
+                                        "Application %s timed out during staging",
+                                        applicationName));
+    }
+
+    private Mono<DropletResource> requestDroplet(String packageId) {
+        return this.cloudFoundryClient
+                .packages()
+                .listDroplets(
+                        ListPackageDropletsRequest.builder()
+                                .packageId(packageId)
+                                .orderBy("-updated_at")
+                                .build())
+                .flatMapIterable(ListPackageDropletsResponse::getResources)
+                .take(1)
+                .singleOrEmpty();
     }
 
     private Mono<GetPackageResponse> waitForUploadProcessingCompleted(

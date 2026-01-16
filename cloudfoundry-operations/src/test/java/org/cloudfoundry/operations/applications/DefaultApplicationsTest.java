@@ -119,6 +119,7 @@ import org.cloudfoundry.client.v3.DockerData;
 import org.cloudfoundry.client.v3.Error;
 import org.cloudfoundry.client.v3.Lifecycle;
 import org.cloudfoundry.client.v3.Pagination;
+import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.ApplicationState;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationEnvironmentResponse;
@@ -142,7 +143,13 @@ import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
 import org.cloudfoundry.client.v3.auditevents.AuditEventResource;
 import org.cloudfoundry.client.v3.auditevents.ListAuditEventsRequest;
 import org.cloudfoundry.client.v3.auditevents.ListAuditEventsResponse;
+import org.cloudfoundry.client.v3.builds.BuildState;
+import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
+import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
+import org.cloudfoundry.client.v3.droplets.DropletState;
+import org.cloudfoundry.client.v3.packages.ListPackageDropletsRequest;
 import org.cloudfoundry.client.v3.packages.PackageResource;
+import org.cloudfoundry.client.v3.packages.PackageState;
 import org.cloudfoundry.client.v3.processes.HealthCheck;
 import org.cloudfoundry.client.v3.processes.HealthCheckType;
 import org.cloudfoundry.client.v3.processes.ProcessState;
@@ -299,6 +306,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-metadata-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-metadata-id");
 
         StepVerifier.withVirtualTime(
                         () ->
@@ -1339,6 +1347,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1394,6 +1403,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1513,6 +1523,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1592,6 +1603,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1674,6 +1686,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1753,6 +1766,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1820,6 +1834,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1919,6 +1934,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -1997,6 +2013,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2064,6 +2081,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2134,6 +2152,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2199,6 +2218,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2343,6 +2363,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2405,6 +2426,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2472,6 +2494,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STOPPED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(
                 this.cloudFoundryClient, "test-application-id", "STARTED", null);
@@ -2525,6 +2548,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestJobSuccess(this.cloudFoundryClient, "test-job-entity-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
@@ -2581,6 +2605,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2644,6 +2669,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
 
         StepVerifier.withVirtualTime(
@@ -2706,6 +2732,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2776,6 +2803,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2841,6 +2869,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -2905,6 +2934,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackages(cloudFoundryClient, "test-application-id");
+        requestListPackageDroplets(cloudFoundryClient, "test-package-id", DropletState.STAGED);
+        requestCreateBuildError(cloudFoundryClient, "test-package-id");
+        requestSetCurrentDroplet(cloudFoundryClient, "test-application-id", "test-id");
+        requestRestartApplicationV3(cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
@@ -2974,24 +3008,27 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackages(
+                cloudFoundryClient, "test-application-id", PackageState.AWAITING_UPLOAD);
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-application-id");
         requestInstancesApplicationFailing(this.cloudFoundryClient, "test-application-id");
 
-        StepVerifier.withVirtualTime(
-                        () ->
-                                this.applications.push(
-                                        PushApplicationRequest.builder()
-                                                .path(testApplication)
-                                                .domain("test-shared-domain")
-                                                .name("test-name")
-                                                .build()))
-                .then(() -> VirtualTimeScheduler.get().advanceTimeBy(Duration.ofSeconds(3)))
+        this.applications
+                .push(
+                        PushApplicationRequest.builder()
+                                .path(testApplication)
+                                .domain("test-shared-domain")
+                                .name("test-name")
+                                .stagingTimeout(Duration.ofSeconds(1))
+                                .build())
+                .as(StepVerifier::create)
                 .consumeErrorWith(
                         t ->
                                 assertThat(t)
                                         .isInstanceOf(IllegalStateException.class)
-                                        .hasMessage("Application test-name failed during staging"))
+                                        .hasMessage(
+                                                "Application test-name timed out during staging"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -3039,6 +3076,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -3101,6 +3139,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
@@ -3234,6 +3273,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-metadata-id");
 
@@ -3274,16 +3314,24 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
         requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
+        requestListPackages(cloudFoundryClient, "test-metadata-id");
+        requestListPackageDroplets(
+                cloudFoundryClient, "test-package-id", DropletState.AWAITING_UPLOAD);
+        requestCreateBuild(cloudFoundryClient, "test-package-id", BuildState.STAGING);
 
         this.applications
-                .restage(RestageApplicationRequest.builder().name("test-application-name").build())
+                .restage(
+                        RestageApplicationRequest.builder()
+                                .name("test-application-name")
+                                .stagingTimeout(Duration.ofSeconds(1))
+                                .build())
                 .as(StepVerifier::create)
                 .consumeErrorWith(
                         t ->
                                 assertThat(t)
                                         .isInstanceOf(IllegalStateException.class)
                                         .hasMessage(
-                                                "Application test-application-name failed during"
+                                                "Application test-application-name timed out during"
                                                         + " staging"))
                 .verify(Duration.ofSeconds(5));
     }
@@ -3296,6 +3344,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-metadata-id");
 
@@ -3318,6 +3367,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-metadata-id");
         requestGetApplication(this.cloudFoundryClient, "test-metadata-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-metadata-id");
 
@@ -3346,8 +3396,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-metadata-id");
         requestRestageApplication(this.cloudFoundryClient, "test-metadata-id");
-        requestGetApplicationTimeout(this.cloudFoundryClient, "test-metadata-id");
         requestInstancesApplicationFailing(this.cloudFoundryClient, "test-metadata-id");
+        requestListPackages(cloudFoundryClient, "test-metadata-id");
+        requestListPackageDroplets(
+                cloudFoundryClient, "test-package-id", DropletState.AWAITING_UPLOAD);
+        requestCreateBuild(cloudFoundryClient, "test-package-id", BuildState.STAGING);
 
         this.applications
                 .restage(
@@ -3374,8 +3427,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-application-id",
                 ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
 
@@ -3398,8 +3453,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-application-id",
                 ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
 
@@ -3469,6 +3526,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-application-id",
                 ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
@@ -3494,6 +3552,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-application-id",
                 ApplicationState.STOPPED);
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
@@ -3564,6 +3623,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestStopApplication(this.cloudFoundryClient, "test-application-id");
         requestGetApplicationV3(
                 this.cloudFoundryClient, "test-application-id", ApplicationState.STARTED);
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
 
         this.applications
@@ -3726,6 +3786,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingPartial(this.cloudFoundryClient, "test-application-id");
 
@@ -3745,6 +3806,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesFailingTotal(this.cloudFoundryClient, "test-application-id");
 
@@ -3770,6 +3832,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesTimeout(this.cloudFoundryClient, "test-application-id");
 
@@ -3823,6 +3886,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsSpecificState(
                 this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID, "STOPPED");
         requestUpdateApplicationState(this.cloudFoundryClient, "test-application-id", "STARTED");
+        requestListPackagesLatest(this.cloudFoundryClient, "test-application-id");
         requestGetApplication(this.cloudFoundryClient, "test-application-id");
         requestApplicationInstancesRunning(this.cloudFoundryClient, "test-application-id");
 
@@ -5290,23 +5354,141 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestListPackages(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
+        requestListPackages(cloudFoundryClient, applicationId, PackageState.READY);
+    }
+
+    private static void requestListPackages(
+            CloudFoundryClient cloudFoundryClient, String applicationId, PackageState state) {
         when(cloudFoundryClient
                         .applicationsV3()
                         .listPackages(
                                 ListApplicationPackagesRequest.builder()
                                         .applicationId(applicationId)
                                         .orderBy("-updated_at")
-                                        .page(1)
                                         .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListApplicationPackagesResponse.builder())
                                         .resource(
-                                                fill(PackageResource.builder())
+                                                fill(PackageResource.builder(), "package-")
                                                         .updatedAt(
                                                                 DateUtils.formatToIso8601(
                                                                         new Date(0)))
+                                                        .state(state)
                                                         .build())
+                                        .build()));
+    }
+
+    private static void requestListPackagesLatest(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        requestListPackages(cloudFoundryClient, applicationId);
+        requestListPackageDroplets(cloudFoundryClient, "test-package-id");
+        // Need to stub the build() Mono, but we don't want to subscribe to it as there's a droplet
+        // already
+        requestCreateBuildError(cloudFoundryClient, "test-package-id");
+        requestSetCurrentDroplet(cloudFoundryClient, applicationId, "test-droplet-id");
+        requestRestartApplicationV3(cloudFoundryClient, applicationId);
+    }
+
+    private static void requestListPackageDroplets(
+            CloudFoundryClient cloudFoundryClient, String packageId) {
+        requestListPackageDroplets(cloudFoundryClient, packageId, DropletState.STAGED);
+    }
+
+    private static void requestListPackageDroplets(
+            CloudFoundryClient cloudFoundryClient, String packageId, DropletState state) {
+        when(cloudFoundryClient
+                        .packages()
+                        .listDroplets(
+                                ListPackageDropletsRequest.builder()
+                                        .packageId(packageId)
+                                        .orderBy("-updated_at")
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.packages.ListPackageDropletsResponse
+                                                .builder())
+                                        .resource(
+                                                fill(org.cloudfoundry.client.v3.droplets
+                                                                .DropletResource.builder())
+                                                        .createdAt(
+                                                                DateUtils.formatToIso8601(
+                                                                        new Date(0)))
+                                                        .state(state)
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestCreateBuild(
+            CloudFoundryClient cloudFoundryClient, String packageId, BuildState buildState) {
+        when(cloudFoundryClient
+                        .builds()
+                        .create(
+                                CreateBuildRequest.builder()
+                                        .getPackage(Relationship.builder().id(packageId).build())
+                                        .build()))
+                .thenReturn(Mono.just(fill(CreateBuildResponse.builder()).build()));
+        requestGetBuild(cloudFoundryClient, "test-build-id", buildState);
+    }
+
+    private static void requestCreateBuildError(
+            CloudFoundryClient cloudFoundryClient, String packageId) {
+        when(cloudFoundryClient
+                        .builds()
+                        .create(
+                                CreateBuildRequest.builder()
+                                        .getPackage(Relationship.builder().id(packageId).build())
+                                        .build()))
+                .thenReturn(Mono.error(new IllegalStateException("Don't call this")));
+        requestGetBuild(cloudFoundryClient, "test-build-id", BuildState.STAGED);
+    }
+
+    private static void requestGetBuild(
+            CloudFoundryClient cloudFoundryClient, String buildId, BuildState state) {
+        when(cloudFoundryClient
+                        .builds()
+                        .get(
+                                org.cloudfoundry.client.v3.builds.GetBuildRequest.builder()
+                                        .buildId(buildId)
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.builds.GetBuildResponse.builder())
+                                        .state(state)
+                                        .droplet(
+                                                org.cloudfoundry.client.v3.builds.Droplet.builder()
+                                                        .id("test-droplet-id")
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestSetCurrentDroplet(
+            CloudFoundryClient cloudFoundryClient, String applicationId, String dropletId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .setCurrentDroplet(
+                                any(
+                                        org.cloudfoundry.client.v3.applications
+                                                .SetApplicationCurrentDropletRequest.class)))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.applications
+                                                .SetApplicationCurrentDropletResponse.builder())
+                                        .build()));
+    }
+
+    private static void requestRestartApplicationV3(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                        .applicationsV3()
+                        .restart(
+                                any(
+                                        org.cloudfoundry.client.v3.applications
+                                                .RestartApplicationRequest.class)))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.applications
+                                                .RestartApplicationResponse.builder())
                                         .build()));
     }
 

@@ -57,6 +57,7 @@ import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
 import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
 import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
+import org.cloudfoundry.operations.applications.InstanceDetail;
 import org.cloudfoundry.operations.applications.ListApplicationTasksRequest;
 import org.cloudfoundry.operations.applications.ManifestV3;
 import org.cloudfoundry.operations.applications.ManifestV3Application;
@@ -308,7 +309,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                 .next())
                 .map(ApplicationEvent::getEvent)
                 .as(StepVerifier::create)
-                .expectNext("audit.app.update")
+                .expectNext("audit.app.upload-bits")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -1730,7 +1731,15 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                         StartApplicationRequest.builder()
                                                 .name(applicationName)
                                                 .build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(GetApplicationRequest.builder().name(applicationName).build()))
+                .map(ApplicationDetail::getInstanceDetails)
+                .map(details -> details.get(0))
+                .map(InstanceDetail::getState)
                 .as(StepVerifier::create)
+                .expectNext("RUNNING")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
