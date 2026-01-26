@@ -1,0 +1,16 @@
+{
+  "resources": [
+    {
+      "authorized_grant_types": [
+        "password",
+        "refresh_token"
+      ]
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 11,
+  "totalResults": 11,
+  "schemas": [
+    "http://cloudfoundry.org/schema/scim/oauth-clients-1.0"
+  ]
+}

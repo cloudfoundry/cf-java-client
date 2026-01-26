@@ -16,19 +16,19 @@
 
 package org.cloudfoundry;
 
-import static org.assertj.core.api.Assertions.fail;
 import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
 import static org.cloudfoundry.uaa.tokens.GrantType.PASSWORD;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.DeserializationProblemHandler;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.zafarkhaja.semver.Version;
 import java.io.IOException;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.nio.file.Path;
 import java.security.SecureRandom;
 import java.time.Duration;
@@ -63,6 +63,7 @@ import org.cloudfoundry.reactor.routing.ReactorRoutingClient;
 import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
+import org.cloudfoundry.reactor.util.JsonDeserializationProblemHandler;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
@@ -250,6 +251,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn("configureVersionMismatchhandling")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -258,6 +260,54 @@ public class IntegrationTestConfiguration {
             @Qualifier("admin") UaaClient uaaClient) {
         return new CloudFoundryCleaner(
                 cloudFoundryClient, nameFactory, networkingClient, serverVersion, uaaClient);
+    }
+
+    @Bean
+    Boolean configureVersionMismatchhandling(
+            @Value("${version.mismatch.config:#{null}}") String fileName)
+            throws URISyntaxException, IOException {
+        if (fileName != null) {
+            URL url = getClass().getResource("/" + fileName);
+            if (url != null) {
+                Path path = Path.of(url.toURI());
+                ObjectMapper mapper = new ObjectMapper();
+                logger.info(
+                        "reading configuration for handling unknown properties from server from"
+                                + " file "
+                                + path.toString());
+                List<VersionMismatchHandlingEntry> config =
+                        mapper.readValue(
+                                path.toFile(),
+                                new TypeReference<
+                                        List<
+                                                IntegrationTestConfiguration
+                                                        .VersionMismatchHandlingEntry>>() {});
+                handleConfig(config);
+            } else {
+                logger.error("cannot load config file " + fileName);
+            }
+        }
+        return false;
+    }
+
+    private static class VersionMismatchHandlingEntry {
+        @JsonProperty("class")
+        private String className;
+
+        @JsonProperty("property")
+        private String property;
+
+        @JsonProperty("pointer")
+        private String pointer;
+    }
+
+    private Boolean handleConfig(List<VersionMismatchHandlingEntry> config) {
+        config.forEach(
+                oneEntry -> {
+                    JsonDeserializationProblemHandler.addPropertyToIgnore(
+                            oneEntry.className, oneEntry.property, oneEntry.pointer);
+                });
+        return true;
     }
 
     @Bean
@@ -306,9 +356,7 @@ public class IntegrationTestConfiguration {
         DefaultConnectionContext.Builder connectionContext =
                 DefaultConnectionContext.builder()
                         .apiHost(apiHost)
-                        .problemHandler(
-                                new FailingDeserializationProblemHandler()) // Test-only problem
-                        // handler
+                        .problemHandler(new JsonDeserializationProblemHandler())
                         .skipSslValidation(skipSslValidation)
                         .sslHandshakeTimeout(Duration.ofSeconds(30));
 
@@ -744,23 +792,5 @@ public class IntegrationTestConfiguration {
     @Bean
     String username(NameFactory nameFactory) {
         return nameFactory.getUserName();
-    }
-
-    public static final class FailingDeserializationProblemHandler
-            extends DeserializationProblemHandler {
-
-        @Override
-        public boolean handleUnknownProperty(
-                DeserializationContext ctxt,
-                JsonParser jp,
-                JsonDeserializer<?> deserializer,
-                Object beanOrClass,
-                String propertyName) {
-            fail(
-                    String.format(
-                            "Found unexpected property %s in payload for %s",
-                            propertyName, beanOrClass.getClass().getName()));
-            return false;
-        }
     }
 }
