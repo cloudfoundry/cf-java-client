@@ -16,10 +16,10 @@
 
 package org.cloudfoundry.operations.applications;
 
+import java.util.Date;
+
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
-
-import java.util.Date;
 
 /**
  * Information about an instance of an application
@@ -64,8 +64,11 @@ abstract class _InstanceDetail {
 
     /**
      * The time this instance was created
+     *
+     * @deprecated Always returns null. The "since" field is not returned by the CF v3 API.
      */
     @Nullable
+    @Deprecated
     abstract Date getSince();
 
     /**

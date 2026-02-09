@@ -16,13 +16,14 @@
 
 package org.cloudfoundry.client.v3.applications;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.cloudfoundry.AllowNulls;
 import org.immutables.value.Value;
-
-import java.util.Map;
 
 @JsonSerialize
 @Value.Immutable
@@ -39,6 +40,7 @@ abstract class _UpdateApplicationEnvironmentVariablesRequest {
      */
     @AllowNulls
     @JsonProperty("var")
+    @JsonInclude(value = JsonInclude.Include.ALWAYS)
     abstract Map<String, String> getVars();
 
 }
