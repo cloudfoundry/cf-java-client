@@ -97,6 +97,7 @@
           "text": "One Time Code (Get on at /passcode)"
         }
       ],
+      "defaultIdentityProvider": "test-identity-provider",
       "idpDiscoveryEnabled": false,
       "accountChooserEnabled": false
     },
