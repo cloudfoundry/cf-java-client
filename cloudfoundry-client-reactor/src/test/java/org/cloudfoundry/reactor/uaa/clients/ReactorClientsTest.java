@@ -24,6 +24,7 @@ import static io.netty.handler.codec.http.HttpResponseStatus.CREATED;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
 import static org.cloudfoundry.uaa.tokens.GrantType.AUTHORIZATION_CODE;
 import static org.cloudfoundry.uaa.tokens.GrantType.CLIENT_CREDENTIALS;
+import static org.cloudfoundry.uaa.tokens.GrantType.JWT_BEARER;
 import static org.cloudfoundry.uaa.tokens.GrantType.REFRESH_TOKEN;
 
 import java.time.Duration;
@@ -620,6 +621,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .allowedProviders("uaa", "ldap", "my-saml-provider")
                                 .authorities("clients.read", "clients.write")
                                 .authorizedGrantType(CLIENT_CREDENTIALS)
+                                .authorizedGrantType(JWT_BEARER)
                                 .autoApprove("true")
                                 .clientId("4Z3t1r")
                                 .lastModified(1468364445592L)
