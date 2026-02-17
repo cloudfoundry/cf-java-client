@@ -25,6 +25,7 @@ import java.util.Optional;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceResponse;
@@ -57,13 +58,16 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_1)
+@RequiresV2Api
 public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Autowired private Mono<String> organizationId;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 
