@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.featureflags.FeatureFlagEntity;
 import org.cloudfoundry.client.v2.featureflags.GetFeatureFlagRequest;
@@ -38,6 +39,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuples;
 
+@RequiresV2Api
 public final class FeatureFlagsTest extends AbstractIntegrationTest {
 
     private static final List<String> coreFeatureFlagNameList =

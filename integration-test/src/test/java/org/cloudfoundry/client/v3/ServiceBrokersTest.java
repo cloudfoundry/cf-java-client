@@ -28,6 +28,7 @@ import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.servicebrokers.BasicAuthentication;
@@ -50,6 +51,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
+@RequiresV2Api
 @CleanupCloudFoundryAfterClass
 public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
@@ -57,7 +59,9 @@ public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Autowired private Mono<String> organizationId;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceBrokerName;
 

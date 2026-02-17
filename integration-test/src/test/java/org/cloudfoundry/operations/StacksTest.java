@@ -2,12 +2,14 @@ package org.cloudfoundry.operations;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.operations.stacks.GetStackRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 class StacksTest extends AbstractIntegrationTest {
     @Autowired private CloudFoundryOperations cloudFoundryOperations;
 

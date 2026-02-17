@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.util.Collections;
 import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -56,6 +57,7 @@ import reactor.test.StepVerifier;
 import reactor.util.function.Tuple3;
 import reactor.util.function.Tuples;
 
+@RequiresV2Api
 public final class UserProvidedServicesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
