@@ -40,6 +40,11 @@ public enum GrantType {
     IMPLICIT("implicit"),
 
     /**
+     * The JWT bearer grant type
+     */
+    JWT_BEARER("urn:ietf:params:oauth:grant-type:jwt-bearer"),
+
+    /**
      * The password grant type
      */
     PASSWORD("password"),
@@ -68,6 +73,8 @@ public enum GrantType {
                 return PASSWORD;
             case "refresh_token":
                 return REFRESH_TOKEN;
+            case "urn:ietf:params:oauth:grant-type:jwt-bearer":
+                return JWT_BEARER;
             default:
                 throw new IllegalArgumentException(String.format("Unknown grant type: %s", s));
         }
