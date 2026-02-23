@@ -353,6 +353,7 @@ Name | Description
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
+`SKIP_BROWSER_AUTH_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require browser-based authentication (e.g., SSO tests). Useful when the Cloud Foundry instance does not support browser-based authentication or when running tests in a non-interactive environment. Defaults to `false`.
 `SKIP_TCP_ROUTING_TESTS` | _(Optional)_ Set to `true` to skip TCP routing integration tests (TcpRoutesTest, RouterGroupsTest). Useful when the Cloud Foundry instance does not have TCP routing configured (i.e., no `routing_endpoint` in the info payload). Defaults to `false`.
 `SKIP_V2_TESTS` | _(Optional)_ Set to `true` to skip all V2 API integration tests. Useful when the Cloud Foundry V2 API is rate-limited or unavailable. When enabled, tests annotated with `@RequiresV2Api` will be skipped, including V3 tests that depend on V2 API calls (e.g., service broker creation). Defaults to `false`.
 
