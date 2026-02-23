@@ -151,6 +151,7 @@ final class ReactorServerInformationTest extends AbstractUaaApiTest {
                                 .showLoginLinks(true)
                                 .timestamp("2017-09-08T23:11:58+0000")
                                 .zoneName("uaa")
+                                .defaultIdpName("test-idp-name")
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
