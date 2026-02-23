@@ -29,6 +29,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -43,13 +44,15 @@ public class LogCacheTest extends AbstractIntegrationTest {
 
     private ApplicationUtils.ApplicationMetadata testLogCacheAppMetadata;
 
-    @Autowired private TestLogCacheEndpoints testLogCacheEndpoints;
+    @Autowired(required = false) private TestLogCacheEndpoints testLogCacheEndpoints;
 
     private final Random random = new SecureRandom();
 
     @BeforeEach
-    void setUp(@Autowired Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
-        this.testLogCacheAppMetadata = testLogCacheApp.block();
+    void setUp(@Autowired(required = false) Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
+        if (testLogCacheApp != null) {
+            this.testLogCacheAppMetadata = testLogCacheApp.block();
+        }
     }
 
     @Test
@@ -68,6 +71,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void meta() {
         this.logCacheClient
                 .meta(MetaRequest.builder().build())
@@ -83,6 +87,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void readCounter() {
         final String name = this.nameFactory.getName("counter-");
         final int delta = this.random.nextInt(1000);
@@ -102,6 +107,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void readEvent() {
         final String title = this.nameFactory.getName("event-");
         final String body = "This is the body. " + new BigInteger(1024, this.random).toString(32);
@@ -117,6 +123,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
 
     @Test
     @Disabled("fails often for no reasons")
+    @RequiresV2Api
     public void readGauge() {
         final String gaugeName = this.nameFactory.getName("gauge-");
         final Double value = this.random.nextDouble() % 100;
@@ -138,6 +145,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void readLogs() {
         final String logMessage = this.nameFactory.getName("log-");
 
