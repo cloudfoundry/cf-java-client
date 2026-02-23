@@ -298,6 +298,7 @@ Name | Description
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
 `UAA_API_REQUEST_LIMIT` | _(Optional)_ If your UAA server does rate limiting and returns 429 errors, set this variable to the smallest limit configured there. Whether your server limits UAA calls is shown in the log, together with the location of the configuration file on the server. Defaults to `0` (no limit).
+`SKIP_BROWSER_AUTH_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require browser-based authentication (e.g., SSO tests). Useful when the Cloud Foundry instance does not support browser-based authentication or when running tests in a non-interactive environment. Defaults to `false`.
 `SKIP_TCP_ROUTING_TESTS` | _(Optional)_ Set to `true` to skip TCP routing integration tests (TcpRoutesTest, RouterGroupsTest). Useful when the Cloud Foundry instance does not have TCP routing configured (i.e., no `routing_endpoint` in the info payload). Defaults to `false`.
 `SKIP_V2_TESTS` | _(Optional)_ Set to `true` to skip all V2 API integration tests. Useful when the Cloud Foundry V2 API is rate-limited or unavailable. When enabled, tests annotated with `@RequiresV2Api` will be skipped, including V3 tests that depend on V2 API calls (e.g., service broker creation). Defaults to `false`.
 
