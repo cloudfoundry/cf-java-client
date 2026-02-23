@@ -95,11 +95,15 @@ public final class ServerInformationTest extends AbstractIntegrationTest {
         this.uaaClient
                 .serverInformation()
                 .getInfo(GetInfoRequest.builder().build())
-                .map(response -> response.getLinks().getPassword())
+                .map(response -> response.getLinks().getLogin())
                 .as(StepVerifier::create)
-                .consumeNextWith(endsWithExpectation("password"))
+                .consumeNextWith(containsExpectation("login"))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
+    }
+
+    private static Consumer<String> containsExpectation(String substring) {
+        return actual -> assertThat(actual).contains(substring);
     }
 
     private static Consumer<String> endsWithExpectation(String suffix) {
