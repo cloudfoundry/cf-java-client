@@ -30,5 +30,6 @@
       "One Time Code ( Get one at http://localhost:8080/uaa/passcode )"
     ]
   },
-  "timestamp": "2017-09-08T23:11:58+0000"
+  "timestamp": "2017-09-08T23:11:58+0000",
+  "defaultIdpName": "test-idp-name"
 }
