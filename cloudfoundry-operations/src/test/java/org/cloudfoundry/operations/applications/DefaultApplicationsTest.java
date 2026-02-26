@@ -5054,29 +5054,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestInstancesApplicationFailing(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient
-                        .applicationsV2()
-                        .instances(
-                                ApplicationInstancesRequest.builder()
-                                        .applicationId(applicationId)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(
-                                                ApplicationInstancesResponse.builder(),
-                                                "application-instances-")
-                                        .instance(
-                                                "instance-0",
-                                                fill(
-                                                                ApplicationInstanceInfo.builder(),
-                                                                "application-instance-info-")
-                                                        .state("FAILED")
-                                                        .build())
-                                        .build()));
-    }
-
     private static void requestGetApplicationTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
@@ -5092,6 +5069,57 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .entity(
                                                 fill(ApplicationEntity.builder())
                                                         .packageState("STAGING")
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestInstancesApplicationFailing(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                .applicationsV2()
+                .instances(
+                        ApplicationInstancesRequest.builder()
+                                .applicationId(applicationId)
+                                .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(
+                                        ApplicationInstancesResponse.builder(),
+                                        "application-instances-")
+                                        .instance(
+                                                "instance-0",
+                                                fill(
+                                                        ApplicationInstanceInfo.builder(),
+                                                        "application-instance-info-")
+                                                        .state("FAILED")
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestLogsRecentLogCache(
+            LogCacheClient logCacheClient, String applicationName, String payload) {
+        when(logCacheClient.recentLogs(any()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ReadResponse.builder())
+                                        .envelopes(
+                                                fill(EnvelopeBatch.builder())
+                                                        .batch(
+                                                                Arrays.asList(
+                                                                        fill(org.cloudfoundry
+                                                                                .logcache.v1
+                                                                                .Envelope
+                                                                                .builder())
+                                                                                .log(
+                                                                                        Log
+                                                                                                .builder()
+                                                                                                .payload(
+                                                                                                        payload)
+                                                                                                .type(
+                                                                                                        LogType
+                                                                                                                .OUT)
+                                                                                                .build())
+                                                                                .build()))
                                                         .build())
                                         .build()));
     }
@@ -5339,34 +5367,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                         Mono.just(
                                 fill(org.cloudfoundry.client.v3.applications
                                                 .ListApplicationTasksResponse.builder())
-                                        .build()));
-    }
-
-    private static void requestLogsRecentLogCache(
-            LogCacheClient logCacheClient, String applicationName, String payload) {
-        when(logCacheClient.recentLogs(any()))
-                .thenReturn(
-                        Mono.just(
-                                fill(ReadResponse.builder())
-                                        .envelopes(
-                                                fill(EnvelopeBatch.builder())
-                                                        .batch(
-                                                                Arrays.asList(
-                                                                        fill(org.cloudfoundry
-                                                                                        .logcache.v1
-                                                                                        .Envelope
-                                                                                        .builder())
-                                                                                .log(
-                                                                                        Log
-                                                                                                .builder()
-                                                                                                .payload(
-                                                                                                        payload)
-                                                                                                .type(
-                                                                                                        LogType
-                                                                                                                .OUT)
-                                                                                                .build())
-                                                                                .build()))
-                                                        .build())
                                         .build()));
     }
 

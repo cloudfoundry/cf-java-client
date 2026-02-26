@@ -154,12 +154,11 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
-import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
-import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -566,25 +565,25 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
-//    @Override
-//    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-//        return logs(LogsRequest.builder()
-//                        .name(request.getName())
-//                        .recent(request.getRecent())
-//                        .build())
-//                .map(
-//                        logMessage ->
-//                                ApplicationLog.builder()
-//                                        .sourceId(logMessage.getApplicationId())
-//                                        .sourceType(logMessage.getSourceType())
-//                                        .instanceId(logMessage.getSourceInstance())
-//                                        .message(logMessage.getMessage())
-//                                        .timestamp(logMessage.getTimestamp())
-//                                        .logType(
-//                                                ApplicationLogType.from(
-//                                                        logMessage.getMessageType().name()))
-//                                        .build());
-//    }
+    @Override
+    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+        return logs(LogsRequest.builder()
+                        .name(request.getName())
+                        .recent(request.getRecent())
+                        .build())
+                .map(
+                        logMessage ->
+                                ApplicationLog.builder()
+                                        .sourceId(logMessage.getApplicationId())
+                                        .sourceType(logMessage.getSourceType())
+                                        .instanceId(logMessage.getSourceInstance())
+                                        .message(logMessage.getMessage())
+                                        .timestamp(logMessage.getTimestamp())
+                                        .logType(
+                                                ApplicationLogType.from(
+                                                        logMessage.getMessageType().name()))
+                                        .build());
+    }
 
     @Override
     @SuppressWarnings("deprecation")
@@ -2443,57 +2442,6 @@ public final class DefaultApplications implements Applications {
                                 .applicationId(applicationId)
                                 .build())
                 .cast(AbstractApplicationResource.class);
-    }
-
-    private static void requestInstancesApplicationFailing(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient
-                .applicationsV2()
-                .instances(
-                        ApplicationInstancesRequest.builder()
-                                .applicationId(applicationId)
-                                .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(
-                                        ApplicationInstancesResponse.builder(),
-                                        "application-instances-")
-                                        .instance(
-                                                "instance-0",
-                                                fill(
-                                                        ApplicationInstanceInfo.builder(),
-                                                        "application-instance-info-")
-                                                        .state("FAILED")
-                                                        .build())
-                                        .build()));
-    }
-
-    private static void requestLogsRecentLogCache(
-            LogCacheClient logCacheClient, String applicationName, String payload) {
-        when(logCacheClient.recentLogs(any()))
-                .thenReturn(
-                        Mono.just(
-                                fill(ReadResponse.builder())
-                                        .envelopes(
-                                                fill(EnvelopeBatch.builder())
-                                                        .batch(
-                                                                Arrays.asList(
-                                                                        fill(org.cloudfoundry
-                                                                                .logcache.v1
-                                                                                .Envelope
-                                                                                .builder())
-                                                                                .log(
-                                                                                        Log
-                                                                                                .builder()
-                                                                                                .payload(
-                                                                                                        payload)
-                                                                                                .type(
-                                                                                                        LogType
-                                                                                                                .OUT)
-                                                                                                .build())
-                                                                                .build()))
-                                                        .build())
-                                        .build()));
     }
 
     private static Flux<DomainResource> requestListDomains(

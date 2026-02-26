@@ -118,14 +118,6 @@ public interface Applications {
     Flux<Task> listTasks(ListApplicationTasksRequest request);
 
     /**
-     * List the applications logs from dopplerClient
-     * @deprecated Only for compatibility. Switch to logCacheClient method below.
-     * @param request the application logs request
-     * @return the applications logs
-     */
-    Flux<LogMessage> logs(LogsRequest request);
-
-    /**
      * List the applications logs. Uses Doppler under the hood.
      * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
      * and {@code TAS < 4.0}.
@@ -135,7 +127,7 @@ public interface Applications {
      * @deprecated Use {@link #logs(ApplicationLogsRequest)} instead.
      */
     @Deprecated
-    Flux<Log> logs(LogsRequest request);
+    Flux<LogMessage> logs(LogsRequest request);
 
     /**
      * List the applications logs from logCacheClient.
