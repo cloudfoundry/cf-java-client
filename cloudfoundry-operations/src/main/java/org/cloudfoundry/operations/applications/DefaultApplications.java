@@ -158,6 +158,8 @@ import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -248,7 +250,7 @@ public final class DefaultApplications implements Applications {
         this.spaceId = spaceId;
     }
 
-@Override
+    @Override
     public Mono<Void> copySource(CopySourceApplicationRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
@@ -541,8 +543,9 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
-    public Flux<Log> logs(LogsRequest request) {
+    public Flux<LogMessage> logs(LogsRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
                         function(
@@ -551,107 +554,37 @@ public final class DefaultApplications implements Applications {
                                                 cloudFoundryClient, request.getName(), spaceId)))
                 .flatMapMany(
                         applicationId ->
-                                getRecentLogs(this.logCacheClient, applicationId))
+                                getLogs(this.dopplerClient, applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
     }
 
     @Override
-    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-        return logs(LogsRequest.builder()
-                        .name(request.getName())
-                        .recent(request.getRecent())
-                        .build())
-                .map(
-                        logMessage ->
-                                ApplicationLog.builder()
-                                        .sourceId(logMessage.getApplicationId())
-                                        .sourceType(logMessage.getSourceType())
-                                        .instanceId(logMessage.getSourceInstance())
-                                        .message(logMessage.getMessage())
-                                        .timestamp(logMessage.getTimestamp())
-                                        .logType(
-                                                ApplicationLogType.from(
-                                                        logMessage.getMessageType().name()))
-                                        .build());
+    public Flux<Log> logsRecent(ReadRequest request) {
+        return getRecentLogsLogCache(this.logCacheClient, request)
+                .transform(OperationsLogging.log("Get Application Logs"))
+                .checkpoint();
     }
 
-    @SuppressWarnings("deprecation")
-    @Test
-    void logsRecent_doppler() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsRecent(this.dopplerClient, "test-metadata-id");
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
-                .as(StepVerifier::create)
-                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void logsNoApp_doppler() {
-        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
-
-        this.applications
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void logs_doppler() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
-                .as(StepVerifier::create)
-                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    void logsRecent_LogCache() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
-        this.applications
-                .logsRecent(ReadRequest.builder().sourceId("test-application-name").build())
-                .as(StepVerifier::create)
-                .expectNext(fill(Log.builder()).type(LogType.OUT).build())
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void logsRecentNotSet_doppler() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
-
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
-                .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
+//    @Override
+//    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+//        return logs(LogsRequest.builder()
+//                        .name(request.getName())
+//                        .recent(request.getRecent())
+//                        .build())
+//                .map(
+//                        logMessage ->
+//                                ApplicationLog.builder()
+//                                        .sourceId(logMessage.getApplicationId())
+//                                        .sourceType(logMessage.getSourceType())
+//                                        .instanceId(logMessage.getSourceInstance())
+//                                        .message(logMessage.getMessage())
+//                                        .timestamp(logMessage.getTimestamp())
+//                                        .logType(
+//                                                ApplicationLogType.from(
+//                                                        logMessage.getMessageType().name()))
+//                                        .build());
+//    }
 
     @Override
     @SuppressWarnings("deprecation")
@@ -1705,8 +1638,13 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static Flux<Log> getRecentLogs(Mono<LogCacheClient> logCacheClient, String applicationId) {
-        return requestLogsRecentLogCache(logCacheClient, applicationId)
+    private static Flux<Log> getRecentLogsLogCache(
+            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
+        return requestLogsRecentLogCache(logCacheClient, readRequest)
+                .map(EnvelopeBatch::getBatch)
+                .map(List::stream)
+                .flatMapIterable(envelopeStream -> envelopeStream.collect(Collectors.toList()))
+                .filter(e -> e.getLog() != null)
                 .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
                 .map(org.cloudfoundry.logcache.v1.Envelope::getLog);
     }
@@ -2646,6 +2584,7 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
+    @Deprecated
     private static Flux<Envelope> requestLogsRecent(
             Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient.flatMapMany(
@@ -2654,30 +2593,12 @@ public final class DefaultApplications implements Applications {
                                 RecentLogsRequest.builder().applicationId(applicationId).build()));
     }
 
-    private static Flux<org.cloudfoundry.logcache.v1.Envelope> requestLogsRecentLogCache(
-            Mono<LogCacheClient> logCacheClient, String applicationId) {
-        return logCacheClient.flatMapMany(
+    private static Mono<EnvelopeBatch> requestLogsRecentLogCache(
+            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
+        return logCacheClient.flatMap(
                 client ->
-                        client.recentLogs(
-                                ReadRequest.builder()
-                                        .sourceId(applicationId)
-                                        .envelopeType(EnvelopeType.LOG)
-                                        .limit(100)
-                                        .build()
-                                )
-                                .flatMap(
-                                        response ->
-                                                Mono.justOrEmpty(
-                                                        response.getEnvelopes().getBatch().stream().findFirst()
-                                                )
-                                )
-                                .repeatWhenEmpty(
-                                        exponentialBackOff(
-                                                Duration.ofSeconds(1),
-                                                Duration.ofSeconds(5),
-                                                Duration.ofMinutes(1))
-                                )
-        );
+                        client.recentLogs(readRequest)
+                                .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes())));
     }
 
     private static Flux<Envelope> requestLogsStream(
