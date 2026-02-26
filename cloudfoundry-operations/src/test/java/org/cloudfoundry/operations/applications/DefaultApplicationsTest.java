@@ -33,6 +33,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Queue;
@@ -144,6 +145,7 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -5105,11 +5107,8 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .envelopes(
                                                 fill(EnvelopeBatch.builder())
                                                         .batch(
-                                                                Arrays.asList(
-                                                                        fill(org.cloudfoundry
-                                                                                        .logcache.v1
-                                                                                        .Envelope
-                                                                                        .builder())
+                                                                List.of(
+                                                                        fill(Envelope.builder())
                                                                                 .log(
                                                                                         Log
                                                                                                 .builder()

@@ -529,7 +529,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations
                                 .applications()
                                 .logs(
-                                        ApplicationLogsRequest.builder()
+                                        ApplicationLogsRequest
+                                                .builder()
                                                 .name(applicationName)
                                                 .recent(true)
                                                 .build()))
@@ -2205,7 +2206,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Log checkOneLogEntry(Log log) {
-        assertThat(log.getType().equals(LogType.OUT));
+        assertThat(log.getType()).isEqualTo(LogType.OUT);
         OperationsLogging.log("one log entry: " + log.getType() + " " + log.getPayloadAsText());
         return log;
     }

@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.reactor.tokenprovider;
 
-import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
 import reactor.netty.http.client.HttpClientForm;
@@ -36,10 +35,4 @@ abstract class _ClientCredentialsGrantTokenProvider extends AbstractUaaTokenProv
             .attr("grant_type", "client_credentials")
             .attr("response_type", "token");
     }
-
-    @Override
-    public void invalidate(ConnectionContext connectionContext) {
-        this.accessTokens.remove(connectionContext);
-    }
-
 }

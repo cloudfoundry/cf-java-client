@@ -74,7 +74,7 @@ public abstract class AbstractUaaTokenProvider implements TokenProvider {
 
     private static final ZoneId UTC = ZoneId.of("UTC");
 
-    protected final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens =
+    private final ConcurrentMap<ConnectionContext, Mono<String>> accessTokens =
             new ConcurrentHashMap<>(1);
 
     private final ConcurrentMap<ConnectionContext, RefreshToken> refreshTokenStreams =
