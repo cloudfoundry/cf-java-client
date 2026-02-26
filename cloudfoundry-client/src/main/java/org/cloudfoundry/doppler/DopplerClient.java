@@ -39,7 +39,7 @@ public interface DopplerClient {
      */
     Flux<Envelope> firehose(FirehoseRequest request);
 
-    //TODO Adapt the message
+    // TODO Adapt the message
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
      *

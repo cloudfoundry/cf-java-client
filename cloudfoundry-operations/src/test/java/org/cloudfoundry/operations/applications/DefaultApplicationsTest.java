@@ -5076,21 +5076,21 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestInstancesApplicationFailing(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                .applicationsV2()
-                .instances(
-                        ApplicationInstancesRequest.builder()
-                                .applicationId(applicationId)
-                                .build()))
+                        .applicationsV2()
+                        .instances(
+                                ApplicationInstancesRequest.builder()
+                                        .applicationId(applicationId)
+                                        .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(
-                                        ApplicationInstancesResponse.builder(),
-                                        "application-instances-")
+                                                ApplicationInstancesResponse.builder(),
+                                                "application-instances-")
                                         .instance(
                                                 "instance-0",
                                                 fill(
-                                                        ApplicationInstanceInfo.builder(),
-                                                        "application-instance-info-")
+                                                                ApplicationInstanceInfo.builder(),
+                                                                "application-instance-info-")
                                                         .state("FAILED")
                                                         .build())
                                         .build()));
@@ -5107,9 +5107,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .batch(
                                                                 Arrays.asList(
                                                                         fill(org.cloudfoundry
-                                                                                .logcache.v1
-                                                                                .Envelope
-                                                                                .builder())
+                                                                                        .logcache.v1
+                                                                                        .Envelope
+                                                                                        .builder())
                                                                                 .log(
                                                                                         Log
                                                                                                 .builder()

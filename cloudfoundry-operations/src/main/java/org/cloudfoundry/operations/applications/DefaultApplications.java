@@ -40,7 +40,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
-
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.OrderDirection;
 import org.cloudfoundry.client.v2.applications.AbstractApplicationResource;
@@ -150,15 +149,15 @@ import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
+import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
-import org.cloudfoundry.doppler.Envelope;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
-import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -205,8 +204,9 @@ public final class DefaultApplications implements Applications {
     private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR =
             Comparator.comparing(LogMessage::getTimestamp);
 
-    private static final Comparator<org.cloudfoundry.logcache.v1.Envelope> LOG_MESSAGE_COMPARATOR_LOG_CACHE =
-            Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
+    private static final Comparator<org.cloudfoundry.logcache.v1.Envelope>
+            LOG_MESSAGE_COMPARATOR_LOG_CACHE =
+                    Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
 
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 

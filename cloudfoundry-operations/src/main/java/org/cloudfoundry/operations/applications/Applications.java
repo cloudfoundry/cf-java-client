@@ -19,7 +19,6 @@ package org.cloudfoundry.operations.applications;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.ReadRequest;
-
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

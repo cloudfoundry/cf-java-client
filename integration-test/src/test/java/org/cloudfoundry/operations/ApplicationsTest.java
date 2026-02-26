@@ -547,18 +547,18 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         Mono<String> applicationGuid =
                 getAppGuidFromAppName(cloudFoundryOperations, applicationName);
         createApplication(
-                this.cloudFoundryOperations,
-                new ClassPathResource("test-application.zip").getFile().toPath(),
-                applicationName,
-                false)
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
                 .then(
                         applicationGuid
                                 .map(ApplicationsTest::getReadRequest)
                                 .flatMapMany(
                                         readRequest ->
                                                 callLogsRecent(
-                                                        this.cloudFoundryOperations,
-                                                        readRequest)
+                                                                this.cloudFoundryOperations,
+                                                                readRequest)
                                                         .log(null, Level.ALL, SignalType.ON_NEXT))
                                 .map(ApplicationsTest::checkOneLogEntry)
                                 .then())
