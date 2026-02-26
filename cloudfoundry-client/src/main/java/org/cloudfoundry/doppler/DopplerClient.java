@@ -39,13 +39,15 @@ public interface DopplerClient {
      */
     Flux<Envelope> firehose(FirehoseRequest request);
 
-    // TODO Adapt the message
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
      *
-     * @deprecated Do not use this type directly, it exists only for the <em>Jackson</em>-binding infrastructure
      * @param request the Recent Logs request
      * @return the events from the recent logs
+     * @deprecated Use {@link org.cloudfoundry.logcache.v1.LogCacheClient#recentLogs(org.cloudfoundry.logcache.v1.ReadRequest)} instead.
+     *             The Doppler recent logs endpoint has been removed since {@code Loggregator 107.0},
+     *             shipped in {@code CFD 24.3}.
+     * @see org.cloudfoundry.logcache.v1.LogCacheClient#recentLogs(org.cloudfoundry.logcache.v1.ReadRequest)
      */
     @Deprecated
     Flux<Envelope> recentLogs(RecentLogsRequest request);
