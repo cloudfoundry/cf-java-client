@@ -1315,15 +1315,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logsRecentDoppler() {
+    void logsDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
+
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
+                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
                 .as(StepVerifier::create)
                 .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
                 .expectComplete()
@@ -1349,15 +1350,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logsDoppler() {
+    void logsRecentDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
+                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
                 .as(StepVerifier::create)
                 .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
                 .expectComplete()
@@ -1372,6 +1374,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 TEST_SPACE_ID,
                 "test-metadata-id");
         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
+
         this.applications
                 .logsRecent(ReadRequest.builder().sourceId("test-metadata-id").build())
                 .as(StepVerifier::create)
@@ -5096,31 +5099,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecentLogCache(
-            LogCacheClient logCacheClient, String sourceId, String payload) {
-        when(logCacheClient.recentLogs(ReadRequest.builder().sourceId(sourceId).build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(ReadResponse.builder())
-                                        .envelopes(
-                                                fill(EnvelopeBatch.builder())
-                                                        .batch(
-                                                                Arrays.asList(
-                                                                        fill(Envelope.builder())
-                                                                                .log(
-                                                                                        Log
-                                                                                                .builder()
-                                                                                                .payload(
-                                                                                                        payload)
-                                                                                                .type(
-                                                                                                        LogType
-                                                                                                                .OUT)
-                                                                                                .build())
-                                                                                .build()))
-                                                        .build())
-                                        .build()));
-    }
-
     private static void requestGetApplicationV3Buildpack(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
@@ -5367,8 +5345,10 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.stream(StreamRequest.builder().applicationId(applicationId).build()))
+    @SuppressWarnings("deprecation")
+    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
+        when(dopplerClient.recentLogs(
+                        RecentLogsRequest.builder().applicationId(applicationId).build()))
                 .thenReturn(
                         Flux.just(
                                 org.cloudfoundry.doppler.Envelope.builder()
@@ -5379,10 +5359,33 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    @SuppressWarnings("deprecation")
-    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.recentLogs(
-                        RecentLogsRequest.builder().applicationId(applicationId).build()))
+    private static void requestLogsRecentLogCache(
+            LogCacheClient logCacheClient, String sourceId, String payload) {
+        when(logCacheClient.recentLogs(ReadRequest.builder().sourceId(sourceId).build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(ReadResponse.builder())
+                                        .envelopes(
+                                                fill(EnvelopeBatch.builder())
+                                                        .batch(
+                                                                Arrays.asList(
+                                                                        fill(Envelope.builder())
+                                                                                .log(
+                                                                                        Log
+                                                                                                .builder()
+                                                                                                .payload(
+                                                                                                        payload)
+                                                                                                .type(
+                                                                                                        LogType
+                                                                                                                .OUT)
+                                                                                                .build())
+                                                                                .build()))
+                                                        .build())
+                                        .build()));
+    }
+
+    private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {
+        when(dopplerClient.stream(StreamRequest.builder().applicationId(applicationId).build()))
                 .thenReturn(
                         Flux.just(
                                 org.cloudfoundry.doppler.Envelope.builder()
