@@ -529,8 +529,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations
                                 .applications()
                                 .logs(
-                                        ApplicationLogsRequest
-                                                .builder()
+                                        ApplicationLogsRequest.builder()
                                                 .name(applicationName)
                                                 .recent(true)
                                                 .build()))
