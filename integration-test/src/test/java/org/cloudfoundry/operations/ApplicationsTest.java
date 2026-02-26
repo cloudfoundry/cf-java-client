@@ -529,14 +529,14 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations
                                 .applications()
                                 .logs(
-                                        LogsRequest.builder()
+                                        ApplicationLogsRequest.builder()
                                                 .name(applicationName)
                                                 .recent(true)
                                                 .build()))
-                .map(LogMessage::getMessageType)
+                .map(ApplicationLog::getLogType)
                 .next()
                 .as(StepVerifier::create)
-                .expectNext(MessageType.OUT)
+                .expectNext(ApplicationLogType.OUT)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
