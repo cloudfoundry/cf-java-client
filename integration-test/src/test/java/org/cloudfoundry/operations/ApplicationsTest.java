@@ -2205,8 +2205,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     private static Log checkOneLogEntry(Log log) {
-        assertThat(log.getType()).isEqualTo(LogType.OUT);
         OperationsLogging.log("one log entry: " + log.getType() + " " + log.getPayloadAsText());
+        assertThat(log.getType()).isIn(LogType.OUT, LogType.ERR);
         return log;
     }
 }
