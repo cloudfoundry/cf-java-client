@@ -20,7 +20,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -144,6 +143,7 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -1315,7 +1315,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logsRecent_doppler() {
+    void logsRecentDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1332,7 +1332,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logsNoApp_doppler() {
+    void logsNoAppDoppler() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
@@ -1349,7 +1349,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logs_doppler() {
+    void logsDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1365,7 +1365,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void logsRecent_LogCache() {
+    void logsRecentLogCache() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1373,7 +1373,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 "test-metadata-id");
         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
         this.applications
-                .logsRecent(ReadRequest.builder().sourceId("test-application-name").build())
+                .logsRecent(ReadRequest.builder().sourceId("test-metadata-id").build())
                 .as(StepVerifier::create)
                 .expectNext(fill(Log.builder()).type(LogType.OUT).build())
                 .expectComplete()
@@ -1382,7 +1382,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @SuppressWarnings("deprecation")
     @Test
-    void logsRecentNotSet_doppler() {
+    void logsRecentNotSetDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -5054,25 +5054,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestGetApplicationTimeout(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        when(cloudFoundryClient
-                        .applicationsV2()
-                        .get(
-                                org.cloudfoundry.client.v2.applications.GetApplicationRequest
-                                        .builder()
-                                        .applicationId(applicationId)
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(GetApplicationResponse.builder())
-                                        .entity(
-                                                fill(ApplicationEntity.builder())
-                                                        .packageState("STAGING")
-                                                        .build())
-                                        .build()));
-    }
-
     private static void requestInstancesApplicationFailing(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
@@ -5096,9 +5077,28 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
+    private static void requestGetApplicationTimeout(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        when(cloudFoundryClient
+                .applicationsV2()
+                .get(
+                        org.cloudfoundry.client.v2.applications.GetApplicationRequest
+                                .builder()
+                                .applicationId(applicationId)
+                                .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(GetApplicationResponse.builder())
+                                        .entity(
+                                                fill(ApplicationEntity.builder())
+                                                        .packageState("STAGING")
+                                                        .build())
+                                        .build()));
+    }
+
     private static void requestLogsRecentLogCache(
-            LogCacheClient logCacheClient, String applicationName, String payload) {
-        when(logCacheClient.recentLogs(any()))
+            LogCacheClient logCacheClient, String sourceId, String payload) {
+        when(logCacheClient.recentLogs(ReadRequest.builder().sourceId(sourceId).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ReadResponse.builder())
@@ -5106,10 +5106,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                 fill(EnvelopeBatch.builder())
                                                         .batch(
                                                                 Arrays.asList(
-                                                                        fill(org.cloudfoundry
-                                                                                        .logcache.v1
-                                                                                        .Envelope
-                                                                                        .builder())
+                                                                        fill(Envelope.builder())
                                                                                 .log(
                                                                                         Log
                                                                                                 .builder()
