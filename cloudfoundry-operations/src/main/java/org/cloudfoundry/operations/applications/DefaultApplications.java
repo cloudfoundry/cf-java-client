@@ -158,6 +158,7 @@ import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -562,6 +563,14 @@ public final class DefaultApplications implements Applications {
     public Flux<Log> logsRecent(ReadRequest request) {
         return getRecentLogsLogCache(this.logCacheClient, request)
                 .transform(OperationsLogging.log("Get Application Logs"))
+                .checkpoint();
+    }
+
+    @Override
+    public Flux<org.cloudfoundry.logcache.v1.Envelope> logsTail(TailLogsRequest request) {
+        return this.logCacheClient
+                .flatMapMany(client -> client.logsTail(request))
+                .transform(OperationsLogging.log("Tail Application Logs"))
                 .checkpoint();
     }
 

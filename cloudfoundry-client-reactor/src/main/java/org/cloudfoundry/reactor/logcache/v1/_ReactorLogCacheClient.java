@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.reactor.logcache.v1;
 
+import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.InfoRequest;
 import org.cloudfoundry.logcache.v1.InfoResponse;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -23,9 +24,11 @@ import org.cloudfoundry.logcache.v1.MetaRequest;
 import org.cloudfoundry.logcache.v1.MetaResponse;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
 import org.immutables.value.Value;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -56,6 +59,11 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
     @Override
     public Mono<ReadResponse> recentLogs(ReadRequest request) {
         return getReactorLogCacheEndpoints().recentLogs(request);
+    }
+
+    @Override
+    public Flux<Envelope> logsTail(TailLogsRequest request) {
+        return getReactorLogCacheEndpoints().logsTail(request);
     }
 
     /**
