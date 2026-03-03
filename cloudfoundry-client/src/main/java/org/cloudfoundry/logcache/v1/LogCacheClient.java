@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.logcache.v1;
 
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 /**
@@ -46,4 +47,25 @@ public interface LogCacheClient {
      * @return the read response
      */
     Mono<ReadResponse> read(ReadRequest request);
+
+    /**
+     * Makes the Log Cache RecentLogs /api/v1/read request
+     *
+     * @param request the Recent Logs request
+     * @return the events from the recent logs
+     */
+    Mono<ReadResponse> recentLogs(ReadRequest request);
+
+    /**
+     * Continuously polls the Log Cache /api/v1/read endpoint and streams new {@link Envelope}s
+     * as they appear. This is the Java equivalent of the Go {@code logcache.Walk()} API and
+     * {@code cf tail --follow}.
+     * <p>
+     * The returned {@link Flux} will never complete on its own – unsubscribe (or cancel) it to
+     * stop streaming.
+     *
+     * @param request the tail request (source id, optional filters, poll interval)
+     * @return an infinite stream of envelopes
+     */
+    Flux<Envelope> logsTail(TailLogsRequest request);
 }
