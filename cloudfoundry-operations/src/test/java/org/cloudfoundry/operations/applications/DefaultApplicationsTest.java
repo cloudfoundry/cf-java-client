@@ -5080,12 +5080,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     private static void requestGetApplicationTimeout(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         when(cloudFoundryClient
-                .applicationsV2()
-                .get(
-                        org.cloudfoundry.client.v2.applications.GetApplicationRequest
-                                .builder()
-                                .applicationId(applicationId)
-                                .build()))
+                        .applicationsV2()
+                        .get(
+                                org.cloudfoundry.client.v2.applications.GetApplicationRequest
+                                        .builder()
+                                        .applicationId(applicationId)
+                                        .build()))
                 .thenReturn(
                         Mono.just(
                                 fill(GetApplicationResponse.builder())
