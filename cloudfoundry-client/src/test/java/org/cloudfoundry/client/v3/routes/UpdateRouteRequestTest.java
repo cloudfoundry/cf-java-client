@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.routes;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.cloudfoundry.client.v3.Metadata;
@@ -38,5 +39,23 @@ class UpdateRouteRequestTest {
                 .metadata(Metadata.builder().label("test-key", "test-value").build())
                 .routeId("test-route-id")
                 .build();
+    }
+
+    @Test
+    void validWithRouteOptions() {
+        UpdateRouteRequest request = UpdateRouteRequest.builder()
+                .metadata(Metadata.builder().label("test-key", "test-value").build())
+                .options(
+                        RouteOptions.builder()
+                                    .value("loadbalancing", "hash")
+                                    .value("hash_header", "X-Hash")
+                                    .value("hash_balance", "90")
+                                    .build())
+                .routeId("test-route-id")
+                .build();
+
+        assertEquals("hash", request.getOptions().getLoadbalancing().get());
+        assertEquals("X-Hash", request.getOptions().getHashHeader().get());
+        assertEquals("90", request.getOptions().getHashBalance().get());
     }
 }
