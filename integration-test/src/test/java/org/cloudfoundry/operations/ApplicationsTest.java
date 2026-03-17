@@ -542,6 +542,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
     public void logsRecent() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         Mono<String> applicationGuid =
