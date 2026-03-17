@@ -1640,12 +1640,9 @@ public final class DefaultApplications implements Applications {
     private static Flux<Log> getRecentLogsLogCache(
             Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
         return requestLogsRecentLogCache(logCacheClient, readRequest)
-                .map(EnvelopeBatch::getBatch)
-                .map(List::stream)
-                .flatMapIterable(envelopeStream -> envelopeStream.collect(Collectors.toList()))
-                .filter(e -> e.getLog() != null)
+                .flatMapIterable(EnvelopeBatch::getBatch)
                 .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
-                .map(org.cloudfoundry.logcache.v1.Envelope::getLog);
+                .mapNotNull(org.cloudfoundry.logcache.v1.Envelope::getLog);
     }
 
     @SuppressWarnings("unchecked")
