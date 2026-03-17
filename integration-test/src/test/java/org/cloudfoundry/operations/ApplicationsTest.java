@@ -39,6 +39,7 @@ import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.LogType;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -602,6 +603,94 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .next()
                 .as(StepVerifier::create)
                 .expectNext(LogType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Integration test for {@link org.cloudfoundry.operations.applications.Applications#logsTail}.
+     * Verifies that streaming a single LOG envelope from a running application succeeds.
+     */
+    @Test
+    public void logsTail() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(
+                                        GetApplicationRequest.builder()
+                                                .name(applicationName)
+                                                .build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.cloudFoundryOperations
+                                        .applications()
+                                        .logsTail(
+                                                TailLogsRequest.builder()
+                                                        .sourceId(appGuid)
+                                                        .envelopeTypes(
+                                                                Collections.singletonList(
+                                                                        EnvelopeType.LOG))
+                                                        .build())
+                                        .take(1))
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Integration test for {@link org.cloudfoundry.operations.applications.Applications#logsTail}
+     * verifying that multiple LOG envelopes can be streamed from a running application.
+     */
+    @Test
+    public void logsTailMultipleEnvelopes() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(
+                                        GetApplicationRequest.builder()
+                                                .name(applicationName)
+                                                .build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.cloudFoundryOperations
+                                        .applications()
+                                        .logsTail(
+                                                TailLogsRequest.builder()
+                                                        .sourceId(appGuid)
+                                                        .envelopeTypes(
+                                                                Collections.singletonList(
+                                                                        EnvelopeType.LOG))
+                                                        .build())
+                                        .take(3))
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
