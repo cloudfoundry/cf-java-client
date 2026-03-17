@@ -154,6 +154,11 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -200,6 +205,10 @@ public final class DefaultApplications implements Applications {
     private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR =
             Comparator.comparing(LogMessage::getTimestamp);
 
+    private static final Comparator<org.cloudfoundry.logcache.v1.Envelope>
+            LOG_MESSAGE_COMPARATOR_LOG_CACHE =
+                    Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
+
     private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
     private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
@@ -214,6 +223,8 @@ public final class DefaultApplications implements Applications {
 
     private final Mono<DopplerClient> dopplerClient;
 
+    private final Mono<LogCacheClient> logCacheClient;
+
     private final RandomWords randomWords;
 
     private final Mono<String> spaceId;
@@ -221,17 +232,20 @@ public final class DefaultApplications implements Applications {
     public DefaultApplications(
             Mono<CloudFoundryClient> cloudFoundryClient,
             Mono<DopplerClient> dopplerClient,
+            Mono<LogCacheClient> logCacheClient,
             Mono<String> spaceId) {
-        this(cloudFoundryClient, dopplerClient, new WordListRandomWords(), spaceId);
+        this(cloudFoundryClient, dopplerClient, logCacheClient, new WordListRandomWords(), spaceId);
     }
 
     DefaultApplications(
             Mono<CloudFoundryClient> cloudFoundryClient,
             Mono<DopplerClient> dopplerClient,
+            Mono<LogCacheClient> logCacheClient,
             RandomWords randomWords,
             Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
         this.dopplerClient = dopplerClient;
+        this.logCacheClient = logCacheClient;
         this.randomWords = randomWords;
         this.spaceId = spaceId;
     }
@@ -529,6 +543,7 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
+    @Deprecated
     @Override
     public Flux<LogMessage> logs(LogsRequest request) {
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
@@ -541,6 +556,21 @@ public final class DefaultApplications implements Applications {
                         applicationId ->
                                 getLogs(this.dopplerClient, applicationId, request.getRecent()))
                 .transform(OperationsLogging.log("Get Application Logs"))
+                .checkpoint();
+    }
+
+    @Override
+    public Flux<Log> logsRecent(ReadRequest request) {
+        return getRecentLogsLogCache(this.logCacheClient, request)
+                .transform(OperationsLogging.log("Get Application Logs"))
+                .checkpoint();
+    }
+
+    @Override
+    public Flux<org.cloudfoundry.logcache.v1.Envelope> logsTail(TailLogsRequest request) {
+        return this.logCacheClient
+                .flatMapMany(client -> client.logsTail(request))
+                .transform(OperationsLogging.log("Tail Application Logs"))
                 .checkpoint();
     }
 
@@ -673,7 +703,6 @@ public final class DefaultApplications implements Applications {
         } catch (IOException e) {
             throw new RuntimeException("Could not serialize manifest", e);
         }
-
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
                         function(
@@ -1617,6 +1646,17 @@ public final class DefaultApplications implements Applications {
         }
     }
 
+    private static Flux<Log> getRecentLogsLogCache(
+            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
+        return requestLogsRecentLogCache(logCacheClient, readRequest)
+                .map(EnvelopeBatch::getBatch)
+                .map(List::stream)
+                .flatMapIterable(envelopeStream -> envelopeStream.collect(Collectors.toList()))
+                .filter(e -> e.getLog() != null)
+                .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .map(org.cloudfoundry.logcache.v1.Envelope::getLog);
+    }
+
     @SuppressWarnings("unchecked")
     private static Map<String, Object> getMetadataRequest(EventEntity entity) {
         Map<String, Optional<Object>> metadata =
@@ -2501,12 +2541,21 @@ public final class DefaultApplications implements Applications {
                                                 .build()));
     }
 
+    @Deprecated
     private static Flux<Envelope> requestLogsRecent(
             Mono<DopplerClient> dopplerClient, String applicationId) {
         return dopplerClient.flatMapMany(
                 client ->
                         client.recentLogs(
                                 RecentLogsRequest.builder().applicationId(applicationId).build()));
+    }
+
+    private static Mono<EnvelopeBatch> requestLogsRecentLogCache(
+            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
+        return logCacheClient.flatMap(
+                client ->
+                        client.recentLogs(readRequest)
+                                .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes())));
     }
 
     private static Flux<Envelope> requestLogsStream(
