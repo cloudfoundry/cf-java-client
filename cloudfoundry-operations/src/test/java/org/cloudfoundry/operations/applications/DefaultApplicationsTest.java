@@ -5361,7 +5361,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     private static void requestLogsRecentLogCache(
             LogCacheClient logCacheClient, String sourceId, String payload) {
-        when(logCacheClient.recentLogs(ReadRequest.builder().sourceId(sourceId).build()))
+        when(logCacheClient.read(ReadRequest.builder().sourceId(sourceId).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ReadResponse.builder())

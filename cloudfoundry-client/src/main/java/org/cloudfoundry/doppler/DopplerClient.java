@@ -42,13 +42,13 @@ public interface DopplerClient {
     /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
      *
-     * @deprecated Use {@link org.cloudfoundry.logcache.v1.LogCacheClient#recentLogs(org.cloudfoundry.logcache.v1.ReadRequest)} instead.
+     * @deprecated Use {@link org.cloudfoundry.logcache.v1.LogCacheClient#read(org.cloudfoundry.logcache.v1.ReadRequest)} instead.
      * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3} and {@code TAS < 4.0}.
      * @param request the Recent Logs request
      * @return a flux of events from the recent logs
      * @see <a href="https://github.com/cloudfoundry/loggregator">Loggregator</a>
      * @see <a href="https://github.com/cloudfoundry/log-cache">Log Cache</a>
-     * @see org.cloudfoundry.logcache.v1.LogCacheClient#recentLogs(org.cloudfoundry.logcache.v1.ReadRequest)
+     * @see org.cloudfoundry.logcache.v1.LogCacheClient#read(org.cloudfoundry.logcache.v1.ReadRequest)
      */
     @Deprecated
     Flux<Envelope> recentLogs(RecentLogsRequest request);

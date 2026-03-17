@@ -2545,7 +2545,7 @@ public final class DefaultApplications implements Applications {
             Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
         return logCacheClient.flatMap(
                 client ->
-                        client.recentLogs(readRequest)
+                        client.read(readRequest)
                                 .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes())));
     }
 
