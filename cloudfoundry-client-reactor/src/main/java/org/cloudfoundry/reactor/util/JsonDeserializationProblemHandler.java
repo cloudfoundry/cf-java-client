@@ -123,7 +123,10 @@ public class JsonDeserializationProblemHandler extends DeserializationProblemHan
                     "Ignoring value " + t.asString() + " at " + jsonPointer + " as configured.");
             throw new RetryException(jsonPointer, t.asString());
         } else {
-            jsonPointer = jsonPointer.appendProperty(t.asString());
+            jsonPointer = JsonPointer.compile(jsonPointer.toString() + "/" + t.asString());
+            // Cleanup when Java11 is no longer supported.
+            // jsonPointer = jsonPointer .appendProperty(t.asString()); better, but not supported in
+            // old versions.
             shouldDelete = propertyShouldBeDroped(className, jsonPointer, t.asString());
             if (shouldDelete) {
                 LOGGER.info(
@@ -161,7 +164,10 @@ public class JsonDeserializationProblemHandler extends DeserializationProblemHan
             LOGGER.info("Ignoring value " + p.getText() + " at " + jsonPointer + " as configured.");
             throw new RetryException(jsonPointer, p.getText());
         } else {
-            jsonPointer = jsonPointer.appendProperty(p.getText());
+            jsonPointer = JsonPointer.compile(jsonPointer.toString() + "/" + p.getText());
+            // Cleanup when Java11 is no longer supported.
+            // jsonPointer = jsonPointer .appendProperty(p.getText()); better, but not supported in
+            // old versions.
             shouldDelete = propertyShouldBeDroped(className, jsonPointer, p.currentName());
             if (shouldDelete) {
                 LOGGER.info(
