@@ -298,6 +298,7 @@ Name | Description
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
 `UAA_API_REQUEST_LIMIT` | _(Optional)_ If your UAA server does rate limiting and returns 429 errors, set this variable to the smallest limit configured there. Whether your server limits UAA calls is shown in the log, together with the location of the configuration file on the server. Defaults to `0` (no limit).
+`VERSION_MISMATCH_CONFIG` | _(Optional)_ If Cient and Cloud Foundry instance have different versions, it may happen that the response messages can not be parsed because of new properties that are not known to the client. The json file named in this environment variable allows to ignore such properties without failing the client. A sample configuration for ignoring any unknown property is available in file `versionMismatchConfigIgnoreAll.json`.
 
 If you do not have access to a CloudFoundry instance with admin access, you can run one locally using [bosh-deployment](https://github.com/cloudfoundry/bosh-deployment) & [cf-deployment](https://github.com/cloudfoundry/cf-deployment/) and Virtualbox.
 
