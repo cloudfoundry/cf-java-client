@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Map;
 import org.cloudfoundry.uaa.clients.ListClientsResponse;
@@ -38,7 +39,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/AddedProperty_ListIdentityZonesResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListIdentityZonesResponse.class))
                 .expectError(JsonParsingException.class)
@@ -54,7 +55,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/AddedProperty_ListIdentityZonesResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListIdentityZonesResponse.class))
                 .expectError(JsonParsingException.class)
@@ -66,7 +67,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/PropertyWrongType2_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .expectError(JsonParsingException.class)
@@ -80,7 +81,7 @@ public class JsonCodecTest {
                 "autoapprove",
                 "/resources/*/autoapprove");
         URL fileUrl = getClass().getResource("/fixtures/util/AddedValue_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .expectError(JsonParsingException.class)
@@ -96,7 +97,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/AddedProperty_ListIdentityZonesResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListIdentityZonesResponse.class))
                 .assertNext(this::checkResponse1)
@@ -112,7 +113,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/AddedProperty_ListIdentityZonesResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListIdentityZonesResponse.class))
                 .assertNext(this::checkResponse1)
@@ -123,7 +124,7 @@ public class JsonCodecTest {
     void invalidProperyFails() throws URISyntaxException {
         URL fileUrl =
                 getClass().getResource("/fixtures/util/PropertyWrongType_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .expectError(JsonParsingException.class)
@@ -138,7 +139,7 @@ public class JsonCodecTest {
                 "java.util.ArrayList", "autoapprove", "/resources/*/autoapprove/*");
         URL fileUrl =
                 getClass().getResource("/fixtures/util/PropertyWrongType_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .assertNext(r -> checkResponse2(r, 1))
@@ -153,7 +154,7 @@ public class JsonCodecTest {
                 "java.util.ArrayList", "autoapprove", "/resources/*/autoapprove/*");
         URL fileUrl =
                 getClass().getResource("/fixtures/util/PropertyWrongType_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .assertNext(r -> checkResponse2(r, 1))
@@ -167,7 +168,7 @@ public class JsonCodecTest {
         URL fileUrl =
                 getClass()
                         .getResource("/fixtures/util/PropertyWrongType2_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .assertNext(r -> checkResponse2(r, 1))
@@ -181,7 +182,7 @@ public class JsonCodecTest {
                 "grant_type_that_is_not_known",
                 "/resources/*/authorized_grant_types/*");
         URL fileUrl = getClass().getResource("/fixtures/util/AddedValue_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, ListClientsResponse.class))
                 .assertNext(r -> checkResponse2(r, 1))
@@ -202,7 +203,7 @@ public class JsonCodecTest {
                 "java.util.LinkedHashMap", "*", "/String");
         JsonDeserializationProblemHandler.addPropertyToIgnore("java.util.LinkedHashMap", "*", "/");
         URL fileUrl = getClass().getResource("/fixtures/util/AddedRoot_ListClientsResponse.json");
-        Path path = Path.of(fileUrl.toURI());
+        Path path = Paths.get(fileUrl.toURI());
         body = ByteBufFlux.fromPath(path);
         StepVerifier.create(JsonCodec.decode(objectMapper, body, Map.class))
                 .expectError(JsonParsingException.class)
