@@ -43,16 +43,17 @@ class UpdateRouteRequestTest {
 
     @Test
     void validWithRouteOptions() {
-        UpdateRouteRequest request = UpdateRouteRequest.builder()
-                .metadata(Metadata.builder().label("test-key", "test-value").build())
-                .options(
-                        RouteOptions.builder()
-                                    .value("loadbalancing", "hash")
-                                    .value("hash_header", "X-Hash")
-                                    .value("hash_balance", "90")
-                                    .build())
-                .routeId("test-route-id")
-                .build();
+        UpdateRouteRequest request =
+                UpdateRouteRequest.builder()
+                        .metadata(Metadata.builder().label("test-key", "test-value").build())
+                        .options(
+                                RouteOptions.builder()
+                                        .value("loadbalancing", "hash")
+                                        .value("hash_header", "X-Hash")
+                                        .value("hash_balance", "90")
+                                        .build())
+                        .routeId("test-route-id")
+                        .build();
 
         assertEquals("hash", request.getOptions().getLoadbalancing().get());
         assertEquals("X-Hash", request.getOptions().getHashHeader().get());
