@@ -30,6 +30,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.security.SecureRandom;
 import java.time.Duration;
 import java.util.Arrays;
@@ -269,7 +270,7 @@ public class IntegrationTestConfiguration {
         if (fileName != null) {
             URL url = getClass().getResource("/" + fileName);
             if (url != null) {
-                Path path = Path.of(url.toURI());
+                Path path = Paths.get(url.toURI());
                 ObjectMapper mapper = new ObjectMapper();
                 logger.info(
                         "reading configuration for handling unknown properties from server from"
