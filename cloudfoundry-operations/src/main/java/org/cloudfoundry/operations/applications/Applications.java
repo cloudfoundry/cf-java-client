@@ -17,8 +17,6 @@
 package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.logcache.v1.Log;
-import org.cloudfoundry.logcache.v1.ReadRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -129,18 +127,7 @@ public interface Applications {
     Flux<LogMessage> logs(LogsRequest request);
 
     /**
-     * List the applications logs from logCacheClient.
-     * If no messages are available, an empty Flux is returned.
-     *
-     * @param request the application logs request
-     * @return the applications logs
-     */
-    Flux<Log> logsRecent(ReadRequest request);
-
-    /**
-     * List the applications logs.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
+     * List the applications logs. Uses Log Cache under the hood.
      *
      * @param request the application logs request
      * @return the applications logs

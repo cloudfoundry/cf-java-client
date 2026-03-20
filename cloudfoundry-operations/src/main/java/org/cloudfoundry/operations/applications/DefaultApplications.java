@@ -155,7 +155,6 @@ import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
-import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
@@ -559,30 +558,24 @@ public final class DefaultApplications implements Applications {
     }
 
     @Override
-    public Flux<Log> logsRecent(ReadRequest request) {
-        return getRecentLogsLogCache(this.logCacheClient, request)
-                .transform(OperationsLogging.log("Get Application Logs"))
-                .checkpoint();
-    }
-
-    @Override
     public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-        return logs(LogsRequest.builder()
-                        .name(request.getName())
-                        .recent(request.getRecent())
-                        .build())
-                .map(
-                        logMessage ->
-                                ApplicationLog.builder()
-                                        .sourceId(logMessage.getApplicationId())
-                                        .sourceType(logMessage.getSourceType())
-                                        .instanceId(logMessage.getSourceInstance())
-                                        .message(logMessage.getMessage())
-                                        .timestamp(logMessage.getTimestamp())
-                                        .logType(
-                                                ApplicationLogType.from(
-                                                        logMessage.getMessageType().name()))
-                                        .build());
+        if (Optional.ofNullable(request.getRecent()).orElse(true)) {
+            return Mono.zip(this.cloudFoundryClient, this.spaceId)
+                    .flatMap(
+                            function(
+                                    (cloudFoundryClient, spaceId) ->
+                                            getApplicationId(
+                                                    cloudFoundryClient,
+                                                    request.getName(),
+                                                    spaceId)))
+                    .flatMapMany(
+                            applicationId -> getLogsLogCache(this.logCacheClient, applicationId))
+                    .transform(OperationsLogging.log("Get Application Logs"))
+                    .checkpoint();
+        } else {
+            return logs(LogsRequest.builder().name(request.getName()).recent(false).build())
+                    .map(DefaultApplications::toApplicationLog);
+        }
     }
 
     @Override
@@ -1637,12 +1630,30 @@ public final class DefaultApplications implements Applications {
         }
     }
 
-    private static Flux<Log> getRecentLogsLogCache(
-            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
-        return requestLogsRecentLogCache(logCacheClient, readRequest)
-                .flatMapIterable(EnvelopeBatch::getBatch)
+    private static Flux<ApplicationLog> getLogsLogCache(
+            Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return requestLogsRecentLogCache(logCacheClient, applicationId)
+                .filter(e -> e.getLog() != null)
                 .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
-                .mapNotNull(org.cloudfoundry.logcache.v1.Envelope::getLog);
+                .map(
+                        envelope ->
+                                ApplicationLog.builder()
+                                        .sourceId(
+                                                Optional.ofNullable(envelope.getSourceId())
+                                                        .orElse(""))
+                                        .sourceType(
+                                                envelope.getTags().getOrDefault("source_type", ""))
+                                        .instanceId(
+                                                Optional.ofNullable(envelope.getInstanceId())
+                                                        .orElse(""))
+                                        .message(envelope.getLog().getPayloadAsText())
+                                        .timestamp(
+                                                Optional.ofNullable(envelope.getTimestamp())
+                                                        .orElse(0L))
+                                        .logType(
+                                                ApplicationLogType.from(
+                                                        envelope.getLog().getType().name()))
+                                        .build());
     }
 
     @SuppressWarnings("unchecked")
@@ -2538,12 +2549,14 @@ public final class DefaultApplications implements Applications {
                                 RecentLogsRequest.builder().applicationId(applicationId).build()));
     }
 
-    private static Mono<EnvelopeBatch> requestLogsRecentLogCache(
-            Mono<LogCacheClient> logCacheClient, ReadRequest readRequest) {
-        return logCacheClient.flatMap(
-                client ->
-                        client.read(readRequest)
-                                .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes())));
+    private static Flux<org.cloudfoundry.logcache.v1.Envelope> requestLogsRecentLogCache(
+            Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return logCacheClient
+                .flatMap(
+                        client ->
+                                client.read(ReadRequest.builder().sourceId(applicationId).build()))
+                .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes()))
+                .flatMapIterable(EnvelopeBatch::getBatch);
     }
 
     private static Flux<Envelope> requestLogsStream(
@@ -2949,6 +2962,17 @@ public final class DefaultApplications implements Applications {
         return isNotIn(resource, STOPPED_STATE)
                 ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource))
                 : Mono.just(resource);
+    }
+
+    private static ApplicationLog toApplicationLog(LogMessage logMessage) {
+        return ApplicationLog.builder()
+                .sourceId(logMessage.getApplicationId())
+                .sourceType(logMessage.getSourceType())
+                .instanceId(logMessage.getSourceInstance())
+                .message(logMessage.getMessage())
+                .timestamp(logMessage.getTimestamp())
+                .logType(ApplicationLogType.from(logMessage.getMessageType().name()))
+                .build();
     }
 
     private static ApplicationDetail toApplicationDetail(

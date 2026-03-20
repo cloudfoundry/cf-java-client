@@ -25,9 +25,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1367,18 +1369,25 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void logsRecentLogCache() {
+    void logsLogCache() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id", "test-payload");
+        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
         this.applications
-                .logsRecent(ReadRequest.builder().sourceId("test-metadata-id").build())
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
-                .expectNext(fill(Log.builder()).type(LogType.OUT).build())
+                .expectNextMatches(
+                        log ->
+                                log.getMessage().equals("test-payload")
+                                        && log.getLogType() == ApplicationLogType.OUT
+                                        && log.getSourceId().equals("test-sourceId")
+                                        && log.getInstanceId().equals("test-instanceId")
+                                        && log.getSourceType().equals("APP/PROC/WEB")
+                                        && log.getTimestamp() == 1L)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -5359,8 +5368,9 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecentLogCache(
-            LogCacheClient logCacheClient, String sourceId, String payload) {
+    private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String sourceId) {
+        String base64Payload =
+                Base64.getEncoder().encodeToString("test-payload".getBytes(StandardCharsets.UTF_8));
         when(logCacheClient.read(ReadRequest.builder().sourceId(sourceId).build()))
                 .thenReturn(
                         Mono.just(
@@ -5370,11 +5380,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                         .batch(
                                                                 Arrays.asList(
                                                                         fill(Envelope.builder())
+                                                                                .tags(
+                                                                                        Collections
+                                                                                                .singletonMap(
+                                                                                                        "source_type",
+                                                                                                        "APP/PROC/WEB"))
                                                                                 .log(
                                                                                         Log
                                                                                                 .builder()
                                                                                                 .payload(
-                                                                                                        payload)
+                                                                                                        base64Payload)
                                                                                                 .type(
                                                                                                         LogType
                                                                                                                 .OUT)
