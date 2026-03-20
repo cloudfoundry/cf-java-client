@@ -499,11 +499,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Doppler was dropped in PCF 4.x in favor of logcache. This test does not work
-     * on TAS 4.x.
+     * Exercise the LogCache client via {@code logs(ApplicationLogsRequest)}.
+     * LogCache has been a default cf-deployment component since v3.0.0 (July 2018),
+     * with the {@code /api/v1/read} endpoint available since log-cache-release v2.0.0
+     * (October 2018).
      */
     @Test
-    @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_4_v2)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_3)
     public void logs() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
