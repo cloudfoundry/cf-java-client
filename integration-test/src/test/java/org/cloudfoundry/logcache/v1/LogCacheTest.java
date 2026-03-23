@@ -31,6 +31,7 @@ import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.RequiresMetricRegistrar;
 import org.cloudfoundry.RequiresV2Api;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -48,6 +49,10 @@ public class LogCacheTest extends AbstractIntegrationTest {
     // Optional: only available when V2 API is enabled (requires deployed test app)
     @Autowired(required = false)
     private TestLogCacheEndpoints testLogCacheEndpoints;
+
+    // Optional: pre-deployed app GUID for V2-free testing
+    @Autowired(required = false)
+    private String testLogCacheAppGuid;
 
     private final Random random = new SecureRandom();
 
@@ -174,6 +179,44 @@ public class LogCacheTest extends AbstractIntegrationTest {
                                                         envelope.getLog().getPayloadAsText())))
                 .as(StepVerifier::create)
                 .expectNextCount(1)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Exercises {@code LogCacheClient.read()} without any CAPI V2 dependency.
+     * Requires a pre-deployed application whose GUID is passed via the
+     * {@code TEST_LOGCACHE_APP_GUID} environment variable.
+     */
+    @Test
+    public void readLogsWithoutV2() {
+        Assumptions.assumeTrue(
+                this.testLogCacheAppGuid != null, "TEST_LOGCACHE_APP_GUID not set");
+
+        this.logCacheClient
+                .read(
+                        ReadRequest.builder()
+                                .sourceId(this.testLogCacheAppGuid)
+                                .envelopeType(EnvelopeType.LOG)
+                                .limit(1000)
+                                .build())
+                .as(StepVerifier::create)
+                .assertNext(
+                        response -> {
+                            assertThat(response).isNotNull();
+                            assertThat(response.getEnvelopes()).isNotNull();
+                            assertThat(response.getEnvelopes().getBatch())
+                                    .isNotNull()
+                                    .isNotEmpty()
+                                    .allSatisfy(
+                                            envelope -> {
+                                                assertThat(envelope.getLog()).isNotNull();
+                                                assertThat(envelope.getSourceId())
+                                                        .isEqualTo(this.testLogCacheAppGuid);
+                                                assertThat(envelope.getTimestamp())
+                                                        .isGreaterThan(0);
+                                            });
+                        })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

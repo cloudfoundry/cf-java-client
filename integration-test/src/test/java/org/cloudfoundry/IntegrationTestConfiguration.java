@@ -628,6 +628,11 @@ public class IntegrationTestConfiguration {
         return nameFactory.getApplicationName();
     }
 
+    @Bean
+    String testLogCacheAppGuid() {
+        return System.getenv("TEST_LOGCACHE_APP_GUID");
+    }
+
     @Lazy
     @Bean
     @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
