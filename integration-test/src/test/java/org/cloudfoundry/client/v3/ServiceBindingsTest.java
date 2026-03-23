@@ -25,6 +25,7 @@ import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
@@ -54,11 +55,14 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_11)
+@RequiresV2Api
 public class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 

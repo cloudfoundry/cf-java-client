@@ -24,6 +24,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.domains.CreateDomainRequest;
 import org.cloudfoundry.client.v3.domains.CreateDomainResponse;
@@ -57,6 +58,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_12)
+@RequiresV2Api
 public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;

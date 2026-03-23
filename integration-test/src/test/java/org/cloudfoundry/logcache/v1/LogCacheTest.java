@@ -29,6 +29,8 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresMetricRegistrar;
+import org.cloudfoundry.RequiresV2Api;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -43,13 +45,26 @@ public class LogCacheTest extends AbstractIntegrationTest {
 
     private ApplicationUtils.ApplicationMetadata testLogCacheAppMetadata;
 
-    @Autowired private TestLogCacheEndpoints testLogCacheEndpoints;
+    // Optional: only available when V2 API is enabled (requires deployed test app)
+    @Autowired(required = false)
+    private TestLogCacheEndpoints testLogCacheEndpoints;
 
     private final Random random = new SecureRandom();
 
+    /**
+     * Sets up the test log cache app metadata. The testLogCacheApp bean is optional
+     * ({@code required = false}) because it depends on V2 API calls for app deployment.
+     * When SKIP_V2_TESTS=true, this bean won't be available and setUp becomes a no-op.
+     * Tests that need testLogCacheAppMetadata are annotated with {@code @RequiresV2Api}
+     * and will be skipped in that case.
+     */
     @BeforeEach
-    void setUp(@Autowired Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
-        this.testLogCacheAppMetadata = testLogCacheApp.block();
+    void setUp(
+            @Autowired(required = false)
+                    Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp) {
+        if (testLogCacheApp != null) {
+            this.testLogCacheAppMetadata = testLogCacheApp.block();
+        }
     }
 
     @Test
@@ -68,6 +83,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void meta() {
         this.logCacheClient
                 .meta(MetaRequest.builder().build())
@@ -83,6 +99,8 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
+    @RequiresMetricRegistrar
     public void readCounter() {
         final String name = this.nameFactory.getName("counter-");
         final int delta = this.random.nextInt(1000);
@@ -102,6 +120,8 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
+    @RequiresMetricRegistrar
     public void readEvent() {
         final String title = this.nameFactory.getName("event-");
         final String body = "This is the body. " + new BigInteger(1024, this.random).toString(32);
@@ -117,6 +137,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
 
     @Test
     @Disabled("fails often for no reasons")
+    @RequiresV2Api
     public void readGauge() {
         final String gaugeName = this.nameFactory.getName("gauge-");
         final Double value = this.random.nextDouble() % 100;
@@ -138,6 +159,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresV2Api
     public void readLogs() {
         final String logMessage = this.nameFactory.getName("log-");
 

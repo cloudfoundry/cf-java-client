@@ -21,6 +21,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.NameFactory;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceRequest;
 import org.cloudfoundry.client.v2.serviceinstances.CreateServiceInstanceResponse;
@@ -40,11 +41,14 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class ServiceUsageEventsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 

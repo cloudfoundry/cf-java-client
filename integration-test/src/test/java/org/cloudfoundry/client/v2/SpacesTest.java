@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
@@ -116,13 +117,16 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
+@RequiresV2Api
 public final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     @Autowired private Mono<String> organizationId;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 

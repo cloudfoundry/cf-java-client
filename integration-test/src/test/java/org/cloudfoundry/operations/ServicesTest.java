@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
@@ -66,6 +67,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
+@RequiresV2Api
 public final class ServicesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -76,7 +78,9 @@ public final class ServicesTest extends AbstractIntegrationTest {
 
     @Autowired private String planName;
 
-    @Autowired private Mono<String> serviceBrokerId;
+    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
+    @Autowired(required = false)
+    private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 

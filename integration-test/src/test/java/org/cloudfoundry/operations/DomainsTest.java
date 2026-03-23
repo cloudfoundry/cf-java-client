@@ -23,6 +23,7 @@ import static org.cloudfoundry.operations.domains.Status.SHARED;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.ClientV3Exception;
 import org.cloudfoundry.client.v3.Error;
@@ -40,6 +41,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class DomainsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
