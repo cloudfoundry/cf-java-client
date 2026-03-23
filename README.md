@@ -49,6 +49,9 @@ The Cloud Foundry Java Client has two active versions. The `5.x` line is compati
 >     .build());
 > ```
 
+> [!NOTE]
+> **Operations API users:** `Applications.logs(ApplicationLogsRequest)` now uses Log Cache under the hood for recent logs (the default). No migration is needed at the Operations layer.
+
 [loggregator]: https://github.com/cloudfoundry/loggregator
 [log-cache-api]: https://github.com/cloudfoundry/log-cache
 
