@@ -145,6 +145,10 @@ public final class ServiceBrokerUtils {
         Map<String, Object> env = new HashMap<>();
         env.put("SERVICE_NAME", serviceName);
         env.put("PLAN_NAME", planName);
+        env.put(
+                "JAVA_OPTS",
+                "--add-opens java.base/java.lang=ALL-UNNAMED"
+                        + " --add-opens java.base/java.io=ALL-UNNAMED");
 
         return ApplicationUtils.pushApplication(
                 cloudFoundryClient,
