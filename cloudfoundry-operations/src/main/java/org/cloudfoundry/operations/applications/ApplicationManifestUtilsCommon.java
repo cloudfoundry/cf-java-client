@@ -16,30 +16,25 @@
 
 package org.cloudfoundry.operations.applications;
 
-import static java.util.Collections.emptyMap;
+import org.cloudfoundry.util.tuple.Consumer2;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import reactor.core.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.cloudfoundry.util.tuple.Consumer2;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import reactor.core.Exceptions;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Common base class for dealing with manifests
@@ -71,6 +66,7 @@ abstract class ApplicationManifestUtilsCommon {
         asString(application, "domain", variables, builder::domain);
         asListOfString(application, "domains", variables, builder::domain);
         asMapOfStringString(application, "env", variables, builder::environmentVariable);
+        asMap(application, "features", variables, String::valueOf, (k,v) -> builder.feature(k, Boolean.valueOf(v)));
         asString(
                 application,
                 "health-check-http-endpoint",
@@ -430,6 +426,7 @@ abstract class ApplicationManifestUtilsCommon {
                 ApplicationManifestUtilsCommon::toDockerYaml);
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
+        putIfPresent(yaml, "features", applicationManifest.getFeatures());
         putIfPresent(
                 yaml,
                 "health-check-http-endpoint",
