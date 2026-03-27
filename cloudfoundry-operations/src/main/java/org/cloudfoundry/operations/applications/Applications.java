@@ -128,8 +128,9 @@ public interface Applications {
 
     /**
      * List the applications logs.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
+     * Uses Log Cache under the hood when {@link ApplicationLogsRequest#getRecent()} is {@code true}.
+     * Log streaming still uses Doppler, which is not available in CF deployments following
+     * <a href="https://docs.cloudfoundry.org/loggregator/architecture.html#shared-nothing-architecture">shared-nothing architecture</a>.
      *
      * @param request the application logs request
      * @return the applications logs
