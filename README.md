@@ -17,16 +17,16 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 ## Versions
 The Cloud Foundry Java Client has two active versions. The `5.x` line is compatible with Spring Boot `2.4.x - 2.6.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
 
-## Deprecations
+## Breaking Changes (6.x)
 
 ### `DopplerClient.recentLogs()` — Recent Logs via Doppler
 
 > [!WARNING]
-> **Deprecated since cf-java-client `5.17.x`**
+> **Removed since cf-java-client `6.0.x`**
 >
-> The `DopplerClient.recentLogs()` endpoint (and the related `RecentLogsRequest` / `LogMessage` types from the `org.cloudfoundry.doppler` package) are **deprecated** and will be removed in a future release.
+> The `DopplerClient.recentLogs()` endpoint (and the related `RecentLogsRequest` / `LogMessage` types from the `org.cloudfoundry.doppler` package) have been **removed**.
 >
-> This API relies on the [Loggregator][loggregator] Doppler/Traffic Controller endpoint `/apps/{id}/recentlogs`, which was removed in **Loggregator ≥ 107.0**.
+> This API relied on the [Loggregator][loggregator] Doppler/Traffic Controller endpoint `/apps/{id}/recentlogs`, which was removed in **Loggregator ≥ 107.0**.
 > The affected platform versions are:
 >
 > | Platform | Last version with Doppler recent-logs support |
@@ -48,24 +48,17 @@ The Cloud Foundry Java Client has two active versions. The `5.x` line is compati
 >     .envelopeTypes(EnvelopeType.LOG)
 >     .build());
 > ```
->
-> The return type and envelope objects differ between the two APIs:
->
-> | | Doppler (`org.cloudfoundry.doppler`) | Log Cache (`org.cloudfoundry.logcache.v1`) |
-> |---|---|---|
-> | **Return type** | `Flux<Envelope>` | `Mono<ReadResponse>` → unpack via `response.getEnvelopes().getBatch()` |
-> | **Log access** | `envelope.getLogMessage()` → `LogMessage` | `envelope.getLog()` → `Log` |
-> | **Message text** | `logMessage.getMessage()` | `log.getPayloadAsText()` |
-> | **Message type** | `MessageType.OUT` / `ERR` | `LogType.OUT` / `ERR` |
-> | **Source metadata** | `logMessage.getSourceType()`, `.getSourceInstance()` | `envelope.getTags().get("source_type")`, `envelope.getInstanceId()` |
->
-> See the [`org.cloudfoundry.doppler`][doppler-pkg] and [`org.cloudfoundry.logcache.v1`][logcache-pkg] Javadoc for full type details.
-
-[doppler-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/doppler/package-summary.html
-[logcache-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/logcache/v1/package-summary.html
 
 > [!NOTE]
-> **Operations API users:** `Applications.logs(ApplicationLogsRequest)` now uses Log Cache under the hood for recent logs (the default). No migration is needed at the Operations layer.
+> **Operations API users:** Use `Applications.logs(ApplicationLogsRequest)` instead of the removed `Applications.logs(LogsRequest)`.
+
+### `Applications.logs(LogsRequest)` — Removed
+
+> [!WARNING]
+> **Removed since cf-java-client `6.0.x`**
+> The `Applications.logs(LogsRequest)` method (and the `LogsRequest` type) have been **removed**.
+>
+> **Migration:** Use `Applications.logs(ApplicationLogsRequest)` instead. For recent logs, set `recent(true)` (the default). For streaming, set `recent(false)`.
 
 [loggregator]: https://github.com/cloudfoundry/loggregator
 [log-cache-api]: https://github.com/cloudfoundry/log-cache
