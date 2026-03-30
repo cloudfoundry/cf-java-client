@@ -143,7 +143,6 @@ import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
@@ -1315,31 +1314,12 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @SuppressWarnings("deprecation")
     @Test
-    void logsDoppler() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
-
-        this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(false).build())
-                .as(StepVerifier::create)
-                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @SuppressWarnings("deprecation")
-    @Test
-    void logsNoAppDoppler() {
+    void logsNoApp() {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
                 .consumeErrorWith(
                         t ->
@@ -1350,18 +1330,21 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @SuppressWarnings("deprecation")
     @Test
-    void logsRecentDoppler() {
+    void logsStreamDoppler() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsRecent(this.dopplerClient, "test-metadata-id");
+        requestLogsStream(this.dopplerClient, "test-metadata-id");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").recent(true).build())
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(false)
+                                .build())
                 .as(StepVerifier::create)
                 .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
                 .expectComplete()
@@ -1369,7 +1352,7 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void logsLogCache() {
+    void logsRecentNull() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
@@ -1392,20 +1375,30 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .verify(Duration.ofSeconds(5));
     }
 
-    @SuppressWarnings("deprecation")
     @Test
-    void logsRecentNotSetDoppler() {
+    void logsRecentTrue() {
         requestApplications(
                 this.cloudFoundryClient,
                 "test-application-name",
                 TEST_SPACE_ID,
                 "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
+        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
         this.applications
-                .logs(LogsRequest.builder().name("test-application-name").build())
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(true)
+                                .build())
                 .as(StepVerifier::create)
-                .expectNext(fill(LogMessage.builder(), "log-message-").build())
+                .expectNextMatches(
+                        log ->
+                                log.getMessage().equals("test-payload")
+                                        && log.getLogType() == ApplicationLogType.OUT
+                                        && log.getSourceId().equals("test-sourceId")
+                                        && log.getInstanceId().equals("test-instanceId")
+                                        && log.getSourceType().equals("APP/PROC/WEB")
+                                        && log.getTimestamp() == 1L)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -5351,20 +5344,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                         Mono.just(
                                 fill(org.cloudfoundry.client.v3.applications
                                                 .ListApplicationTasksResponse.builder())
-                                        .build()));
-    }
-
-    @SuppressWarnings("deprecation")
-    private static void requestLogsRecent(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.recentLogs(
-                        RecentLogsRequest.builder().applicationId(applicationId).build()))
-                .thenReturn(
-                        Flux.just(
-                                org.cloudfoundry.doppler.Envelope.builder()
-                                        .eventType(EventType.LOG_MESSAGE)
-                                        .logMessage(
-                                                fill(LogMessage.builder(), "log-message-").build())
-                                        .origin("rsp")
                                         .build()));
     }
 

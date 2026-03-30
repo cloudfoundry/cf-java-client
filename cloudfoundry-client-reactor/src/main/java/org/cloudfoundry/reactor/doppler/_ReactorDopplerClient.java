@@ -20,7 +20,7 @@ import org.cloudfoundry.doppler.ContainerMetricsRequest;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.FirehoseRequest;
-import org.cloudfoundry.doppler.RecentLogsRequest;
+
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
@@ -45,11 +45,6 @@ abstract class _ReactorDopplerClient implements DopplerClient {
     @Override
     public Flux<Envelope> firehose(FirehoseRequest request) {
         return getDopplerEndpoints().firehose(request);
-    }
-
-    @Override
-    public Flux<Envelope> recentLogs(RecentLogsRequest request) {
-        return getDopplerEndpoints().recentLogs(request);
     }
 
     @Override

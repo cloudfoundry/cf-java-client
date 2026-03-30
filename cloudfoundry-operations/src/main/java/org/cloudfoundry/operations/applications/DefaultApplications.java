@@ -152,7 +152,6 @@ import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.doppler.Envelope;
 import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -541,9 +540,9 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
-    @Deprecated
     @Override
-    public Flux<LogMessage> logs(LogsRequest request) {
+    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+        boolean recent = request.getRecent() == null || request.getRecent();
         return Mono.zip(this.cloudFoundryClient, this.spaceId)
                 .flatMap(
                         function(
@@ -552,30 +551,11 @@ public final class DefaultApplications implements Applications {
                                                 cloudFoundryClient, request.getName(), spaceId)))
                 .flatMapMany(
                         applicationId ->
-                                getLogs(this.dopplerClient, applicationId, request.getRecent()))
+                                recent
+                                        ? getLogsLogCache(this.logCacheClient, applicationId)
+                                        : getLogsStream(this.dopplerClient, applicationId))
                 .transform(OperationsLogging.log("Get Application Logs"))
                 .checkpoint();
-    }
-
-    @Override
-    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-        if (request.getRecent() == null || request.getRecent()) {
-            return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                    .flatMap(
-                            function(
-                                    (cloudFoundryClient, spaceId) ->
-                                            getApplicationId(
-                                                    cloudFoundryClient,
-                                                    request.getName(),
-                                                    spaceId)))
-                    .flatMapMany(
-                            applicationId -> getLogsLogCache(this.logCacheClient, applicationId))
-                    .transform(OperationsLogging.log("Get Application Logs"))
-                    .checkpoint();
-        } else {
-            return logs(LogsRequest.builder().name(request.getName()).recent(false).build())
-                    .map(DefaultApplications::toApplicationLog);
-        }
     }
 
     @Override
@@ -1613,21 +1593,14 @@ public final class DefaultApplications implements Applications {
                 .orElse(0);
     }
 
-    private static Flux<LogMessage> getLogs(
-            Mono<DopplerClient> dopplerClient, String applicationId, Boolean recent) {
-        if (Optional.ofNullable(recent).orElse(false)) {
-            return requestLogsRecent(dopplerClient, applicationId)
-                    .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                    .map(Envelope::getLogMessage)
-                    .collectSortedList(LOG_MESSAGE_COMPARATOR)
-                    .flatMapIterable(d -> d);
-        } else {
-            return requestLogsStream(dopplerClient, applicationId)
-                    .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                    .map(Envelope::getLogMessage)
-                    .transformDeferred(
-                            SortingUtils.timespan(LOG_MESSAGE_COMPARATOR, LOG_MESSAGE_TIMESPAN));
-        }
+    private static Flux<ApplicationLog> getLogsStream(
+            Mono<DopplerClient> dopplerClient, String applicationId) {
+        return requestLogsStream(dopplerClient, applicationId)
+                .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
+                .map(Envelope::getLogMessage)
+                .transformDeferred(
+                        SortingUtils.timespan(LOG_MESSAGE_COMPARATOR, LOG_MESSAGE_TIMESPAN))
+                .map(DefaultApplications::toApplicationLog);
     }
 
     private static Flux<ApplicationLog> getLogsLogCache(
@@ -2538,15 +2511,6 @@ public final class DefaultApplications implements Applications {
                                                 .page(page)
                                                 .sequenceId(sequenceId.toString())
                                                 .build()));
-    }
-
-    @Deprecated
-    private static Flux<Envelope> requestLogsRecent(
-            Mono<DopplerClient> dopplerClient, String applicationId) {
-        return dopplerClient.flatMapMany(
-                client ->
-                        client.recentLogs(
-                                RecentLogsRequest.builder().applicationId(applicationId).build()));
     }
 
     private static Flux<org.cloudfoundry.logcache.v1.Envelope> requestLogsRecentLogCache(
