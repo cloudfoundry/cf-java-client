@@ -15,7 +15,7 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
-The Cloud Foundry Java Client has two active versions. The `5.x` line is compatible with Spring Boot `2.4.x - 2.6.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
+The Cloud Foundry Java Client has two active versions. The `6.x` line includes breaking changes (see below), while the `5.x` line maintains backward compatibility.
 
 ## Breaking Changes (6.x)
 
@@ -48,6 +48,18 @@ The Cloud Foundry Java Client has two active versions. The `5.x` line is compati
 >     .envelopeTypes(EnvelopeType.LOG)
 >     .build());
 > ```
+>
+> The return type and envelope objects differ between the two APIs:
+>
+> | | Doppler (`org.cloudfoundry.doppler`) | Log Cache (`org.cloudfoundry.logcache.v1`) |
+> |---|---|---|
+> | **Return type** | `Flux<Envelope>` | `Mono<ReadResponse>` → unpack via `response.getEnvelopes().getBatch()` |
+> | **Log access** | `envelope.getLogMessage()` → `LogMessage` | `envelope.getLog()` → `Log` |
+> | **Message text** | `logMessage.getMessage()` | `log.getPayloadAsText()` |
+> | **Message type** | `MessageType.OUT` / `ERR` | `LogType.OUT` / `ERR` |
+> | **Source metadata** | `logMessage.getSourceType()`, `.getSourceInstance()` | `envelope.getTags().get("source_type")`, `envelope.getInstanceId()` |
+>
+> See the [`org.cloudfoundry.doppler`][doppler-pkg] and [`org.cloudfoundry.logcache.v1`][logcache-pkg] Javadoc for full type details.
 
 > [!NOTE]
 > **Operations API users:** Use `Applications.logs(ApplicationLogsRequest)` instead of the removed `Applications.logs(LogsRequest)`.
