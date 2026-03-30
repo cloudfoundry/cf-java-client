@@ -30,14 +30,6 @@ import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.logcache.v1.Envelope;
-import org.cloudfoundry.logcache.v1.EnvelopeBatch;
-import org.cloudfoundry.logcache.v1.EnvelopeType;
-import org.cloudfoundry.logcache.v1.Log;
-import org.cloudfoundry.logcache.v1.LogCacheClient;
-import org.cloudfoundry.logcache.v1.LogType;
-import org.cloudfoundry.logcache.v1.ReadRequest;
-import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -108,7 +100,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired private String serviceName;
 
-    @Autowired private LogCacheClient logCacheClient;
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
@@ -508,11 +499,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Doppler was dropped in PCF 4.x in favor of logcache. This test does not work
-     * on TAS 4.x.
+     * Exercise the LogCache client via {@code logs(ApplicationLogsRequest)}.
+     * LogCache has been a default cf-deployment component since v3.0.0 (July 2018),
+     * with the {@code /api/v1/read} endpoint available since log-cache-release v2.0.0
+     * (October 2018).
      */
     @Test
-    @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_4_v2)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_3)
     public void logs() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -533,45 +526,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .next()
                 .as(StepVerifier::create)
                 .expectNext(ApplicationLogType.OUT)
-                .expectComplete()
-                .verify(Duration.ofMinutes(5));
-    }
-
-    /**
-     * Exercise the LogCache client. Serves as a reference for using the logcache client,
-     * and will help with the transition to the new
-     * {@link org.cloudfoundry.operations.applications.Applications#logs(ApplicationLogsRequest)}.
-     */
-    @Test
-    public void logCacheLogs() throws IOException {
-        String applicationName = this.nameFactory.getApplicationName();
-
-        createApplication(
-                        this.cloudFoundryOperations,
-                        new ClassPathResource("test-application.zip").getFile().toPath(),
-                        applicationName,
-                        false)
-                .then(
-                        this.cloudFoundryOperations
-                                .applications()
-                                .get(GetApplicationRequest.builder().name(applicationName).build()))
-                .map(ApplicationDetail::getId)
-                .flatMapMany(
-                        appGuid ->
-                                this.logCacheClient.read(
-                                        ReadRequest.builder()
-                                                .sourceId(appGuid)
-                                                .envelopeType(EnvelopeType.LOG)
-                                                .limit(1)
-                                                .build()))
-                .map(ReadResponse::getEnvelopes)
-                .map(EnvelopeBatch::getBatch)
-                .flatMap(Flux::fromIterable)
-                .map(Envelope::getLog)
-                .map(Log::getType)
-                .next()
-                .as(StepVerifier::create)
-                .expectNext(LogType.OUT)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

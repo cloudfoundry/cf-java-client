@@ -15,7 +15,34 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
-The Cloud Foundry Java Client has two active versions. The `5.x` line is compatible with Spring Boot `2.4.x - 2.6.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
+The Cloud Foundry Java Client has two active versions. The `6.x` line includes breaking changes (see below), while the `5.x` line maintains backward compatibility.
+
+## Breaking Changes (6.x)
+
+### `DopplerClient.recentLogs()` — Removed
+
+The `DopplerClient.recentLogs()` endpoint (and the `RecentLogsRequest` type) have been **removed**.
+This API relied on the [Loggregator][loggregator] Doppler/Traffic Controller endpoint `/apps/{id}/recentlogs`, which was removed in **Loggregator >= 107.0** (CF Deployment >= 24.3, TAS >= 4.0).
+
+**Migration:** Replace calls to `DopplerClient.recentLogs()` with [`LogCacheClient.read()`][log-cache-api]:
+
+```java
+logCacheClient.read(ReadRequest.builder()
+    .sourceId(appId)
+    .envelopeTypes(EnvelopeType.LOG)
+    .build());
+```
+
+**Operations API users:** Use `Applications.logs(ApplicationLogsRequest)` instead of the removed `Applications.logs(LogsRequest)`.
+
+### `Applications.logs(LogsRequest)` — Removed
+
+The `Applications.logs(LogsRequest)` method (and the `LogsRequest` type) have been **removed**.
+
+**Migration:** Use `Applications.logs(ApplicationLogsRequest)` instead. For recent logs, set `recent(true)` (the default). For streaming, set `recent(false)`.
+
+[loggregator]: https://github.com/cloudfoundry/loggregator
+[log-cache-api]: https://github.com/cloudfoundry/log-cache
 
 ## Dependencies
 Most projects will need two dependencies; the Operations API and an implementation of the Client API.  For Maven, the dependencies would be defined like this:
@@ -75,6 +102,9 @@ repositories {
 Both the `cloudfoundry-operations` and `cloudfoundry-client` projects follow a ["Reactive"][r] design pattern and expose their responses with [Project Reactor][p] `Monos`s and `Flux`s.
 
 ### `CloudFoundryClient`, `DopplerClient`, `UaaClient` Builders
+
+> [!NOTE]
+> **`DopplerClient` — partial deprecation:** The `recentLogs()` method on `DopplerClient` is deprecated and only works against Loggregator \< 107.0 (CFD \< 24.3 / TAS \< 4.0). See the [Deprecations](#deprecations) section above for the migration path to `LogCacheClient`.
 
 The lowest-level building blocks of the API are `ConnectionContext` and `TokenProvider`.  These types are intended to be shared between instances of the clients, and come with out of the box implementations.  To instantiate them, you configure them with builders:
 

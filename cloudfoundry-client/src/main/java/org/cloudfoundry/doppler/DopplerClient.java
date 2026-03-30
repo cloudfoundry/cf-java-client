@@ -40,14 +40,6 @@ public interface DopplerClient {
     Flux<Envelope> firehose(FirehoseRequest request);
 
     /**
-     * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Recent Logs</a> request
-     *
-     * @param request the Recent Logs request
-     * @return the events from the recent logs
-     */
-    Flux<Envelope> recentLogs(RecentLogsRequest request);
-
-    /**
      * Makes the <a href="https://github.com/cloudfoundry/loggregator/tree/develop/src/trafficcontroller#endpoints">Stream</a> request
      *
      * @param request the Stream request

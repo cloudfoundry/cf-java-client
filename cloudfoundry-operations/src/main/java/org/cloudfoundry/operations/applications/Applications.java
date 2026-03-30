@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.doppler.LogMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -115,21 +114,10 @@ public interface Applications {
     Flux<Task> listTasks(ListApplicationTasksRequest request);
 
     /**
-     * List the applications logs. Uses Doppler under the hood.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
-     *
-     * @param request the application logs request
-     * @return the applications logs
-     * @deprecated Use {@link #logs(ApplicationLogsRequest)} instead.
-     */
-    @Deprecated
-    Flux<LogMessage> logs(LogsRequest request);
-
-    /**
      * List the applications logs.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
+     * Uses Log Cache under the hood when {@link ApplicationLogsRequest#getRecent()} is {@code true}.
+     * Log streaming still uses Doppler, which is not available in CF deployments following
+     * <a href="https://docs.cloudfoundry.org/loggregator/architecture.html#shared-nothing-architecture">shared-nothing architecture</a>.
      *
      * @param request the application logs request
      * @return the applications logs
