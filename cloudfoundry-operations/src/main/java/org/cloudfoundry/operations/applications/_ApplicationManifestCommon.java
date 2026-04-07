@@ -46,10 +46,6 @@ abstract class _ApplicationManifestCommon {
         Builder environmentVariable(Map.Entry<String, ? extends Object> entry);
         Builder environmentVariables(@Nullable Map<String, ? extends Object> entries);
         Builder putAllEnvironmentVariables(Map<String, ? extends Object> entries);
-        Builder feature(String key, Object value);
-        Builder feature(Map.Entry<String, ? extends Object> entry);
-        Builder features(@Nullable Map<String, ? extends Object> entries);
-        Builder putAllFeatures(Map<String, ? extends Object> entries);
         Builder healthCheckHttpEndpoint(@Nullable String healthCheckHttpEndpoint);
         Builder healthCheckType(@Nullable ApplicationHealthCheck healthCheckType);
         Builder host(String element);
@@ -145,13 +141,6 @@ abstract class _ApplicationManifestCommon {
     @AllowNulls
     @Nullable
     abstract Map<String, Object> getEnvironmentVariables();
-
-    /**
-     * Manage whether optional capabilities are enabled
-     */
-    @AllowNulls
-    @Nullable
-    abstract Map<String, Object> getFeatures();
 
     /**
      * The HTTP health check endpoint

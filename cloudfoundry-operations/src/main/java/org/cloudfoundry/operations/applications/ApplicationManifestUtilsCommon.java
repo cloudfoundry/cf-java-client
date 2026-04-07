@@ -26,7 +26,13 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.TreeMap;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -66,7 +72,6 @@ abstract class ApplicationManifestUtilsCommon {
         asString(application, "domain", variables, builder::domain);
         asListOfString(application, "domains", variables, builder::domain);
         asMapOfStringString(application, "env", variables, builder::environmentVariable);
-        asMap(application, "features", variables, String::valueOf, (k,v) -> builder.feature(k, Boolean.valueOf(v)));
         asString(
                 application,
                 "health-check-http-endpoint",
@@ -317,7 +322,7 @@ abstract class ApplicationManifestUtilsCommon {
                                 value ->
                                         value instanceof Map
                                                 && name.equals(
-                                                        ((Map<String, String>) value).get("name")))
+                                                ((Map<String, String>) value).get("name")))
                         .findFirst()
                         .orElseGet(() -> getEmptyNamedObject(array, name));
     }
@@ -426,7 +431,6 @@ abstract class ApplicationManifestUtilsCommon {
                 ApplicationManifestUtilsCommon::toDockerYaml);
         putIfPresent(yaml, "domains", applicationManifest.getDomains());
         putIfPresent(yaml, "env", applicationManifest.getEnvironmentVariables());
-        putIfPresent(yaml, "features", applicationManifest.getFeatures());
         putIfPresent(
                 yaml,
                 "health-check-http-endpoint",

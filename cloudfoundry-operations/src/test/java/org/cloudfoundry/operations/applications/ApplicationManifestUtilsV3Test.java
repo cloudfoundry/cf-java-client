@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -33,6 +34,22 @@ class ApplicationManifestUtilsV3Test {
                                 ManifestV3Application.builder()
                                         .name("test-app")
                                         .feature("file-based-vcap-services", true)
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithFeatureAsMap() throws IOException {
+        Map<String, Boolean> features = new java.util.HashMap<>();
+        features.put("file-based-vcap-services", true);
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .features(features)
                                         .build())
                         .build();
 
