@@ -16,76 +16,17 @@
 
 package org.cloudfoundry.operations;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.logcache.v1.Envelope;
-import org.cloudfoundry.logcache.v1.EnvelopeBatch;
-import org.cloudfoundry.logcache.v1.EnvelopeType;
-import org.cloudfoundry.logcache.v1.Log;
-import org.cloudfoundry.logcache.v1.LogCacheClient;
-import org.cloudfoundry.logcache.v1.LogType;
-import org.cloudfoundry.logcache.v1.ReadRequest;
-import org.cloudfoundry.logcache.v1.ReadResponse;
-import org.cloudfoundry.operations.applications.ApplicationDetail;
-import org.cloudfoundry.operations.applications.ApplicationEnvironments;
-import org.cloudfoundry.operations.applications.ApplicationEvent;
-import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
-import org.cloudfoundry.operations.applications.ApplicationLog;
-import org.cloudfoundry.operations.applications.ApplicationLogType;
-import org.cloudfoundry.operations.applications.ApplicationLogsRequest;
-import org.cloudfoundry.operations.applications.ApplicationManifest;
-import org.cloudfoundry.operations.applications.ApplicationSshEnabledRequest;
-import org.cloudfoundry.operations.applications.ApplicationSummary;
-import org.cloudfoundry.operations.applications.CopySourceApplicationRequest;
-import org.cloudfoundry.operations.applications.DeleteApplicationRequest;
-import org.cloudfoundry.operations.applications.DisableApplicationSshRequest;
-import org.cloudfoundry.operations.applications.EnableApplicationSshRequest;
-import org.cloudfoundry.operations.applications.GetApplicationEnvironmentsRequest;
-import org.cloudfoundry.operations.applications.GetApplicationEventsRequest;
-import org.cloudfoundry.operations.applications.GetApplicationHealthCheckRequest;
-import org.cloudfoundry.operations.applications.GetApplicationManifestRequest;
-import org.cloudfoundry.operations.applications.GetApplicationRequest;
-import org.cloudfoundry.operations.applications.ListApplicationTasksRequest;
-import org.cloudfoundry.operations.applications.ManifestV3;
-import org.cloudfoundry.operations.applications.ManifestV3Application;
-import org.cloudfoundry.operations.applications.PushApplicationManifestRequest;
-import org.cloudfoundry.operations.applications.PushApplicationRequest;
-import org.cloudfoundry.operations.applications.PushManifestV3Request;
-import org.cloudfoundry.operations.applications.RenameApplicationRequest;
-import org.cloudfoundry.operations.applications.RestageApplicationRequest;
-import org.cloudfoundry.operations.applications.RestartApplicationInstanceRequest;
-import org.cloudfoundry.operations.applications.RestartApplicationRequest;
-import org.cloudfoundry.operations.applications.Route;
-import org.cloudfoundry.operations.applications.RunApplicationTaskRequest;
-import org.cloudfoundry.operations.applications.ScaleApplicationRequest;
-import org.cloudfoundry.operations.applications.SetApplicationHealthCheckRequest;
-import org.cloudfoundry.operations.applications.SetEnvironmentVariableApplicationRequest;
-import org.cloudfoundry.operations.applications.StartApplicationRequest;
-import org.cloudfoundry.operations.applications.StopApplicationRequest;
-import org.cloudfoundry.operations.applications.Task;
-import org.cloudfoundry.operations.applications.TaskState;
-import org.cloudfoundry.operations.applications.TerminateApplicationTaskRequest;
-import org.cloudfoundry.operations.applications.UnsetEnvironmentVariableApplicationRequest;
+import org.cloudfoundry.logcache.v1.*;
+import org.cloudfoundry.operations.applications.*;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
 import org.cloudfoundry.operations.domains.CreateSharedDomainRequest;
 import org.cloudfoundry.operations.routes.ListRoutesRequest;
-import org.cloudfoundry.operations.services.BindServiceInstanceRequest;
-import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
-import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
-import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
-import org.cloudfoundry.operations.services.ServiceInstance;
+import org.cloudfoundry.operations.services.*;
 import org.cloudfoundry.util.FluentMap;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,6 +35,16 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @CleanupCloudFoundryAfterClass
 public final class ApplicationsTest extends AbstractIntegrationTest {
@@ -615,6 +566,54 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                 .single())
                 .as(StepVerifier::create)
                 .expectNext(applicationName)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void pushAppFeatures() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        String serviceInstanceName = this.nameFactory.getServiceInstanceName();
+
+        final String featureKey = "file-based-vcap-services";
+        createServiceInstance(
+                        this.cloudFoundryOperations,
+                        this.planName,
+                        serviceInstanceName,
+                        this.serviceName)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .pushManifest(
+                                        PushApplicationManifestRequest.builder()
+                                                .manifest(
+                                                        ApplicationManifest.builder()
+                                                                .path(
+                                                                        new ClassPathResource(
+                                                                                        "test-application.zip")
+                                                                                .getFile()
+                                                                                .toPath())
+                                                                .buildpack("staticfile_buildpack")
+                                                                .disk(512)
+                                                                .healthCheckType(
+                                                                        ApplicationHealthCheck.PORT)
+                                                                .memory(64)
+                                                                .name(applicationName)
+                                                                .service(serviceInstanceName)
+                                                                .feature(featureKey, true)
+                                                                .build())
+                                                .noStart(false)
+                                                .build()))
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .getApplicationManifest(
+                                        GetApplicationManifestRequest.builder()
+                                                .name(applicationName)
+                                                .build()))
+                .map(ApplicationManifest::getFeatures)
+                .as(StepVerifier::create)
+                .expectNextMatches(actual -> actual.containsKey(featureKey))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
