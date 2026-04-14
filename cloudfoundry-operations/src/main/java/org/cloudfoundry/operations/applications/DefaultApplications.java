@@ -559,7 +559,7 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-        if (request.getRecent() == null || request.getRecent()) {
+        if (request.getRecent() != null && request.getRecent()) {
             return Mono.zip(this.cloudFoundryClient, this.spaceId)
                     .flatMap(
                             function(
