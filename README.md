@@ -48,6 +48,21 @@ The Cloud Foundry Java Client has two active versions. The `5.x` line is compati
 >     .envelopeTypes(EnvelopeType.LOG)
 >     .build());
 > ```
+>
+> The return type and envelope objects differ between the two APIs:
+>
+> | | Doppler (`org.cloudfoundry.doppler`) | Log Cache (`org.cloudfoundry.logcache.v1`) |
+> |---|---|---|
+> | **Return type** | `Flux<Envelope>` | `Mono<ReadResponse>` → unpack via `response.getEnvelopes().getBatch()` |
+> | **Log access** | `envelope.getLogMessage()` → `LogMessage` | `envelope.getLog()` → `Log` |
+> | **Message text** | `logMessage.getMessage()` | `log.getPayloadAsText()` |
+> | **Message type** | `MessageType.OUT` / `ERR` | `LogType.OUT` / `ERR` |
+> | **Source metadata** | `logMessage.getSourceType()`, `.getSourceInstance()` | `envelope.getTags().get("source_type")`, `envelope.getInstanceId()` |
+>
+> See the [`org.cloudfoundry.doppler`][doppler-pkg] and [`org.cloudfoundry.logcache.v1`][logcache-pkg] Javadoc for full type details.
+
+[doppler-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/doppler/package-summary.html
+[logcache-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/logcache/v1/package-summary.html
 
 > [!NOTE]
 > **Operations API users:** `Applications.logs(ApplicationLogsRequest)` now uses Log Cache under the hood for recent logs (the default). No migration is needed at the Operations layer.
