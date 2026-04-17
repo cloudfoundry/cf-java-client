@@ -59,9 +59,14 @@ public @interface RequiresV2Api {
      */
     class V2ApiCondition implements ExecutionCondition {
 
+        /** Returns {@code true} if V2 API tests should run (i.e., not skipped). */
+        public static boolean isEnabled() {
+            return !"true".equalsIgnoreCase(System.getenv(SKIP_V2_TESTS_ENV));
+        }
+
         @Override
         public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
-            if ("true".equalsIgnoreCase(System.getenv(SKIP_V2_TESTS_ENV))) {
+            if (!isEnabled()) {
                 return ConditionEvaluationResult.disabled(
                         "V2 API tests are disabled via "
                                 + SKIP_V2_TESTS_ENV
