@@ -55,9 +55,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
 
     @Autowired private String planName;
 
-    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
-    @Autowired(required = false)
-    private Mono<String> serviceBrokerId;
+    @Autowired private Mono<String> serviceBrokerId;
 
     @Test
     public void delete() {

@@ -77,9 +77,7 @@ public final class ServiceInstancesTest extends AbstractIntegrationTest {
 
     @Autowired private RoutingClient routingClient;
 
-    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
-    @Autowired(required = false)
-    private Mono<String> serviceBrokerId;
+    @Autowired private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 

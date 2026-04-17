@@ -473,6 +473,7 @@ public class IntegrationTestConfiguration {
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
+    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
     Mono<String> serviceBrokerId(
             CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,

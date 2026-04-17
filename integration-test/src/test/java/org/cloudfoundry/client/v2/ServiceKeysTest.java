@@ -48,9 +48,7 @@ public final class ServiceKeysTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
-    // Optional: bean requires V2 API; class is guarded by @RequiresV2Api
-    @Autowired(required = false)
-    private Mono<String> serviceBrokerId;
+    @Autowired private Mono<String> serviceBrokerId;
 
     @Autowired private String serviceName;
 
