@@ -347,7 +347,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> metricRegistrarServiceInstance(
             CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, NameFactory nameFactory) {
         return spaceId.flatMap(
@@ -375,7 +375,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> organizationId(
             CloudFoundryClient cloudFoundryClient,
             String organizationName,
@@ -473,7 +473,7 @@ public class IntegrationTestConfiguration {
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> serviceBrokerId(
             CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -516,7 +516,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> spaceId(
             CloudFoundryClient cloudFoundryClient, Mono<String> organizationId, String spaceName) {
         return organizationId
@@ -543,7 +543,7 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, Mono<String> stackName) {
         return stackName
                 .flux()
@@ -572,7 +572,7 @@ public class IntegrationTestConfiguration {
      */
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> stackName(CloudFoundryClient cloudFoundryClient) {
         return PaginationUtils.requestClientV2Resources(
                         page ->
@@ -590,7 +590,7 @@ public class IntegrationTestConfiguration {
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp(
             CloudFoundryClient cloudFoundryClient,
             Mono<String> spaceId,
@@ -627,7 +627,7 @@ public class IntegrationTestConfiguration {
 
     @Lazy
     @Bean
-    @ConditionalOnProperty(name = "SKIP_V2_TESTS", havingValue = "false", matchIfMissing = true)
+    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     TestLogCacheEndpoints testLogCacheEndpoints(
             ConnectionContext connectionContext,
             TokenProvider tokenProvider,

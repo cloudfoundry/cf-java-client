@@ -51,12 +51,13 @@ import org.junit.jupiter.api.extension.ExtensionContext;
 @ExtendWith(RequiresV2Api.V2ApiCondition.class)
 public @interface RequiresV2Api {
 
+    /** Environment variable name used to skip V2 API tests. */
+    String SKIP_V2_TESTS_ENV = "SKIP_V2_TESTS";
+
     /**
      * JUnit 5 ExecutionCondition that checks if V2 tests should be skipped.
      */
     class V2ApiCondition implements ExecutionCondition {
-
-        private static final String SKIP_V2_TESTS_ENV = "SKIP_V2_TESTS";
 
         @Override
         public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {

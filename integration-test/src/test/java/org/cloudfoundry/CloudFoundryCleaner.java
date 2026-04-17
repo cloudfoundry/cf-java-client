@@ -133,7 +133,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     private static final boolean RUN_V2_CLEANUP = isRunV2Tests();
 
     private static boolean isRunV2Tests() {
-        return !"true".equalsIgnoreCase(System.getenv("SKIP_V2_TESTS"));
+        return !"true".equalsIgnoreCase(System.getenv(RequiresV2Api.SKIP_V2_TESTS_ENV));
     }
 
     private static final Map<String, Boolean> STANDARD_FEATURE_FLAGS =
