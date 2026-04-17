@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.net.ssl.SSLException;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
@@ -80,6 +79,8 @@ import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
@@ -207,8 +208,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                             Mono.when(
                                     cleanApplicationsV3(
                                             this.cloudFoundryClient,
-                                            this.nameFactory,
-                                            false), // runV2Calls = false (V3-only path)
+                                            this.nameFactory),
                                     cleanUsers(this.uaaClient, this.nameFactory)))
                     .retryWhen(Retry.max(5).filter(SSLException.class::isInstance))
                     .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP (V3 only) <<"))
@@ -250,9 +250,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                         Mono.when(
                                 cleanApplicationsV3(
                                         this.cloudFoundryClient,
-                                        this.nameFactory,
-                                        true), // After Routes, cannot run with
-                                // other cleanApps
+                                        this.nameFactory),
                                 cleanUsers(this.uaaClient, this.nameFactory) // After CF Users
                                 ))
                 .thenMany(
@@ -274,9 +272,8 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     }
 
     private static Flux<Void> cleanApplicationsV3(
-            CloudFoundryClient cloudFoundryClient, NameFactory nameFactory, boolean runV2Calls) {
-        Flux<ApplicationResource> apps =
-                PaginationUtils.requestClientV3Resources(
+            CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
+        return PaginationUtils.requestClientV3Resources(
                                 page ->
                                         cloudFoundryClient
                                                 .applicationsV3()
@@ -286,17 +283,12 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                                                 .build()))
                         .filter(
                                 application ->
-                                        nameFactory.isApplicationName(application.getName()));
-
-        if (runV2Calls) {
-            apps =
-                    apps.delayUntil(
-                            application ->
-                                    removeApplicationServiceBindings(
-                                            cloudFoundryClient, application));
-        }
-
-        return apps.flatMap(
+                                        nameFactory.isApplicationName(application.getName()))
+                .delayUntil(
+                        application ->
+                                removeApplicationServiceBindings(
+                                        cloudFoundryClient, application))
+                .flatMap(
                 application ->
                         cloudFoundryClient
                                 .applicationsV3()
@@ -1204,21 +1196,24 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
 
     private static Flux<Void> removeApplicationServiceBindings(
             CloudFoundryClient cloudFoundryClient, Application application) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .applicationsV2()
-                                        .listServiceBindings(
-                                                ListApplicationServiceBindingsRequest.builder()
+                                        .serviceBindingsV3()
+                                        .list(
+                                                ListServiceBindingsRequest.builder()
                                                         .page(page)
                                                         .applicationId(application.getId())
                                                         .build()))
                 .flatMap(
                         serviceBinding ->
-                                requestRemoveServiceBinding(
-                                                cloudFoundryClient,
-                                                application.getId(),
-                                                ResourceUtils.getId(serviceBinding))
+                                cloudFoundryClient
+                                        .serviceBindingsV3()
+                                        .delete(
+                                                DeleteServiceBindingRequest.builder()
+                                                        .serviceBindingId(serviceBinding.getId())
+                                                        .build())
+                                        .then()
                                         .doOnError(
                                                 t ->
                                                         LOGGER.error(
