@@ -1378,7 +1378,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
 
         this.applications
-                .logs(ApplicationLogsRequest.builder().name("test-application-name").recent(true).build())
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(true)
+                                .build())
                 .as(StepVerifier::create)
                 .expectNextMatches(
                         log ->
