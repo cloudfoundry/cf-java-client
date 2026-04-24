@@ -76,7 +76,6 @@ import org.cloudfoundry.client.v2.users.UserResource;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.Application;
-import org.cloudfoundry.client.v3.applications.ApplicationResource;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
@@ -202,9 +201,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                     cleanIdentityZones(this.uaaClient, this.nameFactory)))
                     .thenMany(
                             Mono.when(
-                                    cleanApplicationsV3(
-                                            this.cloudFoundryClient,
-                                            this.nameFactory),
+                                    cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),
                                     cleanUsers(this.uaaClient, this.nameFactory)))
                     .retryWhen(Retry.max(5).filter(SSLException.class::isInstance))
                     .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP (V3 only) <<"))
@@ -244,9 +241,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                 cleanUsers(this.cloudFoundryClient, this.nameFactory)))
                 .thenMany(
                         Mono.when(
-                                cleanApplicationsV3(
-                                        this.cloudFoundryClient,
-                                        this.nameFactory),
+                                cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),
                                 cleanUsers(this.uaaClient, this.nameFactory) // After CF Users
                                 ))
                 .thenMany(
@@ -270,35 +265,30 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     private static Flux<Void> cleanApplicationsV3(
             CloudFoundryClient cloudFoundryClient, NameFactory nameFactory) {
         return PaginationUtils.requestClientV3Resources(
-                                page ->
-                                        cloudFoundryClient
-                                                .applicationsV3()
-                                                .list(
-                                                        ListApplicationsRequest.builder()
-                                                                .page(page)
-                                                                .build()))
-                        .filter(
-                                application ->
-                                        nameFactory.isApplicationName(application.getName()))
+                        page ->
+                                cloudFoundryClient
+                                        .applicationsV3()
+                                        .list(ListApplicationsRequest.builder().page(page).build()))
+                .filter(application -> nameFactory.isApplicationName(application.getName()))
                 .delayUntil(
                         application ->
-                                removeApplicationServiceBindings(
-                                        cloudFoundryClient, application))
+                                removeApplicationServiceBindings(cloudFoundryClient, application))
                 .flatMap(
-                application ->
-                        cloudFoundryClient
-                                .applicationsV3()
-                                .delete(
-                                        DeleteApplicationRequest.builder()
-                                                .applicationId(application.getId())
-                                                .build())
-                                .then()
-                                .doOnError(
-                                        t ->
-                                                LOGGER.error(
-                                                        "Unable to delete V3 application" + " {}",
-                                                        application.getName(),
-                                                        t)));
+                        application ->
+                                cloudFoundryClient
+                                        .applicationsV3()
+                                        .delete(
+                                                DeleteApplicationRequest.builder()
+                                                        .applicationId(application.getId())
+                                                        .build())
+                                        .then()
+                                        .doOnError(
+                                                t ->
+                                                        LOGGER.error(
+                                                                "Unable to delete V3 application"
+                                                                        + " {}",
+                                                                application.getName(),
+                                                                t)));
     }
 
     private static Flux<Void> cleanBuildpacks(
