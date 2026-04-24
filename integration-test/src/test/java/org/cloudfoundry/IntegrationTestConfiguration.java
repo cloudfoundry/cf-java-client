@@ -40,9 +40,6 @@ import java.util.List;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.StackEntity;
-import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
@@ -550,23 +547,22 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, Mono<String> stackName) {
         return stackName
-                .flux()
-                .flatMap(
+                .flatMapMany(
                         name ->
-                                PaginationUtils.requestClientV2Resources(
+                                PaginationUtils.requestClientV3Resources(
                                         page ->
                                                 cloudFoundryClient
-                                                        .stacks()
+                                                        .stacksV3()
                                                         .list(
-                                                                ListStacksRequest.builder()
+                                                                org.cloudfoundry.client.v3.stacks
+                                                                        .ListStacksRequest.builder()
                                                                         .name(name)
                                                                         .page(page)
                                                                         .build())))
                 .single()
-                .map(ResourceUtils::getId)
+                .map(org.cloudfoundry.client.v3.stacks.StackResource::getId)
                 .doOnSubscribe(s -> this.logger.debug(">> STACK ({}) <<", stackName))
                 .doOnError(Throwable::printStackTrace)
                 .doOnSuccess(id -> this.logger.debug("<< STACK ({})>>", id))
@@ -579,15 +575,17 @@ public class IntegrationTestConfiguration {
      */
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(name = RequiresV2Api.SKIP_V2_TESTS_ENV, havingValue = "false", matchIfMissing = true)
     Mono<String> stackName(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .stacks()
-                                        .list(ListStacksRequest.builder().page(page).build()))
-                .map(StackResource::getEntity)
-                .map(StackEntity::getName)
+                                        .stacksV3()
+                                        .list(
+                                                org.cloudfoundry.client.v3.stacks
+                                                        .ListStacksRequest.builder()
+                                                        .page(page)
+                                                        .build()))
+                .map(org.cloudfoundry.client.v3.stacks.StackResource::getName)
                 .filter(s -> s.matches("^cflinuxfs\\d$"))
                 .sort(Comparator.reverseOrder())
                 .next()
