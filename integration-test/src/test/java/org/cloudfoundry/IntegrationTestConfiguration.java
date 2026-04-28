@@ -468,7 +468,20 @@ public class IntegrationTestConfiguration {
         return cloudFoundryClient
                 .info()
                 .get(GetInfoRequest.builder().build())
-                .map(response -> Version.valueOf(response.getApiVersion()))
+                .map(
+                        response -> {
+                            String version = response.getApiVersion();
+                            if (version == null || version.isEmpty()) {
+                                this.logger.warn(
+                                        "calling v2 info endpoint but CF API v2 is disabled");
+                                return new Version.Builder()
+                                        .setMajorVersion(0)
+                                        .setMinorVersion(0)
+                                        .setPatchVersion(0)
+                                        .build();
+                            }
+                            return Version.valueOf(version);
+                        })
                 .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
                 .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
                 .block();

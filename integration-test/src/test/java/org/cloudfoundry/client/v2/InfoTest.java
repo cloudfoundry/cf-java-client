@@ -41,7 +41,13 @@ public final class InfoTest extends AbstractIntegrationTest {
                 .consumeNextWith(
                         response -> {
                             Version expected = Version.valueOf(SUPPORTED_API_VERSION);
-                            Version actual = Version.valueOf(response.getApiVersion());
+                            Version actual;
+                            String version = response.getApiVersion();
+                            if (version == null || version.isEmpty()) {
+                                actual = Version.of(0, 0, 0);
+                            } else {
+                                actual = Version.valueOf(version);
+                            }
 
                             assertThat(actual).isLessThanOrEqualTo(expected);
                         })

@@ -39,7 +39,19 @@ final class CloudFoundryClientCompatibilityChecker {
     void check() {
         this.info
                 .get(GetInfoRequest.builder().build())
-                .map(response -> Version.valueOf(response.getApiVersion()))
+                .map(
+                        response -> {
+                            String version = response.getApiVersion();
+                            if (version == null || version.isEmpty()) {
+                                if ("CF API v2 is disabled".equals(response.getSupport())) {
+                                    this.logger.warn(
+                                            "calling v2 info endpoint but CF API v2 is disabled",
+                                            response);
+                                }
+                                return Version.of(0, 0, 0);
+                            }
+                            return Version.valueOf(version);
+                        })
                 .zipWith(Mono.just(Version.valueOf(CloudFoundryClient.SUPPORTED_API_VERSION)))
                 .subscribe(
                         consumer(
