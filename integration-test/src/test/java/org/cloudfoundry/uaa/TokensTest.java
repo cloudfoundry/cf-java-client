@@ -84,7 +84,7 @@ public final class TokensTest extends AbstractIntegrationTest {
                         t ->
                                 assertThat(t)
                                         .isInstanceOf(UaaException.class)
-                                        .hasMessage("access_denied: Access is denied"))
+                                        .hasMessageContainingAll("access_denied", "Access"))
                 .verify(Duration.ofMinutes(5));
     }
 

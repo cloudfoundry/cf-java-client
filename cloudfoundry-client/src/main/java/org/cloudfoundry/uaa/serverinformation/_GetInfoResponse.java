@@ -93,4 +93,12 @@ abstract class _GetInfoResponse {
     @Nullable
     abstract String getZoneName();
 
+    /**
+     * The default identity provider name
+     */
+    @JsonProperty("defaultIdpName")
+    @Nullable
+    abstract String getDefaultIdpName();
+
+
 }

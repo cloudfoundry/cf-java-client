@@ -832,6 +832,8 @@ final class ReactorIdentityZonesTest extends AbstractUaaApiTest {
                                                                                             + " /passcode)")
                                                                                 .build())
                                                                 .ldapDiscoveryEnabled(false)
+                                                                .defaultIdentityProvider(
+                                                                        "test-identity-provider")
                                                                 .accountChooserEnabled(false)
                                                                 .build())
                                                 .name("The Twiglet Zone")
