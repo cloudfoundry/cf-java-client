@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3.routes;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.cloudfoundry.client.v3.Relationship;
@@ -93,5 +94,39 @@ final class CreateRouteRequestTest {
                                                                 .build())
                                                 .build())
                                 .build());
+    }
+
+    @Test
+    void validWithRouteOptions() {
+        CreateRouteRequest request =
+                CreateRouteRequest.builder()
+                        .relationships(
+                                RouteRelationships.builder()
+                                        .domain(
+                                                ToOneRelationship.builder()
+                                                        .data(
+                                                                Relationship.builder()
+                                                                        .id("test-domain-id")
+                                                                        .build())
+                                                        .build())
+                                        .space(
+                                                ToOneRelationship.builder()
+                                                        .data(
+                                                                Relationship.builder()
+                                                                        .id("test-space-id")
+                                                                        .build())
+                                                        .build())
+                                        .build())
+                        .options(
+                                RouteOptions.builder()
+                                        .value("loadbalancing", "hash")
+                                        .value("hash_header", "X-Hash")
+                                        .value("hash_balance", "90")
+                                        .build())
+                        .build();
+
+        assertEquals("hash", request.getOptions().getLoadbalancing().get());
+        assertEquals("X-Hash", request.getOptions().getHashHeader().get());
+        assertEquals("90", request.getOptions().getHashBalance().get());
     }
 }
