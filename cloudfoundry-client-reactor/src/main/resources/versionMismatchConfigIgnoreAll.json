@@ -1,0 +1,7 @@
+[
+    {
+        "class": "*",
+        "pointer": "/*",
+        "property": "*"
+    }
+]

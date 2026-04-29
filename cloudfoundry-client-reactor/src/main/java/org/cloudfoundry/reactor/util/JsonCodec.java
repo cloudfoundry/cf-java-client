@@ -16,7 +16,9 @@
 
 package org.cloudfoundry.reactor.util;
 
+import com.fasterxml.jackson.core.JsonPointer;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import io.netty.handler.codec.http.HttpHeaderNames;
@@ -25,7 +27,10 @@ import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.json.JsonObjectDecoder;
 import java.nio.charset.Charset;
 import java.util.function.BiFunction;
+import org.cloudfoundry.reactor.util.JsonDeserializationProblemHandler.RetryException;
 import org.reactivestreams.Publisher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufFlux;
@@ -35,6 +40,7 @@ import reactor.netty.http.client.HttpClientRequest;
 public final class JsonCodec {
 
     private static final int MAX_PAYLOAD_SIZE = 100 * 1024 * 1024;
+    private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client");
 
     public static <T> Mono<T> decode(
             ObjectMapper objectMapper, ByteBufFlux responseBody, Class<T> responseType) {
@@ -43,15 +49,55 @@ public final class JsonCodec {
                 .asByteArray()
                 .map(
                         payload -> {
-                            try {
-                                return objectMapper.readValue(payload, responseType);
-                            } catch (Throwable t) {
-                                throw new JsonParsingException(
-                                        t.getMessage(),
-                                        t,
-                                        new String(payload, Charset.defaultCharset()));
-                            }
+                            return decodeInternal(objectMapper, payload, responseType);
                         });
+    }
+
+    // decode the payload into an object.
+    // If that fails, check the exception and retry.
+    private static <T> T decodeInternal(
+            ObjectMapper objectMapper, byte[] payload, Class<T> responseType) {
+        try {
+            return objectMapper.readValue(payload, responseType);
+        } catch (Throwable t) {
+            T result = null;
+            if (t instanceof JsonMappingException) {
+                Throwable cause = t.getCause();
+                if (cause != null) {
+                    if (cause instanceof RetryException) {
+                        result = retry(objectMapper, responseType, (RetryException) cause, payload);
+                        if (result != null) {
+                            return result;
+                        }
+                    }
+                }
+            }
+            if (t instanceof RetryException) {
+                result = retry(objectMapper, responseType, (RetryException) t, payload);
+                if (result != null) {
+                    return result;
+                }
+            }
+            String payloadStr = new String(payload, Charset.defaultCharset());
+            LOGGER.warn("unable to parse the following json message:");
+            LOGGER.warn(payloadStr);
+            throw new JsonParsingException(t.getMessage(), t, payloadStr);
+        }
+    }
+
+    // drop the problematic element from the payload and try again.
+    private static <T> T retry(
+            ObjectMapper objectMapper,
+            Class<T> responseType,
+            RetryException cause,
+            byte[] payload) {
+        String property = cause.getProperty();
+        JsonPointer pointer = cause.getJsonPointer(); // JsonPointer.compile(pointerStr);
+        payload = JsonDeserializationProblemHandler.dropProperty(payload, property, pointer);
+        if (payload != null) {
+            return decodeInternal(objectMapper, payload, responseType);
+        }
+        return null;
     }
 
     public static void setDecodeHeaders(HttpHeaders httpHeaders) {
