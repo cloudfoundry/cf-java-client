@@ -29,6 +29,8 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresTcpRouting;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
@@ -88,6 +90,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
+@RequiresV2Api
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
@@ -350,6 +353,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresTcpRouting
     public void getManifestForTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -436,6 +440,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresTcpRouting
     public void getTcp() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -1140,6 +1145,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresTcpRouting
     public void pushTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -1263,6 +1269,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresTcpRouting
     public void pushUpdateTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();

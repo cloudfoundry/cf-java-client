@@ -23,6 +23,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 import java.time.Duration;
 import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationAuditorResponse;
@@ -57,6 +58,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
+@RequiresV2Api
 public final class PrivateDomainsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;

@@ -66,4 +66,18 @@ public abstract class Stack extends Resource {
     @JsonProperty("default")
     @Nullable
     abstract Boolean geDefault();
+
+    /**
+     * The state of the stack (e.g. ready)
+     */
+    @JsonProperty("state")
+    @Nullable
+    abstract String getState();
+
+    /**
+     * The reason for the stack's current state
+     */
+    @JsonProperty("state_reason")
+    @Nullable
+    abstract String getStateReason();
 }

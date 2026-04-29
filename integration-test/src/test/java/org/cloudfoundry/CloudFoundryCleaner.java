@@ -28,7 +28,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 import javax.net.ssl.SSLException;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ListApplicationServiceBindingsRequest;
 import org.cloudfoundry.client.v2.applications.RemoveApplicationServiceBindingRequest;
 import org.cloudfoundry.client.v2.buildpacks.DeleteBuildpackRequest;
 import org.cloudfoundry.client.v2.buildpacks.ListBuildpacksRequest;
@@ -79,6 +78,8 @@ import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
+import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipRequest;
 import org.cloudfoundry.client.v3.serviceinstances.ListSharedSpacesRelationshipResponse;
 import org.cloudfoundry.client.v3.serviceinstances.UnshareServiceInstanceRequest;
@@ -128,6 +129,8 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     private static boolean cleanSlateEnvironment = false;
 
     private static final Logger LOGGER = LoggerFactory.getLogger("cloudfoundry-client.test");
+
+    private static final boolean RUN_V2_CLEANUP = RequiresV2Api.V2ApiCondition.isEnabled();
 
     private static final Map<String, Boolean> STANDARD_FEATURE_FLAGS =
             FluentMap.<String, Boolean>builder()
@@ -186,6 +189,28 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     }
 
     void clean() {
+        if (!RUN_V2_CLEANUP) {
+            LOGGER.info("Skipping V2 API cleanup operations (SKIP_V2_TESTS=true)");
+            // Only run V3 and UAA cleanup operations
+            Flux.empty()
+                    .thenMany(
+                            Mono.when( // No prerequisites - V3/UAA only
+                                    cleanClients(this.uaaClient, this.nameFactory),
+                                    cleanGroups(this.uaaClient, this.nameFactory),
+                                    cleanIdentityProviders(this.uaaClient, this.nameFactory),
+                                    cleanIdentityZones(this.uaaClient, this.nameFactory)))
+                    .thenMany(
+                            Mono.when(
+                                    cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),
+                                    cleanUsers(this.uaaClient, this.nameFactory)))
+                    .retryWhen(Retry.max(5).filter(SSLException.class::isInstance))
+                    .doOnSubscribe(s -> LOGGER.debug(">> CLEANUP (V3 only) <<"))
+                    .doOnComplete(() -> LOGGER.debug("<< CLEANUP (V3 only) >>"))
+                    .then()
+                    .block(Duration.ofMinutes(30));
+            return;
+        }
+
         Flux.empty()
                 .thenMany(
                         Mono.when( // Before Routes
@@ -216,10 +241,7 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                 cleanUsers(this.cloudFoundryClient, this.nameFactory)))
                 .thenMany(
                         Mono.when(
-                                cleanApplicationsV3(
-                                        this.cloudFoundryClient,
-                                        this.nameFactory), // After Routes, cannot run with
-                                // other cleanApps
+                                cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),
                                 cleanUsers(this.uaaClient, this.nameFactory) // After CF Users
                                 ))
                 .thenMany(
@@ -1160,21 +1182,24 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
 
     private static Flux<Void> removeApplicationServiceBindings(
             CloudFoundryClient cloudFoundryClient, Application application) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .applicationsV2()
-                                        .listServiceBindings(
-                                                ListApplicationServiceBindingsRequest.builder()
+                                        .serviceBindingsV3()
+                                        .list(
+                                                ListServiceBindingsRequest.builder()
                                                         .page(page)
                                                         .applicationId(application.getId())
                                                         .build()))
                 .flatMap(
                         serviceBinding ->
-                                requestRemoveServiceBinding(
-                                                cloudFoundryClient,
-                                                application.getId(),
-                                                ResourceUtils.getId(serviceBinding))
+                                cloudFoundryClient
+                                        .serviceBindingsV3()
+                                        .delete(
+                                                DeleteServiceBindingRequest.builder()
+                                                        .serviceBindingId(serviceBinding.getId())
+                                                        .build())
+                                        .then()
                                         .doOnError(
                                                 t ->
                                                         LOGGER.error(
