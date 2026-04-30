@@ -44,6 +44,11 @@ import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.organizations.ListOrganizationQuotasRequest;
+import org.cloudfoundry.client.v3.quotas.organizations.ListOrganizationQuotasResponse;
+import org.cloudfoundry.client.v3.quotas.organizations.OrganizationQuotaResource;
+import org.cloudfoundry.client.v3.quotas.organizations.UpdateOrganizationQuotaRequest;
 import org.cloudfoundry.client.v3.roles.CreateRoleRequest;
 import org.cloudfoundry.client.v3.roles.RoleRelationships;
 import org.cloudfoundry.client.v3.roles.RoleType;
@@ -757,6 +762,35 @@ public class IntegrationTestConfiguration {
     @Bean
     String username(NameFactory nameFactory) {
         return nameFactory.getUserName();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "test.quotas.routes.reserved-ports", matchIfMissing = false)
+    Integer tcpRouteQuota(
+            @Value("${test.quotas.routes.reserved-ports}") Integer portsQuota,
+            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        cloudFoundryClient
+                .organizationQuotasV3()
+                .list(ListOrganizationQuotasRequest.builder().name("default").build())
+                .flatMapIterable(ListOrganizationQuotasResponse::getResources)
+                .map(OrganizationQuotaResource::getId)
+                .last()
+                .flatMap(
+                        orgId ->
+                                cloudFoundryClient
+                                        .organizationQuotasV3()
+                                        .update(
+                                                UpdateOrganizationQuotaRequest.builder()
+                                                        .organizationQuotaId(orgId)
+                                                        .routes(
+                                                                Routes.builder()
+                                                                        .totalReservedPorts(
+                                                                                portsQuota)
+                                                                        .build())
+                                                        .build()))
+                .block();
+        this.logger.debug("APPLIED ORG QUOTA, reserved-route-ports={}", portsQuota);
+        return portsQuota;
     }
 
     private static final class FailingDeserializationProblemHandler
