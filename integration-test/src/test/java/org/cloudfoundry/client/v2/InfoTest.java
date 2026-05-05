@@ -44,6 +44,8 @@ public final class InfoTest extends AbstractIntegrationTest {
                             Version actual;
                             String version = response.getApiVersion();
                             if (version == null || version.isEmpty()) {
+                                assertThat("CF API v2 is disabled")
+                                        .isEqualTo(response.getSupport());
                                 actual = Version.of(0, 0, 0);
                             } else {
                                 actual = Version.valueOf(version);

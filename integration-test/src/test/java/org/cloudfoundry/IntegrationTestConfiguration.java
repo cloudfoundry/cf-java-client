@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.GetRootRequest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
 import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
@@ -465,26 +466,36 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Version serverVersion(@Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        return serverVersionV2(cloudFoundryClient)
+                .switchIfEmpty(serverVersionV3(cloudFoundryClient))
+                .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
+                .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
+                .block();
+    }
+
+    private Mono<Version> serverVersionV2(
+            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient
                 .info()
                 .get(GetInfoRequest.builder().build())
-                .map(
+                .flatMap(
                         response -> {
                             String version = response.getApiVersion();
                             if (version == null || version.isEmpty()) {
                                 this.logger.warn(
                                         "calling v2 info endpoint but CF API v2 is disabled");
-                                return new Version.Builder()
-                                        .setMajorVersion(0)
-                                        .setMinorVersion(0)
-                                        .setPatchVersion(0)
-                                        .build();
+                                return Mono.empty();
                             }
-                            return Version.valueOf(version);
-                        })
-                .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
-                .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
-                .block();
+                            return Mono.just(Version.valueOf(version));
+                        });
+    }
+
+    private Mono<Version> serverVersionV3(
+            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient
+                .rootEndpoint()
+                .get(GetRootRequest.builder().build())
+                .map(response -> Version.valueOf(response.getApiVersionV3()));
     }
 
     @Lazy
