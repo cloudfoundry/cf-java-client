@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.client;
 
 import jakarta.annotation.PostConstruct;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.Root;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.blobstores.Blobstores;
@@ -207,7 +208,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @PostConstruct
     public void checkCompatibility() {
-        new CloudFoundryClientCompatibilityChecker(info()).check();
+        new CloudFoundryClientCompatibilityChecker(info(), rootEndpoint()).check();
     }
 
     @Override
@@ -257,6 +258,13 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Info info() {
         return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public Root rootEndpoint() {
+        Mono<String> root = getConnectionContext().getRootProvider().getRoot(getConnectionContext());
+        return new ReactorRoot(getConnectionContext(), root, getTokenProvider(), getRequestTags());
     }
 
     @Override
