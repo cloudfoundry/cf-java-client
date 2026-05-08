@@ -28,5 +28,6 @@
     "my-saml-provider"
   ],
   "name": "My Client Name",
+  "allowpublic": true,
   "lastModified": 1468364443857
 }
