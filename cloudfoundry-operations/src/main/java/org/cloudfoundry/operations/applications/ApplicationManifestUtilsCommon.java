@@ -16,7 +16,10 @@
 
 package org.cloudfoundry.operations.applications;
 
-import static java.util.Collections.emptyMap;
+import org.cloudfoundry.util.tuple.Consumer2;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import reactor.core.Exceptions;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,10 +39,8 @@ import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import org.cloudfoundry.util.tuple.Consumer2;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import reactor.core.Exceptions;
+
+import static java.util.Collections.emptyMap;
 
 /**
  * Common base class for dealing with manifests
@@ -321,7 +322,7 @@ abstract class ApplicationManifestUtilsCommon {
                                 value ->
                                         value instanceof Map
                                                 && name.equals(
-                                                        ((Map<String, String>) value).get("name")))
+                                                ((Map<String, String>) value).get("name")))
                         .findFirst()
                         .orElseGet(() -> getEmptyNamedObject(array, name));
     }

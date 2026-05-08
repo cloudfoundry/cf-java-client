@@ -16,15 +16,6 @@
 
 package org.cloudfoundry.operations;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
@@ -32,6 +23,8 @@ import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.RequiresTcpRouting;
 import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
+import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -81,6 +74,7 @@ import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceReq
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
 import org.cloudfoundry.util.FluentMap;
+import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -88,6 +82,16 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
+import static org.assertj.core.api.Assertions.assertThat;
 
 @CleanupCloudFoundryAfterClass
 @RequiresV2Api
@@ -746,6 +750,61 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .applications()
                 .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
                 .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    @IfCloudFoundryVersion(
+            greaterThanOrEqualTo =
+                    CloudFoundryVersion.PCF_4_v3)
+    public void pushManifestV3WithFeature() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        final String featureKey = "ssh";
+        final boolean featureValue = false;
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .buildpack("staticfile_buildpack")
+                                        .disk(512)
+                                        .healthCheckType(ApplicationHealthCheck.PORT)
+                                        .memory(64)
+                                        .name(applicationName)
+                                        .feature(featureKey, false)
+                                        .path(
+                                                new ClassPathResource("test-application.zip")
+                                                        .getFile()
+                                                        .toPath())
+                                        .build())
+                        .build();
+
+        this.cloudFoundryOperations
+                .applications()
+                .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(GetApplicationRequest.builder().name(applicationName).build()))
+
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        applicationId ->
+                                PaginationUtils.requestClientV3Resources(
+                                        page ->
+                                                this.cloudFoundryClient
+                                                        .applicationsV3()
+                                                        .listFeatures(
+                                                                ListApplicationFeaturesRequest
+                                                                        .builder()
+                                                                        .applicationId(applicationId)
+                                                                        .page(page)
+                                                                        .build())))
+                .filter(feature -> featureKey.equals(feature.getName()))
+                .map(ApplicationFeatureResource::getEnabled)
+                .as(StepVerifier::create)
+                .expectNext(featureValue)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
