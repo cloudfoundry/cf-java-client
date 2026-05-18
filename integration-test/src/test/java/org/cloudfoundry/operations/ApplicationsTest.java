@@ -757,7 +757,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     @Test
     @IfCloudFoundryVersion(
             greaterThanOrEqualTo =
-                    CloudFoundryVersion.PCF_4_v3)
+                    CloudFoundryVersion.PCF_4_v2)
     public void pushManifestV3WithFeature() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
