@@ -1,15 +1,61 @@
 package org.cloudfoundry.operations.applications;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.junit.jupiter.api.Test;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.Map;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 class ApplicationManifestUtilsV3Test {
+    @Test
+    void testWithDockerApp() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .docker(Docker.builder().image("test-image").build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithFeature() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .feature("file-based-vcap-services", true)
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testWithFeatureAsMap() throws IOException {
+        Map<String, Boolean> features = new java.util.HashMap<>();
+        features.put("file-based-vcap-services", true);
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .features(features)
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
     @Test
     void testGenericApplication() throws IOException {
         ManifestV3 manifest =
@@ -41,20 +87,6 @@ class ApplicationManifestUtilsV3Test {
                                                 ManifestV3Service.builder()
                                                         .name("test-service-1")
                                                         .build())
-                                        .build())
-                        .build();
-
-        assertSerializeDeserialize(manifest);
-    }
-
-    @Test
-    void testWithDockerApp() throws IOException {
-        ManifestV3 manifest =
-                ManifestV3.builder()
-                        .application(
-                                ManifestV3Application.builder()
-                                        .name("test-app")
-                                        .docker(Docker.builder().image("test-image").build())
                                         .build())
                         .build();
 
