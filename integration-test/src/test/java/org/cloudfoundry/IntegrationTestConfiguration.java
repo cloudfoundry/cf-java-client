@@ -470,8 +470,7 @@ public class IntegrationTestConfiguration {
                 .block();
     }
 
-    private Mono<Version> serverVersionV2(
-            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+    private static Mono<Version> serverVersionV2(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient
                 .info()
                 .get(GetInfoRequest.builder().build())
@@ -479,16 +478,13 @@ public class IntegrationTestConfiguration {
                         response -> {
                             String version = response.getApiVersion();
                             if (version == null || version.isEmpty()) {
-                                this.logger.warn(
-                                        "calling v2 info endpoint but CF API v2 is disabled");
                                 return Mono.empty();
                             }
                             return Mono.just(Version.valueOf(version));
                         });
     }
 
-    private Mono<Version> serverVersionV3(
-            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+    private static Mono<Version> serverVersionV3(CloudFoundryClient cloudFoundryClient) {
         return cloudFoundryClient
                 .rootEndpoint()
                 .get(GetRootRequest.builder().build())

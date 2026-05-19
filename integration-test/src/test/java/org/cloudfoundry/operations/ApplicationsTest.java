@@ -16,6 +16,15 @@
 
 package org.cloudfoundry.operations;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
+import java.io.IOException;
+import java.nio.file.Path;
+import java.time.Duration;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
@@ -82,16 +91,6 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.time.Duration;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @CleanupCloudFoundryAfterClass
 @RequiresV2Api
@@ -755,9 +754,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @IfCloudFoundryVersion(
-            greaterThanOrEqualTo =
-                    CloudFoundryVersion.PCF_4_v2)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
     public void pushManifestV3WithFeature() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -787,7 +784,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                         this.cloudFoundryOperations
                                 .applications()
                                 .get(GetApplicationRequest.builder().name(applicationName).build()))
-
                 .map(ApplicationDetail::getId)
                 .flatMapMany(
                         applicationId ->
@@ -798,7 +794,8 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                         .listFeatures(
                                                                 ListApplicationFeaturesRequest
                                                                         .builder()
-                                                                        .applicationId(applicationId)
+                                                                        .applicationId(
+                                                                                applicationId)
                                                                         .page(page)
                                                                         .build())))
                 .filter(feature -> featureKey.equals(feature.getName()))

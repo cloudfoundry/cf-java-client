@@ -16,12 +16,8 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.processes.HealthCheckType;
-import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
-import org.yaml.snakeyaml.DumperOptions;
-import org.yaml.snakeyaml.Yaml;
-import reactor.core.Exceptions;
+import static java.util.Collections.emptyMap;
+import static java.util.stream.Collectors.toMap;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -37,9 +33,12 @@ import java.util.Optional;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyMap;
-import static java.util.stream.Collectors.toMap;
+import org.cloudfoundry.client.v3.Metadata;
+import org.cloudfoundry.client.v3.processes.HealthCheckType;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
+import org.yaml.snakeyaml.DumperOptions;
+import org.yaml.snakeyaml.Yaml;
+import reactor.core.Exceptions;
 
 /**
  * Utilities for dealing with {@link ManifestV3}s.  Includes the functionality to transform to and from standard CLI YAML files.
@@ -162,8 +161,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
                 "features",
                 variables,
                 String::valueOf,
-                (k,v) -> builder.feature(k, Boolean.valueOf(v))
-        );
+                (k, v) -> builder.feature(k, Boolean.valueOf(v)));
         asList(
                 application,
                 "processes",
@@ -307,11 +305,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
     private static Map<String, Object> toApplicationYaml(ManifestV3Application application) {
         Map<String, Object> yaml = ApplicationManifestUtilsCommon.toApplicationYaml(application);
 
-        putIfPresent(
-                yaml,
-                "features",
-                application.getFeatures()
-        );
+        putIfPresent(yaml, "features", application.getFeatures());
         putIfPresent(
                 yaml,
                 "processes",
