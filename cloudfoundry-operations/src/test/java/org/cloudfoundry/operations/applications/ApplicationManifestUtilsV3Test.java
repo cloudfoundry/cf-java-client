@@ -1,15 +1,14 @@
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.client.v3.Metadata;
-import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
-import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import org.cloudfoundry.client.v3.Metadata;
+import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
+import org.junit.jupiter.api.Test;
 
 class ApplicationManifestUtilsV3Test {
     @Test
