@@ -119,14 +119,14 @@ final class CreateRouteRequestTest {
                                         .build())
                         .options(
                                 RouteOptions.builder()
-                                        .value("loadbalancing", "hash")
-                                        .value("hash_header", "X-Hash")
-                                        .value("hash_balance", "90")
+                                        .loadbalancing("hash")
+                                        .hashHeader("X-Hash")
+                                        .hashBalance("90")
                                         .build())
                         .build();
 
-        assertEquals("hash", request.getOptions().getLoadbalancing().get());
-        assertEquals("X-Hash", request.getOptions().getHashHeader().get());
-        assertEquals("90", request.getOptions().getHashBalance().get());
+        assertEquals("hash", request.getOptions().getLoadbalancing());
+        assertEquals("X-Hash", request.getOptions().getHashHeader());
+        assertEquals("90", request.getOptions().getHashBalance());
     }
 }
