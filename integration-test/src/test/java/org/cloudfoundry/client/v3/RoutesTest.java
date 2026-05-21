@@ -46,6 +46,7 @@ import org.cloudfoundry.client.v3.routes.ListRoutesRequest;
 import org.cloudfoundry.client.v3.routes.RemoveRouteDestinationsRequest;
 import org.cloudfoundry.client.v3.routes.ReplaceRouteDestinationsRequest;
 import org.cloudfoundry.client.v3.routes.ReplaceRouteDestinationsResponse;
+import org.cloudfoundry.client.v3.routes.RouteOptions;
 import org.cloudfoundry.client.v3.routes.RouteRelationships;
 import org.cloudfoundry.client.v3.routes.RouteResource;
 import org.cloudfoundry.client.v3.routes.UpdateRouteRequest;
@@ -124,6 +125,72 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .map(Metadata::getLabels)
                 .as(StepVerifier::create)
                 .expectNext(Collections.singletonMap("test-create-key", "test-create-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_14)
+    @Test
+    public void createWithOptions() {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .create(
+                                                        CreateRouteRequest.builder()
+                                                                .metadata(
+                                                                        Metadata.builder()
+                                                                                .label(
+                                                                                        "test-createWithOptions-key",
+                                                                                        "test-createWithOptions-value")
+                                                                                .build())
+                                                                .options(
+                                                                        RouteOptions.builder()
+                                                                                .loadbalancing(
+                                                                                        "round-robin")
+                                                                                .build())
+                                                                .relationships(
+                                                                        RouteRelationships.builder()
+                                                                                .domain(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        domainId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .space(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        spaceId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .thenReturn(domainId)))
+                .flatMapMany(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
+                .map(RouteResource::getOptions)
+                .map(RouteOptions::getLoadbalancing)
+                .as(StepVerifier::create)
+                .expectNext("round-robin")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -962,6 +1029,56 @@ public final class RoutesTest extends AbstractIntegrationTest {
                 .map(Metadata::getLabels)
                 .as(StepVerifier::create)
                 .expectNext(Collections.singletonMap("test-update-key", "test-update-value"))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_14)
+    @Test
+    public void updateOptions() {
+        String domainName = this.nameFactory.getDomainName();
+
+        this.organizationId
+                .flatMap(
+                        organizationId ->
+                                Mono.zip(
+                                        createDomainId(
+                                                this.cloudFoundryClient,
+                                                domainName,
+                                                organizationId),
+                                        this.spaceId))
+                .flatMap(
+                        function(
+                                (domainId, spaceId) ->
+                                        Mono.zip(
+                                                Mono.just(domainId),
+                                                createRouteId(
+                                                        this.cloudFoundryClient,
+                                                        domainId,
+                                                        "updateOptions",
+                                                        spaceId))))
+                .delayUntil(
+                        function(
+                                (domainId, routeId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .update(
+                                                        UpdateRouteRequest.builder()
+                                                                .routeId(routeId)
+                                                                .options(
+                                                                        RouteOptions.builder()
+                                                                                .loadbalancing(
+                                                                                        "least-connection")
+                                                                                .build())
+                                                                .build())))
+                .flatMapMany(
+                        function(
+                                (domainId, ignore) ->
+                                        requestListRoutes(this.cloudFoundryClient, domainId)))
+                .map(RouteResource::getOptions)
+                .map(RouteOptions::getLoadbalancing)
+                .as(StepVerifier::create)
+                .expectNext("least-connection")
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }

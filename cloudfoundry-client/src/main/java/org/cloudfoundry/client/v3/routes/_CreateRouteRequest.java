@@ -28,6 +28,13 @@ abstract class _CreateRouteRequest {
     abstract Metadata getMetadata();
 
     /**
+     * Route options
+     */
+    @Nullable
+    @JsonProperty("options")
+    abstract RouteOptions getOptions();
+
+    /**
      * The path
      */
     @Nullable
