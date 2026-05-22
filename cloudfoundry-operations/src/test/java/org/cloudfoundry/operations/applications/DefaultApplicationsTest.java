@@ -1319,7 +1319,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
         requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
-                .logs(ApplicationLogsRequest.builder().name("test-application-name").recent(true).build())
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(true)
+                                .build())
                 .as(StepVerifier::create)
                 .consumeErrorWith(
                         t ->
