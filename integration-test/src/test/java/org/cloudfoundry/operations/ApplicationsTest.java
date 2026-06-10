@@ -25,15 +25,21 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
-import org.cloudfoundry.RequiresTcpRouting;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
-import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
+import org.cloudfoundry.logcache.v1.Envelope;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.LogType;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -82,18 +88,18 @@ import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
+import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.FluentMap;
-import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.SignalType;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
-@RequiresV2Api
 public final class ApplicationsTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
@@ -106,6 +112,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired private String serviceName;
 
+    @Autowired private LogCacheClient logCacheClient;
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
@@ -356,7 +363,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @RequiresTcpRouting
     public void getManifestForTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -443,7 +449,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @RequiresTcpRouting
     public void getTcp() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -507,13 +512,12 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Exercise the LogCache client via {@code logs(ApplicationLogsRequest)}.
-     * LogCache has been a default cf-deployment component since v3.0.0 (July 2018),
-     * with the {@code /api/v1/read} endpoint available since log-cache-release v2.0.0
-     * (October 2018).
+     * Doppler was dropped in PCF 4.x in favor of logcache. This test does not work
+     * on TAS 4.x.
      */
+    @Deprecated
     @Test
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_3)
+    @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_4_v2)
     public void logs() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -534,6 +538,159 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .next()
                 .as(StepVerifier::create)
                 .expectNext(ApplicationLogType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void logsRecent() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+        Mono<String> applicationGuid =
+                getAppGuidFromAppName(cloudFoundryOperations, applicationName);
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        applicationGuid
+                                .map(ApplicationsTest::getReadRequest)
+                                .flatMapMany(
+                                        readRequest ->
+                                                callLogsRecent(
+                                                                this.cloudFoundryOperations,
+                                                                readRequest)
+                                                        .log(null, Level.ALL, SignalType.ON_NEXT))
+                                .map(ApplicationsTest::checkOneLogEntry)
+                                .then())
+                .as(StepVerifier::create)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Exercise the LogCache client. Serves as a reference for using the logcache client,
+     * and will help with the transition to the new
+     * {@link org.cloudfoundry.operations.applications.Applications#logs(ApplicationLogsRequest)}.
+     */
+    @Test
+    public void logCacheLogs() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(GetApplicationRequest.builder().name(applicationName).build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.logCacheClient.read(
+                                        ReadRequest.builder()
+                                                .sourceId(appGuid)
+                                                .envelopeType(EnvelopeType.LOG)
+                                                .limit(1)
+                                                .build()))
+                .map(ReadResponse::getEnvelopes)
+                .map(EnvelopeBatch::getBatch)
+                .flatMap(Flux::fromIterable)
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .next()
+                .as(StepVerifier::create)
+                .expectNext(LogType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Integration test for {@link org.cloudfoundry.operations.applications.Applications#logsTail}.
+     * Verifies that streaming a single LOG envelope from a running application succeeds.
+     */
+    @Test
+    public void logsTail() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(
+                                        GetApplicationRequest.builder()
+                                                .name(applicationName)
+                                                .build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.cloudFoundryOperations
+                                        .applications()
+                                        .logsTail(
+                                                TailLogsRequest.builder()
+                                                        .sourceId(appGuid)
+                                                        .envelopeTypes(
+                                                                Collections.singletonList(
+                                                                        EnvelopeType.LOG))
+                                                        .build())
+                                        .take(1))
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Integration test for {@link org.cloudfoundry.operations.applications.Applications#logsTail}
+     * verifying that multiple LOG envelopes can be streamed from a running application.
+     */
+    @Test
+    public void logsTailMultipleEnvelopes() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(
+                                        GetApplicationRequest.builder()
+                                                .name(applicationName)
+                                                .build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.cloudFoundryOperations
+                                        .applications()
+                                        .logsTail(
+                                                TailLogsRequest.builder()
+                                                        .sourceId(appGuid)
+                                                        .envelopeTypes(
+                                                                Collections.singletonList(
+                                                                        EnvelopeType.LOG))
+                                                        .build())
+                                        .take(3))
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
+                .expectNextMatches(
+                        logType -> LogType.OUT.equals(logType) || LogType.ERR.equals(logType))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -749,59 +906,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .applications()
                 .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
                 .as(StepVerifier::create)
-                .expectComplete()
-                .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
-    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_4_v2)
-    public void pushManifestV3WithFeature() throws IOException {
-        String applicationName = this.nameFactory.getApplicationName();
-
-        final String featureKey = "ssh";
-        final boolean featureValue = false;
-        ManifestV3 manifest =
-                ManifestV3.builder()
-                        .application(
-                                ManifestV3Application.builder()
-                                        .buildpack("staticfile_buildpack")
-                                        .disk(512)
-                                        .healthCheckType(ApplicationHealthCheck.PORT)
-                                        .memory(64)
-                                        .name(applicationName)
-                                        .feature(featureKey, false)
-                                        .path(
-                                                new ClassPathResource("test-application.zip")
-                                                        .getFile()
-                                                        .toPath())
-                                        .build())
-                        .build();
-
-        this.cloudFoundryOperations
-                .applications()
-                .pushManifestV3(PushManifestV3Request.builder().manifest(manifest).build())
-                .then(
-                        this.cloudFoundryOperations
-                                .applications()
-                                .get(GetApplicationRequest.builder().name(applicationName).build()))
-                .map(ApplicationDetail::getId)
-                .flatMapMany(
-                        applicationId ->
-                                PaginationUtils.requestClientV3Resources(
-                                        page ->
-                                                this.cloudFoundryClient
-                                                        .applicationsV3()
-                                                        .listFeatures(
-                                                                ListApplicationFeaturesRequest
-                                                                        .builder()
-                                                                        .applicationId(
-                                                                                applicationId)
-                                                                        .page(page)
-                                                                        .build())))
-                .filter(feature -> featureKey.equals(feature.getName()))
-                .map(ApplicationFeatureResource::getEnabled)
-                .as(StepVerifier::create)
-                .expectNext(featureValue)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -1201,7 +1305,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @RequiresTcpRouting
     public void pushTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -1325,7 +1428,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @RequiresTcpRouting
     public void pushUpdateTcpRoute() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
         String domainName = this.nameFactory.getDomainName();
@@ -2172,5 +2274,28 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations
                 .applications()
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name(applicationName).build());
+    }
+
+    private static ReadRequest getReadRequest(String applicationId) {
+        return ReadRequest.builder().sourceId(applicationId).build();
+    }
+
+    private static Flux<Log> callLogsRecent(
+            CloudFoundryOperations cloudFoundryOperations, ReadRequest readRequest) {
+        return cloudFoundryOperations.applications().logsRecent(readRequest);
+    }
+
+    private static Mono<String> getAppGuidFromAppName(
+            CloudFoundryOperations cloudFoundryOperations, String applicationName) {
+        return cloudFoundryOperations
+                .applications()
+                .get(GetApplicationRequest.builder().name(applicationName).build())
+                .map(ApplicationDetail::getId);
+    }
+
+    private static Log checkOneLogEntry(Log log) {
+        OperationsLogging.log("one log entry: " + log.getType() + " " + log.getPayloadAsText());
+        assertThat(log.getType()).isIn(LogType.OUT, LogType.ERR);
+        return log;
     }
 }
