@@ -1371,28 +1371,16 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
 
     @Test
     void logsLogCache() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsRecentLogCache(this.logCacheClient, "test-metadata-id");
+        ReadRequest readRequest = ReadRequest.builder().sourceId("test-metadata-id").build();
+        requestLogsRecentLogCache(this.logCacheClient, readRequest);
 
         this.applications
-                .logs(
-                        ApplicationLogsRequest.builder()
-                                .name("test-application-name")
-                                .recent(true)
-                                .build())
+                .logsRecent(readRequest)
                 .as(StepVerifier::create)
                 .expectNextMatches(
                         log ->
-                                log.getMessage().equals("test-payload")
-                                        && log.getLogType() == ApplicationLogType.OUT
-                                        && log.getSourceId().equals("test-sourceId")
-                                        && log.getInstanceId().equals("test-instanceId")
-                                        && log.getSourceType().equals("APP/PROC/WEB")
-                                        && log.getTimestamp() == 1L)
+                                log.getPayloadAsText().equals("test-payload")
+                                        && log.getType() == LogType.OUT)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
@@ -5438,10 +5426,11 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
-    private static void requestLogsRecentLogCache(LogCacheClient logCacheClient, String sourceId) {
+    private static void requestLogsRecentLogCache(
+            LogCacheClient logCacheClient, ReadRequest readRequest) {
         String base64Payload =
                 Base64.getEncoder().encodeToString("test-payload".getBytes(StandardCharsets.UTF_8));
-        when(logCacheClient.read(ReadRequest.builder().sourceId(sourceId).build()))
+        when(logCacheClient.recentLogs(readRequest))
                 .thenReturn(
                         Mono.just(
                                 fill(ReadResponse.builder())
