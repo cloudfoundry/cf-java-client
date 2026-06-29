@@ -1,0 +1,15 @@
+{
+  "resources": [
+    {
+      "authorized_grant_types": [
+        "password",
+        "grant_type_that_is_not_known",
+        "refresh_token"
+      ],
+      "client_id": "cf"
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 11,
+  "totalResults": 11
+}

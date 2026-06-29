@@ -1,13 +1,13 @@
 package org.cloudfoundry.uaa;
 
 import java.time.Duration;
-import org.cloudfoundry.IntegrationTestConfiguration.FailingDeserializationProblemHandler;
 import org.cloudfoundry.ThrottlingUaaClient;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.cloudfoundry.reactor.ProxyConfiguration;
 import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
+import org.cloudfoundry.reactor.util.JsonDeserializationProblemHandler;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.Bean;
@@ -52,7 +52,7 @@ public class RatelimitTestConfiguration {
                 DefaultConnectionContext.builder()
                         .apiHost(apiHost)
                         .problemHandler(
-                                new FailingDeserializationProblemHandler()) // Test-only problem
+                                new JsonDeserializationProblemHandler()) // Test-only problem
                         // handler
                         .skipSslValidation(skipSslValidation)
                         .sslHandshakeTimeout(Duration.ofSeconds(30));
