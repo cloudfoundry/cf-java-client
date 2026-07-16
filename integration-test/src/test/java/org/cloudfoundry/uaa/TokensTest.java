@@ -125,11 +125,13 @@ public final class TokensTest extends AbstractIntegrationTest {
                 .verify(Duration.ofMinutes(5));
     }
 
-    // TODO: Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862 to
-    // get passcode
-    @Disabled(
-            "Ready to Implement - Await https://github.com/cloudfoundry/cf-java-client/issues/862"
-                    + " to get passcode")
+    // When implemented, will fix issue: https://github.com/cloudfoundry/cf-java-client/issues/910.
+    // Could be done similarly to "getTokenByAuthorizationCode".
+    // First user_token grant type must be implented.
+    // See: https://docs.cloudfoundry.org/api/uaa/index.html#user-token-grant
+    // Then this endpoint must be called first, to create the token.
+    // See: https://docs.cloudfoundry.org/api/uaa/index.html#saml2-bearer-grant
+    @Disabled("Ready to Implement")
     @Test
     public void getTokenByOneTimePasscode() {
         this.uaaClient

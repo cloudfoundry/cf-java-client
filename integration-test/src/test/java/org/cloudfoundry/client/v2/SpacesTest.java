@@ -24,6 +24,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.cloudfoundry.AbstractIntegrationTest;
@@ -109,7 +110,6 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -1885,13 +1885,9 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .verify(Duration.ofMinutes(5));
     }
 
-    // TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to
-    // work
-    @Disabled(
-            "Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to"
-                    + " work")
     @Test
     public void listServicesFilterByServiceBrokerId() {
+        List<String> expectedValues = List.of(this.serviceName, this.serviceName + "-shareable");
         Mono.zip(this.serviceBrokerId, this.spaceId)
                 .flatMapMany(
                         function(
@@ -1903,9 +1899,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                                                         builder.serviceBrokerId(serviceBrokerId))))
                 .map(response -> response.getEntity().getLabel())
                 .as(StepVerifier::create)
-                .expectNext(this.serviceName)
+                .consumeNextWith(element -> assertThat(element).isIn(expectedValues))
+                .consumeNextWith(element -> assertThat(element).isIn(expectedValues))
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 
     @Test
