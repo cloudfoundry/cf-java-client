@@ -44,11 +44,13 @@ import org.cloudfoundry.client.v2.stacks.Stacks;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstances;
 import org.cloudfoundry.client.v2.users.Users;
 import org.cloudfoundry.client.v3.applications.ApplicationsV3;
+import org.cloudfoundry.client.v3.buildpacks.BuildpacksV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
 import org.cloudfoundry.client.v3.routes.RoutesV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
+import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -93,6 +95,7 @@ public abstract class AbstractOperationsTest {
     protected final Authorizations authorizations = mock(Authorizations.class, RETURNS_SMART_NULLS);
 
     protected final Buildpacks buildpacks = mock(Buildpacks.class, RETURNS_SMART_NULLS);
+    protected final BuildpacksV3 buildpacksV3 = mock(BuildpacksV3.class, RETURNS_SMART_NULLS);
 
     protected final CloudFoundryClient cloudFoundryClient =
             mock(CloudFoundryClient.class, RETURNS_SMART_NULLS);
@@ -155,6 +158,7 @@ public abstract class AbstractOperationsTest {
     protected final SpacesV3 spacesV3 = mock(SpacesV3.class, RETURNS_SMART_NULLS);
 
     protected final Stacks stacks = mock(Stacks.class, RETURNS_SMART_NULLS);
+    protected final StacksV3 stacksV3 = mock(StacksV3.class, RETURNS_SMART_NULLS);
 
     protected final Tasks tasks = mock(Tasks.class, RETURNS_SMART_NULLS);
 
@@ -175,6 +179,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.applicationsV2()).thenReturn(this.applications);
         when(this.cloudFoundryClient.applicationsV3()).thenReturn(this.applicationsV3);
         when(this.cloudFoundryClient.buildpacks()).thenReturn(this.buildpacks);
+        when(this.cloudFoundryClient.buildpacksV3()).thenReturn(this.buildpacksV3);
         when(this.cloudFoundryClient.domains()).thenReturn(this.domains);
         when(this.cloudFoundryClient.domainsV3()).thenReturn(this.domainsV3);
         when(this.cloudFoundryClient.events()).thenReturn(this.events);
@@ -203,6 +208,7 @@ public abstract class AbstractOperationsTest {
         when(this.cloudFoundryClient.spaces()).thenReturn(this.spaces);
         when(this.cloudFoundryClient.spacesV3()).thenReturn(this.spacesV3);
         when(this.cloudFoundryClient.stacks()).thenReturn(this.stacks);
+        when(this.cloudFoundryClient.stacksV3()).thenReturn(this.stacksV3);
         when(this.cloudFoundryClient.tasks()).thenReturn(this.tasks);
         when(this.cloudFoundryClient.userProvidedServiceInstances())
                 .thenReturn(this.userProvidedServiceInstances);

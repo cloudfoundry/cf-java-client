@@ -16,7 +16,6 @@
 
 package org.cloudfoundry.operations.applications;
 
-import org.cloudfoundry.doppler.LogMessage;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -113,18 +112,6 @@ public interface Applications {
      * @return the tasks
      */
     Flux<Task> listTasks(ListApplicationTasksRequest request);
-
-    /**
-     * List the applications logs. Uses Doppler under the hood.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
-     *
-     * @param request the application logs request
-     * @return the applications logs
-     * @deprecated Use {@link #logs(ApplicationLogsRequest)} instead.
-     */
-    @Deprecated
-    Flux<LogMessage> logs(LogsRequest request);
 
     /**
      * List the applications logs.

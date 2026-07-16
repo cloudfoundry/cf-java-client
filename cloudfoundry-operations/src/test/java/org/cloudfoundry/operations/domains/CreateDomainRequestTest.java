@@ -32,15 +32,6 @@ final class CreateDomainRequestTest {
     }
 
     @Test
-    void noOrganization() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> {
-                    CreateDomainRequest.builder().domain("test-domain").build();
-                });
-    }
-
-    @Test
     void valid() {
         CreateDomainRequest.builder()
                 .domain("test-domain")

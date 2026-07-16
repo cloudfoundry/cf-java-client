@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.uaa.ratelimit;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import org.cloudfoundry.Nullable;
+import org.immutables.value.Value;
 
-import org.junit.jupiter.api.Test;
+@JsonDeserialize
+@Value.Immutable
+abstract class _RatelimitResponse {
 
-final class LogsRequestTest {
+    @JsonProperty("current")
+    @Nullable
+    abstract Current getCurrentData();
 
-    @Test
-    void noName() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> {
-                    LogsRequest.builder().build();
-                });
-    }
+    @JsonProperty("fromSource")
+    @Nullable
+    abstract String getFromSource();
 
-    @Test
-    void valid() {
-        LogsRequest.builder().name("test-name").build();
-    }
 }

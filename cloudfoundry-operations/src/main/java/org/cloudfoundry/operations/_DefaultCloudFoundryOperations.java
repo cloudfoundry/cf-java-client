@@ -86,13 +86,25 @@ abstract class _DefaultCloudFoundryOperations implements CloudFoundryOperations 
     @Override
     @Value.Derived
     public Buildpacks buildpacks() {
-        return new DefaultBuildpacks(getCloudFoundryClientPublisher());
+        CloudFoundryClient cloudFoundryClient = getCloudFoundryClient();
+        if (cloudFoundryClient == null) {
+            throw new IllegalStateException("CloudFoundryClient must be set");
+        }
+        return new DefaultBuildpacks(cloudFoundryClient);
     }
 
     @Override
     @Value.Derived
     public Domains domains() {
-        return new DefaultDomains(getCloudFoundryClientPublisher(), getRoutingClientPublisher());
+        CloudFoundryClient cloudFoundryClient = getCloudFoundryClient();
+        if (cloudFoundryClient == null) {
+            throw new IllegalStateException("CloudFoundryClient must be set");
+        }
+        RoutingClient routingClient = getRoutingClient();
+        if (routingClient == null) {
+            throw new IllegalStateException("RoutingClient must be set");
+        }
+        return new DefaultDomains(cloudFoundryClient, routingClient);
     }
 
     @Override

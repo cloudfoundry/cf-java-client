@@ -21,9 +21,9 @@ import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksResponse;
-import org.cloudfoundry.client.v2.stacks.StackResource;
+import org.cloudfoundry.client.v3.stacks.ListStacksRequest;
+import org.cloudfoundry.client.v3.stacks.ListStacksResponse;
+import org.cloudfoundry.client.v3.stacks.StackResource;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.junit.jupiter.api.Test;
 import reactor.core.publisher.Mono;
@@ -58,7 +58,7 @@ final class DefaultStacksTest extends AbstractOperationsTest {
     }
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient) {
-        when(cloudFoundryClient.stacks().list(ListStacksRequest.builder().page(1).build()))
+        when(cloudFoundryClient.stacksV3().list(ListStacksRequest.builder().page(1).build()))
                 .thenReturn(
                         Mono.just(
                                 fill(ListStacksResponse.builder())
@@ -68,7 +68,7 @@ final class DefaultStacksTest extends AbstractOperationsTest {
 
     private static void requestStacks(CloudFoundryClient cloudFoundryClient, String name) {
         when(cloudFoundryClient
-                        .stacks()
+                        .stacksV3()
                         .list(ListStacksRequest.builder().name(name).page(1).build()))
                 .thenReturn(
                         Mono.just(

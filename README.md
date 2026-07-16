@@ -15,18 +15,18 @@ The `cf-java-client` project is a Java language binding for interacting with a C
 * `cloudfoundry-operations` – An API and implementation that corresponds to the [Cloud Foundry CLI][c] operations.  This project builds on the `cloudfoundry-client` and therefore has a single implementation.
 
 ## Versions
-The Cloud Foundry Java Client has two active versions. The `5.x` line is compatible with Spring Boot `2.4.x - 2.6.x` just to manage its dependencies, while the `4.x` line uses Spring Boot `2.3.x`.
+The Cloud Foundry Java Client has two active versions. The `6.x` line includes breaking changes (see below), while the `5.x` line maintains backward compatibility.
 
-## Deprecations
+## Breaking Changes (6.x)
 
 ### `DopplerClient.recentLogs()` — Recent Logs via Doppler
 
 > [!WARNING]
-> **Deprecated since cf-java-client `5.17.x`**
+> **Removed since cf-java-client `6.0.x`**
 >
-> The `DopplerClient.recentLogs()` endpoint (and the related `RecentLogsRequest` / `LogMessage` types from the `org.cloudfoundry.doppler` package) are **deprecated** and will be removed in a future release.
+> The `DopplerClient.recentLogs()` endpoint (and the related `RecentLogsRequest` / `LogMessage` types from the `org.cloudfoundry.doppler` package) have been **removed**.
 >
-> This API relies on the [Loggregator][loggregator] Doppler/Traffic Controller endpoint `/apps/{id}/recentlogs`, which was removed in **Loggregator ≥ 107.0**.
+> This API relied on the [Loggregator][loggregator] Doppler/Traffic Controller endpoint `/apps/{id}/recentlogs`, which was removed in **Loggregator ≥ 107.0**.
 > The affected platform versions are:
 >
 > | Platform | Last version with Doppler recent-logs support |
@@ -61,11 +61,16 @@ The Cloud Foundry Java Client has two active versions. The `5.x` line is compati
 >
 > See the [`org.cloudfoundry.doppler`][doppler-pkg] and [`org.cloudfoundry.logcache.v1`][logcache-pkg] Javadoc for full type details.
 
-[doppler-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/doppler/package-summary.html
-[logcache-pkg]: https://javadoc.io/doc/org.cloudfoundry/cloudfoundry-client/latest/org/cloudfoundry/logcache/v1/package-summary.html
-
 > [!NOTE]
-> **Operations API users:** `Applications.logs(ApplicationLogsRequest)` now uses Log Cache under the hood for recent logs (the default). No migration is needed at the Operations layer.
+> **Operations API users:** Use `Applications.logs(ApplicationLogsRequest)` instead of the removed `Applications.logs(LogsRequest)`.
+
+### `Applications.logs(LogsRequest)` — Removed
+
+> [!WARNING]
+> **Removed since cf-java-client `6.0.x`**
+> The `Applications.logs(LogsRequest)` method (and the `LogsRequest` type) have been **removed**.
+>
+> **Migration:** Use `Applications.logs(ApplicationLogsRequest)` instead. For recent logs, set `recent(true)` (the default). For streaming, set `recent(false)`.
 
 [loggregator]: https://github.com/cloudfoundry/loggregator
 [log-cache-api]: https://github.com/cloudfoundry/log-cache
@@ -353,11 +358,7 @@ Name | Description
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
-`SKIP_BROWSER_AUTH_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require browser-based authentication (e.g., SSO tests). Useful when the Cloud Foundry instance's UAA does not have browser-based authentication configured. Defaults to `false`.
-`SKIP_METRIC_REGISTRAR_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require the Metric Registrar service (e.g., MetricRegistrarTest). Useful when the Cloud Foundry instance does not have the Metric Registrar service available. Defaults to `false`.
-`SKIP_TCP_ROUTING_TESTS` | _(Optional)_ Set to `true` to skip TCP routing integration tests (TcpRoutesTest, RouterGroupsTest). Useful when the Cloud Foundry instance does not have TCP routing configured (i.e., no `routing_endpoint` in the info payload). Defaults to `false`.
-`TEST_QUOTAS_ROUTES_RESERVED_PORTS` | _(Optional)_ When set to a positive integer, sets reserved TCP route ports (`total_reserved_ports`) on the **default** organization quota to that value during integration test bootstrap. When set to -1, sets the reserved ports to _unlimited_. Use this when the platform leaves that limit at `0` on the default quota but you still run TCP routing tests (`SKIP_TCP_ROUTING_TESTS` unset or `false`). If unset, no quota change is applied. Maps to the Spring property `test.quotas.routes.reserved-ports`.
-`SKIP_V2_TESTS` | _(Optional)_ Set to `true` to skip all V2 API integration tests. Useful when the Cloud Foundry V2 API is rate-limited or unavailable. When enabled, tests annotated with `@RequiresV2Api` will be skipped, including V3 tests that depend on V2 API calls (e.g., service broker creation). Defaults to `false`.
+`UAA_API_REQUEST_LIMIT` | _(Optional)_ If your UAA server does rate limiting and returns 429 errors, set this variable to the smallest limit configured there. Whether your server limits UAA calls is shown in the log, together with the location of the configuration file on the server. Defaults to `0` (no limit).
 
 If you do not have access to a CloudFoundry instance with admin access, you can run one locally using [bosh-deployment](https://github.com/cloudfoundry/bosh-deployment) & [cf-deployment](https://github.com/cloudfoundry/cf-deployment/) and Virtualbox.
 

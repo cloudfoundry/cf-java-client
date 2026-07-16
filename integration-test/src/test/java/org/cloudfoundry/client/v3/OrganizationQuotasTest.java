@@ -19,11 +19,16 @@ package org.cloudfoundry.client.v3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
+import java.util.List;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v3.quotas.*;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.Organization;
+import org.cloudfoundry.client.v3.quotas.Apps;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.Services;
 import org.cloudfoundry.client.v3.quotas.organizations.*;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
@@ -197,6 +202,43 @@ public final class OrganizationQuotasTest extends AbstractIntegrationTest {
                 .verify(Duration.ofMinutes(5));
     }
 
+    @Test
+    public void apply() {
+        String orgName = this.nameFactory.getOrganizationName();
+        String organizationId = createOrganization(this.cloudFoundryClient, orgName).getId();
+        Relationship organizationRelationship1 = Relationship.builder().id(organizationId).build();
+        ToManyRelationship organizationRelationships =
+                ToManyRelationship.builder().data(organizationRelationship1).build();
+
+        String organizationQuotaName = this.nameFactory.getQuotaDefinitionName();
+
+        createOrganizationQuotaId(this.cloudFoundryClient, organizationQuotaName)
+                .flatMap(
+                        organizationQuotaId -> {
+                            ApplyOrganizationQuotaRequest applyOrganizationQuotaRequest =
+                                    ApplyOrganizationQuotaRequest.builder()
+                                            .organizationQuotaId(organizationQuotaId)
+                                            .organizationRelationships(organizationRelationships)
+                                            .build();
+                            return this.cloudFoundryClient
+                                    .organizationQuotasV3()
+                                    .apply(applyOrganizationQuotaRequest);
+                        })
+                .as(StepVerifier::create)
+                .consumeNextWith(
+                        applyOrganizationQuotaResponse -> {
+                            List<Relationship> organizationRelationshipsData =
+                                    applyOrganizationQuotaResponse
+                                            .organizationRelationships()
+                                            .getData();
+                            assertThat(organizationRelationshipsData.size()).isEqualTo(1);
+                            assertThat(organizationRelationshipsData.get(0).getId())
+                                    .isEqualTo(organizationId);
+                        })
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
     private static Mono<String> createOrganizationQuotaId(
             CloudFoundryClient cloudFoundryClient, String organizationQuotaName) {
         return createOrganizationQuota(cloudFoundryClient, organizationQuotaName)
@@ -224,5 +266,13 @@ public final class OrganizationQuotasTest extends AbstractIntegrationTest {
                                                 .name(organizationName)
                                                 .page(page)
                                                 .build()));
+    }
+
+    private static Organization createOrganization(
+            CloudFoundryClient cloudFoundryClient, String orgName) {
+        return cloudFoundryClient
+                .organizationsV3()
+                .create(CreateOrganizationRequest.builder().name(orgName).build())
+                .block(Duration.ofMinutes(5));
     }
 }

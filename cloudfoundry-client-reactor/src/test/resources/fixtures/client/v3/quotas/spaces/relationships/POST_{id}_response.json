@@ -1,0 +1,18 @@
+{
+  "data": [
+    {
+      "guid": "space-guid1"
+    },
+    {
+      "guid": "space-guid2"
+    },
+    {
+      "guid": "previous-space-guid"
+    }
+  ],
+  "links": {
+    "self": {
+      "href": "https://api.example.org/v3/space_quotas/24637893-3b77-489d-bb79-8466f0d88b52/relationships/spaces"
+    }
+  }
+}

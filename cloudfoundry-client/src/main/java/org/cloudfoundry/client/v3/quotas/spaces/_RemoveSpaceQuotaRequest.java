@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.doppler;
+package org.cloudfoundry.client.v3.quotas.spaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request payload for the Recent Logs endpoint
+ * The request payload to Remove a space quota from a space
  */
 @Value.Immutable
-abstract class _RecentLogsRequest {
+abstract class _RemoveSpaceQuotaRequest {
 
     /**
-     * The application id
+     * The space quota id
      */
     @JsonIgnore
-    abstract String getApplicationId();
+    abstract String getSpaceQuotaId();
+
+    /**
+     * The space id
+     */
+    @JsonIgnore
+    abstract String getSpaceId();
 
 }

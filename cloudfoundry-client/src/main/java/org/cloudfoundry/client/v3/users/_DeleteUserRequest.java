@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.doppler;
+package org.cloudfoundry.client.v3.users;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.immutables.value.Value;
 
-import org.junit.jupiter.api.Test;
+/**
+ * The request payload for the Delete User operation
+ * All roles associated with a user will be deleted if the user is deleted.
+ */
+@Value.Immutable
+abstract class _DeleteUserRequest {
 
-final class RecentLogsRequestTest {
+    /**
+     * The User id / guid
+     */
+    @JsonIgnore
+    abstract String getUserId();
 
-    @Test
-    void noApplicationId() {
-        assertThrows(
-                IllegalStateException.class,
-                () -> {
-                    RecentLogsRequest.builder().build();
-                });
-    }
-
-    @Test
-    void valid() {
-        RecentLogsRequest.builder().applicationId("test-application-id").build();
-    }
 }

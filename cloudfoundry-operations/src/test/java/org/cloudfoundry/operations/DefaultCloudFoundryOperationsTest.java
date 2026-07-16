@@ -26,6 +26,7 @@ final class DefaultCloudFoundryOperationsTest extends AbstractOperationsTest {
             DefaultCloudFoundryOperations.builder()
                     .cloudFoundryClient(this.cloudFoundryClient)
                     .dopplerClient(this.dopplerClient)
+                    .routingClient(this.routingClient)
                     .organization(TEST_ORGANIZATION_NAME)
                     .space(TEST_SPACE_NAME)
                     .uaaClient(this.uaaClient)

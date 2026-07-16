@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,26 +14,20 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.operations.applications;
+package org.cloudfoundry.client.v3.users;
 
-import org.cloudfoundry.Nullable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.immutables.value.Value;
 
 /**
- * The request options for the application logs operation
+ * The request payload for the Get User operation
  */
 @Value.Immutable
-abstract class _LogsRequest {
+abstract class _GetUserRequest {
 
     /**
-     * The name of the application
+     * The User id / guid
      */
-    abstract String getName();
-
-    /**
-     * Whether only recent logs should be retrieved
-     */
-    @Nullable
-    abstract Boolean getRecent();
-
+    @JsonIgnore
+    abstract String getUserId();
 }

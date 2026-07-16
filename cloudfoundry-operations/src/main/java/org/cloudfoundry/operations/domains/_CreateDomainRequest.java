@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.operations.domains;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -32,6 +33,13 @@ abstract class _CreateDomainRequest {
     /**
      * The organization name of the domain
      */
+    @Nullable
     abstract String getOrganization();
+
+    /**
+     * The router group of the domain
+     */
+    @Nullable
+    abstract String getRouterGroup();
 
 }
