@@ -9,5 +9,6 @@
   ],
   "autoapprove": [
     "clients.autoapprove"
-  ]
+  ],
+  "allowpublic": true
 }

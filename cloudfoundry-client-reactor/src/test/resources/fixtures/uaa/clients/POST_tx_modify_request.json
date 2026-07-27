@@ -39,6 +39,7 @@
     "redirect_uri": [
       "http://test1.com",
       "http*://ant.path.wildcard/**/passback/*"
-    ]
+    ],
+    "allowpublic": true
   }
 ]

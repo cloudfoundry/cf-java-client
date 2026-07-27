@@ -121,6 +121,7 @@ public final class ClientsTest extends AbstractIntegrationTest {
                                                 .authorizedGrantType(PASSWORD)
                                                 .clientId(clientId1)
                                                 .clientSecret(clientSecret)
+                                                .allowPublic(false)
                                                 .scopes("client.read", "client.write")
                                                 .tokenSalt("test-token-salt")
                                                 .build())
@@ -130,21 +131,33 @@ public final class ClientsTest extends AbstractIntegrationTest {
                                                 .authorizedGrantTypes(PASSWORD, REFRESH_TOKEN)
                                                 .clientId(clientId2)
                                                 .clientSecret(clientSecret)
+                                                .allowPublic(true)
                                                 .scope("client.write")
                                                 .tokenSalt("filtered-test-token-salt")
                                                 .build())
                                 .build())
                 .flatMapIterable(BatchCreateClientsResponse::getClients)
-                .filter(client -> clientId1.equals(client.getClientId()))
+                .collectMap(Client::getClientId)
                 .as(StepVerifier::create)
                 .consumeNextWith(
-                        response -> {
-                            assertThat(response.getAuthorizedGrantTypes())
+                        clients -> {
+                            Client client1 = clients.get(clientId1);
+                            assertThat(client1).isNotNull();
+                            assertThat(client1.getAuthorizedGrantTypes())
                                     .containsExactly(PASSWORD, REFRESH_TOKEN);
-                            assertThat(response.getClientId()).isEqualTo(clientId1);
-                            assertThat(response.getScopes())
+                            assertThat(client1.getScopes())
                                     .containsExactly("client.read", "client.write");
-                            assertThat(response.getTokenSalt()).isEqualTo("test-token-salt");
+                            assertThat(client1.getTokenSalt()).isEqualTo("test-token-salt");
+                            assertThat(client1.getAllowPublic()).isFalse();
+
+                            Client client2 = clients.get(clientId2);
+                            assertThat(client2).isNotNull();
+                            assertThat(client2.getAuthorizedGrantTypes())
+                                    .containsExactlyInAnyOrder(PASSWORD, REFRESH_TOKEN);
+                            assertThat(client2.getScopes()).containsExactly("client.write");
+                            assertThat(client2.getTokenSalt())
+                                    .isEqualTo("filtered-test-token-salt");
+                            assertThat(client2.getAllowPublic()).isTrue();
                         })
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
