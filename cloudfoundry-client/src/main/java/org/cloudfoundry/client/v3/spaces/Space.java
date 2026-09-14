@@ -45,4 +45,12 @@ public abstract class Space extends Resource {
     @JsonProperty("relationships")
     @Nullable
     public abstract SpaceRelationships getRelationships();
+
+    /**
+     * True if the space is suspended and no changes are allowed.
+     * See: https://v3-apidocs.cloudfoundry.org/index.html#spaces
+     */
+    @JsonProperty("suspended")
+    @Nullable
+    public abstract Boolean getSuspended();
 }
