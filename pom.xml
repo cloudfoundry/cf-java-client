@@ -58,18 +58,18 @@
         <java.version>1.8</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <dependencies.version>2.7.17</dependencies.version>
+        <dependencies.version>2.7.18</dependencies.version>
 
-        <commons-compress.version>1.27.1</commons-compress.version>
-        <commons-lang3.version>3.13.0</commons-lang3.version>
+        <commons-compress.version>1.28.0</commons-compress.version>
+        <commons-lang3.version>3.20.0</commons-lang3.version>
         <evo-inflector.version>1.3</evo-inflector.version>
-        <immutables.version>2.10.1</immutables.version>
-        <jackson.version>2.16.1</jackson.version>
+        <immutables.version>2.12.2</immutables.version>
+        <jackson.version>2.19.0</jackson.version>
         <java-semver.version>0.10.2</java-semver.version>
-        <jjwt.version>0.12.6</jjwt.version>
-        <junit-jupiter.version>5.10.1</junit-jupiter.version>
+        <jjwt.version>0.12.7</jjwt.version>
+        <junit-jupiter.version>5.14.4</junit-jupiter.version>
         <mockito.version>5.8.0</mockito.version>
-        <snakeyaml.version>2.2</snakeyaml.version>
+        <snakeyaml.version>2.4</snakeyaml.version>
         <wire.version>3.7.1</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <wire.suffix></wire.suffix>
@@ -133,7 +133,22 @@
                 <artifactId>value</artifactId>
                 <version>${immutables.version}</version>
             </dependency>
-        </dependencies>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+            <version>${jackson.version}</version>
+            </dependency>
+       </dependencies>
     </dependencyManagement>
 
     <build>
