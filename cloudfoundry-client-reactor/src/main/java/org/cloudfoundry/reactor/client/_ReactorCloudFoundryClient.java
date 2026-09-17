@@ -73,6 +73,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.serviceroutebindings.ServiceRouteBindingsV3;
 import org.cloudfoundry.client.v3.quotas.spaces.SpaceQuotasV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
@@ -133,6 +134,7 @@ import org.cloudfoundry.reactor.client.v3.servicebrokers.ReactorServiceBrokersV3
 import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.serviceofferings.ReactorServiceOfferingsV3;
 import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
+import org.cloudfoundry.reactor.client.v3.serviceroutebindings.ReactorServiceRouteBindingsV3;
 import org.cloudfoundry.reactor.client.v3.quotas.spaces.ReactorSpaceQuotasV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
@@ -546,4 +548,9 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
      */
     abstract TokenProvider getTokenProvider();
 
+    @Override
+    @Value.Derived
+    public ServiceRouteBindingsV3 serviceRouteBindingsV3() {
+        return new ReactorServiceRouteBindingsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
 }

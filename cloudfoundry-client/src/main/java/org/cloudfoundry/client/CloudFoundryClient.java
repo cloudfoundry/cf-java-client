@@ -71,6 +71,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.serviceroutebindings.ServiceRouteBindingsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -382,4 +383,10 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Users Client API
      */
     Users users();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Route Bindings V3 Client API
+     * See <a href="https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding">https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding</a>
+     */
+    ServiceRouteBindingsV3 serviceRouteBindingsV3();
 }
