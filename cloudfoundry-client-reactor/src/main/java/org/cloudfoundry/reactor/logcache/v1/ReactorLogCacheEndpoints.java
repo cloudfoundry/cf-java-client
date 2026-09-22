@@ -21,6 +21,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
+import org.cloudfoundry.AbstractCloudFoundryException;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.InfoRequest;
@@ -32,10 +33,15 @@ import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.TokenProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
+
+    private static final Logger LOGGER =
+            LoggerFactory.getLogger(ReactorLogCacheEndpoints.class);
 
     ReactorLogCacheEndpoints(
             ConnectionContext connectionContext,
@@ -116,7 +122,16 @@ final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
                             }
 
                             return read(builder.build())
-                                    .onErrorReturn(ReadResponse.builder().build())
+                                    .onErrorResume(
+                                            t -> {
+                                                if (t instanceof AbstractCloudFoundryException) {
+                                                    return Mono.error(t);
+                                                }
+                                                LOGGER.warn(
+                                                        "Transient error polling Log Cache, retrying",
+                                                        t);
+                                                return Mono.just(ReadResponse.builder().build());
+                                            })
                                     .flatMapMany(
                                             resp -> {
                                                 List<Envelope> raw =
