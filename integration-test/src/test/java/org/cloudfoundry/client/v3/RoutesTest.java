@@ -145,48 +145,47 @@ public final class RoutesTest extends AbstractIntegrationTest {
                                         this.spaceId))
                 .flatMap(
                         function(
-                                (domainId, spaceId) -> {
-                                    var options =
-                                            RouteOptions.builder()
-                                                    .loadbalancing("round-robin")
-                                                    .build();
-                                    return this.cloudFoundryClient
-                                            .routesV3()
-                                            .create(
-                                                    CreateRouteRequest.builder()
-                                                            .metadata(
-                                                                    Metadata.builder()
-                                                                            .label(
-                                                                                    "test-createWithOptions-key",
-                                                                                    "test-createWithOptions-value")
-                                                                            .build())
-                                                            .options(options)
-                                                            .relationships(
-                                                                    RouteRelationships.builder()
-                                                                            .domain(
-                                                                                    ToOneRelationship
-                                                                                            .builder()
-                                                                                            .data(
-                                                                                                    Relationship
-                                                                                                            .builder()
-                                                                                                            .id(
-                                                                                                                    domainId)
-                                                                                                            .build())
-                                                                                            .build())
-                                                                            .space(
-                                                                                    ToOneRelationship
-                                                                                            .builder()
-                                                                                            .data(
-                                                                                                    Relationship
-                                                                                                            .builder()
-                                                                                                            .id(
-                                                                                                                    spaceId)
-                                                                                                            .build())
-                                                                                            .build())
-                                                                            .build())
-                                                            .build())
-                                            .thenReturn(domainId);
-                                }))
+                                (domainId, spaceId) ->
+                                        this.cloudFoundryClient
+                                                .routesV3()
+                                                .create(
+                                                        CreateRouteRequest.builder()
+                                                                .metadata(
+                                                                        Metadata.builder()
+                                                                                .label(
+                                                                                        "test-createWithOptions-key",
+                                                                                        "test-createWithOptions-value")
+                                                                                .build())
+                                                                .options(
+                                                                        RouteOptions.builder()
+                                                                                .loadbalancing(
+                                                                                        "round-robin")
+                                                                                .build())
+                                                                .relationships(
+                                                                        RouteRelationships.builder()
+                                                                                .domain(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        domainId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .space(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        spaceId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .build())
+                                                                .build())
+                                                .thenReturn(domainId)))
                 .flatMapMany(domainId -> requestListRoutes(this.cloudFoundryClient, domainId))
                 .map(RouteResource::getOptions)
                 .map(RouteOptions::getLoadbalancing)
