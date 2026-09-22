@@ -133,6 +133,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                                 .resourceId("none")
                                                 .scopes("clients.read", "clients.write")
                                                 .tokenSalt("uHICvG")
+                                                .allowPublic(true)
                                                 .build())
                                 .client(
                                         Client.builder()
@@ -155,6 +156,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                                 .resourceId("none")
                                                 .scopes("clients.read", "clients.write")
                                                 .tokenSalt("WjlWvu")
+                                                .allowPublic(true)
                                                 .build())
                                 .build())
                 .expectComplete()
@@ -279,6 +281,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .client(
                                         Client.builder()
                                                 .approvalsDeleted(true)
+                                                .allowPublic(true)
                                                 .allowedProviders("uaa", "ldap", "my-saml-provider")
                                                 .authorities("clients.read", "clients.write")
                                                 .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -296,6 +299,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .client(
                                         Client.builder()
                                                 .approvalsDeleted(true)
+                                                .allowPublic(true)
                                                 .allowedProviders("uaa", "ldap", "my-saml-provider")
                                                 .authorities("clients.read", "clients.write")
                                                 .authorizedGrantType(CLIENT_CREDENTIALS)
@@ -469,6 +473,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .authorities("clients.read", "clients.write")
                                 .authorizedGrantType(CLIENT_CREDENTIALS)
                                 .autoApprove("true")
+                                .allowPublic(true)
                                 .clientId("aPq3I1")
                                 .clientSecret("secret")
                                 .name("My Client Name")
@@ -494,6 +499,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .resourceId("none")
                                 .scopes("clients.read", "clients.write")
                                 .tokenSalt("hRZ21X")
+                                .allowPublic(true)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -819,6 +825,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                                 .refreshTokenValidity(7000L)
                                                 .scopes("clients.read", "clients.write")
                                                 .tokenSalt("UpzrHR")
+                                                .allowPublic(true)
                                                 .build())
                                 .build())
                 .as(StepVerifier::create)
@@ -852,6 +859,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                                 .resourceId("none")
                                                 .scopes("clients.read", "clients.write")
                                                 .tokenSalt("WjlWvu")
+                                                .allowPublic(true)
                                                 .build())
                                 .client(
                                         ActionClient.builder()
@@ -871,6 +879,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                                 .resourceId("none")
                                                 .scopes("clients.read", "clients.write")
                                                 .tokenSalt("UpzrHR")
+                                                .allowPublic(true)
                                                 .build())
                                 .build())
                 .expectComplete()
@@ -901,6 +910,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .autoApprove("clients.autoapprove")
                                 .clientId("55pTMX")
                                 .scopes("clients.new", "clients.autoapprove")
+                                .allowPublic(true)
                                 .build())
                 .as(StepVerifier::create)
                 .expectNext(
@@ -918,6 +928,7 @@ final class ReactorClientsTest extends AbstractUaaApiTest {
                                 .resourceId("none")
                                 .scopes("clients.new", "clients.autoapprove")
                                 .tokenSalt("8mwCEy")
+                                .allowPublic(true)
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
