@@ -307,17 +307,18 @@ public class IntegrationTestConfiguration {
             @Value("${test.proxy.password:}") String proxyPassword,
             @Value("${test.proxy.port:8080}") Integer proxyPort,
             @Value("${test.proxy.username:}") String proxyUsername,
+            @Value("${test.fail.on.unknown.properties:true}") Boolean failOnUnknownProperties,
             @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
 
         DefaultConnectionContext.Builder connectionContext =
                 DefaultConnectionContext.builder()
                         .apiHost(apiHost)
-                        .problemHandler(
-                                new FailingDeserializationProblemHandler()) // Test-only problem
-                        // handler
                         .skipSslValidation(skipSslValidation)
                         .sslHandshakeTimeout(Duration.ofSeconds(30));
-
+        if(failOnUnknownProperties) {
+            connectionContext.problemHandler(
+                    new FailingDeserializationProblemHandler()); // Test-only problem handler
+        }
         if (StringUtils.hasText(proxyHost)) {
             ProxyConfiguration.Builder proxyConfiguration =
                     ProxyConfiguration.builder().host(proxyHost).port(proxyPort);

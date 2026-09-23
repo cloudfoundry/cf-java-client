@@ -353,6 +353,7 @@ Name | Description
 `TEST_PROXY_PORT` | _(Optional)_ The port of a proxy to route all requests through. Defaults to `8080`.
 `TEST_PROXY_USERNAME` | _(Optional)_ The username for a proxy to route all requests through
 `TEST_SKIPSSLVALIDATION` | _(Optional)_ Whether to skip SSL validation when connecting to the Cloud Foundry instance.  Defaults to `false`.
+`TEST_FAIL_ON_UNKNOWN_PROPERTIES` | _(Optional)_ If "true", unknown values received from CF result in a parsing error. This usually happens when client and server versions do not match. When "false", unknown properties will be ignored allowing the execution of integration-tests. Use with care!  Defaults to `true`.
 `SKIP_BROWSER_AUTH_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require browser-based authentication (e.g., SSO tests). Useful when the Cloud Foundry instance's UAA does not have browser-based authentication configured. Defaults to `false`.
 `SKIP_METRIC_REGISTRAR_TESTS` | _(Optional)_ Set to `true` to skip integration tests that require the Metric Registrar service (e.g., MetricRegistrarTest). Useful when the Cloud Foundry instance does not have the Metric Registrar service available. Defaults to `false`.
 `SKIP_TCP_ROUTING_TESTS` | _(Optional)_ Set to `true` to skip TCP routing integration tests (TcpRoutesTest, RouterGroupsTest). Useful when the Cloud Foundry instance does not have TCP routing configured (i.e., no `routing_endpoint` in the info payload). Defaults to `false`.
