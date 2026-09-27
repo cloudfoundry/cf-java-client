@@ -30,7 +30,8 @@
     ],
     "name": "My Client Name",
     "lastModified": 1468364444461,
-    "approvals_deleted": true
+    "approvals_deleted": true,
+    "allowpublic": true
   },
   {
     "scope": [
@@ -63,6 +64,7 @@
     ],
     "name": "My Client Name",
     "lastModified": 1468364444868,
-    "approvals_deleted": true
+    "approvals_deleted": true,
+    "allowpublic": true
   }
 ]

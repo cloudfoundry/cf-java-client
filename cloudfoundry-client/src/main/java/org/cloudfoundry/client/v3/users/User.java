@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2025 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.cloudfoundry.client.v3.spaces;
+package org.cloudfoundry.client.v3.users;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import org.cloudfoundry.Nullable;
@@ -22,35 +22,35 @@ import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.Resource;
 
 /**
- * Base class for responses that are spaces
+ * Base class for responses that are users
  */
-public abstract class Space extends Resource {
+public abstract class User extends Resource {
 
     /**
-     * The metadata
+     * The name registered in UAA; will be null for UAA clients and non-UAA users
+     */
+    @JsonProperty("username")
+    @Nullable
+    public abstract String getUsername();
+
+    /**
+     * The name displayed for the user; for UAA users, this is the same as the username. For UAA clients, this is the UAA client ID
+     */
+    @JsonProperty("presentation_name")
+    @Nullable
+    public abstract String getPresentationName();
+
+    /**
+     * The identity provider for the UAA user; will be null for UAA clients
+     */
+    @JsonProperty("origin")
+    @Nullable
+    public abstract String getOrigin();
+
+    /**
+     * The metadata Labels and Annotations applied to the user
      */
     @JsonProperty("metadata")
     @Nullable
     public abstract Metadata getMetadata();
-
-    /**
-     * The name
-     */
-    @JsonProperty("name")
-    public abstract String getName();
-
-    /**
-     * The relationships
-     */
-    @JsonProperty("relationships")
-    @Nullable
-    public abstract SpaceRelationships getRelationships();
-
-    /**
-     * True if the space is suspended and no changes are allowed.
-     * See: https://v3-apidocs.cloudfoundry.org/index.html#spaces
-     */
-    @JsonProperty("suspended")
-    @Nullable
-    public abstract Boolean getSuspended();
 }

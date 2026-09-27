@@ -25,5 +25,6 @@
     "clients.read",
     "clients.write"
   ],
-  "token_salt": "hRZ21X"
+  "token_salt": "hRZ21X",
+  "allowpublic": true
 }
