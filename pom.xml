@@ -124,6 +124,11 @@
                 <version>${commons-compress.version}</version>
             </dependency>
             <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>${commons-lang3.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.atteo</groupId>
                 <artifactId>evo-inflector</artifactId>
                 <version>${evo-inflector.version}</version>
