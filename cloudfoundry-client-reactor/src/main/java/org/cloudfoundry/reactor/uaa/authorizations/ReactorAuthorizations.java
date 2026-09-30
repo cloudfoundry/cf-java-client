@@ -18,6 +18,8 @@ package org.cloudfoundry.reactor.uaa.authorizations;
 
 import static io.netty.handler.codec.http.HttpHeaderNames.AUTHORIZATION;
 
+import io.netty.handler.codec.http.HttpHeaderNames;
+import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.util.AsciiString;
 import java.util.Map;
@@ -99,7 +101,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                         builder ->
                                 builder.pathSegment("oauth", "authorize")
                                         .queryParam("response_type", ResponseType.CODE),
-                        outbound -> {},
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        },
                         ReactorAuthorizations::removeAuthorization)
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
@@ -114,7 +121,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                                 builder.pathSegment("oauth", "authorize")
                                         .queryParam(
                                                 "response_type", ResponseType.CODE_AND_ID_TOKEN),
-                        outbound -> {},
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        },
                         ReactorAuthorizations::removeAuthorization)
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
@@ -126,7 +138,8 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
         return get(
                         request,
                         GetOpenIdProviderConfigurationResponse.class,
-                        builder -> builder.pathSegment(".well-known", "openid-configuration"))
+                        builder -> builder.pathSegment(".well-known", "openid-configuration"),
+                        ReactorAuthorizations::removeAuthorization)
                 .checkpoint();
     }
 
@@ -137,7 +150,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                         builder ->
                                 builder.pathSegment("oauth", "authorize")
                                         .queryParam("response_type", ResponseType.TOKEN),
-                        outbound -> {},
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        },
                         ReactorAuthorizations::removeAuthorization)
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
@@ -152,7 +170,12 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                                 builder.pathSegment("oauth", "authorize")
                                         .queryParam(
                                                 "response_type", ResponseType.CODE_AND_ID_TOKEN),
-                        outbound -> {},
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        },
                         ReactorAuthorizations::removeAuthorization)
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
@@ -164,7 +187,14 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                         request,
                         builder ->
                                 builder.pathSegment("oauth", "authorize")
-                                        .queryParam("response_type", ResponseType.ID_TOKEN))
+                                        .queryParam("response_type", ResponseType.ID_TOKEN),
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        },
+                        ReactorAuthorizations::removeAuthorization)
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
     }
@@ -177,7 +207,13 @@ public final class ReactorAuthorizations extends AbstractUaaOperations implement
                         builder ->
                                 builder.pathSegment("oauth", "authorize")
                                         .queryParam(
-                                                "response_type", ResponseType.TOKEN_AND_ID_TOKEN))
+                                                "response_type", ResponseType.TOKEN_AND_ID_TOKEN),
+                        outbound -> {
+                            outbound.remove(HttpHeaderNames.ACCEPT);
+                            outbound.add(
+                                    HttpHeaderNames.ACCEPT,
+                                    HttpHeaderValues.APPLICATION_X_WWW_FORM_URLENCODED);
+                        })
                 .map(inbound -> inbound.responseHeaders().get(LOCATION))
                 .checkpoint();
     }
