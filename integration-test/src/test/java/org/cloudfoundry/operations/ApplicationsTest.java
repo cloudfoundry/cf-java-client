@@ -2020,7 +2020,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .push(
                         PushApplicationRequest.builder()
                                 .diskQuota(512)
-                                .dockerImage("cloudfoundry/lattice-app")
+                                .dockerImage("cloudfoundry/grace")
                                 .healthCheckType(ApplicationHealthCheck.PORT)
                                 .memory(64)
                                 .name(name)

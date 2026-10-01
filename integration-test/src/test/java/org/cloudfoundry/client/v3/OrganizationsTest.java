@@ -168,9 +168,12 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
 
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_7)
     @Test
+    /* the default domain name is configured by the admin during deployment of the cf landscape.
+     * There is no way to guarantee that it matches the APIHOST or any substring of it.
+     * Therefore we only check if the endpoint can be called and returns something.
+     */
     public void getDefaultDomain() {
         String organizationName = this.nameFactory.getOrganizationName();
-
         createOrganizationId(this.cloudFoundryClient, organizationName)
                 .flatMap(
                         organizationId ->
@@ -182,8 +185,7 @@ public final class OrganizationsTest extends AbstractIntegrationTest {
                                                         .build()))
                 .map(GetOrganizationDefaultDomainResponse::getName)
                 .as(StepVerifier::create)
-                .consumeNextWith(
-                        name -> assertThat(name).contains("apps.", ".shepherd.tanzu.broadcom.net"))
+                .consumeNextWith(name -> assertThat(name).isNotEmpty())
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
