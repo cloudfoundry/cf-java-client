@@ -395,5 +395,4 @@ public interface CloudFoundryClient {
      * See <a href="https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding">https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding</a>
      */
     ServiceRouteBindingsV3 serviceRouteBindingsV3();
-
 }

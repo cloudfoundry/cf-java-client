@@ -315,7 +315,7 @@ public class IntegrationTestConfiguration {
                         .apiHost(apiHost)
                         .skipSslValidation(skipSslValidation)
                         .sslHandshakeTimeout(Duration.ofSeconds(30));
-        if(failOnUnknownProperties) {
+        if (failOnUnknownProperties) {
             connectionContext.problemHandler(
                     new FailingDeserializationProblemHandler()); // Test-only problem handler
         }
