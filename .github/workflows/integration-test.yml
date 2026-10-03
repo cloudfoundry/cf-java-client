@@ -1,0 +1,52 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      java-versions:
+        description: 'JSON array of Java versions to test'
+        required: false
+        default: '[8, 11, 17, 21]'
+  schedule:
+    - cron: '0 3 * * 1-5'
+
+concurrency:
+  group: integration-test
+  cancel-in-progress: false
+
+jobs:
+  integration-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      # All jobs share a single Cloud Foundry environment, so run them one at a time
+      max-parallel: 1
+      matrix:
+        java: ${{ fromJSON(inputs.java-versions || '[8, 11, 17, 21]') }}
+    name: Java ${{ matrix.java }} integration test
+    env:
+      TEST_APIHOST: ${{ secrets.TEST_APIHOST }}
+      TEST_ADMIN_USERNAME: ${{ secrets.TEST_ADMIN_USERNAME }}
+      TEST_ADMIN_PASSWORD: ${{ secrets.TEST_ADMIN_PASSWORD }}
+      TEST_ADMIN_CLIENTID: ${{ secrets.TEST_ADMIN_CLIENTID }}
+      TEST_ADMIN_CLIENTSECRET: ${{ secrets.TEST_ADMIN_CLIENTSECRET }}
+      TEST_SKIPSSLVALIDATION: 'true'
+      TEST_QUOTAS_ROUTES_RESERVEDPORTS: '50'
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prepare multi-module build
+        run: git submodule update --init --recursive
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: liberica
+          java-version: ${{ matrix.java }}
+      - name: Cache Maven packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Run integration tests
+        run: ./mvnw -B -Pintegration-test test -Dgpg.skip
