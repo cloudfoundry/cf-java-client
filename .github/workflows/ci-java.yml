@@ -39,3 +39,9 @@ jobs:
         name: Check style with Spotless
         run:  ./mvnw spotless:check -Pintegration-test
 
+  integration-test:
+    needs: build
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      java-versions: '[21]'
+
