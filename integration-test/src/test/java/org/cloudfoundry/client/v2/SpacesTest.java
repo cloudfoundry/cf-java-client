@@ -22,6 +22,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -1887,7 +1888,7 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listServicesFilterByServiceBrokerId() {
-        List<String> expectedValues = List.of(this.serviceName, this.serviceName + "-shareable");
+        List<String> expectedValues = Arrays.asList(this.serviceName, this.serviceName + "-shareable");
         Mono.zip(this.serviceBrokerId, this.spaceId)
                 .flatMapMany(
                         function(
