@@ -36,6 +36,10 @@ abstract class _CreateDeploymentRequest {
     @Nullable
     abstract Relationship getDroplet();
 
+    @JsonProperty("strategy")
+    @Nullable
+    abstract DeploymentStrategy getDeploymentStrategy();
+
     /**
      * The relationships
      */
