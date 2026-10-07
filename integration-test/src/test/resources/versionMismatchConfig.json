@@ -1,0 +1,12 @@
+[
+    {
+        "class": "org.cloudfoundry.uaa.tokens.GrantType",
+        "pointer": "/resources/*/authorized_grant_types/*",
+        "property": "urn:ietf:params:oauth:grant-type:jwt-bearer"
+    },
+    {
+        "class": "org.cloudfoundry.uaa.identityzones.IdentityZoneConfiguration.Json",
+        "pointer": "/0/config/defaultIdentityProvider",
+        "property": "defaultIdentityProvider"
+    }
+]

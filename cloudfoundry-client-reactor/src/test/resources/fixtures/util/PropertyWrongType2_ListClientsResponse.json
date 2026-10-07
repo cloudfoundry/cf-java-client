@@ -1,0 +1,11 @@
+{
+  "resources": [
+    {
+      "client_id": "cf_smoke_tests",
+      "autoapprove": "true"
+    }
+  ],
+  "startIndex": 1,
+  "itemsPerPage": 37,
+  "totalResults": 37
+}
