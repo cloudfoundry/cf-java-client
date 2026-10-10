@@ -21,6 +21,7 @@ import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.Map;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentRequest;
 import org.cloudfoundry.client.v2.applications.ApplicationEnvironmentResponse;
@@ -66,6 +67,7 @@ import org.cloudfoundry.reactor.TokenProvider;
 import org.cloudfoundry.reactor.client.v2.AbstractClientV2Operations;
 import org.cloudfoundry.reactor.util.MultipartHttpClientRequest;
 import org.cloudfoundry.util.FileUtils;
+import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -356,11 +358,23 @@ public final class ReactorApplicationsV2 extends AbstractClientV2Operations
         return put(
                         request,
                         UploadApplicationResponse.class,
-                        builder -> builder.pathSegment("apps", request.getApplicationId(), "bits"),
+                        builder -> uploadUri(builder, request),
                         multipartRequest ->
                                 upload(request.getApplication(), multipartRequest, request),
                         onTerminate)
                 .checkpoint();
+    }
+
+    // The nginx upload module of CAPI can drop the "resources" form field ("missing :resources").
+    // Cloud Controller also takes it as query parameter, but only an empty list fits into a URL.
+    private static UriComponentsBuilder uploadUri(
+            UriComponentsBuilder builder, UploadApplicationRequest request) {
+        builder.pathSegment("apps", request.getApplicationId(), "bits");
+        if (request.getResources().isEmpty()) {
+            builder.queryParam("resources", "{resources}")
+                    .uriVariables(Collections.singletonMap("resources", "[]"));
+        }
+        return builder;
     }
 
     private void upload(
