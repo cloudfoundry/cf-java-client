@@ -21,6 +21,8 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
+import java.util.List;
+
 /**
  * The payload for the ldap identity provider configuration
  */
@@ -62,6 +64,13 @@ abstract class _LdapConfiguration extends AbstractExternalIdentityProviderConfig
     @JsonProperty("bindUserDn")
     @Nullable
     abstract String getBindUserDistinguishedName();
+
+    /**
+     * The PEM encoded CA certificates used to validate the connection
+     */
+    @JsonProperty("caCertificates")
+    @Nullable
+    abstract List<String> getCaCertificates();
 
     /**
      * The group role attribute

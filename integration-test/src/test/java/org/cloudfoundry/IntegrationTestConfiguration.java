@@ -74,6 +74,9 @@ import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvide
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.routing.RoutingClient;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
+import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
@@ -254,6 +257,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn("routerGroupPorts")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -452,6 +456,55 @@ public class IntegrationTestConfiguration {
     @Bean
     String planName(NameFactory nameFactory) {
         return nameFactory.getPlanName();
+    }
+
+    // Tests allocate TCP ports from NameFactory, so the default router group has to reserve them
+    // regardless of the order in which the tests run (or of the deployment's default range).
+    @Bean(initMethod = "block")
+    Mono<Void> routerGroupPorts(
+            ConnectionContext connectionContext,
+            @Value("${test.admin.password}") String password,
+            @Value("${test.admin.username}") String username,
+            @Value("${skip.tcp.routing.tests:false}") boolean skipTcpRouting) {
+        if (skipTcpRouting) {
+            return Mono.empty();
+        }
+
+        // Not the shared routingClient: its token provider depends on the cleaner, which depends on
+        // this bean
+        RoutingClient routingClient =
+                ReactorRoutingClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(
+                                PasswordGrantTokenProvider.builder()
+                                        .password(password)
+                                        .username(username)
+                                        .build())
+                        .build();
+
+        return routingClient
+                .routerGroups()
+                .list(ListRouterGroupsRequest.builder().build())
+                .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+                .filter(group -> "default-tcp".equals(group.getName()))
+                .next()
+                .switchIfEmpty(
+                        Mono.fromRunnable(
+                                () ->
+                                        this.logger.warn(
+                                                "No default-tcp router group, TCP route tests will"
+                                                        + " fail")))
+                .flatMap(
+                        group ->
+                                routingClient
+                                        .routerGroups()
+                                        .update(
+                                                UpdateRouterGroupRequest.builder()
+                                                        .reservablePorts(
+                                                                RandomNameFactory.PORT_RANGE)
+                                                        .routerGroupId(group.getRouterGroupId())
+                                                        .build()))
+                .then();
     }
 
     @Bean
