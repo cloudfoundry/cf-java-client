@@ -1363,6 +1363,16 @@ final class ReactorApplicationsV2Test extends AbstractClientApiTest {
     }
 
     @Test
+    void uploadWithoutResourcesSendsResourcesQueryParameter() throws IOException {
+        uploadWithoutResources("/apps/test-application-id/bits?resources=%5B%5D", null);
+    }
+
+    @Test
+    void uploadAsyncWithoutResourcesSendsResourcesQueryParameter() throws IOException {
+        uploadWithoutResources("/apps/test-application-id/bits?async=true&resources=%5B%5D", true);
+    }
+
+    @Test
     void uploadDroplet() throws IOException {
         mockRequest(
                 InteractionContext.builder()
@@ -1435,6 +1445,51 @@ final class ReactorApplicationsV2Test extends AbstractClientApiTest {
                                                         "/v2/jobs/8d321cee-8633-42e9-a021-78876d0d389c")
                                                 .build())
                                 .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    private void uploadWithoutResources(String path, Boolean async) throws IOException {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(PUT)
+                                        .path(path)
+                                        .contents(
+                                                consumer(
+                                                        (headers, body) ->
+                                                                assertThat(
+                                                                                body.readString(
+                                                                                        Charset
+                                                                                                .defaultCharset()))
+                                                                        .contains(
+                                                                                "name=\"application\"")
+                                                                        .contains(
+                                                                                "name=\"resources\"")
+                                                                        .contains("[]")))
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(CREATED)
+                                        .payload(
+                                                "fixtures/client/v2/apps/PUT_{id}_bits_response.json")
+                                        .build())
+                        .build());
+
+        this.applications
+                .upload(
+                        UploadApplicationRequest.builder()
+                                .application(
+                                        new ClassPathResource(
+                                                        "fixtures/client/v2/apps/test-application.zip")
+                                                .getFile()
+                                                .toPath())
+                                .applicationId("test-application-id")
+                                .async(async)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNextCount(1)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }

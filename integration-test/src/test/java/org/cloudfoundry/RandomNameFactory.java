@@ -29,6 +29,11 @@ final class RandomNameFactory implements NameFactory {
 
     private static final int PORT_MINIMUM = 1025;
 
+    /**
+     * The router group port range that covers every port handed out by {@link #getPort()}
+     */
+    static final String PORT_RANGE = PORT_MINIMUM + "-" + PORT_MAXIMUM;
+
     private final Random random;
 
     private AtomicInteger port = new AtomicInteger(PORT_MINIMUM);

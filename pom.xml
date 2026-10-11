@@ -185,7 +185,7 @@
                     <version>3.11.2</version>
                     <configuration>
                         <links>
-                            <link>https://projectreactor.io/docs/core/release/api/</link>
+                            <link>https://javadoc.io/doc/io.projectreactor/reactor-core/latest/</link>
                         </links>
                         <quiet>true</quiet>
                         <source>8</source>
