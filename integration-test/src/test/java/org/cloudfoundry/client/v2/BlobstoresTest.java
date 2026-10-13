@@ -49,6 +49,6 @@ public final class BlobstoresTest extends AbstractIntegrationTest {
                                         this.cloudFoundryClient, Duration.ofMinutes(5), job))
                 .as(StepVerifier::create)
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 }

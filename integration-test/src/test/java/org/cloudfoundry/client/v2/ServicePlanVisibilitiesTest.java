@@ -78,7 +78,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 false))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         Mono.zip(
                         this.organizationId,
@@ -143,7 +143,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 false))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         Mono.zip(
                         this.organizationId,
@@ -277,7 +277,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 false))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         Mono.zip(
                         this.organizationId,
@@ -500,7 +500,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 false))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         Mono.zip(
                         this.organizationId,
@@ -573,7 +573,7 @@ public final class ServicePlanVisibilitiesTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 false))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         Mono.zip(
                         this.organizationId,

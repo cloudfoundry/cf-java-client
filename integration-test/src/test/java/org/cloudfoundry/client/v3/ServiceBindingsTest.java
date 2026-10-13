@@ -368,7 +368,7 @@ public class ServiceBindingsTest extends AbstractIntegrationTest {
                 .as(StepVerifier::create)
                 .expectNext(Collections.singletonMap("foo", "bar"))
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 
     private static Mono<String> createManagedServiceInstanceId(

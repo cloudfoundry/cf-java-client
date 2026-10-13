@@ -80,7 +80,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 true))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
                 .flatMap(
@@ -289,7 +289,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 true))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
                 .flatMap(

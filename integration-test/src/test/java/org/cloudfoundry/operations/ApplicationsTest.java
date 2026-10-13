@@ -1798,10 +1798,33 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                         .sequenceId(sequenceId)
                                                         .build())
                                         .thenReturn(sequenceId))
-                .flatMapMany(
+                .flatMap(
                         sequenceId ->
-                                requestListTasks(this.cloudFoundryOperations, applicationName)
-                                        .filter(task -> sequenceId.equals(task.getSequenceId())))
+                                Mono.defer(
+                                                () ->
+                                                        requestListTasks(
+                                                                        this.cloudFoundryOperations,
+                                                                        applicationName)
+                                                                .filter(
+                                                                        task ->
+                                                                                sequenceId.equals(
+                                                                                        task
+                                                                                                .getSequenceId()))
+                                                                .next()
+                                                                .flatMap(
+                                                                        task ->
+                                                                                TaskState.CANCELING
+                                                                                                .equals(
+                                                                                                        task
+                                                                                                                .getState())
+                                                                                        ? Mono
+                                                                                                .empty()
+                                                                                        : Mono.just(
+                                                                                                task)))
+                                        .repeatWhenEmpty(
+                                                repeat ->
+                                                        repeat.delayElements(
+                                                                Duration.ofSeconds(2))))
                 .map(Task::getState)
                 .as(StepVerifier::create)
                 .expectNext(TaskState.FAILED)
