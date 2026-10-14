@@ -19,7 +19,7 @@ package org.cloudfoundry.client.v3;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
-import java.util.List;
+import java.util.Arrays;
 import java.util.stream.Collectors;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.client.CloudFoundryClient;
@@ -64,7 +64,7 @@ public class FeatureFlagsV3Test extends AbstractIntegrationTest {
                         names ->
                                 assertThat(names)
                                         .containsAll(
-                                                List.of(
+                                                Arrays.asList(
                                                         "app_bits_upload",
                                                         "app_scaling",
                                                         "diego_docker",
