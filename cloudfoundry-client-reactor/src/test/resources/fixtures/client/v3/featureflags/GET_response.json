@@ -1,0 +1,27 @@
+{
+  "pagination": {
+    "total_results": 2,
+    "first": {
+      "href": "https://api.example.org/v3/feature_flags?page=1&per_page=50"
+    },
+    "last": {
+      "href": "https://api.example.org/v3/feature_flags?page=1&per_page=50"
+    },
+    "next": null,
+    "previous": null
+  },
+  "resources": [
+    {
+      "name": "app_scaling",
+      "enabled": true,
+      "custom_error_message": null,
+      "updated_at": "2020-03-10T15:49:32Z"
+    },
+    {
+      "name": "user_org_creation",
+      "enabled": false,
+      "custom_error_message": "This feature is disabled",
+      "updated_at": "2020-03-10T15:49:32Z"
+    }
+  ]
+}
