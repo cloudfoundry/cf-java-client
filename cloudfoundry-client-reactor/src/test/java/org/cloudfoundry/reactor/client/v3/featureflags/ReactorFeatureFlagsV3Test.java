@@ -39,6 +39,7 @@ import reactor.test.StepVerifier;
 
 final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
 
+    private static final String BASE_URL = "https://api.example.org/v3/feature_flags/";
     private static final String UPDATED_AT = "2020-03-10T15:49:32Z";
 
     private final ReactorFeatureFlagsV3 featureFlags =
@@ -70,6 +71,7 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                                 .name("app_scaling")
                                 .enabled(true)
                                 .updatedAt(UPDATED_AT)
+                                .link("self", selfLink("app_scaling"))
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
@@ -112,6 +114,7 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                                                 .name("app_scaling")
                                                 .enabled(true)
                                                 .updatedAt(UPDATED_AT)
+                                                .link("self", selfLink("app_scaling"))
                                                 .build())
                                 .resource(
                                         GetFeatureFlagResponse.builder()
@@ -119,6 +122,7 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                                                 .enabled(false)
                                                 .customErrorMessage("This feature is disabled")
                                                 .updatedAt(UPDATED_AT)
+                                                .link("self", selfLink("user_org_creation"))
                                                 .build())
                                 .build())
                 .expectComplete()
@@ -158,8 +162,13 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                                 .enabled(false)
                                 .customErrorMessage("This feature is disabled")
                                 .updatedAt(UPDATED_AT)
+                                .link("self", selfLink("app_scaling"))
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    private static Link selfLink(String flagName) {
+        return Link.builder().href(BASE_URL + flagName).build();
     }
 }

@@ -18,7 +18,10 @@ package org.cloudfoundry.client.v3.featureflags;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import java.util.Map;
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
+import org.cloudfoundry.client.v3.Link;
 import org.immutables.value.Value;
 
 /**
@@ -53,4 +56,12 @@ abstract class _GetFeatureFlagResponse {
     @JsonProperty("updated_at")
     @Nullable
     abstract String getUpdatedAt();
+
+    /**
+     * Links to related resources and actions for the feature flag
+     */
+    @AllowNulls
+    @JsonProperty("links")
+    @Nullable
+    abstract Map<String, Link> getLinks();
 }
