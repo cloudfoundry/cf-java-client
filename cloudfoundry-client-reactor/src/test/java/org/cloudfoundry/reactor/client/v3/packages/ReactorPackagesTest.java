@@ -764,6 +764,20 @@ final class ReactorPackagesTest extends AbstractClientApiTest {
                                                                                     + "test-content\r\n"
                                                                                     + "--"
                                                                                     + boundary
+                                                                                    + "\r\n"
+                                                                                    + "content-disposition:"
+                                                                                    + " form-data;"
+                                                                                    + " name=\"resources\"\r\n"
+                                                                                    + "content-length:"
+                                                                                    + " 2\r\n"
+                                                                                    + "content-type:"
+                                                                                    + " application/json\r\n"
+                                                                                    + "content-transfer-encoding:"
+                                                                                    + " binary\r\n"
+                                                                                    + "\r\n"
+                                                                                    + "[]\r\n"
+                                                                                    + "--"
+                                                                                    + boundary
                                                                                     + "--\r\n");
                                                         }))
                                         .build())
