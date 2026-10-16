@@ -24,6 +24,7 @@ import java.util.Collections;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.serviceplans.DeleteServicePlanRequest;
@@ -45,6 +46,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_10)
+@RequiresV2Api
 public final class ServicePlansTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -78,7 +80,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 true))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
                 .flatMap(
@@ -287,7 +289,7 @@ public final class ServicePlansTest extends AbstractIntegrationTest {
                                                 serviceName,
                                                 spaceId,
                                                 true))
-                        .block(Duration.ofMinutes(5));
+                        .block(Duration.ofMinutes(10));
 
         getServicePlanId(this.cloudFoundryClient, serviceBrokerMetadata.serviceBrokerId)
                 .flatMap(

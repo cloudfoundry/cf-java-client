@@ -30,9 +30,9 @@ import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.Package;
+import org.cloudfoundry.client.v3.packages.PackageRelationships;
 import org.cloudfoundry.client.v3.packages.PackageType;
 import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -40,7 +40,6 @@ import reactor.core.Exceptions;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@Disabled("Until Packages are no longer experimental")
 public final class PackagesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -81,6 +80,19 @@ public final class PackagesTest extends AbstractIntegrationTest {
                                         .create(
                                                 CreatePackageRequest.builder()
                                                         .type(PackageType.BITS)
+                                                        .relationships(
+                                                                PackageRelationships.builder()
+                                                                        .application(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                applicationId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
                                                         .build()))
                 .map(Package::getId)
                 .flatMap(

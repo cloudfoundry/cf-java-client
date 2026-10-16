@@ -55,6 +55,13 @@ abstract class AbstractClient {
     abstract Boolean getApprovalsDeleted();
 
     /**
+     * If true, allow to omit client_secret for authorization_code flow in combination with PKCE
+     */
+    @JsonProperty("allowpublic")
+    @Nullable
+    abstract Boolean getAllowPublic();
+
+    /**
      * Scopes that the client is able to grant when creating a client
      */
     @JsonProperty("authorities")

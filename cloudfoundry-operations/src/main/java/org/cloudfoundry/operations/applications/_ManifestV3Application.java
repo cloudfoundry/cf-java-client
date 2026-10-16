@@ -16,9 +16,10 @@
 
 package org.cloudfoundry.operations.applications;
 
+import org.cloudfoundry.AllowNulls;
 import org.cloudfoundry.Nullable;
-import org.immutables.value.Value;
 import org.cloudfoundry.client.v3.Metadata;
+import org.immutables.value.Value;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +36,13 @@ abstract class _ManifestV3Application extends _ApplicationManifestCommon {
      */
     @Nullable
     abstract Boolean getDefaultRoute();
+
+    /**
+     * Manage whether optional capabilities are enabled
+     */
+    @AllowNulls
+    @Nullable
+    abstract Map<String, Object> getFeatures();
 
     /**
      * The metadata for this application
@@ -61,6 +69,9 @@ abstract class _ManifestV3Application extends _ApplicationManifestCommon {
     abstract List<ManifestV3Sidecar> getSidecars();
 
     public abstract static class Builder implements _ApplicationManifestCommon.Builder {
-
+        abstract Builder feature(String key, Object value);
+        abstract Builder feature(Map.Entry<String, ? extends Object> entry);
+        abstract Builder features(@Nullable Map<String, ? extends Object> entries);
+        abstract Builder putAllFeatures(Map<String, ? extends Object> entries);
     }
 }

@@ -29,6 +29,8 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresMetricRegistrar;
+import org.cloudfoundry.RequiresV2Api;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -37,6 +39,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
+@RequiresV2Api
 public class LogCacheTest extends AbstractIntegrationTest {
 
     @Autowired LogCacheClient logCacheClient;
@@ -83,6 +86,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresMetricRegistrar
     public void readCounter() {
         final String name = this.nameFactory.getName("counter-");
         final int delta = this.random.nextInt(1000);
@@ -102,6 +106,7 @@ public class LogCacheTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresMetricRegistrar
     public void readEvent() {
         final String title = this.nameFactory.getName("event-");
         final String body = "This is the body. " + new BigInteger(1024, this.random).toString(32);

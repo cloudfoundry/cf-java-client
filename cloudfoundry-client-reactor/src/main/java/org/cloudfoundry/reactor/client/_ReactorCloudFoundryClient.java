@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.client;
 
 import jakarta.annotation.PostConstruct;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.Root;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.blobstores.Blobstores;
@@ -72,6 +73,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.serviceroutebindings.ServiceRouteBindingsV3;
 import org.cloudfoundry.client.v3.quotas.spaces.SpaceQuotasV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
@@ -133,6 +135,7 @@ import org.cloudfoundry.reactor.client.v3.servicebrokers.ReactorServiceBrokersV3
 import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.serviceofferings.ReactorServiceOfferingsV3;
 import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
+import org.cloudfoundry.reactor.client.v3.serviceroutebindings.ReactorServiceRouteBindingsV3;
 import org.cloudfoundry.reactor.client.v3.quotas.spaces.ReactorSpaceQuotasV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
@@ -207,7 +210,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @PostConstruct
     public void checkCompatibility() {
-        new CloudFoundryClientCompatibilityChecker(info()).check();
+        new CloudFoundryClientCompatibilityChecker(info(), rootEndpoint()).check();
     }
 
     @Override
@@ -257,6 +260,13 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public Info info() {
         return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public Root rootEndpoint() {
+        Mono<String> root = getConnectionContext().getRootProvider().getRoot(getConnectionContext());
+        return new ReactorRoot(getConnectionContext(), root, getTokenProvider(), getRequestTags());
     }
 
     @Override
@@ -546,4 +556,9 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
      */
     abstract TokenProvider getTokenProvider();
 
+    @Override
+    @Value.Derived
+    public ServiceRouteBindingsV3 serviceRouteBindingsV3() {
+        return new ReactorServiceRouteBindingsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
 }
