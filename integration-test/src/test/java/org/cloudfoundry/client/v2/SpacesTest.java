@@ -1888,7 +1888,8 @@ public final class SpacesTest extends AbstractIntegrationTest {
 
     @Test
     public void listServicesFilterByServiceBrokerId() {
-        List<String> expectedValues = Arrays.asList(this.serviceName, this.serviceName + "-shareable");
+        List<String> expectedValues =
+                Arrays.asList(this.serviceName, this.serviceName + "-shareable");
         Mono.zip(this.serviceBrokerId, this.spaceId)
                 .flatMapMany(
                         function(
