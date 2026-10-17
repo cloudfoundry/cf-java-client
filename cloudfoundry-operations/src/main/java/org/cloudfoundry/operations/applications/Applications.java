@@ -128,9 +128,9 @@ public interface Applications {
 
     /**
      * List the applications logs.
-     * Uses Log Cache under the hood when {@link ApplicationLogsRequest#getRecent()} is {@code true}.
-     * Log streaming still uses Doppler, which is not available in CF deployments following
-     * <a href="https://docs.cloudfoundry.org/loggregator/architecture.html#shared-nothing-architecture">shared-nothing architecture</a>.
+     * Uses Log Cache under the hood: recent logs are read when {@link ApplicationLogsRequest#getRecent()}
+     * is {@code true}, otherwise logs are continuously streamed (like {@code cf logs}). The returned
+     * {@link Flux} of a streaming request never completes on its own – cancel it to stop.
      *
      * @param request the application logs request
      * @return the applications logs
