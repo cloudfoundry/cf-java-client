@@ -63,10 +63,6 @@ final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
         return get(request, ReadResponse.class, "read", request.getSourceId()).checkpoint();
     }
 
-    Mono<ReadResponse> recentLogs(ReadRequest request) {
-        return read(request);
-    }
-
     /**
      * Continuously polls Log Cache and emits new {@link Envelope}s as they arrive.
      *

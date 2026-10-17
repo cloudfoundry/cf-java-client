@@ -49,14 +49,6 @@ public interface LogCacheClient {
     Mono<ReadResponse> read(ReadRequest request);
 
     /**
-     * Makes the Log Cache RecentLogs /api/v1/read request
-     *
-     * @param request the Recent Logs request
-     * @return the events from the recent logs
-     */
-    Mono<ReadResponse> recentLogs(ReadRequest request);
-
-    /**
      * Continuously polls the Log Cache /api/v1/read endpoint and streams new {@link Envelope}s
      * as they appear. This is the Java equivalent of the Go {@code logcache.Walk()} API and
      * {@code cf tail --follow}.

@@ -57,11 +57,6 @@ abstract class _ReactorLogCacheClient implements LogCacheClient {
     }
 
     @Override
-    public Mono<ReadResponse> recentLogs(ReadRequest request) {
-        return getReactorLogCacheEndpoints().recentLogs(request);
-    }
-
-    @Override
     public Flux<Envelope> logsTail(TailLogsRequest request) {
         return getReactorLogCacheEndpoints().logsTail(request);
     }

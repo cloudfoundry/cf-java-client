@@ -25,7 +25,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
@@ -92,7 +91,6 @@ import org.cloudfoundry.operations.services.CreateServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.operations.services.GetServiceInstanceRequest;
 import org.cloudfoundry.operations.services.ServiceInstance;
-import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.PaginationUtils;
 import org.junit.jupiter.api.Test;
@@ -101,7 +99,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
-import reactor.core.publisher.SignalType;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
@@ -520,12 +517,13 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
     }
 
     /**
-     * Doppler was dropped in PCF 4.x in favor of logcache. This test does not work
-     * on TAS 4.x.
+     * Exercise the LogCache client via {@code logs(ApplicationLogsRequest)}.
+     * LogCache has been a default cf-deployment component since v3.0.0 (July 2018),
+     * with the {@code /api/v1/read} endpoint available since log-cache-release v2.0.0
+     * (October 2018).
      */
-    @Deprecated
     @Test
-    @IfCloudFoundryVersion(lessThan = CloudFoundryVersion.PCF_4_v2)
+    @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_3)
     public void logs() throws IOException {
         String applicationName = this.nameFactory.getApplicationName();
 
@@ -546,32 +544,6 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .next()
                 .as(StepVerifier::create)
                 .expectNext(ApplicationLogType.OUT)
-                .expectComplete()
-                .verify(Duration.ofMinutes(5));
-    }
-
-    @Test
-    public void logsRecent() throws IOException {
-        String applicationName = this.nameFactory.getApplicationName();
-        Mono<String> applicationGuid =
-                getAppGuidFromAppName(cloudFoundryOperations, applicationName);
-        createApplication(
-                        this.cloudFoundryOperations,
-                        new ClassPathResource("test-application.zip").getFile().toPath(),
-                        applicationName,
-                        false)
-                .then(
-                        applicationGuid
-                                .map(ApplicationsTest::getReadRequest)
-                                .flatMapMany(
-                                        readRequest ->
-                                                callLogsRecent(
-                                                                this.cloudFoundryOperations,
-                                                                readRequest)
-                                                        .log(null, Level.ALL, SignalType.ON_NEXT))
-                                .map(ApplicationsTest::checkOneLogEntry)
-                                .then())
-                .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -2360,28 +2332,5 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
         return cloudFoundryOperations
                 .applications()
                 .sshEnabled(ApplicationSshEnabledRequest.builder().name(applicationName).build());
-    }
-
-    private static ReadRequest getReadRequest(String applicationId) {
-        return ReadRequest.builder().sourceId(applicationId).build();
-    }
-
-    private static Flux<Log> callLogsRecent(
-            CloudFoundryOperations cloudFoundryOperations, ReadRequest readRequest) {
-        return cloudFoundryOperations.applications().logsRecent(readRequest);
-    }
-
-    private static Mono<String> getAppGuidFromAppName(
-            CloudFoundryOperations cloudFoundryOperations, String applicationName) {
-        return cloudFoundryOperations
-                .applications()
-                .get(GetApplicationRequest.builder().name(applicationName).build())
-                .map(ApplicationDetail::getId);
-    }
-
-    private static Log checkOneLogEntry(Log log) {
-        OperationsLogging.log("one log entry: " + log.getType() + " " + log.getPayloadAsText());
-        assertThat(log.getType()).isIn(LogType.OUT, LogType.ERR);
-        return log;
     }
 }

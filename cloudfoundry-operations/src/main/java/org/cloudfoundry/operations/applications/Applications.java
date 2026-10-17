@@ -18,8 +18,6 @@ package org.cloudfoundry.operations.applications;
 
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.logcache.v1.Envelope;
-import org.cloudfoundry.logcache.v1.Log;
-import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -131,15 +129,6 @@ public interface Applications {
     Flux<LogMessage> logs(LogsRequest request);
 
     /**
-     * List the applications logs from logCacheClient.
-     * If no messages are available, an empty Flux is returned.
-     *
-     * @param request the application logs request
-     * @return the applications logs
-     */
-    Flux<Log> logsRecent(ReadRequest request);
-
-    /**
      * Continuously streams application log envelopes from Log Cache by repeatedly polling
      * the {@code /api/v1/read} endpoint. The returned {@link Flux} is infinite – cancel it
      * to stop streaming. This is the Java equivalent of {@code cf tail --follow}.
@@ -151,8 +140,9 @@ public interface Applications {
 
     /**
      * List the applications logs.
-     * Only works with {@code Loggregator < 107.0}, shipped in {@code CFD < 24.3}
-     * and {@code TAS < 4.0}.
+     * Uses Log Cache under the hood when {@link ApplicationLogsRequest#getRecent()} is {@code true}.
+     * Log streaming still uses Doppler, which is not available in CF deployments following
+     * <a href="https://docs.cloudfoundry.org/loggregator/architecture.html#shared-nothing-architecture">shared-nothing architecture</a>.
      *
      * @param request the application logs request
      * @return the applications logs
