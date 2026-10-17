@@ -1,0 +1,14 @@
+{
+  "envelopes" : {
+    "batch" : [
+      {
+        "log" : {
+          "payload" : "bXNnMw==",
+          "type" : "OUT"
+        },
+        "source_id" : "test-source-id",
+        "timestamp" : "30"
+      }
+    ]
+  }
+}
