@@ -147,6 +147,7 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.LogType;
@@ -1398,47 +1399,54 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void logsTailLogCache() {
-        TailLogsRequest tailRequest = TailLogsRequest.builder().sourceId("test-source-id").build();
-        requestLogsTailLogCache(this.logCacheClient, tailRequest, "test-tail-payload");
+    void logsStreamLogCache() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsTailLogCache(
+                this.logCacheClient,
+                tailRequest("test-metadata-id"),
+                tailEnvelope("msg1", LogType.OUT, 1L),
+                tailEnvelope("msg2", LogType.ERR, 2L),
+                tailEnvelope("msg3", LogType.OUT, 3L));
 
         this.applications
-                .logsTail(tailRequest)
-                .take(1)
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
+                .take(3)
                 .as(StepVerifier::create)
                 .expectNextMatches(
-                        envelope ->
-                                envelope.getLog() != null
-                                        && LogType.OUT.equals(envelope.getLog().getType()))
+                        log ->
+                                log.getMessage().equals("msg1")
+                                        && log.getLogType() == ApplicationLogType.OUT
+                                        && log.getSourceId().equals("test-metadata-id")
+                                        && log.getTimestamp() == 1L)
+                .expectNextMatches(
+                        log ->
+                                log.getMessage().equals("msg2")
+                                        && log.getLogType() == ApplicationLogType.ERR)
+                .expectNextMatches(log -> log.getMessage().equals("msg3"))
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
     @Test
-    void logsTailLogCacheMultipleEnvelopes() {
-        TailLogsRequest tailRequest = TailLogsRequest.builder().sourceId("test-source-id").build();
-        requestLogsTailLogCacheMultiple(this.logCacheClient, tailRequest);
-
-        this.applications
-                .logsTail(tailRequest)
-                .take(3)
-                .map(e -> e.getLog().getType())
-                .as(StepVerifier::create)
-                .expectNext(LogType.OUT)
-                .expectNext(LogType.ERR)
-                .expectNext(LogType.OUT)
-                .expectComplete()
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    void logsTailLogCacheError() {
-        TailLogsRequest tailRequest = TailLogsRequest.builder().sourceId("test-source-id").build();
-        when(this.logCacheClient.logsTail(tailRequest))
+    void logsStreamLogCacheError() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        when(this.logCacheClient.logsTail(tailRequest("test-metadata-id")))
                 .thenReturn(Flux.error(new RuntimeException("log-cache unavailable")));
 
         this.applications
-                .logsTail(tailRequest)
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(false)
+                                .build())
                 .as(StepVerifier::create)
                 .expectErrorMatches(
                         t ->
@@ -1448,17 +1456,18 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void logsTailLogCacheOutAndErrEnvelopes() {
-        TailLogsRequest tailRequest = TailLogsRequest.builder().sourceId("test-source-id").build();
-        requestLogsTailLogCacheOutAndErr(this.logCacheClient, tailRequest);
+    void logsStreamLogCacheApplicationDoesNotExist() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
 
         this.applications
-                .logsTail(tailRequest)
-                .take(2)
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
                 .as(StepVerifier::create)
-                .expectNextMatches(e -> LogType.OUT.equals(e.getLog().getType()))
-                .expectNextMatches(e -> LogType.ERR.equals(e.getLog().getType()))
-                .expectComplete()
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage(
+                                                "Application test-application-name does not exist"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -5469,88 +5478,32 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .build()));
     }
 
+    private static TailLogsRequest tailRequest(String sourceId) {
+        return TailLogsRequest.builder()
+                .sourceId(sourceId)
+                .envelopeTypes(Collections.singletonList(EnvelopeType.LOG))
+                .build();
+    }
+
+    private static Envelope tailEnvelope(String payload, LogType type, long timestamp) {
+        return Envelope.builder()
+                .sourceId("test-metadata-id")
+                .timestamp(timestamp)
+                .log(
+                        Log.builder()
+                                .payload(
+                                        Base64.getEncoder()
+                                                .encodeToString(
+                                                        payload.getBytes(StandardCharsets.UTF_8)))
+                                .type(type)
+                                .build())
+                .build();
+    }
+
     private static void requestLogsTailLogCache(
-            LogCacheClient logCacheClient, TailLogsRequest tailRequest, String payload) {
+            LogCacheClient logCacheClient, TailLogsRequest tailRequest, Envelope... envelopes) {
         when(logCacheClient.logsTail(tailRequest))
-                .thenReturn(
-                        Flux.just(
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(System.nanoTime())
-                                        .log(
-                                                Log.builder()
-                                                        .payload(payload)
-                                                        .type(LogType.OUT)
-                                                        .build())
-                                        .build()));
-    }
-
-    /**
-     * Three envelopes with types OUT, ERR, OUT and strictly ascending timestamps so ordering
-     * is deterministic.
-     */
-    private static void requestLogsTailLogCacheMultiple(
-            LogCacheClient logCacheClient, TailLogsRequest tailRequest) {
-        long base = System.nanoTime();
-        when(logCacheClient.logsTail(tailRequest))
-                .thenReturn(
-                        Flux.just(
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(base)
-                                        .log(
-                                                Log.builder()
-                                                        .payload("msg1")
-                                                        .type(LogType.OUT)
-                                                        .build())
-                                        .build(),
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(base + 1)
-                                        .log(
-                                                Log.builder()
-                                                        .payload("msg2")
-                                                        .type(LogType.ERR)
-                                                        .build())
-                                        .build(),
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(base + 2)
-                                        .log(
-                                                Log.builder()
-                                                        .payload("msg3")
-                                                        .type(LogType.OUT)
-                                                        .build())
-                                        .build()));
-    }
-
-    /**
-     * Two envelopes – one STDOUT, one STDERR – to verify both log types are forwarded.
-     */
-    private static void requestLogsTailLogCacheOutAndErr(
-            LogCacheClient logCacheClient, TailLogsRequest tailRequest) {
-        long base = System.nanoTime();
-        when(logCacheClient.logsTail(tailRequest))
-                .thenReturn(
-                        Flux.just(
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(base)
-                                        .log(
-                                                Log.builder()
-                                                        .payload("stdout")
-                                                        .type(LogType.OUT)
-                                                        .build())
-                                        .build(),
-                                Envelope.builder()
-                                        .sourceId(tailRequest.getSourceId())
-                                        .timestamp(base + 1)
-                                        .log(
-                                                Log.builder()
-                                                        .payload("stderr")
-                                                        .type(LogType.ERR)
-                                                        .build())
-                                        .build()));
+                .thenReturn(Flux.concat(Flux.just(envelopes), Flux.never()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {

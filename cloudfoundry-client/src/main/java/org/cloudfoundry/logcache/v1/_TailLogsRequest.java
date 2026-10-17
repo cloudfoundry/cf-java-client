@@ -61,5 +61,16 @@ abstract class _TailLogsRequest {
     Duration getPollInterval() {
         return Duration.ofMillis(250);
     }
+
+    /**
+     * Log Cache is eventually consistent: envelopes may become visible out of order. Envelopes
+     * younger than this delay are therefore withheld and re-read on a later poll, so that late
+     * arrivals are not skipped (equivalent to the Go client's {@code WalkWithDelay}).
+     * Defaults to 2 seconds.
+     */
+    @Value.Default
+    Duration getDelay() {
+        return Duration.ofSeconds(2);
+    }
 }
 
