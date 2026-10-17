@@ -43,8 +43,7 @@ import reactor.util.retry.Retry;
 
 final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
 
-    private static final Logger LOGGER =
-            LoggerFactory.getLogger(ReactorLogCacheEndpoints.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(ReactorLogCacheEndpoints.class);
 
     private static final int MAX_RETRIES = 5;
 
@@ -109,7 +108,8 @@ final class ReactorLogCacheEndpoints extends AbstractLogCacheOperations {
                 .concatMapIterable(page -> page.envelopes);
     }
 
-    private Mono<Page> poll(TailLogsRequest request, List<EnvelopeType> envelopeTypes, long cursor) {
+    private Mono<Page> poll(
+            TailLogsRequest request, List<EnvelopeType> envelopeTypes, long cursor) {
         ReadRequest.Builder builder =
                 ReadRequest.builder().sourceId(request.getSourceId()).startTime(cursor);
         if (!envelopeTypes.isEmpty()) {

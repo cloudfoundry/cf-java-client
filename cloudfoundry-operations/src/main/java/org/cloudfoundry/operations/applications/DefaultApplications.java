@@ -1670,8 +1670,7 @@ public final class DefaultApplications implements Applications {
                                         TailLogsRequest.builder()
                                                 .sourceId(applicationId)
                                                 .envelopeTypes(
-                                                        Collections.singletonList(
-                                                                EnvelopeType.LOG))
+                                                        Collections.singletonList(EnvelopeType.LOG))
                                                 .build()))
                 .filter(e -> e.getLog() != null)
                 .map(

@@ -601,7 +601,10 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .thenMany(
                         this.cloudFoundryOperations
                                 .applications()
-                                .logs(ApplicationLogsRequest.builder().name(applicationName).build())
+                                .logs(
+                                        ApplicationLogsRequest.builder()
+                                                .name(applicationName)
+                                                .build())
                                 .take(3))
                 .map(ApplicationLog::getLogType)
                 .as(StepVerifier::create)
