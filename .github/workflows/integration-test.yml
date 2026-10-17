@@ -1,0 +1,125 @@
+name: Integration Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      java-versions:
+        description: 'JSON array of Java versions to test'
+        type: string
+        required: false
+        default: '[8, 11, 17, 21]'
+      preview:
+        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        type: boolean
+        required: false
+        default: false
+  schedule:
+    - cron: '0 3 * * 1-5'
+  workflow_call:
+    inputs:
+      java-versions:
+        description: 'JSON array of Java versions to test'
+        type: string
+        required: false
+        default: '[8, 11, 17, 21]'
+      preview:
+        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+
+# A new push supersedes the running test. The group name differs from the caller's workflow name on
+# purpose: a called workflow shares github.workflow with its caller, which would cancel the caller.
+concurrency:
+  group: integration-test-${{ github.event_name == 'schedule' && 'schedule' || github.ref }}
+  cancel-in-progress: true
+
+env:
+  CF_API_HOST: api.cf.127-0-0-1.nip.io
+  CF_UAA_HOST: uaa.cf.127-0-0-1.nip.io
+
+jobs:
+  integration-test:
+    if: ${{ github.event_name != 'schedule' || github.repository == 'cloudfoundry/cf-java-client' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        java: ${{ fromJSON(inputs.java-versions || (github.event_name == 'schedule' && '[21]' || '[8, 11, 17, 21]')) }}
+    name: Java ${{ matrix.java }} integration test${{ (inputs.preview || github.event_name == 'schedule') && ' (preview)' || '' }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      # Validation runs deploy the capi-release that matches SUPPORTED_API_VERSION. Preview runs
+      # (scheduled, or started by hand with `preview`) keep the latest versions.
+      - name: Resolve CAPI version
+        id: capi
+        if: ${{ !(inputs.preview || github.event_name == 'schedule') }}
+        run: |
+          # separate assignment, so that a failing resolver fails the step
+          version="$(.github/scripts/resolve-capi-version.sh)"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
+      # All components share one Postgres, which runs out of its default 100 connections during a full
+      # test run. Written first, the CAPI override below appends to the same file.
+      - name: Write PostgreSQL values override
+        run: |
+          cat > "$RUNNER_TEMP/cf-values.yaml" <<EOF
+          postgresql:
+            primary:
+              extendedConfiguration: |
+                max_connections = 500
+          EOF
+      # Overrides the capi chart version of kind-deployment (merged last by Helmfile).
+      # kind-deployment's helmfile passes cloudController.appDomains, which the capi chart only
+      # accepts from 1.241.0 on (1.240.0 fails its values schema), so older matches are raised to it.
+      - name: Write CAPI values override
+        if: ${{ steps.capi.outputs.version != '' }}
+        env:
+          MIN_CAPI_VERSION: 1.241.0
+          MATCHED_CAPI_VERSION: ${{ steps.capi.outputs.version }}
+        run: |
+          version="$(printf '%s\n%s\n' "$MIN_CAPI_VERSION" "$MATCHED_CAPI_VERSION" | sort -V | tail -1)"
+          if [ "$version" != "$MATCHED_CAPI_VERSION" ]; then
+            echo "::warning::capi-release $MATCHED_CAPI_VERSION matches SUPPORTED_API_VERSION but is too old for kind-deployment, deploying $version"
+          fi
+          cat >> "$RUNNER_TEMP/cf-values.yaml" <<EOF
+          charts:
+            capi:
+              version: $version
+          EOF
+      # Every job gets its own Cloud Foundry on KinD, so the matrix can run in parallel.
+      - name: Set up Cloud Foundry
+        uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@main
+        with:
+          use-latest-versions: ${{ (inputs.preview || github.event_name == 'schedule') }}
+          github-token: ${{ github.token }}
+          additional-values-files: ${{ runner.temp }}/cf-values.yaml
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: liberica
+          java-version: ${{ matrix.java }}
+      - name: Cache Maven packages
+        uses: actions/cache@v6
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+          restore-keys: ${{ runner.os }}-m2
+      - name: Run integration tests
+        # CC_ADMIN_PASSWORD and UAA_ADMIN_SECRET are exported by setup-cf
+        env:
+          TEST_APIHOST: ${{ env.CF_API_HOST }}
+          TEST_ADMIN_USERNAME: ccadmin
+          TEST_ADMIN_PASSWORD: ${{ env.CC_ADMIN_PASSWORD }}
+          TEST_ADMIN_CLIENTID: admin
+          TEST_ADMIN_CLIENTSECRET: ${{ env.UAA_ADMIN_SECRET }}
+          TEST_SKIPSSLVALIDATION: 'true'
+          TEST_QUOTAS_ROUTES_RESERVED_PORTS: '50'
+          # kind-deployment has no metric registrar, which the log-cache metric tests need
+          SKIP_METRIC_REGISTRAR_TESTS: 'true'
+        run: ./mvnw -B -Pintegration-test test -Dgpg.skip

@@ -22,12 +22,14 @@ import static org.cloudfoundry.client.CloudFoundryClient.SUPPORTED_API_VERSION;
 import com.github.zafarkhaja.semver.Version;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class InfoTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -41,8 +43,15 @@ public final class InfoTest extends AbstractIntegrationTest {
                 .consumeNextWith(
                         response -> {
                             Version expected = Version.valueOf(SUPPORTED_API_VERSION);
-                            Version actual = Version.valueOf(response.getApiVersion());
-
+                            Version actual;
+                            String version = response.getApiVersion();
+                            if (version == null || version.isEmpty()) {
+                                assertThat("CF API v2 is disabled")
+                                        .isEqualTo(response.getSupport());
+                                actual = Version.of(0, 0, 0);
+                            } else {
+                                actual = Version.valueOf(version);
+                            }
                             assertThat(actual).isLessThanOrEqualTo(expected);
                         })
                 .expectComplete()

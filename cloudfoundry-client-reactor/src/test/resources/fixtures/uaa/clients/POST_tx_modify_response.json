@@ -43,7 +43,8 @@
     ],
     "name": "My Client Name",
     "lastModified": 1474923482302,
-    "approvals_deleted": true
+    "approvals_deleted": true,
+    "allowpublic": true
   },
   {
     "scope": [
@@ -78,6 +79,7 @@
       "my-saml-provider"
     ],
     "name": "My Client Name",
+    "allowpublic": true,
     "lastModified": 1474923482727
   }
 ]

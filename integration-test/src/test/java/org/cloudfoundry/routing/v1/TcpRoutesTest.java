@@ -19,6 +19,7 @@ package org.cloudfoundry.routing.v1;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.NameFactory;
+import org.cloudfoundry.RequiresTcpRouting;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
@@ -39,6 +40,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.retry.Retry;
 
+@RequiresTcpRouting
 public final class TcpRoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";

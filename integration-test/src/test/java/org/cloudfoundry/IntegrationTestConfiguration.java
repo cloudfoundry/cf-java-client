@@ -38,15 +38,24 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.GetRootRequest;
 import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.organizationquotadefinitions.CreateOrganizationQuotaDefinitionRequest;
-import org.cloudfoundry.client.v2.organizations.AssociateOrganizationManagerRequest;
-import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v2.stacks.ListStacksRequest;
-import org.cloudfoundry.client.v2.stacks.StackEntity;
-import org.cloudfoundry.client.v2.stacks.StackResource;
 import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
+import org.cloudfoundry.client.v3.quotas.Routes;
+import org.cloudfoundry.client.v3.quotas.organizations.ListOrganizationQuotasRequest;
+import org.cloudfoundry.client.v3.quotas.organizations.ListOrganizationQuotasResponse;
+import org.cloudfoundry.client.v3.quotas.organizations.OrganizationQuotaResource;
+import org.cloudfoundry.client.v3.quotas.organizations.UpdateOrganizationQuotaRequest;
+import org.cloudfoundry.client.v3.roles.CreateRoleRequest;
+import org.cloudfoundry.client.v3.roles.RoleRelationships;
+import org.cloudfoundry.client.v3.roles.RoleType;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.doppler.DopplerClient;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.TestLogCacheEndpoints;
@@ -65,6 +74,9 @@ import org.cloudfoundry.reactor.tokenprovider.ClientCredentialsGrantTokenProvide
 import org.cloudfoundry.reactor.tokenprovider.PasswordGrantTokenProvider;
 import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.routing.RoutingClient;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
+import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
+import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
 import org.cloudfoundry.uaa.groups.AddMemberRequest;
@@ -86,6 +98,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.DependsOn;
@@ -251,6 +264,7 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
+    @DependsOn("routerGroupPorts")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -304,17 +318,18 @@ public class IntegrationTestConfiguration {
             @Value("${test.proxy.password:}") String proxyPassword,
             @Value("${test.proxy.port:8080}") Integer proxyPort,
             @Value("${test.proxy.username:}") String proxyUsername,
+            @Value("${test.fail.on.unknown.properties:true}") Boolean failOnUnknownProperties,
             @Value("${test.skipSslValidation:false}") Boolean skipSslValidation) {
 
         DefaultConnectionContext.Builder connectionContext =
                 DefaultConnectionContext.builder()
                         .apiHost(apiHost)
-                        .problemHandler(
-                                new FailingDeserializationProblemHandler()) // Test-only problem
-                        // handler
                         .skipSslValidation(skipSslValidation)
                         .sslHandshakeTimeout(Duration.ofSeconds(30));
-
+        if (failOnUnknownProperties) {
+            connectionContext.problemHandler(
+                    new FailingDeserializationProblemHandler()); // Test-only problem handler
+        }
         if (StringUtils.hasText(proxyHost)) {
             ProxyConfiguration.Builder proxyConfiguration =
                     ProxyConfiguration.builder().host(proxyHost).port(proxyPort);
@@ -353,6 +368,10 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
+    @ConditionalOnProperty(
+            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
+            havingValue = "false",
+            matchIfMissing = true)
     Mono<String> metricRegistrarServiceInstance(
             CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, NameFactory nameFactory) {
         return spaceId.flatMap(
@@ -381,52 +400,48 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> organizationId(
-            CloudFoundryClient cloudFoundryClient,
-            String organizationName,
-            String organizationQuotaName,
-            Mono<String> userId) {
+            CloudFoundryClient cloudFoundryClient, String organizationName, Mono<String> userId) {
         return userId.flatMap(
                         userId1 ->
                                 cloudFoundryClient
-                                        .organizationQuotaDefinitions()
+                                        .organizationsV3()
                                         .create(
-                                                CreateOrganizationQuotaDefinitionRequest.builder()
-                                                        .applicationInstanceLimit(-1)
-                                                        .applicationTaskLimit(-1)
-                                                        .instanceMemoryLimit(-1)
-                                                        .memoryLimit(16384)
-                                                        .name(organizationQuotaName)
-                                                        .nonBasicServicesAllowed(true)
-                                                        .totalPrivateDomains(-1)
-                                                        .totalReservedRoutePorts(-1)
-                                                        .totalRoutes(-1)
-                                                        .totalServiceKeys(-1)
-                                                        .totalServices(-1)
+                                                CreateOrganizationRequest.builder()
+                                                        .name(organizationName)
                                                         .build())
-                                        .map(ResourceUtils::getId)
+                                        .map(CreateOrganizationResponse::getId)
                                         .zipWith(Mono.just(userId1)))
-                .flatMap(
-                        function(
-                                (quotaId, userId1) ->
-                                        cloudFoundryClient
-                                                .organizations()
-                                                .create(
-                                                        CreateOrganizationRequest.builder()
-                                                                .name(organizationName)
-                                                                .quotaDefinitionId(quotaId)
-                                                                .build())
-                                                .map(ResourceUtils::getId)
-                                                .zipWith(Mono.just(userId1))))
                 .flatMap(
                         function(
                                 (organizationId, userId1) ->
                                         cloudFoundryClient
-                                                .organizations()
-                                                .associateManager(
-                                                        AssociateOrganizationManagerRequest
-                                                                .builder()
-                                                                .organizationId(organizationId)
-                                                                .managerId(userId1)
+                                                .rolesV3()
+                                                .create(
+                                                        CreateRoleRequest.builder()
+                                                                .type(RoleType.ORGANIZATION_MANAGER)
+                                                                .relationships(
+                                                                        RoleRelationships.builder()
+                                                                                .user(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        userId1)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .organization(
+                                                                                        ToOneRelationship
+                                                                                                .builder()
+                                                                                                .data(
+                                                                                                        Relationship
+                                                                                                                .builder()
+                                                                                                                .id(
+                                                                                                                        organizationId)
+                                                                                                                .build())
+                                                                                                .build())
+                                                                                .build())
                                                                 .build())
                                                 .thenReturn(organizationId)))
                 .doOnSubscribe(s -> this.logger.debug(">> ORGANIZATION ({}) <<", organizationName))
@@ -441,11 +456,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    String organizationQuotaName(NameFactory nameFactory) {
-        return nameFactory.getQuotaDefinitionName();
-    }
-
-    @Bean
     String password(NameFactory nameFactory) {
         return nameFactory.getPassword();
     }
@@ -453,6 +463,55 @@ public class IntegrationTestConfiguration {
     @Bean
     String planName(NameFactory nameFactory) {
         return nameFactory.getPlanName();
+    }
+
+    // Tests allocate TCP ports from NameFactory, so the default router group has to reserve them
+    // regardless of the order in which the tests run (or of the deployment's default range).
+    @Bean(initMethod = "block")
+    Mono<Void> routerGroupPorts(
+            ConnectionContext connectionContext,
+            @Value("${test.admin.password}") String password,
+            @Value("${test.admin.username}") String username,
+            @Value("${skip.tcp.routing.tests:false}") boolean skipTcpRouting) {
+        if (skipTcpRouting) {
+            return Mono.empty();
+        }
+
+        // Not the shared routingClient: its token provider depends on the cleaner, which depends on
+        // this bean
+        RoutingClient routingClient =
+                ReactorRoutingClient.builder()
+                        .connectionContext(connectionContext)
+                        .tokenProvider(
+                                PasswordGrantTokenProvider.builder()
+                                        .password(password)
+                                        .username(username)
+                                        .build())
+                        .build();
+
+        return routingClient
+                .routerGroups()
+                .list(ListRouterGroupsRequest.builder().build())
+                .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+                .filter(group -> "default-tcp".equals(group.getName()))
+                .next()
+                .switchIfEmpty(
+                        Mono.fromRunnable(
+                                () ->
+                                        this.logger.warn(
+                                                "No default-tcp router group, TCP route tests will"
+                                                        + " fail")))
+                .flatMap(
+                        group ->
+                                routingClient
+                                        .routerGroups()
+                                        .update(
+                                                UpdateRouterGroupRequest.builder()
+                                                        .reservablePorts(
+                                                                RandomNameFactory.PORT_RANGE)
+                                                        .routerGroupId(group.getRouterGroupId())
+                                                        .build()))
+                .then();
     }
 
     @Bean
@@ -465,18 +524,41 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Version serverVersion(@Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient
-                .info()
-                .get(GetInfoRequest.builder().build())
-                .map(response -> Version.valueOf(response.getApiVersion()))
+        return serverVersionV2(cloudFoundryClient)
+                .switchIfEmpty(serverVersionV3(cloudFoundryClient))
                 .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
                 .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
                 .block();
     }
 
+    private static Mono<Version> serverVersionV2(CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient
+                .info()
+                .get(GetInfoRequest.builder().build())
+                .flatMap(
+                        response -> {
+                            String version = response.getApiVersion();
+                            if (version == null || version.isEmpty()) {
+                                return Mono.empty();
+                            }
+                            return Mono.just(Version.valueOf(version));
+                        });
+    }
+
+    private static Mono<Version> serverVersionV3(CloudFoundryClient cloudFoundryClient) {
+        return cloudFoundryClient
+                .rootEndpoint()
+                .get(GetRootRequest.builder().build())
+                .map(response -> Version.valueOf(response.getApiVersionV3()));
+    }
+
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
+    @ConditionalOnProperty(
+            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
+            havingValue = "false",
+            matchIfMissing = true)
     Mono<String> serviceBrokerId(
             CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -525,13 +607,25 @@ public class IntegrationTestConfiguration {
                 .flatMap(
                         orgId ->
                                 cloudFoundryClient
-                                        .spaces()
+                                        .spacesV3()
                                         .create(
                                                 CreateSpaceRequest.builder()
                                                         .name(spaceName)
-                                                        .organizationId(orgId)
+                                                        .relationships(
+                                                                SpaceRelationships.builder()
+                                                                        .organization(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                orgId)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
                                                         .build()))
-                .map(ResourceUtils::getId)
+                .map(CreateSpaceResponse::getId)
                 .doOnSubscribe(s -> this.logger.debug(">> SPACE ({}) <<", spaceName))
                 .doOnError(Throwable::printStackTrace)
                 .doOnSuccess(id -> this.logger.debug("<< SPACE ({}) >>", id))
@@ -547,20 +641,20 @@ public class IntegrationTestConfiguration {
     @DependsOn("cloudFoundryCleaner")
     Mono<String> stackId(CloudFoundryClient cloudFoundryClient, Mono<String> stackName) {
         return stackName
-                .flux()
-                .flatMap(
+                .flatMapMany(
                         name ->
-                                PaginationUtils.requestClientV2Resources(
+                                PaginationUtils.requestClientV3Resources(
                                         page ->
                                                 cloudFoundryClient
-                                                        .stacks()
+                                                        .stacksV3()
                                                         .list(
-                                                                ListStacksRequest.builder()
+                                                                org.cloudfoundry.client.v3.stacks
+                                                                        .ListStacksRequest.builder()
                                                                         .name(name)
                                                                         .page(page)
                                                                         .build())))
                 .single()
-                .map(ResourceUtils::getId)
+                .map(org.cloudfoundry.client.v3.stacks.StackResource::getId)
                 .doOnSubscribe(s -> this.logger.debug(">> STACK ({}) <<", stackName))
                 .doOnError(Throwable::printStackTrace)
                 .doOnSuccess(id -> this.logger.debug("<< STACK ({})>>", id))
@@ -574,13 +668,16 @@ public class IntegrationTestConfiguration {
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
     Mono<String> stackName(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .stacks()
-                                        .list(ListStacksRequest.builder().page(page).build()))
-                .map(StackResource::getEntity)
-                .map(StackEntity::getName)
+                                        .stacksV3()
+                                        .list(
+                                                org.cloudfoundry.client.v3.stacks.ListStacksRequest
+                                                        .builder()
+                                                        .page(page)
+                                                        .build()))
+                .map(org.cloudfoundry.client.v3.stacks.StackResource::getName)
                 .filter(s -> s.matches("^cflinuxfs\\d$"))
                 .sort(Comparator.reverseOrder())
                 .next()
@@ -590,6 +687,10 @@ public class IntegrationTestConfiguration {
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
+    @ConditionalOnProperty(
+            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
+            havingValue = "false",
+            matchIfMissing = true)
     Mono<ApplicationUtils.ApplicationMetadata> testLogCacheApp(
             CloudFoundryClient cloudFoundryClient,
             Mono<String> spaceId,
@@ -626,6 +727,10 @@ public class IntegrationTestConfiguration {
 
     @Lazy
     @Bean
+    @ConditionalOnProperty(
+            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
+            havingValue = "false",
+            matchIfMissing = true)
     TestLogCacheEndpoints testLogCacheEndpoints(
             ConnectionContext connectionContext,
             TokenProvider tokenProvider,
@@ -747,6 +852,35 @@ public class IntegrationTestConfiguration {
     @Bean
     String username(NameFactory nameFactory) {
         return nameFactory.getUserName();
+    }
+
+    @Bean
+    @ConditionalOnProperty(value = "test.quotas.routes.reserved-ports", matchIfMissing = false)
+    Integer tcpRouteQuota(
+            @Value("${test.quotas.routes.reserved-ports}") Integer portsQuota,
+            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        cloudFoundryClient
+                .organizationQuotasV3()
+                .list(ListOrganizationQuotasRequest.builder().name("default").build())
+                .flatMapIterable(ListOrganizationQuotasResponse::getResources)
+                .map(OrganizationQuotaResource::getId)
+                .last()
+                .flatMap(
+                        orgId ->
+                                cloudFoundryClient
+                                        .organizationQuotasV3()
+                                        .update(
+                                                UpdateOrganizationQuotaRequest.builder()
+                                                        .organizationQuotaId(orgId)
+                                                        .routes(
+                                                                Routes.builder()
+                                                                        .totalReservedPorts(
+                                                                                portsQuota)
+                                                                        .build())
+                                                        .build()))
+                .block();
+        this.logger.debug("APPLIED ORG QUOTA, reserved-route-ports={}", portsQuota);
+        return portsQuota;
     }
 
     public static final class FailingDeserializationProblemHandler

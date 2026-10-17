@@ -25,6 +25,7 @@ import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletRequest;
 import org.cloudfoundry.client.v3.applications.GetApplicationCurrentDropletResponse;
@@ -52,6 +53,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_4)
+@RequiresV2Api // Due to ApplicationUtils
 @CleanupCloudFoundryAfterClass
 public final class DeploymentsTest extends AbstractIntegrationTest {
 
