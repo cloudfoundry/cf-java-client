@@ -154,8 +154,10 @@ import org.cloudfoundry.doppler.EventType;
 import org.cloudfoundry.doppler.LogMessage;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.util.OperationsLogging;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.DelayTimeoutException;
@@ -540,22 +542,46 @@ public final class DefaultApplications implements Applications {
                 .checkpoint();
     }
 
+//    @Override
+//    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
+//        boolean recent = request.getRecent() != null && request.getRecent();
+//        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+//                .flatMap(
+//                        function(
+//                                (cloudFoundryClient, spaceId) ->
+//                                        getApplicationId(
+//                                                cloudFoundryClient, request.getName(), spaceId)))
+//                .flatMapMany(
+//                        applicationId ->
+//                                recent
+//                                        ? getLogsLogCache(this.logCacheClient, applicationId)
+//                                        : getLogsStream(this.dopplerClient, applicationId))
+//                .transform(OperationsLogging.log("Get Application Logs"))
+//                .checkpoint();
+//    }
+
     @Override
     public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-        boolean recent = request.getRecent() != null && request.getRecent();
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-                .flatMap(
-                        function(
-                                (cloudFoundryClient, spaceId) ->
-                                        getApplicationId(
-                                                cloudFoundryClient, request.getName(), spaceId)))
-                .flatMapMany(
-                        applicationId ->
-                                recent
-                                        ? getLogsLogCache(this.logCacheClient, applicationId)
-                                        : getLogsStream(this.dopplerClient, applicationId))
-                .transform(OperationsLogging.log("Get Application Logs"))
-                .checkpoint();
+        Mono<String> applicationId =
+                Mono.zip(this.cloudFoundryClient, this.spaceId)
+                        .flatMap(
+                                function(
+                                        (cloudFoundryClient, spaceId) ->
+                                                getApplicationId(
+                                                        cloudFoundryClient,
+                                                        request.getName(),
+                                                        spaceId)));
+        if (request.getRecent() != null && request.getRecent()) {
+            return applicationId
+                    .flatMapMany(id -> getLogsLogCache(this.logCacheClient, id))
+                    .transform(OperationsLogging.log("Get Application Logs"))
+                    .checkpoint();
+        } else {
+            return applicationId
+                    .flatMapMany(id -> getLogsTailLogCache(this.logCacheClient, id))
+                    .transform(OperationsLogging.log("Get Application Logs"))
+                    .checkpoint();
+        }
     }
 
     @Override
@@ -1608,6 +1634,39 @@ public final class DefaultApplications implements Applications {
         return requestLogsRecentLogCache(logCacheClient, applicationId)
                 .filter(e -> e.getLog() != null)
                 .sort(LOG_MESSAGE_COMPARATOR_LOG_CACHE)
+                .map(
+                        envelope ->
+                                ApplicationLog.builder()
+                                        .sourceId(
+                                                Optional.ofNullable(envelope.getSourceId())
+                                                        .orElse(""))
+                                        .sourceType(
+                                                envelope.getTags().getOrDefault("source_type", ""))
+                                        .instanceId(
+                                                Optional.ofNullable(envelope.getInstanceId())
+                                                        .orElse(""))
+                                        .message(envelope.getLog().getPayloadAsText())
+                                        .timestamp(
+                                                Optional.ofNullable(envelope.getTimestamp())
+                                                        .orElse(0L))
+                                        .logType(
+                                                ApplicationLogType.from(
+                                                        envelope.getLog().getType().name()))
+                                        .build());
+    }
+
+    private static Flux<ApplicationLog> getLogsTailLogCache(
+            Mono<LogCacheClient> logCacheClient, String applicationId) {
+        return logCacheClient
+                .flatMapMany(
+                        client ->
+                                client.logsTail(
+                                        TailLogsRequest.builder()
+                                                .sourceId(applicationId)
+                                                .envelopeTypes(
+                                                        Collections.singletonList(EnvelopeType.LOG))
+                                                .build()))
+                .filter(e -> e.getLog() != null)
                 .map(
                         envelope ->
                                 ApplicationLog.builder()
@@ -2926,17 +2985,6 @@ public final class DefaultApplications implements Applications {
         return isNotIn(resource, STOPPED_STATE)
                 ? stopApplication(cloudFoundryClient, ResourceUtils.getId(resource))
                 : Mono.just(resource);
-    }
-
-    private static ApplicationLog toApplicationLog(LogMessage logMessage) {
-        return ApplicationLog.builder()
-                .sourceId(logMessage.getApplicationId())
-                .sourceType(logMessage.getSourceType())
-                .instanceId(logMessage.getSourceInstance())
-                .message(logMessage.getMessage())
-                .timestamp(logMessage.getTimestamp())
-                .logType(ApplicationLogType.from(logMessage.getMessageType().name()))
-                .build();
     }
 
     private static ApplicationDetail toApplicationDetail(
