@@ -147,11 +147,13 @@ import org.cloudfoundry.doppler.RecentLogsRequest;
 import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.Log;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
 import org.cloudfoundry.logcache.v1.LogType;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.operations.AbstractOperationsTest;
 import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
@@ -1393,6 +1395,79 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         && log.getSourceType().equals("APP/PROC/WEB")
                                         && log.getTimestamp() == 1L)
                 .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsStreamLogCache() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        requestLogsTailLogCache(
+                this.logCacheClient,
+                tailRequest("test-metadata-id"),
+                tailEnvelope("msg1", LogType.OUT, 1L),
+                tailEnvelope("msg2", LogType.ERR, 2L),
+                tailEnvelope("msg3", LogType.OUT, 3L));
+
+        this.applications
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
+                .take(3)
+                .as(StepVerifier::create)
+                .expectNextMatches(
+                        log ->
+                                log.getMessage().equals("msg1")
+                                        && log.getLogType() == ApplicationLogType.OUT
+                                        && log.getSourceId().equals("test-metadata-id")
+                                        && log.getTimestamp() == 1L)
+                .expectNextMatches(
+                        log ->
+                                log.getMessage().equals("msg2")
+                                        && log.getLogType() == ApplicationLogType.ERR)
+                .expectNextMatches(log -> log.getMessage().equals("msg3"))
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsStreamLogCacheError() {
+        requestApplications(
+                this.cloudFoundryClient,
+                "test-application-name",
+                TEST_SPACE_ID,
+                "test-metadata-id");
+        when(this.logCacheClient.logsTail(tailRequest("test-metadata-id")))
+                .thenReturn(Flux.error(new RuntimeException("log-cache unavailable")));
+
+        this.applications
+                .logs(
+                        ApplicationLogsRequest.builder()
+                                .name("test-application-name")
+                                .recent(false)
+                                .build())
+                .as(StepVerifier::create)
+                .expectErrorMatches(
+                        t ->
+                                t instanceof RuntimeException
+                                        && "log-cache unavailable".equals(t.getMessage()))
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsStreamLogCacheApplicationDoesNotExist() {
+        requestApplicationsEmpty(this.cloudFoundryClient, "test-application-name", TEST_SPACE_ID);
+
+        this.applications
+                .logs(ApplicationLogsRequest.builder().name("test-application-name").build())
+                .as(StepVerifier::create)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalArgumentException.class)
+                                        .hasMessage(
+                                                "Application test-application-name does not exist"))
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -5401,6 +5476,34 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                                                                 .build()))
                                                         .build())
                                         .build()));
+    }
+
+    private static TailLogsRequest tailRequest(String sourceId) {
+        return TailLogsRequest.builder()
+                .sourceId(sourceId)
+                .envelopeTypes(Collections.singletonList(EnvelopeType.LOG))
+                .build();
+    }
+
+    private static Envelope tailEnvelope(String payload, LogType type, long timestamp) {
+        return Envelope.builder()
+                .sourceId("test-metadata-id")
+                .timestamp(timestamp)
+                .log(
+                        Log.builder()
+                                .payload(
+                                        Base64.getEncoder()
+                                                .encodeToString(
+                                                        payload.getBytes(StandardCharsets.UTF_8)))
+                                .type(type)
+                                .build())
+                .build();
+    }
+
+    private static void requestLogsTailLogCache(
+            LogCacheClient logCacheClient, TailLogsRequest tailRequest, Envelope... envelopes) {
+        when(logCacheClient.logsTail(tailRequest))
+                .thenReturn(Flux.concat(Flux.just(envelopes), Flux.never()));
     }
 
     private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {

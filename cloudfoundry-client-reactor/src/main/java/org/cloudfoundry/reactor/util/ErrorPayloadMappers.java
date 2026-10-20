@@ -74,8 +74,11 @@ public final class ErrorPayloadMappers {
                                 ByteBufFlux body =
                                         ByteBufFlux.fromInbound(connection.inbound().receive());
 
+                                // An error response without a body must still surface as an error
+                                // instead of silently completing empty.
                                 return body.aggregate()
                                         .asString()
+                                        .defaultIfEmpty("")
                                         .doFinally(signalType -> connection.channel().close())
                                         .flatMap(
                                                 payload -> {
