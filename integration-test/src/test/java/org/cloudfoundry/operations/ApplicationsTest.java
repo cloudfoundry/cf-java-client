@@ -34,6 +34,14 @@ import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.ApplicationFeatureResource;
 import org.cloudfoundry.client.v3.applications.ListApplicationFeaturesRequest;
+import org.cloudfoundry.logcache.v1.Envelope;
+import org.cloudfoundry.logcache.v1.EnvelopeBatch;
+import org.cloudfoundry.logcache.v1.EnvelopeType;
+import org.cloudfoundry.logcache.v1.Log;
+import org.cloudfoundry.logcache.v1.LogCacheClient;
+import org.cloudfoundry.logcache.v1.LogType;
+import org.cloudfoundry.logcache.v1.ReadRequest;
+import org.cloudfoundry.logcache.v1.ReadResponse;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationEnvironments;
 import org.cloudfoundry.operations.applications.ApplicationEvent;
@@ -106,6 +114,7 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
 
     @Autowired private String serviceName;
 
+    @Autowired private LogCacheClient logCacheClient;
     @Autowired private CloudFoundryClient cloudFoundryClient;
 
     // To create a service in #pushBindService, the Service Broker must be installed first.
@@ -534,6 +543,72 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                 .next()
                 .as(StepVerifier::create)
                 .expectNext(ApplicationLogType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Exercise the LogCache client. Serves as a reference for using the logcache client,
+     * and will help with the transition to the new
+     * {@link org.cloudfoundry.operations.applications.Applications#logs(ApplicationLogsRequest)}.
+     */
+    @Test
+    public void logCacheLogs() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .then(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .get(GetApplicationRequest.builder().name(applicationName).build()))
+                .map(ApplicationDetail::getId)
+                .flatMapMany(
+                        appGuid ->
+                                this.logCacheClient.read(
+                                        ReadRequest.builder()
+                                                .sourceId(appGuid)
+                                                .envelopeType(EnvelopeType.LOG)
+                                                .limit(1)
+                                                .build()))
+                .map(ReadResponse::getEnvelopes)
+                .map(EnvelopeBatch::getBatch)
+                .flatMap(Flux::fromIterable)
+                .map(Envelope::getLog)
+                .map(Log::getType)
+                .next()
+                .as(StepVerifier::create)
+                .expectNext(LogType.OUT)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    /**
+     * Streams application logs via {@code logs(ApplicationLogsRequest)} (Log Cache tailing).
+     */
+    @Test
+    public void logsStream() throws IOException {
+        String applicationName = this.nameFactory.getApplicationName();
+
+        createApplication(
+                        this.cloudFoundryOperations,
+                        new ClassPathResource("test-application.zip").getFile().toPath(),
+                        applicationName,
+                        false)
+                .thenMany(
+                        this.cloudFoundryOperations
+                                .applications()
+                                .logs(
+                                        ApplicationLogsRequest.builder()
+                                                .name(applicationName)
+                                                .build())
+                                .take(3))
+                .map(ApplicationLog::getLogType)
+                .as(StepVerifier::create)
+                .expectNextCount(3)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
