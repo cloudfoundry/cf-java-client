@@ -1,0 +1,67 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      release-version:
+        description: 'Version to release, e.g. 5.19.0.RELEASE'
+        type: string
+        required: true
+      snapshot-version:
+        description: 'Next development version, e.g. 5.20.0.BUILD-SNAPSHOT'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    if: ${{ github.repository == 'cloudfoundry/cf-java-client' && (github.ref == 'refs/heads/5.x.x' || github.ref == 'refs/heads/main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      RELEASE_BRANCH: ${{ github.ref_name }}
+      RELEASE_VERSION: ${{ inputs.release-version }}
+      SNAPSHOT_VERSION: ${{ inputs.snapshot-version }}
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: liberica
+          java-version: 8
+          cache: maven
+          server-id: central
+          server-username: CENTRAL_USERNAME
+          server-password: CENTRAL_PASSWORD
+          gpg-private-key: ${{ secrets.MAVEN_GPG_PRIVATE_KEY }}
+          gpg-passphrase: MAVEN_GPG_PASSPHRASE
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+      # Leaves HEAD on the snapshot commit and the v<release> tag on the release commit.
+      - name: Create release and snapshot commits
+        run: ci/create-release.sh "$RELEASE_VERSION" "$SNAPSHOT_VERSION"
+      - name: Deploy to Maven Central
+        env:
+          CENTRAL_USERNAME: ${{ secrets.CENTRAL_USERNAME }}
+          CENTRAL_PASSWORD: ${{ secrets.CENTRAL_PASSWORD }}
+          MAVEN_GPG_PASSPHRASE: ${{ secrets.MAVEN_GPG_PASSPHRASE }}
+        run: |
+          git checkout --quiet "v$RELEASE_VERSION"
+          ./mvnw --batch-mode -Dmaven.test.skip=true deploy
+          git checkout --quiet -
+      - name: Push development version and tag
+        run: git push origin "HEAD:$RELEASE_BRANCH" "v$RELEASE_VERSION"
+      - name: Create GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "v$RELEASE_VERSION" --title "v$RELEASE_VERSION" --generate-notes

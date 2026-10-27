@@ -244,28 +244,15 @@
 
         <plugins>
             <plugin>
-                <groupId>org.jfrog.buildinfo</groupId>
-                <artifactId>artifactory-maven-plugin</artifactId>
-                <version>3.7.0</version>
-                <inherited>false</inherited>
-                <executions>
-                    <execution>
-                        <id>build-info</id>
-                        <goals>
-                            <goal>publish</goal>
-                        </goals>
-                        <configuration>
-                            <publisher>
-                                <contextUrl>https://repo.spring.io</contextUrl>
-                                <username>{{ARTIFACTORY_USERNAME}}</username>
-                                <password>{{ARTIFACTORY_PASSWORD}}</password>
-                                <repoKey>{{ARTIFACTORY_REPO_KEY|"libs-release-local"}}</repoKey>
-                                <snapshotRepoKey>{{ARTIFACTORY_SNAPSHOT_REPO_KEY|"libs-snapshot-local"}}</snapshotRepoKey>
-                                <excludePatterns>*-tests.jar</excludePatterns>
-                            </publisher>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.sonatype.central</groupId>
+                <artifactId>central-publishing-maven-plugin</artifactId>
+                <version>0.8.0</version>
+                <extensions>true</extensions>
+                <configuration>
+                    <publishingServerId>central</publishingServerId>
+                    <autoPublish>true</autoPublish>
+                    <waitUntil>published</waitUntil>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
