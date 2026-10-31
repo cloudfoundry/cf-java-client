@@ -468,22 +468,20 @@ public class IntegrationTestConfiguration {
             "!'true'.equalsIgnoreCase(systemEnvironment['SKIP_TCP_ROUTING_TESTS'])")
     SmartInitializingSingleton routerGroupPorts(RoutingClient routingClient) {
         return () -> {
-            ListRouterGroupsResponse response =
+            RouterGroup defaultGroup =
                     routingClient
                             .routerGroups()
                             .list(ListRouterGroupsRequest.builder().build())
-                            .block();
-            RouterGroup defaultGroup =
-                    response.getRouterGroups().stream()
+                            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
                             .filter(group -> "default-tcp".equals(group.getName()))
-                            .findFirst()
-                            .orElseThrow(
-                                    () ->
-                                            new IllegalStateException(
-                                                    "No default-tcp router group, TCP route tests"
-                                                            + " will fail. Set"
-                                                            + " SKIP_TCP_ROUTING_TESTS=true to skip"
-                                                            + " TCP routing tests entirely."));
+                            .blockFirst();
+
+            if (defaultGroup == null) {
+                throw new IllegalStateException(
+                        "No default-tcp router group, TCP route tests will fail. Set"
+                                + " SKIP_TCP_ROUTING_TESTS=true to skip TCP routing tests"
+                                + " entirely.");
+            }
 
             routingClient
                     .routerGroups()
