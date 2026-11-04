@@ -26,8 +26,11 @@ import org.immutables.value.Value;
  * The request payload for the Update Feature Flag operation
  *
  * see https://v3-apidocs.cloudfoundry.org/#update-a-feature-flag
+ *
+ * Please note that a request that defines only a "name", but no "enabled" and no "customErrorMessage" is still valid.
+ * It will update the "updated_at" property of the named feature flag.
  */
-@JsonSerialize
+@JsonSerialize(using = UpdateFeatureFlagRequestSerializer.class)
 @Value.Immutable
 abstract class _UpdateFeatureFlagRequest {
 
@@ -45,9 +48,26 @@ abstract class _UpdateFeatureFlagRequest {
     abstract Boolean getEnabled();
 
     /**
-     * The custom error message displayed to users when the flag is disabled
+     * The custom error message to set. Ignored when {@link #clearCustomErrorMessage()} is true.
+     * When neither this nor {@link #clearCustomErrorMessage()} is set, the field is omitted from
+     * the request and the existing value is preserved.
      */
-    @JsonProperty("custom_error_message")
+    @JsonIgnore
     @Nullable
     abstract String getCustomErrorMessage();
+
+    /**
+     * When true, sends {@code "custom_error_message": null} to clear the existing message.
+     * Takes precedence over {@link #getCustomErrorMessage()}.
+     */
+    @JsonIgnore
+    @Nullable
+    abstract Boolean clearCustomErrorMessage();
+
+    @Value.Check
+    void check() {
+        if (getName().isEmpty()) {
+            throw new IllegalStateException("name must not be empty");
+        }
+    }
 }

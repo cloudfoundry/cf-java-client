@@ -16,12 +16,7 @@
 
 package org.cloudfoundry.client.v3.featureflags;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import java.util.Map;
-import org.cloudfoundry.AllowNulls;
-import org.cloudfoundry.Nullable;
-import org.cloudfoundry.client.v3.Link;
 import org.immutables.value.Value;
 
 /**
@@ -29,39 +24,4 @@ import org.immutables.value.Value;
  */
 @JsonDeserialize
 @Value.Immutable
-abstract class _GetFeatureFlagResponse {
-
-    /**
-     * The name of the feature flag
-     */
-    @JsonProperty("name")
-    abstract String getName();
-
-    /**
-     * Whether the feature flag is enabled
-     */
-    @JsonProperty("enabled")
-    abstract Boolean getEnabled();
-
-    /**
-     * The custom error message displayed to users when the flag is disabled
-     */
-    @JsonProperty("custom_error_message")
-    @Nullable
-    abstract String getCustomErrorMessage();
-
-    /**
-     * The time the feature flag was last updated
-     */
-    @JsonProperty("updated_at")
-    @Nullable
-    abstract String getUpdatedAt();
-
-    /**
-     * Links to related resources and actions for the feature flag
-     */
-    @AllowNulls
-    @JsonProperty("links")
-    @Nullable
-    abstract Map<String, Link> getLinks();
-}
+abstract class _GetFeatureFlagResponse extends FeatureFlag {}

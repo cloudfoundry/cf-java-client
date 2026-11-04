@@ -21,7 +21,7 @@ import org.immutables.value.Value;
 
 /**
  * The request payload for the Get Feature Flag operation
- * 
+ *
  * see https://v3-apidocs.cloudfoundry.org/#get-a-feature-flag
  */
 @Value.Immutable
@@ -32,4 +32,11 @@ abstract class _GetFeatureFlagRequest {
      */
     @JsonIgnore
     abstract String getName();
+
+    @Value.Check
+    void check() {
+        if (getName().isEmpty()) {
+            throw new IllegalStateException("name must not be empty");
+        }
+    }
 }

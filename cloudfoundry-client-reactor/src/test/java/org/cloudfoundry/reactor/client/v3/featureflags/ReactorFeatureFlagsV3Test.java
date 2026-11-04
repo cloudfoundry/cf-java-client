@@ -130,6 +130,66 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
     }
 
     @Test
+    void listFiltered() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path(
+                                                "/feature_flags?order_by=name&page=1&per_page=1")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/featureflags/GET_response_filtered.json")
+                                        .build())
+                        .build());
+
+        this.featureFlags
+                .list(
+                        ListFeatureFlagsRequest.builder()
+                                .orderBy("name")
+                                .page(1)
+                                .perPage(1)
+                                .build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        ListFeatureFlagsResponse.builder()
+                                .pagination(
+                                        Pagination.builder()
+                                                .totalResults(2)
+                                                .totalPages(2)
+                                                .first(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/feature_flags?order_by=name&page=1&per_page=1")
+                                                                .build())
+                                                .last(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/feature_flags?order_by=name&page=2&per_page=1")
+                                                                .build())
+                                                .next(
+                                                        Link.builder()
+                                                                .href(
+                                                                        "https://api.example.org/v3/feature_flags?order_by=name&page=2&per_page=1")
+                                                                .build())
+                                                .build())
+                                .resource(
+                                        GetFeatureFlagResponse.builder()
+                                                .name("app_scaling")
+                                                .enabled(true)
+                                                .updatedAt(UPDATED_AT)
+                                                .link("self", selfLink("app_scaling"))
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     void update() {
         mockRequest(
                 InteractionContext.builder()

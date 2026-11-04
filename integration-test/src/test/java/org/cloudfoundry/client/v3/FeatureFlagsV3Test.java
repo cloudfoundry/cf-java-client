@@ -32,7 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
-public class FeatureFlagsV3Test extends AbstractIntegrationTest {
+public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
 
     private static final String FLAG_NAME = "app_scaling";
 
@@ -79,6 +79,92 @@ public class FeatureFlagsV3Test extends AbstractIntegrationTest {
     }
 
     @Test
+    public void updateCustomErrorMessage() {
+        String newMessage = "Integration test custom error message";
+
+        this.cloudFoundryClient
+                .featureFlagsV3()
+                .get(GetFeatureFlagRequest.builder().name(FLAG_NAME).build())
+                .flatMap(
+                        original ->
+                                this.cloudFoundryClient
+                                        .featureFlagsV3()
+                                        .update(
+                                                UpdateFeatureFlagRequest.builder()
+                                                        .name(FLAG_NAME)
+                                                        .customErrorMessage(newMessage)
+                                                        .build())
+                                        .flatMap(
+                                                updated ->
+                                                        this.cloudFoundryClient
+                                                                .featureFlagsV3()
+                                                                .update(
+                                                                        UpdateFeatureFlagRequest
+                                                                                .builder()
+                                                                                .name(FLAG_NAME)
+                                                                                .customErrorMessage(
+                                                                                        original
+                                                                                                .getCustomErrorMessage())
+                                                                                .build())
+                                                                .thenReturn(
+                                                                        updated
+                                                                                .getCustomErrorMessage())))
+                .as(StepVerifier::create)
+                .expectNext(newMessage)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateCustomErrorMessageToNull() {
+        String tempMessage = "Integration test custom error message";
+
+        this.cloudFoundryClient
+                .featureFlagsV3()
+                .get(GetFeatureFlagRequest.builder().name(FLAG_NAME).build())
+                .flatMap(
+                        original ->
+                                this.cloudFoundryClient
+                                        .featureFlagsV3()
+                                        .update(
+                                                UpdateFeatureFlagRequest.builder()
+                                                        .name(FLAG_NAME)
+                                                        .customErrorMessage(tempMessage)
+                                                        .build())
+                                        .flatMap(
+                                                ignored ->
+                                                        this.cloudFoundryClient
+                                                                .featureFlagsV3()
+                                                                .update(
+                                                                        UpdateFeatureFlagRequest
+                                                                                .builder()
+                                                                                .name(FLAG_NAME)
+                                                                                .clearCustomErrorMessage(
+                                                                                        true)
+                                                                                .build()))
+                                        .flatMap(
+                                                cleared -> {
+                                                    UpdateFeatureFlagRequest.Builder restore =
+                                                            UpdateFeatureFlagRequest.builder()
+                                                                    .name(FLAG_NAME);
+                                                    if (original.getCustomErrorMessage() != null) {
+                                                        restore.customErrorMessage(
+                                                                original.getCustomErrorMessage());
+                                                    } else {
+                                                        restore.clearCustomErrorMessage(true);
+                                                    }
+                                                    return this.cloudFoundryClient
+                                                            .featureFlagsV3()
+                                                            .update(restore.build())
+                                                            .thenReturn(cleared);
+                                                }))
+                .as(StepVerifier::create)
+                .consumeNextWith(cleared -> assertThat(cleared.getCustomErrorMessage()).isNull())
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
     public void update() {
         this.cloudFoundryClient
                 .featureFlagsV3()
@@ -92,8 +178,12 @@ public class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                         .name(FLAG_NAME)
                                                         .enabled(!original.getEnabled())
                                                         .build())
-                                        .flatMap(
+                                        .map(
                                                 toggled ->
+                                                        toggled.getEnabled()
+                                                                != original.getEnabled())
+                                        .doFinally(
+                                                signal ->
                                                         this.cloudFoundryClient
                                                                 .featureFlagsV3()
                                                                 .update(
@@ -104,10 +194,109 @@ public class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                                                         original
                                                                                                 .getEnabled())
                                                                                 .build())
-                                                                .thenReturn(
-                                                                        toggled.getEnabled()
-                                                                                != original
-                                                                                        .getEnabled())))
+                                                                .as(StepVerifier::create)
+                                                                .consumeNextWith(
+                                                                        r ->
+                                                                                assertThat(
+                                                                                                r
+                                                                                                        .getEnabled())
+                                                                                        .isEqualTo(
+                                                                                                original
+                                                                                                        .getEnabled()))
+                                                                .expectComplete()
+                                                                .verify(Duration.ofMinutes(5))))
+                .as(StepVerifier::create)
+                .expectNext(true)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateMessage() {
+        String newMessage = "Integration test updateMessage";
+
+        this.cloudFoundryClient
+                .featureFlagsV3()
+                .get(GetFeatureFlagRequest.builder().name(FLAG_NAME).build())
+                .flatMap(
+                        original ->
+                                this.cloudFoundryClient
+                                        .featureFlagsV3()
+                                        .update(
+                                                UpdateFeatureFlagRequest.builder()
+                                                        .name(FLAG_NAME)
+                                                        .customErrorMessage(newMessage)
+                                                        .build())
+                                        .map(updated -> updated.getCustomErrorMessage())
+                                        .doFinally(
+                                                signal ->
+                                                        this.cloudFoundryClient
+                                                                .featureFlagsV3()
+                                                                .update(
+                                                                        UpdateFeatureFlagRequest
+                                                                                .builder()
+                                                                                .name(FLAG_NAME)
+                                                                                .customErrorMessage(
+                                                                                        original
+                                                                                                .getCustomErrorMessage())
+                                                                                .build())
+                                                                .as(StepVerifier::create)
+                                                                .consumeNextWith(
+                                                                        r ->
+                                                                                assertThat(
+                                                                                                r
+                                                                                                        .getCustomErrorMessage())
+                                                                                        .isEqualTo(
+                                                                                                original
+                                                                                                        .getCustomErrorMessage()))
+                                                                .expectComplete()
+                                                                .verify(Duration.ofMinutes(5))))
+                .as(StepVerifier::create)
+                .expectNext(newMessage)
+                .expectComplete()
+                .verify(Duration.ofMinutes(5));
+    }
+
+    @Test
+    public void updateNothing() {
+        this.cloudFoundryClient
+                .featureFlagsV3()
+                .get(GetFeatureFlagRequest.builder().name(FLAG_NAME).build())
+                .flatMap(
+                        original ->
+                                this.cloudFoundryClient
+                                        .featureFlagsV3()
+                                        .update(
+                                                UpdateFeatureFlagRequest.builder()
+                                                        .name(FLAG_NAME)
+                                                        .build())
+                                        .map(
+                                                unchanged ->
+                                                        unchanged.getEnabled()
+                                                                == original.getEnabled())
+                                        .doFinally(
+                                                signal ->
+                                                        this.cloudFoundryClient
+                                                                .featureFlagsV3()
+                                                                .update(
+                                                                        UpdateFeatureFlagRequest
+                                                                                .builder()
+                                                                                .name(FLAG_NAME)
+                                                                                .enabled(
+                                                                                        original
+                                                                                                .getEnabled())
+                                                                                .build())
+                                                                .as(StepVerifier::create)
+                                                                .consumeNextWith(
+                                                                        r ->
+                                                                                assertThat(
+                                                                                                r
+                                                                                                        .getEnabled())
+                                                                                        .isEqualTo(
+                                                                                                original
+                                                                                                        .getEnabled()))
+                                                                .expectComplete()
+                                                                .verify(Duration.ofMinutes(5))))
                 .as(StepVerifier::create)
                 .expectNext(true)
                 .expectComplete()
