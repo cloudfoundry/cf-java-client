@@ -136,8 +136,7 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                         .request(
                                 TestRequest.builder()
                                         .method(GET)
-                                        .path(
-                                                "/feature_flags?order_by=name&page=1&per_page=1")
+                                        .path("/feature_flags?order_by=name&page=1&per_page=1")
                                         .build())
                         .response(
                                 TestResponse.builder()
@@ -148,12 +147,7 @@ final class ReactorFeatureFlagsV3Test extends AbstractClientApiTest {
                         .build());
 
         this.featureFlags
-                .list(
-                        ListFeatureFlagsRequest.builder()
-                                .orderBy("name")
-                                .page(1)
-                                .perPage(1)
-                                .build())
+                .list(ListFeatureFlagsRequest.builder().orderBy("name").page(1).perPage(1).build())
                 .as(StepVerifier::create)
                 .expectNext(
                         ListFeatureFlagsResponse.builder()
