@@ -268,6 +268,43 @@ final class ReactorProcessesTest extends AbstractClientApiTest {
     }
 
     @Test
+    void getProcessStatisticsStopping() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(
+                                TestRequest.builder()
+                                        .method(GET)
+                                        .path("/processes/test-id/stats")
+                                        .build())
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .payload(
+                                                "fixtures/client/v3/processes/GET_{id}_stats_stopping_response.json")
+                                        .build())
+                        .build());
+
+        this.processes
+                .getStatistics(GetProcessStatisticsRequest.builder().processId("test-id").build())
+                .as(StepVerifier::create)
+                .expectNext(
+                        GetProcessStatisticsResponse.builder()
+                                .resource(
+                                        ProcessStatisticsResource.builder()
+                                                .type("web")
+                                                .index(0)
+                                                .state(ProcessState.STOPPING)
+                                                .usage(ProcessUsage.builder().build())
+                                                .host("10.244.16.10")
+                                                .uptime(42L)
+                                                .fileDescriptorQuota(16384L)
+                                                .build())
+                                .build())
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     void list() {
         mockRequest(
                 InteractionContext.builder()
