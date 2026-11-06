@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.featureflags.FeatureFlagsV3;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
@@ -168,6 +169,11 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Feature Flags Client API
      */
     FeatureFlags featureFlags();
+
+    /**
+     * Main entry point to the Cloud Foundry Feature Flags V3 Client API
+     */
+    FeatureFlagsV3 featureFlagsV3();
 
     /**
      * Main entry point to the Cloud Foundry Info Client API
