@@ -76,6 +76,7 @@ import org.cloudfoundry.reactor.uaa.ReactorUaaClient;
 import org.cloudfoundry.routing.RoutingClient;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsRequest;
 import org.cloudfoundry.routing.v1.routergroups.ListRouterGroupsResponse;
+import org.cloudfoundry.routing.v1.routergroups.RouterGroup;
 import org.cloudfoundry.routing.v1.routergroups.UpdateRouterGroupRequest;
 import org.cloudfoundry.uaa.UaaClient;
 import org.cloudfoundry.uaa.clients.CreateClientRequest;
@@ -94,10 +95,12 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.SmartInitializingSingleton;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -257,7 +260,6 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    @DependsOn("routerGroupPorts")
     CloudFoundryCleaner cloudFoundryCleaner(
             @Qualifier("admin") CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
@@ -458,53 +460,38 @@ public class IntegrationTestConfiguration {
         return nameFactory.getPlanName();
     }
 
-    // Tests allocate TCP ports from NameFactory, so the default router group has to reserve them
-    // regardless of the order in which the tests run (or of the deployment's default range).
-    @Bean(initMethod = "block")
-    Mono<Void> routerGroupPorts(
-            ConnectionContext connectionContext,
-            @Value("${test.admin.password}") String password,
-            @Value("${test.admin.username}") String username,
-            @Value("${skip.tcp.routing.tests:false}") boolean skipTcpRouting) {
-        if (skipTcpRouting) {
-            return Mono.empty();
-        }
+    // Ensure that the default-tcp router group reserves the ports the tests allocate from
+    // NameFactory, regardless of the deployment's default range. Runs once all singletons exist;
+    // ApplicationRunner is not an option, as the tests use a plain SpringJUnitConfig.
+    @Bean
+    @ConditionalOnExpression(
+            "!'true'.equalsIgnoreCase(systemEnvironment['SKIP_TCP_ROUTING_TESTS'])")
+    SmartInitializingSingleton routerGroupPorts(RoutingClient routingClient) {
+        return () -> {
+            RouterGroup defaultGroup =
+                    routingClient
+                            .routerGroups()
+                            .list(ListRouterGroupsRequest.builder().build())
+                            .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
+                            .filter(group -> "default-tcp".equals(group.getName()))
+                            .blockFirst();
 
-        // Not the shared routingClient: its token provider depends on the cleaner, which depends on
-        // this bean
-        RoutingClient routingClient =
-                ReactorRoutingClient.builder()
-                        .connectionContext(connectionContext)
-                        .tokenProvider(
-                                PasswordGrantTokenProvider.builder()
-                                        .password(password)
-                                        .username(username)
-                                        .build())
-                        .build();
+            if (defaultGroup == null) {
+                throw new IllegalStateException(
+                        "No default-tcp router group, TCP route tests will fail. Set"
+                                + " SKIP_TCP_ROUTING_TESTS=true to skip TCP routing tests"
+                                + " entirely.");
+            }
 
-        return routingClient
-                .routerGroups()
-                .list(ListRouterGroupsRequest.builder().build())
-                .flatMapIterable(ListRouterGroupsResponse::getRouterGroups)
-                .filter(group -> "default-tcp".equals(group.getName()))
-                .next()
-                .switchIfEmpty(
-                        Mono.fromRunnable(
-                                () ->
-                                        this.logger.warn(
-                                                "No default-tcp router group, TCP route tests will"
-                                                        + " fail")))
-                .flatMap(
-                        group ->
-                                routingClient
-                                        .routerGroups()
-                                        .update(
-                                                UpdateRouterGroupRequest.builder()
-                                                        .reservablePorts(
-                                                                RandomNameFactory.PORT_RANGE)
-                                                        .routerGroupId(group.getRouterGroupId())
-                                                        .build()))
-                .then();
+            routingClient
+                    .routerGroups()
+                    .update(
+                            UpdateRouterGroupRequest.builder()
+                                    .reservablePorts(RandomNameFactory.PORT_RANGE)
+                                    .routerGroupId(defaultGroup.getRouterGroupId())
+                                    .build())
+                    .block();
+        };
     }
 
     @Bean
