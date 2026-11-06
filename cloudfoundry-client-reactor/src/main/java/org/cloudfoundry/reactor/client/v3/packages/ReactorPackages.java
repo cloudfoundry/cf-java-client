@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -131,7 +131,8 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         Path bits = request.getBits();
 
-        if (bits.toFile().isDirectory()) {
+        // bits is null when uploading via resource matching only (all files already cached on server)
+        if (bits != null && bits.toFile().isDirectory()) {
             return FileUtils.compress(bits)
                     .map(
                             temporaryFile ->
