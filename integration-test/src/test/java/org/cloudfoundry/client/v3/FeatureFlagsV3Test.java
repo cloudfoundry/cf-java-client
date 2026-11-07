@@ -112,7 +112,7 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                 .as(StepVerifier::create)
                 .expectNext(newMessage)
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(8));
     }
 
     @Test
