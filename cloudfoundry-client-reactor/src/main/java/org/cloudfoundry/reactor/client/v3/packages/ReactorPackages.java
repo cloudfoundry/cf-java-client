@@ -131,7 +131,8 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         Path bits = request.getBits();
 
-        // bits is null when uploading via resource matching only (all files already cached on server)
+        // bits is null when uploading via resource matching only (all files already cached on
+        // server)
         if (bits != null && bits.toFile().isDirectory()) {
             return FileUtils.compress(bits)
                     .map(
