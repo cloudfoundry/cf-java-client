@@ -125,8 +125,6 @@ import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
 import org.cloudfoundry.client.v3.builds.CreateBuildResponse;
 import org.cloudfoundry.client.v3.builds.GetBuildRequest;
 import org.cloudfoundry.client.v3.builds.GetBuildResponse;
-import org.cloudfoundry.client.v3.domains.DomainResource;
-import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
 import org.cloudfoundry.client.v3.packages.BitsData;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageResponse;
@@ -149,10 +147,6 @@ import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
 import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.Envelope;
-import org.cloudfoundry.doppler.EventType;
-import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
 import org.cloudfoundry.logcache.v1.LogCacheClient;
@@ -169,7 +163,6 @@ import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.cloudfoundry.util.ResourceMatchingUtilsV3;
 import org.cloudfoundry.util.ResourceUtils;
-import org.cloudfoundry.util.SortingUtils;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -201,14 +194,9 @@ public final class DefaultApplications implements Applications {
         "instances", "memory", "state", "environment_json"
     };
 
-    private static final Comparator<LogMessage> LOG_MESSAGE_COMPARATOR =
-            Comparator.comparing(LogMessage::getTimestamp);
-
     private static final Comparator<org.cloudfoundry.logcache.v1.Envelope>
             LOG_MESSAGE_COMPARATOR_LOG_CACHE =
                     Comparator.comparing(org.cloudfoundry.logcache.v1.Envelope::getTimestamp);
-
-    private static final Duration LOG_MESSAGE_TIMESPAN = Duration.ofMillis(500);
 
     private static final int MAX_NUMBER_OF_RECENT_EVENTS = 50;
 
@@ -219,8 +207,6 @@ public final class DefaultApplications implements Applications {
     private static final String APP_FEATURE_SSH = "ssh";
 
     private final Mono<CloudFoundryClient> cloudFoundryClient;
-
-    private final Mono<DopplerClient> dopplerClient;
 
     private final Mono<LogCacheClient> logCacheClient;
 
@@ -243,7 +229,6 @@ public final class DefaultApplications implements Applications {
             RandomWords randomWords,
             Mono<String> spaceId) {
         this.cloudFoundryClient = cloudFoundryClient;
-        this.dopplerClient = dopplerClient;
         this.logCacheClient = logCacheClient;
         this.randomWords = randomWords;
         this.spaceId = spaceId;
@@ -541,24 +526,6 @@ public final class DefaultApplications implements Applications {
                 .transform(OperationsLogging.log("List Application Tasks"))
                 .checkpoint();
     }
-
-//    @Override
-//    public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
-//        boolean recent = request.getRecent() != null && request.getRecent();
-//        return Mono.zip(this.cloudFoundryClient, this.spaceId)
-//                .flatMap(
-//                        function(
-//                                (cloudFoundryClient, spaceId) ->
-//                                        getApplicationId(
-//                                                cloudFoundryClient, request.getName(), spaceId)))
-//                .flatMapMany(
-//                        applicationId ->
-//                                recent
-//                                        ? getLogsLogCache(this.logCacheClient, applicationId)
-//                                        : getLogsStream(this.dopplerClient, applicationId))
-//                .transform(OperationsLogging.log("Get Application Logs"))
-//                .checkpoint();
-//    }
 
     @Override
     public Flux<ApplicationLog> logs(ApplicationLogsRequest request) {
@@ -1619,16 +1586,6 @@ public final class DefaultApplications implements Applications {
                 .orElse(0);
     }
 
-    private static Flux<ApplicationLog> getLogsStream(
-            Mono<DopplerClient> dopplerClient, String applicationId) {
-        return requestLogsStream(dopplerClient, applicationId)
-                .filter(e -> EventType.LOG_MESSAGE == e.getEventType())
-                .map(Envelope::getLogMessage)
-                .transformDeferred(
-                        SortingUtils.timespan(LOG_MESSAGE_COMPARATOR, LOG_MESSAGE_TIMESPAN))
-                .map(DefaultApplications::toApplicationLog);
-    }
-
     private static Flux<ApplicationLog> getLogsLogCache(
             Mono<LogCacheClient> logCacheClient, String applicationId) {
         return requestLogsRecentLogCache(logCacheClient, applicationId)
@@ -2484,15 +2441,6 @@ public final class DefaultApplications implements Applications {
                 .cast(AbstractApplicationResource.class);
     }
 
-    private static Flux<DomainResource> requestListDomains(
-            CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils.requestClientV3Resources(
-                page ->
-                        cloudFoundryClient
-                                .domainsV3()
-                                .list(ListDomainsRequest.builder().page(page).build()));
-    }
-
     private static Flux<PrivateDomainResource> requestListPrivateDomains(
             CloudFoundryClient cloudFoundryClient, String organizationId) {
         return PaginationUtils.requestClientV2Resources(
@@ -2580,14 +2528,6 @@ public final class DefaultApplications implements Applications {
                                 client.read(ReadRequest.builder().sourceId(applicationId).build()))
                 .flatMap(response -> Mono.justOrEmpty(response.getEnvelopes()))
                 .flatMapIterable(EnvelopeBatch::getBatch);
-    }
-
-    private static Flux<Envelope> requestLogsStream(
-            Mono<DopplerClient> dopplerClient, String applicationId) {
-        return dopplerClient.flatMapMany(
-                client ->
-                        client.stream(
-                                StreamRequest.builder().applicationId(applicationId).build()));
     }
 
     private static Flux<SpaceResource> requestOrganizationSpacesByName(
@@ -2838,12 +2778,6 @@ public final class DefaultApplications implements Applications {
                 cloudFoundryClient,
                 applicationId,
                 builder -> builder.diskQuota(disk).instances(instances).memory(memory));
-    }
-
-    private static Mono<AbstractApplicationResource> requestUpdateApplicationSsh(
-            CloudFoundryClient cloudFoundryClient, String applicationId, Boolean enabled) {
-        return requestUpdateApplication(
-                cloudFoundryClient, applicationId, builder -> builder.enableSsh(enabled));
     }
 
     private static Mono<AbstractApplicationResource> requestUpdateApplicationState(

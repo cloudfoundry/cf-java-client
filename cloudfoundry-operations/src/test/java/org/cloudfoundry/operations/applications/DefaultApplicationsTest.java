@@ -140,10 +140,6 @@ import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CreateTaskResponse;
 import org.cloudfoundry.client.v3.tasks.TaskResource;
-import org.cloudfoundry.doppler.DopplerClient;
-import org.cloudfoundry.doppler.EventType;
-import org.cloudfoundry.doppler.LogMessage;
-import org.cloudfoundry.doppler.StreamRequest;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.EnvelopeType;
@@ -1333,27 +1329,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalArgumentException.class)
                                         .hasMessage(
                                                 "Application test-application-name does not exist"))
-                .verify(Duration.ofSeconds(5));
-    }
-
-    @Test
-    void logsStreamDoppler() {
-        requestApplications(
-                this.cloudFoundryClient,
-                "test-application-name",
-                TEST_SPACE_ID,
-                "test-metadata-id");
-        requestLogsStream(this.dopplerClient, "test-metadata-id");
-
-        this.applications
-                .logs(
-                        ApplicationLogsRequest.builder()
-                                .name("test-application-name")
-                                .recent(false)
-                                .build())
-                .as(StepVerifier::create)
-                .expectNextMatches(log -> log.getMessage().equals("test-log-message-message"))
-                .expectComplete()
                 .verify(Duration.ofSeconds(5));
     }
 
@@ -5488,18 +5463,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
             LogCacheClient logCacheClient, TailLogsRequest tailRequest, Envelope... envelopes) {
         when(logCacheClient.logsTail(tailRequest))
                 .thenReturn(Flux.concat(Flux.just(envelopes), Flux.never()));
-    }
-
-    private static void requestLogsStream(DopplerClient dopplerClient, String applicationId) {
-        when(dopplerClient.stream(StreamRequest.builder().applicationId(applicationId).build()))
-                .thenReturn(
-                        Flux.just(
-                                org.cloudfoundry.doppler.Envelope.builder()
-                                        .eventType(EventType.LOG_MESSAGE)
-                                        .logMessage(
-                                                fill(LogMessage.builder(), "log-message-").build())
-                                        .origin("rsp")
-                                        .build()));
     }
 
     private static void requestOrganizationSpacesByName(
