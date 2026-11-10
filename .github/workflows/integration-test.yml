@@ -94,8 +94,9 @@ jobs:
           EOF
       # Every job gets its own Cloud Foundry on KinD, so the matrix can run in parallel.
       - name: Set up Cloud Foundry
-        uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@main
+        uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@b42a88a35756595bd4108d2b525ded5b014a9515 # v0.26.0
         with:
+          ref: b42a88a35756595bd4108d2b525ded5b014a9515
           use-latest-versions: ${{ (inputs.preview || github.event_name == 'schedule') }}
           github-token: ${{ github.token }}
           additional-values-files: ${{ runner.temp }}/cf-values.yaml
