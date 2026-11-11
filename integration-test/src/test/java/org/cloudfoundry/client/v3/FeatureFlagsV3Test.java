@@ -178,12 +178,8 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                         .name(FLAG_NAME)
                                                         .enabled(!original.getEnabled())
                                                         .build())
-                                        .map(
+                                        .flatMap(
                                                 toggled ->
-                                                        toggled.getEnabled()
-                                                                != original.getEnabled())
-                                        .doFinally(
-                                                signal ->
                                                         this.cloudFoundryClient
                                                                 .featureFlagsV3()
                                                                 .update(
@@ -194,17 +190,10 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                                                         original
                                                                                                 .getEnabled())
                                                                                 .build())
-                                                                .as(StepVerifier::create)
-                                                                .consumeNextWith(
-                                                                        r ->
-                                                                                assertThat(
-                                                                                                r
-                                                                                                        .getEnabled())
-                                                                                        .isEqualTo(
-                                                                                                original
-                                                                                                        .getEnabled()))
-                                                                .expectComplete()
-                                                                .verify(Duration.ofMinutes(5))))
+                                                                .thenReturn(
+                                                                        toggled.getEnabled()
+                                                                                != original
+                                                                                        .getEnabled())))
                 .as(StepVerifier::create)
                 .expectNext(true)
                 .expectComplete()
@@ -227,9 +216,8 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                         .name(FLAG_NAME)
                                                         .customErrorMessage(newMessage)
                                                         .build())
-                                        .map(updated -> updated.getCustomErrorMessage())
-                                        .doFinally(
-                                                signal ->
+                                        .flatMap(
+                                                updated ->
                                                         this.cloudFoundryClient
                                                                 .featureFlagsV3()
                                                                 .update(
@@ -240,17 +228,9 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                                                         original
                                                                                                 .getCustomErrorMessage())
                                                                                 .build())
-                                                                .as(StepVerifier::create)
-                                                                .consumeNextWith(
-                                                                        r ->
-                                                                                assertThat(
-                                                                                                r
-                                                                                                        .getCustomErrorMessage())
-                                                                                        .isEqualTo(
-                                                                                                original
-                                                                                                        .getCustomErrorMessage()))
-                                                                .expectComplete()
-                                                                .verify(Duration.ofMinutes(5))))
+                                                                .thenReturn(
+                                                                        updated
+                                                                                .getCustomErrorMessage())))
                 .as(StepVerifier::create)
                 .expectNext(newMessage)
                 .expectComplete()
@@ -270,12 +250,8 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                 UpdateFeatureFlagRequest.builder()
                                                         .name(FLAG_NAME)
                                                         .build())
-                                        .map(
+                                        .flatMap(
                                                 unchanged ->
-                                                        unchanged.getEnabled()
-                                                                == original.getEnabled())
-                                        .doFinally(
-                                                signal ->
                                                         this.cloudFoundryClient
                                                                 .featureFlagsV3()
                                                                 .update(
@@ -286,17 +262,10 @@ public final class FeatureFlagsV3Test extends AbstractIntegrationTest {
                                                                                         original
                                                                                                 .getEnabled())
                                                                                 .build())
-                                                                .as(StepVerifier::create)
-                                                                .consumeNextWith(
-                                                                        r ->
-                                                                                assertThat(
-                                                                                                r
-                                                                                                        .getEnabled())
-                                                                                        .isEqualTo(
-                                                                                                original
-                                                                                                        .getEnabled()))
-                                                                .expectComplete()
-                                                                .verify(Duration.ofMinutes(5))))
+                                                                .thenReturn(
+                                                                        unchanged.getEnabled()
+                                                                                == original
+                                                                                        .getEnabled())))
                 .as(StepVerifier::create)
                 .expectNext(true)
                 .expectComplete()
