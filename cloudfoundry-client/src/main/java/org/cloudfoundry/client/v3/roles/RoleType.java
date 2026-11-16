@@ -62,7 +62,12 @@ public enum RoleType {
     /**
      * space_manager role type
      */
-    SPACE_MANAGER;
+    SPACE_MANAGER,
+
+    /**
+     * space_supporter role type
+     */
+    SPACE_SUPPORTER;
 
     public static final Set<RoleType> ORGANIZATION_ROLE_TYPES =
             EnumSet.of(
@@ -72,7 +77,7 @@ public enum RoleType {
                     ORGANIZATION_USER);
 
     public static final Set<RoleType> SPACE_ROLE_TYPES =
-            EnumSet.of(SPACE_AUDITOR, SPACE_DEVELOPER, SPACE_MANAGER);
+            EnumSet.of(SPACE_AUDITOR, SPACE_DEVELOPER, SPACE_MANAGER, SPACE_SUPPORTER);
 
     private static final Map<String, RoleType> NAMES_TO_VALUES =
             Arrays.stream(RoleType.values())
