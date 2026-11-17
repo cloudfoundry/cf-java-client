@@ -80,7 +80,7 @@ jobs:
       - name: Write CAPI values override
         if: ${{ steps.capi.outputs.version != '' }}
         env:
-          MIN_CAPI_VERSION: 1.241.0
+          MIN_CAPI_VERSION: 1.251.0
           MATCHED_CAPI_VERSION: ${{ steps.capi.outputs.version }}
         run: |
           version="$(printf '%s\n%s\n' "$MIN_CAPI_VERSION" "$MATCHED_CAPI_VERSION" | sort -V | tail -1)"
