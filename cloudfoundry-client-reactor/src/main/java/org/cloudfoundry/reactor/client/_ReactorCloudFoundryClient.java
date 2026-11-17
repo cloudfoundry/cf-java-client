@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -58,6 +58,7 @@ import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.featureflags.FeatureFlagsV3;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.quotas.organizations.OrganizationQuotasV3;
@@ -120,6 +121,7 @@ import org.cloudfoundry.reactor.client.v3.builpacks.ReactorBuildpacksV3;
 import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
+import org.cloudfoundry.reactor.client.v3.featureflags.ReactorFeatureFlagsV3;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
 import org.cloudfoundry.reactor.client.v3.quotas.organizations.ReactorOrganizationQuotasV3;
@@ -254,6 +256,12 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
     @Value.Derived
     public FeatureFlags featureFlags() {
         return new ReactorFeatureFlags(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public FeatureFlagsV3 featureFlagsV3() {
+        return new ReactorFeatureFlagsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
     }
 
     @Override

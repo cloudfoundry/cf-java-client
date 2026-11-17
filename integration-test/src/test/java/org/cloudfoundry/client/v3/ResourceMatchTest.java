@@ -29,6 +29,7 @@ import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.applications.Application;
 import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
 import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.featureflags.GetFeatureFlagRequest;
 import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageRequest;
 import org.cloudfoundry.client.v3.packages.GetPackageResponse;
@@ -40,8 +41,8 @@ import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
 import org.cloudfoundry.util.DelayTimeoutException;
 import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.ResourceMatchingUtilsV3;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIf;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
@@ -54,22 +55,23 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
 
     @Autowired private Mono<String> spaceId;
 
+    // enable resource_matching with: cf enable-feature-flag  resource_matching
     @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_9)
     @Test
-    @Disabled(
-            "Cloud Controller is configured not to cache resource smaller than 4k - Find a better"
-                    + " way to test this")
+    @DisabledIf("resource_matching_disabled")
     public void upload() throws IOException {
         createAndUploadPackage()
                 .flatMap(this::waitForReady)
                 .then(
                         ResourceMatchingUtilsV3.getMatchedResources(
                                 this.cloudFoundryClient,
-                                new ClassPathResource("test-application.zip").getFile().toPath()))
+                                new ClassPathResource("test-service-broker.jar")
+                                        .getFile()
+                                        .toPath()))
                 .as(StepVerifier::create)
                 .consumeNextWith(matchedResources -> assertThat(matchedResources).isNotEmpty())
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 
     private Mono<String> createAndUploadPackage() {
@@ -130,7 +132,7 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
                                                         .packageId(packageId)
                                                         .bits(
                                                                 new ClassPathResource(
-                                                                                "test-application.zip")
+                                                                                "test-service-broker.jar")
                                                                         .getFile()
                                                                         .toPath())
                                                         .build());
@@ -167,5 +169,14 @@ public class ResourceMatchTest extends AbstractIntegrationTest {
                                 ExceptionUtils.illegalState(
                                         "Package %s timed out during upload processing",
                                         packageId));
+    }
+
+    boolean resource_matching_disabled() {
+        return !this.cloudFoundryClient
+                .featureFlagsV3()
+                .get(GetFeatureFlagRequest.builder().name("resource_matching").build())
+                .map(response -> response.getEnabled())
+                .onErrorReturn(false)
+                .block();
     }
 }

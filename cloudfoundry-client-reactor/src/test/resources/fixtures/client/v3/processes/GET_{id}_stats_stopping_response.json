@@ -1,0 +1,14 @@
+{
+  "resources": [
+    {
+      "type": "web",
+      "index": 0,
+      "state": "STOPPING",
+      "usage": {},
+      "host": "10.244.16.10",
+      "instance_ports": [],
+      "uptime": 42,
+      "fds_quota": 16384
+    }
+  ]
+}

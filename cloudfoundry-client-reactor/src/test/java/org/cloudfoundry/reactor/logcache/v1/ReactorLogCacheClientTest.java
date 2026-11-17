@@ -17,7 +17,9 @@
 package org.cloudfoundry.reactor.logcache.v1;
 
 import static io.netty.handler.codec.http.HttpMethod.GET;
+import static io.netty.handler.codec.http.HttpResponseStatus.NOT_FOUND;
 import static io.netty.handler.codec.http.HttpResponseStatus.OK;
+import static io.netty.handler.codec.http.HttpResponseStatus.SERVICE_UNAVAILABLE;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -27,6 +29,7 @@ import static org.mockito.Mockito.when;
 import java.net.URI;
 import java.time.Duration;
 import java.util.Collections;
+import org.cloudfoundry.UnknownCloudFoundryException;
 import org.cloudfoundry.logcache.v1.Envelope;
 import org.cloudfoundry.logcache.v1.EnvelopeBatch;
 import org.cloudfoundry.logcache.v1.Gauge;
@@ -40,6 +43,7 @@ import org.cloudfoundry.logcache.v1.Metadata;
 import org.cloudfoundry.logcache.v1.Metric;
 import org.cloudfoundry.logcache.v1.ReadRequest;
 import org.cloudfoundry.logcache.v1.ReadResponse;
+import org.cloudfoundry.logcache.v1.TailLogsRequest;
 import org.cloudfoundry.reactor.ConnectionContext;
 import org.cloudfoundry.reactor.DefaultConnectionContext;
 import org.cloudfoundry.reactor.InteractionContext;
@@ -47,6 +51,7 @@ import org.cloudfoundry.reactor.RootProvider;
 import org.cloudfoundry.reactor.TestRequest;
 import org.cloudfoundry.reactor.TestResponse;
 import org.junit.jupiter.api.Test;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -349,5 +354,95 @@ class ReactorLogCacheClientTest extends AbstractLogCacheApiTest {
                                 .build())
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsTailOrdersEnvelopesAndAdvancesCursor() {
+        mockTailRead(10, "fixtures/logcache.v1/GET_read_tail_page1_response.json");
+        mockTailRead(21, "fixtures/logcache.v1/GET_read_tail_page2_response.json");
+
+        this.logCacheEndpoints
+                .logsTail(tailRequest())
+                .take(3)
+                .map(envelope -> envelope.getTimestamp())
+                .as(StepVerifier::create)
+                .expectNext(10L, 20L, 30L)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsTailRetriesTransientErrors() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(tailGet(10))
+                        .response(TestResponse.builder().status(SERVICE_UNAVAILABLE).build())
+                        .build());
+        mockTailRead(10, "fixtures/logcache.v1/GET_read_tail_page2_response.json");
+
+        this.logCacheEndpoints
+                .logsTail(tailRequest())
+                .take(1)
+                .map(envelope -> envelope.getTimestamp())
+                .as(StepVerifier::create)
+                .expectNext(30L)
+                .expectComplete()
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsTailFailsOnClientError() {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(tailGet(10))
+                        .response(TestResponse.builder().status(NOT_FOUND).build())
+                        .build());
+
+        this.logCacheEndpoints
+                .logsTail(tailRequest())
+                .as(StepVerifier::create)
+                .expectError(UnknownCloudFoundryException.class)
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void logsTailUsesIndependentCursorPerSubscription() {
+        mockTailRead(10, "fixtures/logcache.v1/GET_read_tail_page1_response.json");
+        mockTailRead(10, "fixtures/logcache.v1/GET_read_tail_page1_response.json");
+
+        Flux<Long> tail =
+                this.logCacheEndpoints.logsTail(tailRequest()).take(1).map(e -> e.getTimestamp());
+
+        StepVerifier.create(tail).expectNext(10L).expectComplete().verify(Duration.ofSeconds(5));
+        StepVerifier.create(tail).expectNext(10L).expectComplete().verify(Duration.ofSeconds(5));
+    }
+
+    private static TailLogsRequest tailRequest() {
+        return TailLogsRequest.builder()
+                .sourceId("test-source-id")
+                .startTime(10L)
+                .pollInterval(Duration.ofMillis(10))
+                .delay(Duration.ZERO)
+                .build();
+    }
+
+    private static TestRequest tailGet(long startTime) {
+        return TestRequest.builder()
+                .method(GET)
+                .path("/api/v1/read/test-source-id?start_time=" + startTime)
+                .build();
+    }
+
+    private void mockTailRead(long startTime, String payload) {
+        mockRequest(
+                InteractionContext.builder()
+                        .request(tailGet(startTime))
+                        .response(
+                                TestResponse.builder()
+                                        .status(OK)
+                                        .contentType("application/json")
+                                        .payload(payload)
+                                        .build())
+                        .build());
     }
 }
