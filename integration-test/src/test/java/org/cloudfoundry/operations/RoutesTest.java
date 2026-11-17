@@ -28,6 +28,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.PushApplicationRequest;
 import org.cloudfoundry.operations.domains.CreateDomainRequest;
@@ -42,7 +43,6 @@ import org.cloudfoundry.operations.routes.Route;
 import org.cloudfoundry.operations.routes.UnmapRouteRequest;
 import org.cloudfoundry.operations.services.BindRouteServiceInstanceRequest;
 import org.cloudfoundry.operations.services.CreateUserProvidedServiceInstanceRequest;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
@@ -51,6 +51,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
+@RequiresV2Api
 public final class RoutesTest extends AbstractIntegrationTest {
 
     private static final String DEFAULT_ROUTER_GROUP = "default-tcp";
@@ -272,7 +273,6 @@ public final class RoutesTest extends AbstractIntegrationTest {
     }
 
     @Test
-    @Disabled("fails often for no reasons")
     public void deleteOrphanedRoutes() {
         String domainName = this.nameFactory.getDomainName();
         String hostName = this.nameFactory.getHostName();

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,6 +55,7 @@ import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.featureflags.FeatureFlagsV3;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.organizations.OrganizationsV3;
@@ -71,6 +72,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.serviceroutebindings.ServiceRouteBindingsV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
 import org.cloudfoundry.client.v3.tasks.Tasks;
@@ -84,7 +86,9 @@ public interface CloudFoundryClient {
     /**
      * The currently supported Cloud Controller API version
      */
-    String SUPPORTED_API_VERSION = "2.272.0";
+    String SUPPORTED_API_VERSION = "2.291.0";
+
+    String SUPPORTED_API_VERSION_V3 = "3.225.0";
 
     /**
      * Main entry point to the Cloud Foundry Application Usage Events Client API
@@ -167,9 +171,19 @@ public interface CloudFoundryClient {
     FeatureFlags featureFlags();
 
     /**
+     * Main entry point to the Cloud Foundry Feature Flags V3 Client API
+     */
+    FeatureFlagsV3 featureFlagsV3();
+
+    /**
      * Main entry point to the Cloud Foundry Info Client API
      */
     Info info();
+
+    /**
+     * Main entry point to the Cloud Foundry root endpoint
+     */
+    Root rootEndpoint();
 
     /**
      * Main entry point to the Cloud Foundry Isolation Segments API
@@ -381,4 +395,10 @@ public interface CloudFoundryClient {
      * Main entry point to the Cloud Foundry Users V3 Client API
      */
     UsersV3 usersV3();
+
+    /**
+     * Main entry point to the Cloud Foundry Service Route Bindings V3 Client API
+     * See <a href="https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding">https://v3-apidocs.cloudfoundry.org/index.html#service-route-binding</a>
+     */
+    ServiceRouteBindingsV3 serviceRouteBindingsV3();
 }

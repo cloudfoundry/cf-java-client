@@ -20,6 +20,7 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
 import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
@@ -80,6 +81,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuples;
 
+@RequiresV2Api
 public final class UsersTest extends AbstractIntegrationTest {
 
     private static final String STATUS_FILTER = "active";

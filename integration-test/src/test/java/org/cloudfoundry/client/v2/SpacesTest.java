@@ -22,11 +22,14 @@ import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.applications.ApplicationResource;
 import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
@@ -108,7 +111,6 @@ import org.cloudfoundry.util.ExceptionUtils;
 import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -116,6 +118,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 import reactor.util.function.Tuple2;
 
+@RequiresV2Api
 public final class SpacesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -1883,13 +1886,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                 .verify(Duration.ofMinutes(5));
     }
 
-    // TODO: Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to
-    // work
-    @Disabled(
-            "Await https://github.com/cloudfoundry/cloud_controller_ng/issues/856 for this test to"
-                    + " work")
     @Test
     public void listServicesFilterByServiceBrokerId() {
+        List<String> expectedValues =
+                Arrays.asList(this.serviceName, this.serviceName + "-shareable");
         Mono.zip(this.serviceBrokerId, this.spaceId)
                 .flatMapMany(
                         function(
@@ -1901,9 +1901,10 @@ public final class SpacesTest extends AbstractIntegrationTest {
                                                         builder.serviceBrokerId(serviceBrokerId))))
                 .map(response -> response.getEntity().getLabel())
                 .as(StepVerifier::create)
-                .expectNext(this.serviceName)
+                .consumeNextWith(element -> assertThat(element).isIn(expectedValues))
+                .consumeNextWith(element -> assertThat(element).isIn(expectedValues))
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 
     @Test

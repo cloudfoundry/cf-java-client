@@ -20,6 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.operations.organizationadmin.CreateQuotaRequest;
 import org.cloudfoundry.operations.organizationadmin.DeleteQuotaRequest;
 import org.cloudfoundry.operations.organizationadmin.GetQuotaRequest;
@@ -33,6 +34,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class OrganizationAdminTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryOperations cloudFoundryOperations;

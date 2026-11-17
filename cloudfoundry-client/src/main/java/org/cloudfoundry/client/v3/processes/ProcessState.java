@@ -42,7 +42,12 @@ public enum ProcessState {
     /**
      * The starting state
      */
-    STARTING("STARTING");
+    STARTING("STARTING"),
+
+    /**
+     * The stopping state
+     */
+    STOPPING("STOPPING");
 
     private final String value;
 
@@ -61,6 +66,8 @@ public enum ProcessState {
                 return RUNNING;
             case "starting":
                 return STARTING;
+            case "stopping":
+                return STOPPING;
             default:
                 throw new IllegalArgumentException(String.format("Unknown process state: %s", s));
         }

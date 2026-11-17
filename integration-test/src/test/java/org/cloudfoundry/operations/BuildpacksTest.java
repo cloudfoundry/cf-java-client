@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.io.IOException;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.operations.buildpacks.Buildpack;
 import org.cloudfoundry.operations.buildpacks.CreateBuildpackRequest;
 import org.cloudfoundry.operations.buildpacks.DeleteBuildpackRequest;
@@ -31,6 +32,7 @@ import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class BuildpacksTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryOperations cloudFoundryOperations;

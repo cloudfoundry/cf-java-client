@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - main
+      - 5.x.x
   pull_request:
     branches:
       - main
+      - 5.x.x
 
 jobs:
   build:
@@ -38,4 +40,10 @@ jobs:
       - if: ${{ matrix.java != 8 }}
         name: Check style with Spotless
         run:  ./mvnw spotless:check -Pintegration-test
+
+  integration-test:
+    needs: build
+    uses: ./.github/workflows/integration-test.yml
+    with:
+      java-versions: '[21]'
 

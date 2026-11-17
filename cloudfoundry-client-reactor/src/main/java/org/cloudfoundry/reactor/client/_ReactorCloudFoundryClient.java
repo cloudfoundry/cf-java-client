@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package org.cloudfoundry.reactor.client;
 
 import jakarta.annotation.PostConstruct;
 import org.cloudfoundry.client.CloudFoundryClient;
+import org.cloudfoundry.client.Root;
 import org.cloudfoundry.client.v2.applications.ApplicationsV2;
 import org.cloudfoundry.client.v2.applicationusageevents.ApplicationUsageEvents;
 import org.cloudfoundry.client.v2.blobstores.Blobstores;
@@ -57,6 +58,7 @@ import org.cloudfoundry.client.v3.builds.Builds;
 import org.cloudfoundry.client.v3.deployments.DeploymentsV3;
 import org.cloudfoundry.client.v3.domains.DomainsV3;
 import org.cloudfoundry.client.v3.droplets.Droplets;
+import org.cloudfoundry.client.v3.featureflags.FeatureFlagsV3;
 import org.cloudfoundry.client.v3.isolationsegments.IsolationSegments;
 import org.cloudfoundry.client.v3.jobs.JobsV3;
 import org.cloudfoundry.client.v3.quotas.organizations.OrganizationQuotasV3;
@@ -72,6 +74,7 @@ import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokersV3;
 import org.cloudfoundry.client.v3.serviceinstances.ServiceInstancesV3;
 import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingsV3;
 import org.cloudfoundry.client.v3.serviceplans.ServicePlansV3;
+import org.cloudfoundry.client.v3.serviceroutebindings.ServiceRouteBindingsV3;
 import org.cloudfoundry.client.v3.quotas.spaces.SpaceQuotasV3;
 import org.cloudfoundry.client.v3.spaces.SpacesV3;
 import org.cloudfoundry.client.v3.stacks.StacksV3;
@@ -118,6 +121,7 @@ import org.cloudfoundry.reactor.client.v3.builpacks.ReactorBuildpacksV3;
 import org.cloudfoundry.reactor.client.v3.deployments.ReactorDeploymentsV3;
 import org.cloudfoundry.reactor.client.v3.domains.ReactorDomainsV3;
 import org.cloudfoundry.reactor.client.v3.droplets.ReactorDroplets;
+import org.cloudfoundry.reactor.client.v3.featureflags.ReactorFeatureFlagsV3;
 import org.cloudfoundry.reactor.client.v3.isolationsegments.ReactorIsolationSegments;
 import org.cloudfoundry.reactor.client.v3.jobs.ReactorJobsV3;
 import org.cloudfoundry.reactor.client.v3.quotas.organizations.ReactorOrganizationQuotasV3;
@@ -133,6 +137,7 @@ import org.cloudfoundry.reactor.client.v3.servicebrokers.ReactorServiceBrokersV3
 import org.cloudfoundry.reactor.client.v3.serviceinstances.ReactorServiceInstancesV3;
 import org.cloudfoundry.reactor.client.v3.serviceofferings.ReactorServiceOfferingsV3;
 import org.cloudfoundry.reactor.client.v3.serviceplans.ReactorServicePlansV3;
+import org.cloudfoundry.reactor.client.v3.serviceroutebindings.ReactorServiceRouteBindingsV3;
 import org.cloudfoundry.reactor.client.v3.quotas.spaces.ReactorSpaceQuotasV3;
 import org.cloudfoundry.reactor.client.v3.spaces.ReactorSpacesV3;
 import org.cloudfoundry.reactor.client.v3.stacks.ReactorStacksV3;
@@ -207,7 +212,7 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @PostConstruct
     public void checkCompatibility() {
-        new CloudFoundryClientCompatibilityChecker(info()).check();
+        new CloudFoundryClientCompatibilityChecker(info(), rootEndpoint()).check();
     }
 
     @Override
@@ -255,8 +260,21 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
 
     @Override
     @Value.Derived
+    public FeatureFlagsV3 featureFlagsV3() {
+        return new ReactorFeatureFlagsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
     public Info info() {
         return new ReactorInfo(getConnectionContext(), getRootV2(), getTokenProvider(), getRequestTags());
+    }
+
+    @Override
+    @Value.Derived
+    public Root rootEndpoint() {
+        Mono<String> root = getConnectionContext().getRootProvider().getRoot(getConnectionContext());
+        return new ReactorRoot(getConnectionContext(), root, getTokenProvider(), getRequestTags());
     }
 
     @Override
@@ -546,4 +564,9 @@ abstract class _ReactorCloudFoundryClient implements CloudFoundryClient {
      */
     abstract TokenProvider getTokenProvider();
 
+    @Override
+    @Value.Derived
+    public ServiceRouteBindingsV3 serviceRouteBindingsV3() {
+        return new ReactorServiceRouteBindingsV3(getConnectionContext(), getRootV3(), getTokenProvider(), getRequestTags());
+    }
 }

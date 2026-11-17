@@ -1,5 +1,5 @@
 /*
- * Copyright 2013-2021 the original author or authors.
+ * Copyright 2013-2026 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,9 +16,12 @@
 
 package org.cloudfoundry.reactor.client.v3.packages;
 
+import static io.netty.handler.codec.http.HttpHeaderValues.APPLICATION_JSON;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.cloudfoundry.client.v3.packages.CopyPackageRequest;
@@ -128,7 +131,9 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
     public Mono<UploadPackageResponse> upload(UploadPackageRequest request) {
         Path bits = request.getBits();
 
-        if (bits.toFile().isDirectory()) {
+        // bits is null when uploading via resource matching only (all files already cached on
+        // server)
+        if (bits != null && bits.toFile().isDirectory()) {
             return FileUtils.compress(bits)
                     .map(
                             temporaryFile ->
@@ -169,9 +174,12 @@ public final class ReactorPackages extends AbstractClientV3Operations implements
             r.addPart(part -> part.setName("bits").setContentType(APPLICATION_ZIP).sendFile(bits));
         }
 
-        if (resources != null && !resources.isEmpty()) {
-            r.addPart(part -> part.setName("resources").send(resources));
-        }
+        // CAPI rejects bits uploads without a "resources" part (CF-AppBitsUploadInvalid)
+        r.addPart(
+                part ->
+                        part.setName("resources")
+                                .setContentType(APPLICATION_JSON.toString())
+                                .send(resources == null ? Collections.emptyList() : resources));
 
         r.done();
     }

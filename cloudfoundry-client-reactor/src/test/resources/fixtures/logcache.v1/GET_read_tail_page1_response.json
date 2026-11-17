@@ -1,0 +1,22 @@
+{
+  "envelopes" : {
+    "batch" : [
+      {
+        "log" : {
+          "payload" : "bXNnMg==",
+          "type" : "OUT"
+        },
+        "source_id" : "test-source-id",
+        "timestamp" : "20"
+      },
+      {
+        "log" : {
+          "payload" : "bXNnMQ==",
+          "type" : "ERR"
+        },
+        "source_id" : "test-source-id",
+        "timestamp" : "10"
+      }
+    ]
+  }
+}

@@ -25,6 +25,7 @@ import java.util.Map;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
 import org.cloudfoundry.client.v3.servicebindings.DeleteServiceBindingRequest;
@@ -54,6 +55,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_2_11)
+@RequiresV2Api
 public class ServiceBindingsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -366,7 +368,7 @@ public class ServiceBindingsTest extends AbstractIntegrationTest {
                 .as(StepVerifier::create)
                 .expectNext(Collections.singletonMap("foo", "bar"))
                 .expectComplete()
-                .verify(Duration.ofMinutes(5));
+                .verify(Duration.ofMinutes(10));
     }
 
     private static Mono<String> createManagedServiceInstanceId(

@@ -20,10 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresV2Api;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.test.StepVerifier;
 
+@RequiresV2Api
 public final class AdvancedTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryOperations cloudFoundryOperations;

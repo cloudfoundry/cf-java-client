@@ -22,6 +22,13 @@ abstract class _UpdateRouteRequest {
     abstract Metadata getMetadata();
 
     /**
+     * Route options
+     */
+    @JsonProperty("options")
+    @Nullable
+    abstract RouteOptions getOptions();
+
+    /**
      * The route id
      */
     @JsonIgnore

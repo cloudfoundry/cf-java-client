@@ -26,6 +26,7 @@ import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.ApplicationUtils;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
+import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
@@ -45,6 +46,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
+@RequiresV2Api
 public final class ServiceBrokersTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;

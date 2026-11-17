@@ -156,6 +156,12 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
             Path root) {
         toApplicationManifestCommon(application, variables, builder, root);
 
+        asMap(
+                application,
+                "features",
+                variables,
+                String::valueOf,
+                (k, v) -> builder.feature(k, Boolean.valueOf(v)));
         asList(
                 application,
                 "processes",
@@ -299,6 +305,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
     private static Map<String, Object> toApplicationYaml(ManifestV3Application application) {
         Map<String, Object> yaml = ApplicationManifestUtilsCommon.toApplicationYaml(application);
 
+        putIfPresent(yaml, "features", application.getFeatures());
         putIfPresent(
                 yaml,
                 "processes",

@@ -52,6 +52,13 @@ abstract class _SamlConfiguration extends AbstractExternalIdentityProviderConfig
     abstract List<String> getAuthnContext();
 
     /**
+     * The PEM encoded CA certificates used to validate the connection
+     */
+    @JsonProperty("caCertificates")
+    @Nullable
+    abstract List<String> getCaCertificates();
+
+    /**
      * Either EXPLICITLY_MAPPED in order to map external groups to OAuth scopes using the group mappings, or AS_SCOPES to use SAML group names as scopes.
      */
     @JsonProperty("groupMappingMode")

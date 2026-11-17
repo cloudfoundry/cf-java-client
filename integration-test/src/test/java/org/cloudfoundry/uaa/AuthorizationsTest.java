@@ -21,6 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import java.time.Duration;
 import java.util.function.Consumer;
 import org.cloudfoundry.AbstractIntegrationTest;
+import org.cloudfoundry.RequiresBrowserAuth;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantApiRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantBrowserRequest;
 import org.cloudfoundry.uaa.authorizations.AuthorizeByAuthorizationCodeGrantHybridRequest;
@@ -55,6 +56,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByAuthorizationCodeGrantBrowser() {
         this.uaaClient
                 .authorizations()
@@ -70,6 +72,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByAuthorizationCodeGrantHybrid() {
         this.uaaClient
                 .authorizations()
@@ -85,6 +88,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByImplicitGrantBrowser() {
         this.uaaClient
                 .authorizations()
@@ -100,6 +104,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByOpenIdWithAuthorizationCodeGrant() {
         this.uaaClient
                 .authorizations()
@@ -116,6 +121,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByOpenIdWithIdToken() {
         this.uaaClient
                 .authorizations()
@@ -132,6 +138,7 @@ public final class AuthorizationsTest extends AbstractIntegrationTest {
     }
 
     @Test
+    @RequiresBrowserAuth
     public void authorizeByOpenIdWithImplicitGrant() {
         this.uaaClient
                 .authorizations()
