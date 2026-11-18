@@ -9,7 +9,7 @@ on:
         required: false
         default: '[17, 21]'
       preview:
-        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        description: 'Deploy the latest cf-deployment versions and capi chart instead of the default ones (v3 job only)'
         type: boolean
         required: false
         default: false
@@ -23,7 +23,7 @@ on:
         required: false
         default: '[17, 21]'
       preview:
-        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        description: 'Deploy the latest cf-deployment versions and capi chart instead of the default ones (v3 job only)'
         type: boolean
         required: false
         default: false
@@ -50,54 +50,71 @@ jobs:
       fail-fast: false
       matrix:
         java: ${{ fromJSON(inputs.java-versions || (github.event_name == 'schedule' && '[21]' || '[17, 21]')) }}
-    name: Java ${{ matrix.java }} integration test${{ (inputs.preview || github.event_name == 'schedule') && ' (preview)' || '' }}
+        api: [v2, v3]
+        include:
+          # Newer CAPI releases disable the CC v2 API, so the v2 tests (@RequiresV2Api, JUnit tag
+          # "v2") run against a dedicated, pinned CAPI. The capi chart 1.249.0 is the last one that
+          # serves v2: from 1.249.1-1 on, v2 is behind cloudController.config.temporaryEnableV2,
+          # which kind-deployment v0.26.0 doesn't set. Newer kind-deployment versions don't deploy
+          # these older charts any more (their capi values schema changed with 1.249.1-1).
+          # Keep capi-version in sync with SUPPORTED_API_VERSION (2.299.0) in CloudFoundryClient.java.
+          - api: v2
+            kind-deployment-ref: b42a88a35756595bd4108d2b525ded5b014a9515 # v0.26.0
+            capi-version: 1.249.0
+            test-selection: -Dgroups=v2
+            skip-v2-tests: 'false'
+          # All other tests run with v2 disabled, against the capi chart of SUPPORTED_API_VERSION_V3
+          # (3.237.0, capi-release 1.252.0), so that a new capi chart can't break validation runs.
+          # Preview runs deploy the latest capi chart instead.
+          # Keep capi-version in sync with SUPPORTED_API_VERSION_V3 in CloudFoundryClient.java.
+          - api: v3
+            kind-deployment-ref: 6b6882c54a23bfd23982299052ae681f481ad231 # main, 2026-11-13
+            capi-version: 1.252.1-1
+            test-selection: -DexcludedGroups=v2
+            skip-v2-tests: 'true'
+    name: Java ${{ matrix.java }} ${{ matrix.api }} integration test${{ matrix.api == 'v3' && (inputs.preview || github.event_name == 'schedule') && ' (preview)' || '' }}
     steps:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      # Validation runs deploy the capi-release that matches SUPPORTED_API_VERSION. Preview runs
-      # (scheduled, or started by hand with `preview`) keep the latest versions.
       - name: Resolve CAPI version
         id: capi
-        if: ${{ !(inputs.preview || github.event_name == 'schedule') }}
+        env:
+          CAPI_VERSION: ${{ matrix.capi-version }}
+          # The v2 job stays on its pinned version, preview runs only affect the v3 job
+          USE_LATEST_CAPI: ${{ matrix.api == 'v3' && (inputs.preview || github.event_name == 'schedule') }}
         run: |
-          # separate assignment, so that a failing resolver fails the step
-          version="$(.github/scripts/resolve-capi-version.sh)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          if [ "$USE_LATEST_CAPI" = true ]; then
+            # separate assignment, so that a failing resolver fails the step
+            CAPI_VERSION="$(.github/scripts/resolve-latest-capi-chart.sh)"
+          fi
+          echo "version=$CAPI_VERSION" >> "$GITHUB_OUTPUT"
       # All components share one Postgres, which runs out of its default 100 connections during a full
-      # test run. Written first, the CAPI override below appends to the same file.
-      - name: Write PostgreSQL values override
+      # test run.
+      # The capi chart version overrides the one of kind-deployment (merged last by Helmfile), also in
+      # preview runs.
+      - name: Write values override
+        env:
+          CAPI_VERSION: ${{ steps.capi.outputs.version }}
         run: |
           cat > "$RUNNER_TEMP/cf-values.yaml" <<EOF
           postgresql:
             primary:
               extendedConfiguration: |
                 max_connections = 500
-          EOF
-      # Overrides the capi chart version of kind-deployment (merged last by Helmfile).
-      # kind-deployment's helmfile passes cloudController.appDomains, which the capi chart only
-      # accepts from 1.241.0 on (1.240.0 fails its values schema), so older matches are raised to it.
-      - name: Write CAPI values override
-        if: ${{ steps.capi.outputs.version != '' }}
-        env:
-          MIN_CAPI_VERSION: 1.241.0
-          MATCHED_CAPI_VERSION: ${{ steps.capi.outputs.version }}
-        run: |
-          version="$(printf '%s\n%s\n' "$MIN_CAPI_VERSION" "$MATCHED_CAPI_VERSION" | sort -V | tail -1)"
-          if [ "$version" != "$MATCHED_CAPI_VERSION" ]; then
-            echo "::warning::capi-release $MATCHED_CAPI_VERSION matches SUPPORTED_API_VERSION but is too old for kind-deployment, deploying $version"
-          fi
-          cat >> "$RUNNER_TEMP/cf-values.yaml" <<EOF
           charts:
             capi:
-              version: $version
+              version: $CAPI_VERSION
           EOF
       # Every job gets its own Cloud Foundry on KinD, so the matrix can run in parallel.
+      # The action of kind-deployment main also deploys v0.26.0 (ref), but unlike the v0.26.0 one, it
+      # masks the generated admin credentials, which the step logs show otherwise.
       - name: Set up Cloud Foundry
-        uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@b42a88a35756595bd4108d2b525ded5b014a9515 # v0.26.0
+        uses: cloudfoundry/kind-deployment/.github/actions/setup-cf@6b6882c54a23bfd23982299052ae681f481ad231 # main, 2026-11-13
         with:
-          ref: b42a88a35756595bd4108d2b525ded5b014a9515
-          use-latest-versions: ${{ (inputs.preview || github.event_name == 'schedule') }}
+          ref: ${{ matrix.kind-deployment-ref }}
+          # The v2 job stays on its pinned versions, preview runs only affect the v3 job
+          use-latest-versions: ${{ matrix.api == 'v3' && (inputs.preview || github.event_name == 'schedule') }}
           github-token: ${{ github.token }}
           additional-values-files: ${{ runner.temp }}/cf-values.yaml
       - name: Set up Java
@@ -121,6 +138,7 @@ jobs:
           TEST_ADMIN_CLIENTSECRET: ${{ env.UAA_ADMIN_SECRET }}
           TEST_SKIPSSLVALIDATION: 'true'
           TEST_QUOTAS_ROUTES_RESERVED_PORTS: '50'
+          SKIP_V2_TESTS: ${{ matrix.skip-v2-tests }}
           # kind-deployment has no metric registrar, which the log-cache metric tests need
           SKIP_METRIC_REGISTRAR_TESTS: 'true'
-        run: ./mvnw -B -Pintegration-test test -Dgpg.skip
+        run: ./mvnw -B -Pintegration-test test -Dgpg.skip ${{ matrix.test-selection }}

@@ -20,31 +20,55 @@ import static org.cloudfoundry.CloudFoundryVersion.UNSPECIFIED;
 
 import com.github.zafarkhaja.semver.Version;
 import java.lang.reflect.AnnotatedElement;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Stream;
 import org.junit.jupiter.api.extension.ConditionEvaluationResult;
 import org.junit.jupiter.api.extension.ExecutionCondition;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.core.annotation.AnnotationUtils;
 
+/**
+ * Evaluates {@link IfCloudFoundryVersion}. The V2 and V3 API have separate version numbers, so
+ * every {@link CloudFoundryVersion} is compared with the server version of its own API: a 2.x
+ * version with the V2 API version from {@code /v2/info}, a 3.x version with the V3 API version
+ * from the root endpoint.
+ */
 final class CloudFoundryVersionConditionalRule implements ExecutionCondition {
 
-    private final Version server;
+    /**
+     * Stands in for the V2 API version of a server that has the V2 API disabled. Only CAPI
+     * releases newer than every V2 version referenced by a {@link CloudFoundryVersion} can disable
+     * the V2 API, so such a server counts as newer than all of them.
+     */
+    static final Version V2_DISABLED = Version.of(2, Integer.MAX_VALUE, 0);
 
-    CloudFoundryVersionConditionalRule(Version server) {
-        this.server = server;
+    private final Version serverV2;
+
+    private final Version serverV3;
+
+    /**
+     * @param serverV2 the V2 API version of the server, empty if the server has the V2 API disabled
+     * @param serverV3 the V3 API version of the server
+     */
+    CloudFoundryVersionConditionalRule(Optional<Version> serverV2, Version serverV3) {
+        this.serverV2 = serverV2.orElse(V2_DISABLED);
+        this.serverV3 = serverV3;
     }
 
     @Override
     public ConditionEvaluationResult evaluateExecutionCondition(ExtensionContext context) {
         AnnotatedElement element = context.getElement().orElse(null);
 
-        IfCloudFoundryVersion annotation =
-                AnnotationUtils.findAnnotation(element, IfCloudFoundryVersion.class);
-
+        // This rule is registered on a test instance field, so JUnit only evaluates it for test
+        // methods, and a method lookup doesn't see the annotations of its class. A class-level
+        // @IfCloudFoundryVersion is therefore looked up on the test class as well.
         boolean enabled =
-                Optional.ofNullable(annotation)
-                        .map(c -> isTestEnabled(c, CloudFoundryVersionConditionalRule.this.server))
-                        .orElse(true);
+                Stream.of(element, context.getTestClass().orElse(null))
+                        .filter(Objects::nonNull)
+                        .map(e -> AnnotationUtils.findAnnotation(e, IfCloudFoundryVersion.class))
+                        .filter(Objects::nonNull)
+                        .allMatch(this::isTestEnabled);
 
         return enabled
                 ? ConditionEvaluationResult.enabled("Test enabled")
@@ -55,33 +79,61 @@ final class CloudFoundryVersionConditionalRule implements ExecutionCondition {
                                 element));
     }
 
-    private static boolean isTestEnabled(IfCloudFoundryVersion condition, Version server) {
+    private boolean isTestEnabled(IfCloudFoundryVersion condition) {
         boolean enabled = true;
 
         if (condition.lessThan() != UNSPECIFIED) {
-            enabled = enabled && server.lessThan(condition.lessThan().getVersion());
+            enabled =
+                    enabled
+                            && server(condition.lessThan())
+                                    .isLowerThan(version(condition.lessThan()));
         }
 
         if (condition.lessThanOrEqualTo() != UNSPECIFIED) {
             enabled =
-                    enabled && server.lessThanOrEqualTo(condition.lessThanOrEqualTo().getVersion());
+                    enabled
+                            && server(condition.lessThanOrEqualTo())
+                                    .isLowerThanOrEquivalentTo(
+                                            version(condition.lessThanOrEqualTo()));
         }
 
         if (condition.equalTo() != UNSPECIFIED) {
-            enabled = enabled && server.equals(condition.equalTo().getVersion());
+            enabled = enabled && server(condition.equalTo()).equals(version(condition.equalTo()));
         }
 
         if (condition.greaterThanOrEqualTo() != UNSPECIFIED) {
             enabled =
                     enabled
-                            && server.greaterThanOrEqualTo(
-                                    condition.greaterThanOrEqualTo().getVersion());
+                            && server(condition.greaterThanOrEqualTo())
+                                    .isHigherThanOrEquivalentTo(
+                                            version(condition.greaterThanOrEqualTo()));
         }
 
         if (condition.greaterThan() != UNSPECIFIED) {
-            enabled = enabled && server.greaterThan(condition.greaterThan().getVersion());
+            enabled =
+                    enabled
+                            && server(condition.greaterThan())
+                                    .isHigherThan(version(condition.greaterThan()));
         }
 
         return enabled;
+    }
+
+    private Version server(CloudFoundryVersion version) {
+        long major = version(version).majorVersion();
+        if (major == 2) {
+            return this.serverV2;
+        }
+        if (major == 3) {
+            return this.serverV3;
+        }
+        throw new IllegalArgumentException(
+                String.format(
+                        "%s is neither a V2 (2.x) nor a V3 (3.x) API version: %s",
+                        version, version(version)));
+    }
+
+    private static Version version(CloudFoundryVersion version) {
+        return version.getVersion();
     }
 }

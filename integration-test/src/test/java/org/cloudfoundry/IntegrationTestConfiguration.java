@@ -309,8 +309,11 @@ public class IntegrationTestConfiguration {
     }
 
     @Bean
-    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(Version serverVersion) {
-        return new CloudFoundryVersionConditionalRule(serverVersion);
+    CloudFoundryVersionConditionalRule cloudFoundryVersionConditionalRule(
+            @Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
+        return new CloudFoundryVersionConditionalRule(
+                serverVersionV2(cloudFoundryClient).blockOptional(),
+                serverVersionV3(cloudFoundryClient).block());
     }
 
     @Bean
