@@ -7,7 +7,7 @@ on:
         description: 'JSON array of Java versions to test'
         type: string
         required: false
-        default: '[8, 11, 17, 21]'
+        default: '[17, 21]'
       preview:
         description: 'Deploy the latest cf-deployment versions instead of the default ones'
         type: boolean
@@ -21,7 +21,7 @@ on:
         description: 'JSON array of Java versions to test'
         type: string
         required: false
-        default: '[8, 11, 17, 21]'
+        default: '[17, 21]'
       preview:
         description: 'Deploy the latest cf-deployment versions instead of the default ones'
         type: boolean
@@ -49,7 +49,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        java: ${{ fromJSON(inputs.java-versions || (github.event_name == 'schedule' && '[21]' || '[8, 11, 17, 21]')) }}
+        java: ${{ fromJSON(inputs.java-versions || (github.event_name == 'schedule' && '[21]' || '[17, 21]')) }}
     name: Java ${{ matrix.java }} integration test${{ (inputs.preview || github.event_name == 'schedule') && ' (preview)' || '' }}
     steps:
       - uses: actions/checkout@v7
