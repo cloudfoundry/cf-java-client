@@ -22,15 +22,16 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
 import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
-import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
-import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
-import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
-import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanResponse;
-import org.cloudfoundry.client.v2.services.ListServicesRequest;
-import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.serviceofferings.ListServiceOfferingsRequest;
+import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingResource;
+import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityResponse;
+import org.cloudfoundry.client.v3.serviceplans.Visibility;
 import org.cloudfoundry.util.PaginationUtils;
 import org.cloudfoundry.util.ResourceUtils;
 import org.springframework.core.io.ClassPathResource;
@@ -128,8 +129,9 @@ public final class ServiceBrokerUtils {
     public static Mono<Void> deleteServiceBroker(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient
-                .applicationsV2()
-                .delete(DeleteApplicationRequest.builder().applicationId(applicationId).build());
+                .applicationsV3()
+                .delete(DeleteApplicationRequest.builder().applicationId(applicationId).build())
+                .then();
     }
 
     public static Mono<ApplicationUtils.ApplicationMetadata> pushServiceBrokerApplication(
@@ -142,7 +144,7 @@ public final class ServiceBrokerUtils {
         String applicationName = nameFactory.getApplicationName();
         String hostName = nameFactory.getHostName();
 
-        Map<String, Object> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>();
         env.put("SERVICE_NAME", serviceName);
         env.put("PLAN_NAME", planName);
         env.put(
@@ -164,17 +166,17 @@ public final class ServiceBrokerUtils {
             CloudFoundryClient cloudFoundryClient, String serviceName) {
         return requestListServices(cloudFoundryClient, serviceName)
                 .single()
-                .map(ResourceUtils::getId);
+                .map(ServiceOfferingResource::getId);
     }
 
     private static Mono<String> getServicePlanId(
             CloudFoundryClient cloudFoundryClient, String serviceId) {
         return requestListServicePlans(cloudFoundryClient, serviceId)
                 .single()
-                .map(ResourceUtils::getId);
+                .map(ServicePlanResource::getId);
     }
 
-    private static Mono<UpdateServicePlanResponse> makeServicePlanPubliclyVisible(
+    private static Mono<UpdateServicePlanVisibilityResponse> makeServicePlanPubliclyVisible(
             CloudFoundryClient cloudFoundryClient, String serviceName, Boolean spaceScoped) {
         if (spaceScoped) {
             return Mono.empty();
@@ -203,35 +205,39 @@ public final class ServiceBrokerUtils {
     }
 
     private static Flux<ServicePlanResource> requestListServicePlans(
-            CloudFoundryClient cloudFoundryClient, String serviceId) {
-        return PaginationUtils.requestClientV2Resources(
+            CloudFoundryClient cloudFoundryClient, String serviceOfferingId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .servicePlans()
+                                .servicePlansV3()
                                 .list(
                                         ListServicePlansRequest.builder()
-                                                .serviceId(serviceId)
+                                                .serviceOfferingId(serviceOfferingId)
                                                 .page(page)
                                                 .build()));
     }
 
-    private static Flux<ServiceResource> requestListServices(
+    private static Flux<ServiceOfferingResource> requestListServices(
             CloudFoundryClient cloudFoundryClient, String serviceName) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .services()
-                                .list(ListServicesRequest.builder().label(serviceName).build()));
+                                .serviceOfferingsV3()
+                                .list(
+                                        ListServiceOfferingsRequest.builder()
+                                                .name(serviceName)
+                                                .page(page)
+                                                .build()));
     }
 
-    private static Mono<UpdateServicePlanResponse> requestUpdateServicePlan(
+    private static Mono<UpdateServicePlanVisibilityResponse> requestUpdateServicePlan(
             CloudFoundryClient cloudFoundryClient, String planId, Boolean visibility) {
         return cloudFoundryClient
-                .servicePlans()
-                .update(
-                        UpdateServicePlanRequest.builder()
+                .servicePlansV3()
+                .updateVisibility(
+                        UpdateServicePlanVisibilityRequest.builder()
                                 .servicePlanId(planId)
-                                .publiclyVisible(visibility)
+                                .type(Visibility.PUBLIC)
                                 .build());
     }
 

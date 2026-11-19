@@ -39,8 +39,6 @@ import java.util.HashMap;
 import java.util.List;
 import org.cloudfoundry.client.CloudFoundryClient;
 import org.cloudfoundry.client.GetRootRequest;
-import org.cloudfoundry.client.v2.info.GetInfoRequest;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.CreateUserProvidedServiceInstanceRequest;
 import org.cloudfoundry.client.v3.Relationship;
 import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
@@ -53,6 +51,9 @@ import org.cloudfoundry.client.v3.quotas.organizations.UpdateOrganizationQuotaRe
 import org.cloudfoundry.client.v3.roles.CreateRoleRequest;
 import org.cloudfoundry.client.v3.roles.RoleRelationships;
 import org.cloudfoundry.client.v3.roles.RoleType;
+import org.cloudfoundry.client.v3.serviceinstances.CreateServiceInstanceRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceRelationships;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceType;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
 import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
 import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
@@ -92,7 +93,6 @@ import org.cloudfoundry.uaa.users.CreateUserResponse;
 import org.cloudfoundry.uaa.users.Email;
 import org.cloudfoundry.uaa.users.Name;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.SmartInitializingSingleton;
@@ -370,23 +370,33 @@ public class IntegrationTestConfiguration {
 
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(
-            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
-            havingValue = "false",
-            matchIfMissing = true)
     Mono<String> metricRegistrarServiceInstance(
             CloudFoundryClient cloudFoundryClient, Mono<String> spaceId, NameFactory nameFactory) {
         return spaceId.flatMap(
                         spaceIdValue ->
                                 cloudFoundryClient
-                                        .userProvidedServiceInstances()
+                                        .serviceInstancesV3()
                                         .create(
-                                                CreateUserProvidedServiceInstanceRequest.builder()
+                                                CreateServiceInstanceRequest.builder()
+                                                        .type(ServiceInstanceType.USER_PROVIDED)
                                                         .name(nameFactory.getServiceInstanceName())
-                                                        .spaceId(spaceIdValue)
+                                                        .relationships(
+                                                                ServiceInstanceRelationships
+                                                                        .builder()
+                                                                        .space(
+                                                                                ToOneRelationship
+                                                                                        .builder()
+                                                                                        .data(
+                                                                                                Relationship
+                                                                                                        .builder()
+                                                                                                        .id(
+                                                                                                                spaceIdValue)
+                                                                                                        .build())
+                                                                                        .build())
+                                                                        .build())
                                                         .syslogDrainUrl("structured-format://json")
                                                         .build()))
-                .map(ResourceUtils::getId)
+                .map(r -> r.getServiceInstance().get().getId())
                 .cache();
     }
 
@@ -511,25 +521,10 @@ public class IntegrationTestConfiguration {
 
     @Bean
     Version serverVersion(@Qualifier("admin") CloudFoundryClient cloudFoundryClient) {
-        return serverVersionV2(cloudFoundryClient)
-                .switchIfEmpty(serverVersionV3(cloudFoundryClient))
+        return serverVersionV3(cloudFoundryClient)
                 .doOnSubscribe(s -> this.logger.debug(">> CLOUD FOUNDRY VERSION <<"))
                 .doOnSuccess(r -> this.logger.debug("<< CLOUD FOUNDRY VERSION >>"))
                 .block();
-    }
-
-    private static Mono<Version> serverVersionV2(CloudFoundryClient cloudFoundryClient) {
-        return cloudFoundryClient
-                .info()
-                .get(GetInfoRequest.builder().build())
-                .flatMap(
-                        response -> {
-                            String version = response.getApiVersion();
-                            if (version == null || version.isEmpty()) {
-                                return Mono.empty();
-                            }
-                            return Mono.just(Version.valueOf(version));
-                        });
     }
 
     private static Mono<Version> serverVersionV3(CloudFoundryClient cloudFoundryClient) {
@@ -542,10 +537,6 @@ public class IntegrationTestConfiguration {
     @Lazy
     @Bean(initMethod = "block")
     @DependsOn("cloudFoundryCleaner")
-    @ConditionalOnProperty(
-            name = RequiresV2Api.SKIP_V2_TESTS_ENV,
-            havingValue = "false",
-            matchIfMissing = true)
     Mono<String> serviceBrokerId(
             CloudFoundryClient cloudFoundryClient,
             NameFactory nameFactory,
