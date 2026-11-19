@@ -72,7 +72,6 @@
         <snakeyaml.version>2.4</snakeyaml.version>
         <wire.version>4.9.1</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
-        <wire.suffix>-jvm</wire.suffix>
         <spotless.version>2.44.4</spotless.version>
         <resilience4j.version>1.7.0</resilience4j.version>
     </properties>
@@ -91,11 +90,6 @@
                 <groupId>com.github.zafarkhaja</groupId>
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.wire</groupId>
-                <artifactId>wire-runtime</artifactId>
-                <version>${wire.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.wire</groupId>
@@ -178,7 +172,9 @@
                     <artifactId>maven-compiler-plugin</artifactId>
                     <version>3.14.0</version>
                     <configuration>
-                        <!-- @see https://github.com/immutables/immutables/issues/1339#issuecomment-1016125673 -->
+                        <!-- Fork is required so the -J add-opens flag below reaches javac. Without it the
+                             Immutables annotation processor generates broken code on JDK 17+.
+                             @see https://github.com/immutables/immutables/issues/1339#issuecomment-1016125673 -->
                         <fork>true</fork>
                         <compilerArgs>
                             <arg>-Xlint:all</arg>
