@@ -9,7 +9,7 @@ on:
         required: false
         default: '[8, 11, 17, 21]'
       preview:
-        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        description: 'Deploy the latest cf-deployment versions instead of the default ones (CAPI stays pinned)'
         type: boolean
         required: false
         default: false
@@ -23,7 +23,7 @@ on:
         required: false
         default: '[8, 11, 17, 21]'
       preview:
-        description: 'Deploy the latest cf-deployment versions instead of the default ones'
+        description: 'Deploy the latest cf-deployment versions instead of the default ones (CAPI stays pinned)'
         type: boolean
         required: false
         default: false
@@ -55,15 +55,6 @@ jobs:
       - uses: actions/checkout@v7
         with:
           submodules: recursive
-      # Validation runs deploy the capi-release that matches SUPPORTED_API_VERSION. Preview runs
-      # (scheduled, or started by hand with `preview`) keep the latest versions.
-      - name: Resolve CAPI version
-        id: capi
-        if: ${{ !(inputs.preview || github.event_name == 'schedule') }}
-        run: |
-          # separate assignment, so that a failing resolver fails the step
-          version="$(.github/scripts/resolve-capi-version.sh)"
-          echo "version=$version" >> "$GITHUB_OUTPUT"
       # All components share one Postgres, which runs out of its default 100 connections during a full
       # test run. Written first, the CAPI override below appends to the same file.
       - name: Write PostgreSQL values override
@@ -74,23 +65,19 @@ jobs:
               extendedConfiguration: |
                 max_connections = 500
           EOF
-      # Overrides the capi chart version of kind-deployment (merged last by Helmfile).
-      # kind-deployment's helmfile passes cloudController.appDomains, which the capi chart only
-      # accepts from 1.241.0 on (1.240.0 fails its values schema), so older matches are raised to it.
+      # Pins the capi chart of kind-deployment (merged last by Helmfile) for every run, preview runs
+      # included, because 5.x.x needs the CC v2 API. 1.249.0 is the last capi chart that serves v2:
+      # from 1.249.1-1 on, v2 is behind cloudController.config.temporaryEnableV2, which defaults to
+      # false. Keep CAPI_VERSION in sync with SUPPORTED_API_VERSION (2.299.0) and
+      # SUPPORTED_API_VERSION_V3 (3.234.0) in CloudFoundryClient.java.
       - name: Write CAPI values override
-        if: ${{ steps.capi.outputs.version != '' }}
         env:
-          MIN_CAPI_VERSION: 1.241.0
-          MATCHED_CAPI_VERSION: ${{ steps.capi.outputs.version }}
+          CAPI_VERSION: 1.249.0
         run: |
-          version="$(printf '%s\n%s\n' "$MIN_CAPI_VERSION" "$MATCHED_CAPI_VERSION" | sort -V | tail -1)"
-          if [ "$version" != "$MATCHED_CAPI_VERSION" ]; then
-            echo "::warning::capi-release $MATCHED_CAPI_VERSION matches SUPPORTED_API_VERSION but is too old for kind-deployment, deploying $version"
-          fi
           cat >> "$RUNNER_TEMP/cf-values.yaml" <<EOF
           charts:
             capi:
-              version: $version
+              version: $CAPI_VERSION
           EOF
       # Every job gets its own Cloud Foundry on KinD, so the matrix can run in parallel.
       - name: Set up Cloud Foundry
