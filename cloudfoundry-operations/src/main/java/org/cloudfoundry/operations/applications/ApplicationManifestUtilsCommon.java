@@ -48,14 +48,12 @@ abstract class ApplicationManifestUtilsCommon {
 
     static final int GIBI = 1_024;
 
-    static final Yaml YAML;
+    static final DumperOptions dumperOptions;
 
     static {
-        DumperOptions dumperOptions = new DumperOptions();
+        dumperOptions = new DumperOptions();
         dumperOptions.setDefaultFlowStyle(DumperOptions.FlowStyle.BLOCK);
         dumperOptions.setExplicitStart(true);
-
-        YAML = new Yaml(dumperOptions);
     }
 
     static final Pattern FIND_VARIABLE_REGEX = Pattern.compile("\\(\\(([a-zA-Z]\\w+)\\)\\)");
@@ -276,10 +274,12 @@ abstract class ApplicationManifestUtilsCommon {
 
     @SuppressWarnings("unchecked")
     static Map<String, Object> deserialize(Path path) {
+        Yaml yaml = new Yaml(dumperOptions);
+
         AtomicReference<Map<String, Object>> root = new AtomicReference<>();
 
         try (InputStream in = Files.newInputStream(path, StandardOpenOption.READ)) {
-            root.set((Map<String, Object>) YAML.load(in));
+            root.set((Map<String, Object>) yaml.load(in));
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }
