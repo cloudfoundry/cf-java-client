@@ -29,11 +29,12 @@ import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Consumer;
 
 /**
- * Dynamically creates {@link byte} arrays and caches them, reusing them once they have been released.
- * <p>
- * The maximum number of byte arrays is unbounded
- * <p>
- * The default time-to-live for unused byte arrays is one minute
+ * Dynamically creates {@link Byte} arrays and caches them, reusing them once they have been
+ * released.
+ *
+ * <p>The maximum number of byte arrays is unbounded
+ *
+ * <p>The default time-to-live for unused byte arrays is one minute
  */
 public final class ByteArrayPool {
 
@@ -69,7 +70,7 @@ public final class ByteArrayPool {
     /**
      * Executes a {@link Consumer} providing a pooled {@code byte} array
      *
-     * @param consumer the {@link Consumer} of the {@link byte} array
+     * @param consumer the {@link Consumer} of the {@link Byte} array
      */
     public static void withByteArray(Consumer<byte[]> consumer) {
         INSTANCE.doWithByteArray(consumer);
