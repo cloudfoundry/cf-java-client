@@ -191,14 +191,18 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
     void clean() {
         if (!RUN_V2_CLEANUP) {
             LOGGER.info("Skipping V2 API cleanup operations (SKIP_V2_TESTS=true)");
-            // Only run V3 and UAA cleanup operations
+            // Only run V3, UAA and networking cleanup operations
             Flux.empty()
                     .thenMany(
-                            Mono.when( // No prerequisites - V3/UAA only
+                            Mono.when( // No prerequisites - V3/UAA/networking only
                                     cleanClients(this.uaaClient, this.nameFactory),
                                     cleanGroups(this.uaaClient, this.nameFactory),
                                     cleanIdentityProviders(this.uaaClient, this.nameFactory),
-                                    cleanIdentityZones(this.uaaClient, this.nameFactory)))
+                                    cleanIdentityZones(this.uaaClient, this.nameFactory),
+                                    cleanNetworkingPolicies(
+                                            this.networkingClient,
+                                            this.nameFactory,
+                                            this.serverVersion)))
                     .thenMany(
                             Mono.when(
                                     cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),

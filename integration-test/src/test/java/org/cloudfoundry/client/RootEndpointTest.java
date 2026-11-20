@@ -1,5 +1,7 @@
 package org.cloudfoundry.client;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.github.zafarkhaja.semver.Version;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
@@ -21,7 +23,7 @@ class RootEndpointTest extends AbstractIntegrationTest {
                 .map(GetRootResponse::getApiVersionV3)
                 .map(Version::parse)
                 .as(StepVerifier::create)
-                .consumeNextWith(v -> v.isHigherThan(Version.of(3)))
+                .consumeNextWith(v -> assertThat(v.isHigherThan(Version.of(3))).isTrue())
                 .expectComplete()
                 .verify(Duration.ofMinutes(1));
     }
