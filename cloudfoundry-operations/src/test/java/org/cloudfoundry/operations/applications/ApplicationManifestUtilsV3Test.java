@@ -1,8 +1,11 @@
 package org.cloudfoundry.operations.applications;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -146,6 +149,55 @@ class ApplicationManifestUtilsV3Test {
                         .build();
 
         assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testDockerPasswordRoundTrips() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .docker(Docker.builder()
+                                                .image("my-registry/my-image:latest")
+                                                .username("user")
+                                                .password("secret")
+                                                .build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testDockerPasswordStrippedFromSerializedYaml() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .docker(Docker.builder()
+                                                .image("my-registry/my-image:latest")
+                                                .username("user")
+                                                .password("secret")
+                                                .build())
+                                        .build())
+                        .build();
+
+        ManifestV3 scrubbed = ManifestV3.builder()
+                .application(ManifestV3Application.builder()
+                        .from(manifest.getApplications().get(0))
+                        .docker(Docker.builder()
+                                .image("my-registry/my-image:latest")
+                                .build())
+                        .build())
+                .build();
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ApplicationManifestUtilsV3.write(baos, scrubbed);
+        String yaml = baos.toString(StandardCharsets.UTF_8);
+
+        assertFalse(yaml.contains("password"), "docker password must not appear in manifest YAML sent to apply_manifest");
     }
 
     private void assertSerializeDeserialize(ManifestV3 manifest) throws IOException {

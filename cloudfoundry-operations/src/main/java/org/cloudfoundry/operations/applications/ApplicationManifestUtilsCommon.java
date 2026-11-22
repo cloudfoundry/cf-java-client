@@ -467,9 +467,7 @@ abstract class ApplicationManifestUtilsCommon {
         Map<String, Object> yaml = new TreeMap<>();
         putIfPresent(yaml, "image", docker.getImage());
         putIfPresent(yaml, "username", docker.getUsername());
-        // password is intentionally omitted: CAPI records the manifest YAML verbatim in the
-        // audit.app.apply_manifest event and does not redact docker.password there. Credentials
-        // must be passed via POST /v3/packages (createPackage), not embedded in the manifest.
+        putIfPresent(yaml, "password", docker.getPassword());
         return yaml;
     }
 
