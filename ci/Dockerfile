@@ -1,4 +1,4 @@
-ARG base_image=openjdk:8-jre
+ARG base_image=eclipse-temurin:17-jre
 ARG script_image=springio/concourse-release-scripts:0.3.4
 
 FROM ${script_image}
