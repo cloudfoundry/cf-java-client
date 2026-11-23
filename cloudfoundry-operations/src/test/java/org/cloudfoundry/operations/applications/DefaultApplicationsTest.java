@@ -187,6 +187,42 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                     Mono.just(TEST_SPACE_ID));
 
     @Test
+    void pushManifestV3IsLazyAndReportsErrorsThroughMono() {
+        java.util.concurrent.atomic.AtomicBoolean subscribed =
+                new java.util.concurrent.atomic.AtomicBoolean();
+        DefaultApplications applications =
+                new DefaultApplications(
+                        Mono.just(this.cloudFoundryClient),
+                        Mono.just(this.dopplerClient),
+                        Mono.just(this.logCacheClient),
+                        this.randomWords,
+                        Mono.<String>error(new IllegalStateException("test-space-error"))
+                                .doOnSubscribe(s -> subscribed.set(true)));
+
+        Mono<Void> result =
+                applications.pushManifestV3(
+                        PushManifestV3Request.builder()
+                                .manifest(
+                                        ManifestV3.builder()
+                                                .application(
+                                                        ManifestV3Application.builder()
+                                                                .name("test-app")
+                                                                .build())
+                                                .build())
+                                .build());
+
+        assertThat(subscribed).isFalse();
+
+        StepVerifier.create(result)
+                .consumeErrorWith(
+                        t ->
+                                assertThat(t)
+                                        .isInstanceOf(IllegalStateException.class)
+                                        .hasMessage("test-space-error"))
+                .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
     void copySourceNoRestartOrgSpace() {
         requestApplications(
                 this.cloudFoundryClient,

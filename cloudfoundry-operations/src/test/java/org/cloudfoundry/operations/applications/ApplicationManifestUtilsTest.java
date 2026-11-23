@@ -23,7 +23,9 @@ import static org.cloudfoundry.operations.applications.ApplicationHealthCheck.PO
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -686,5 +688,33 @@ final class ApplicationManifestUtilsTest {
         List<String> actual = Files.readAllLines(out);
 
         assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void writeUsesUtf8() {
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ApplicationManifestUtils.write(
+                out,
+                ApplicationManifest.builder()
+                        .name("test-app")
+                        .environmentVariable("CITY", "M\u00fcnchen")
+                        .build());
+
+        assertThat(new String(out.toByteArray(), StandardCharsets.UTF_8)).contains("M\u00fcnchen");
+    }
+
+    @Test
+    void writeTruncatesExistingFile() throws IOException {
+        Path file = this.tempDir.resolve("test-manifest.yml");
+        Files.write(file, new byte[4096]);
+
+        ApplicationManifest manifest =
+                ApplicationManifest.builder()
+                        .name("b")
+                        .path(Paths.get("/test-path").toAbsolutePath())
+                        .build();
+        ApplicationManifestUtils.write(file, manifest);
+
+        assertThat(ApplicationManifestUtils.read(file)).containsExactly(manifest);
     }
 }

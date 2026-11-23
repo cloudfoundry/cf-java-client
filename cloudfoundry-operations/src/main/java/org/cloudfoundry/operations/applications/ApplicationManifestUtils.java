@@ -70,7 +70,7 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
     }
 
     /**
-     * Write {@link ApplicationManifest}s to a {@link Path}
+     * Write {@link ApplicationManifest}s to a {@link Path} as UTF-8 encoded YAML, replacing any existing content
      *
      * @param path                 the path to write to
      * @param applicationManifests the manifests to write
@@ -80,14 +80,18 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
     }
 
     /**
-     * Write {@link ApplicationManifest}s to a {@link Path}
+     * Write {@link ApplicationManifest}s to a {@link Path} as UTF-8 encoded YAML, replacing any existing content
      *
      * @param path                 the path to write to
      * @param applicationManifests the manifests to write
      */
     public static void write(Path path, List<ApplicationManifest> applicationManifests) {
         try (OutputStream out =
-                Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+                Files.newOutputStream(
+                        path,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE)) {
             write(out, applicationManifests);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
@@ -95,7 +99,8 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
     }
 
     /**
-     * Write {@link ApplicationManifest}s to an {@link OutputStream}
+     * Write {@link ApplicationManifest}s to an {@link OutputStream} as UTF-8 encoded YAML. The stream is flushed but not
+     * closed.
      *
      * @param out                  the {@link OutputStream} to write to
      * @param applicationManifests the manifests to write
@@ -105,13 +110,15 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
     }
 
     /**
-     * Write {@link ApplicationManifest}s to an {@link OutputStream}
+     * Write {@link ApplicationManifest}s to an {@link OutputStream} as UTF-8 encoded YAML. The stream is flushed but not
+     * closed.
      *
      * @param out                  the {@link OutputStream} to write to
      * @param applicationManifests the manifests to write
      */
     public static void write(OutputStream out, List<ApplicationManifest> applicationManifests) {
-        try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
+        try {
+            Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
             YAML.dump(
                     Collections.singletonMap(
                             "applications",
@@ -119,6 +126,7 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
                                     .map(ApplicationManifestUtils::toYaml)
                                     .collect(Collectors.toList())),
                     writer);
+            writer.flush();
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }

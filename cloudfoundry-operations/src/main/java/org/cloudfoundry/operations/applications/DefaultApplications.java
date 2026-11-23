@@ -687,10 +687,13 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> pushManifestV3(PushManifestV3Request request) {
         // Don't send docker credentials in the apply_manifest body, they end up in the
         // audit.app.apply_manifest event. createPackage sends them separately.
-        return Mono.zip(
-                        this.cloudFoundryClient,
-                        this.spaceId,
-                        serializeManifest(stripDockerCredentials(request.getManifest())))
+        return serializeManifest(stripDockerCredentials(request.getManifest()))
+                .flatMap(
+                        manifestSerialized ->
+                                Mono.zip(
+                                        this.cloudFoundryClient,
+                                        this.spaceId,
+                                        Mono.just(manifestSerialized)))
                 .flatMap(
                         function(
                                 (cloudFoundryClient, spaceId, manifestSerialized) ->
@@ -736,7 +739,9 @@ public final class DefaultApplications implements Applications {
                                                                                 manifestApp,
                                                                                 packageId,
                                                                                 appId)))))
-                .then();
+                .then()
+                .transform(OperationsLogging.log("Push Manifest V3"))
+                .checkpoint();
     }
 
     @Override
