@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -110,7 +111,7 @@ public final class ApplicationManifestUtils extends ApplicationManifestUtilsComm
      * @param applicationManifests the manifests to write
      */
     public static void write(OutputStream out, List<ApplicationManifest> applicationManifests) {
-        try (Writer writer = new OutputStreamWriter(out)) {
+        try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             YAML.dump(
                     Collections.singletonMap(
                             "applications",

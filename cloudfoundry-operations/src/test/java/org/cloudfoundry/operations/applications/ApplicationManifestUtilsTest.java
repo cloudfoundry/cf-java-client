@@ -33,9 +33,12 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import org.apache.commons.lang3.SystemUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.springframework.core.io.ClassPathResource;
 
 final class ApplicationManifestUtilsTest {
+
+    @TempDir Path tempDir;
 
     @Test
     void anchorsAndReferences() throws IOException {
@@ -628,7 +631,7 @@ final class ApplicationManifestUtilsTest {
     }
 
     private void write(String path, String expectedManifest) throws IOException {
-        Path out = Files.createTempFile("test-manifest-", ".yml");
+        Path out = this.tempDir.resolve("test-manifest.yml");
 
         ApplicationManifestUtils.write(
                 out,

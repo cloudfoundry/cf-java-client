@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -108,7 +109,7 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
      * @param manifest the manifest to write
      */
     public static void write(OutputStream out, ManifestV3 manifest) {
-        try (Writer writer = new OutputStreamWriter(out)) {
+        try (Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8)) {
             YAML.dump(toYaml(manifest), writer);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
