@@ -24,12 +24,11 @@ import java.nio.file.Path;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.servicebindings.ListServiceBindingsRequest;
-import org.cloudfoundry.client.v2.servicebindings.ServiceBindingResource;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.ListUserProvidedServiceInstancesRequest;
-import org.cloudfoundry.client.v2.userprovidedserviceinstances.UserProvidedServiceInstanceResource;
+import org.cloudfoundry.client.v3.servicebindings.ListServiceBindingsRequest;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingResource;
+import org.cloudfoundry.client.v3.serviceinstances.ListServiceInstancesRequest;
+import org.cloudfoundry.client.v3.serviceinstances.ServiceInstanceResource;
 import org.cloudfoundry.operations.applications.ApplicationDetail;
 import org.cloudfoundry.operations.applications.ApplicationHealthCheck;
 import org.cloudfoundry.operations.applications.GetApplicationRequest;
@@ -67,7 +66,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
-@RequiresV2Api
 public final class ServicesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -555,7 +553,7 @@ public final class ServicesTest extends AbstractIntegrationTest {
                 .thenMany(
                         requestListUserProvidedServiceInstances(
                                         this.cloudFoundryClient, serviceInstanceName)
-                                .map(r -> r.getEntity().getSyslogDrainUrl()))
+                                .map(ServiceInstanceResource::getSyslogDrainUrl))
                 .as(StepVerifier::create)
                 .expectNext("test.url")
                 .expectComplete()
@@ -721,10 +719,10 @@ public final class ServicesTest extends AbstractIntegrationTest {
 
     private static Flux<ServiceBindingResource> requestListServiceBindings(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .serviceBindingsV2()
+                                .serviceBindingsV3()
                                 .list(
                                         ListServiceBindingsRequest.builder()
                                                 .applicationId(applicationId)
@@ -737,16 +735,16 @@ public final class ServicesTest extends AbstractIntegrationTest {
         return cloudFoundryOperations.services().listInstances();
     }
 
-    private static Flux<UserProvidedServiceInstanceResource>
+    private static Flux<ServiceInstanceResource>
             requestListUserProvidedServiceInstances(
                     CloudFoundryClient cloudFoundryClient, String serviceInstanceName) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .userProvidedServiceInstances()
+                                .serviceInstancesV3()
                                 .list(
-                                        ListUserProvidedServiceInstancesRequest.builder()
-                                                .name(serviceInstanceName)
+                                        ListServiceInstancesRequest.builder()
+                                                .serviceInstanceName(serviceInstanceName)
                                                 .page(page)
                                                 .build()));
     }

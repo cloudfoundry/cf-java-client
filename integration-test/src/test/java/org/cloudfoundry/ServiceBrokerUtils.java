@@ -18,21 +18,28 @@ package org.cloudfoundry;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.DeleteApplicationRequest;
-import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerRequest;
-import org.cloudfoundry.client.v2.servicebrokers.CreateServiceBrokerResponse;
-import org.cloudfoundry.client.v2.serviceplans.ListServicePlansRequest;
-import org.cloudfoundry.client.v2.serviceplans.ServicePlanResource;
-import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanRequest;
-import org.cloudfoundry.client.v2.serviceplans.UpdateServicePlanResponse;
-import org.cloudfoundry.client.v2.services.ListServicesRequest;
-import org.cloudfoundry.client.v2.services.ServiceResource;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.DeleteApplicationRequest;
+import org.cloudfoundry.client.v3.servicebrokers.BasicAuthentication;
+import org.cloudfoundry.client.v3.servicebrokers.CreateServiceBrokerRequest;
+import org.cloudfoundry.client.v3.servicebrokers.ListServiceBrokersRequest;
+import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokerRelationships;
+import org.cloudfoundry.client.v3.servicebrokers.ServiceBrokerResource;
+import org.cloudfoundry.client.v3.serviceofferings.ListServiceOfferingsRequest;
+import org.cloudfoundry.client.v3.serviceofferings.ServiceOfferingResource;
+import org.cloudfoundry.client.v3.serviceplans.ListServicePlansRequest;
+import org.cloudfoundry.client.v3.serviceplans.ServicePlanResource;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityRequest;
+import org.cloudfoundry.client.v3.serviceplans.UpdateServicePlanVisibilityResponse;
+import org.cloudfoundry.client.v3.serviceplans.Visibility;
+import org.cloudfoundry.util.JobUtils;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.Exceptions;
 import reactor.core.publisher.Flux;
@@ -70,8 +77,18 @@ public final class ServiceBrokerUtils {
                                                 applicationMetadata,
                                                 serviceBrokerName,
                                                 spaceScoped)
+                                        .flatMap(
+                                                jobId ->
+                                                        JobUtils.waitForCompletion(
+                                                                        cloudFoundryClient,
+                                                                        Duration.ofMinutes(5),
+                                                                        jobId)
+                                                                .then(
+                                                                        requestGetServiceBrokerId(
+                                                                                cloudFoundryClient,
+                                                                                serviceBrokerName)))
                                         .delayUntil(
-                                                response ->
+                                                brokerId ->
                                                         Mono.zip(
                                                                 makeServicePlanPubliclyVisible(
                                                                         cloudFoundryClient,
@@ -82,10 +99,9 @@ public final class ServiceBrokerUtils {
                                                                         serviceName + "-shareable",
                                                                         spaceScoped)))
                                         .map(
-                                                response ->
+                                                brokerId ->
                                                         new ServiceBrokerMetadata(
-                                                                applicationMetadata,
-                                                                ResourceUtils.getId(response))));
+                                                                applicationMetadata, brokerId)));
     }
 
     @SuppressWarnings("BlockingMethodInNonBlockingContext")
@@ -118,18 +134,28 @@ public final class ServiceBrokerUtils {
                                                 applicationMetadata,
                                                 serviceBrokerName,
                                                 spaceScoped)
+                                        .flatMap(
+                                                jobId ->
+                                                        JobUtils.waitForCompletion(
+                                                                        cloudFoundryClient,
+                                                                        Duration.ofMinutes(5),
+                                                                        jobId)
+                                                                .then(
+                                                                        requestGetServiceBrokerId(
+                                                                                cloudFoundryClient,
+                                                                                serviceBrokerName)))
                                         .map(
-                                                response ->
+                                                brokerId ->
                                                         new ServiceBrokerMetadata(
-                                                                applicationMetadata,
-                                                                ResourceUtils.getId(response))));
+                                                                applicationMetadata, brokerId)));
     }
 
     public static Mono<Void> deleteServiceBroker(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient
-                .applicationsV2()
-                .delete(DeleteApplicationRequest.builder().applicationId(applicationId).build());
+                .applicationsV3()
+                .delete(DeleteApplicationRequest.builder().applicationId(applicationId).build())
+                .then();
     }
 
     public static Mono<ApplicationUtils.ApplicationMetadata> pushServiceBrokerApplication(
@@ -142,7 +168,7 @@ public final class ServiceBrokerUtils {
         String applicationName = nameFactory.getApplicationName();
         String hostName = nameFactory.getHostName();
 
-        Map<String, Object> env = new HashMap<>();
+        Map<String, String> env = new HashMap<>();
         env.put("SERVICE_NAME", serviceName);
         env.put("PLAN_NAME", planName);
         env.put(
@@ -164,17 +190,17 @@ public final class ServiceBrokerUtils {
             CloudFoundryClient cloudFoundryClient, String serviceName) {
         return requestListServices(cloudFoundryClient, serviceName)
                 .single()
-                .map(ResourceUtils::getId);
+                .map(ServiceOfferingResource::getId);
     }
 
     private static Mono<String> getServicePlanId(
             CloudFoundryClient cloudFoundryClient, String serviceId) {
         return requestListServicePlans(cloudFoundryClient, serviceId)
                 .single()
-                .map(ResourceUtils::getId);
+                .map(ServicePlanResource::getId);
     }
 
-    private static Mono<UpdateServicePlanResponse> makeServicePlanPubliclyVisible(
+    private static Mono<UpdateServicePlanVisibilityResponse> makeServicePlanPubliclyVisible(
             CloudFoundryClient cloudFoundryClient, String serviceName, Boolean spaceScoped) {
         if (spaceScoped) {
             return Mono.empty();
@@ -185,53 +211,88 @@ public final class ServiceBrokerUtils {
                 .flatMap(planId -> requestUpdateServicePlan(cloudFoundryClient, planId, true));
     }
 
-    private static Mono<CreateServiceBrokerResponse> requestCreateServiceBroker(
+    private static Mono<String> requestCreateServiceBroker(
             CloudFoundryClient cloudFoundryClient,
             ApplicationUtils.ApplicationMetadata applicationMetadata,
             String serviceBrokerName,
             Boolean spaceScoped) {
         return cloudFoundryClient
-                .serviceBrokers()
+                .serviceBrokersV3()
                 .create(
                         CreateServiceBrokerRequest.builder()
-                                .authenticationPassword("test-authentication-password")
-                                .authenticationUsername("test-authentication-username")
-                                .brokerUrl(applicationMetadata.uri)
+                                .authentication(
+                                        BasicAuthentication.builder()
+                                                .username("test-authentication-username")
+                                                .password("test-authentication-password")
+                                                .build())
                                 .name(serviceBrokerName)
-                                .spaceId(spaceScoped ? applicationMetadata.spaceId : null)
+                                .relationships(
+                                        spaceScoped
+                                                ? ServiceBrokerRelationships.builder()
+                                                        .space(
+                                                                ToOneRelationship.builder()
+                                                                        .data(
+                                                                                Relationship.builder()
+                                                                                        .id(
+                                                                                                applicationMetadata
+                                                                                                        .spaceId)
+                                                                                        .build())
+                                                                        .build())
+                                                        .build()
+                                                : null)
+                                .url(applicationMetadata.uri)
                                 .build());
     }
 
+    private static Mono<String> requestGetServiceBrokerId(
+            CloudFoundryClient cloudFoundryClient, String serviceBrokerName) {
+        return PaginationUtils.requestClientV3Resources(
+                        page ->
+                                cloudFoundryClient
+                                        .serviceBrokersV3()
+                                        .list(
+                                                ListServiceBrokersRequest.builder()
+                                                        .name(serviceBrokerName)
+                                                        .page(page)
+                                                        .build()))
+                .single()
+                .map(ServiceBrokerResource::getId);
+    }
+
     private static Flux<ServicePlanResource> requestListServicePlans(
-            CloudFoundryClient cloudFoundryClient, String serviceId) {
-        return PaginationUtils.requestClientV2Resources(
+            CloudFoundryClient cloudFoundryClient, String serviceOfferingId) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .servicePlans()
+                                .servicePlansV3()
                                 .list(
                                         ListServicePlansRequest.builder()
-                                                .serviceId(serviceId)
+                                                .serviceOfferingId(serviceOfferingId)
                                                 .page(page)
                                                 .build()));
     }
 
-    private static Flux<ServiceResource> requestListServices(
+    private static Flux<ServiceOfferingResource> requestListServices(
             CloudFoundryClient cloudFoundryClient, String serviceName) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .services()
-                                .list(ListServicesRequest.builder().label(serviceName).build()));
+                                .serviceOfferingsV3()
+                                .list(
+                                        ListServiceOfferingsRequest.builder()
+                                                .name(serviceName)
+                                                .page(page)
+                                                .build()));
     }
 
-    private static Mono<UpdateServicePlanResponse> requestUpdateServicePlan(
+    private static Mono<UpdateServicePlanVisibilityResponse> requestUpdateServicePlan(
             CloudFoundryClient cloudFoundryClient, String planId, Boolean visibility) {
         return cloudFoundryClient
-                .servicePlans()
-                .update(
-                        UpdateServicePlanRequest.builder()
+                .servicePlansV3()
+                .updateVisibility(
+                        UpdateServicePlanVisibilityRequest.builder()
                                 .servicePlanId(planId)
-                                .publiclyVisible(visibility)
+                                .type(Visibility.PUBLIC)
                                 .build());
     }
 

@@ -23,30 +23,40 @@ import java.nio.file.Path;
 import java.time.Duration;
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.ApplicationInstanceInfo;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesRequest;
-import org.cloudfoundry.client.v2.applications.ApplicationInstancesResponse;
-import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteRequest;
-import org.cloudfoundry.client.v2.applications.AssociateApplicationRouteResponse;
-import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
-import org.cloudfoundry.client.v2.applications.GetApplicationRequest;
-import org.cloudfoundry.client.v2.applications.GetApplicationResponse;
-import org.cloudfoundry.client.v2.applications.UpdateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.UpdateApplicationResponse;
-import org.cloudfoundry.client.v2.applications.UploadApplicationRequest;
-import org.cloudfoundry.client.v2.applications.UploadApplicationResponse;
-import org.cloudfoundry.client.v2.routes.CreateRouteRequest;
-import org.cloudfoundry.client.v2.routes.CreateRouteResponse;
-import org.cloudfoundry.client.v2.servicebindings.CreateServiceBindingRequest;
-import org.cloudfoundry.client.v2.shareddomains.ListSharedDomainsRequest;
-import org.cloudfoundry.client.v2.shareddomains.SharedDomainResource;
-import org.cloudfoundry.util.JobUtils;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsRequest;
+import org.cloudfoundry.client.v3.applications.GetApplicationProcessStatisticsResponse;
+import org.cloudfoundry.client.v3.applications.SetApplicationCurrentDropletRequest;
+import org.cloudfoundry.client.v3.applications.StartApplicationRequest;
+import org.cloudfoundry.client.v3.applications.UpdateApplicationEnvironmentVariablesRequest;
+import org.cloudfoundry.client.v3.builds.BuildState;
+import org.cloudfoundry.client.v3.builds.CreateBuildRequest;
+import org.cloudfoundry.client.v3.builds.GetBuildRequest;
+import org.cloudfoundry.client.v3.domains.DomainResource;
+import org.cloudfoundry.client.v3.domains.ListDomainsRequest;
+import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.GetPackageRequest;
+import org.cloudfoundry.client.v3.packages.PackageRelationships;
+import org.cloudfoundry.client.v3.packages.PackageState;
+import org.cloudfoundry.client.v3.packages.PackageType;
+import org.cloudfoundry.client.v3.packages.UploadPackageRequest;
+import org.cloudfoundry.client.v3.packages.UploadPackageResponse;
+import org.cloudfoundry.client.v3.routes.Application;
+import org.cloudfoundry.client.v3.routes.CreateRouteRequest;
+import org.cloudfoundry.client.v3.routes.CreateRouteResponse;
+import org.cloudfoundry.client.v3.routes.Destination;
+import org.cloudfoundry.client.v3.routes.InsertRouteDestinationsRequest;
+import org.cloudfoundry.client.v3.routes.RouteRelationships;
+import org.cloudfoundry.client.v3.servicebindings.CreateServiceBindingRequest;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingRelationships;
+import org.cloudfoundry.client.v3.servicebindings.ServiceBindingType;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -57,7 +67,7 @@ public class ApplicationUtils {
             Path applicationBits,
             String applicationName,
             Collection<String> boundServices,
-            Map<String, Object> env,
+            Map<String, String> env,
             String hostName,
             String spaceId) {
         return getSharedDomain(cloudFoundryClient)
@@ -70,7 +80,7 @@ public class ApplicationUtils {
                                                         applicationName),
                                                 createRouteId(
                                                         cloudFoundryClient,
-                                                        ResourceUtils.getId(domain),
+                                                        domain.getId(),
                                                         spaceId,
                                                         hostName))
                                         .flatMap(
@@ -103,9 +113,7 @@ public class ApplicationUtils {
                                                                                                 .format(
                                                                                                         "https://%s.%s",
                                                                                                         hostName,
-                                                                                                        ResourceUtils
-                                                                                                                .getEntity(
-                                                                                                                        domain)
+                                                                                                        domain
                                                                                                                 .getName())))));
     }
 
@@ -118,14 +126,37 @@ public class ApplicationUtils {
                                 .map(
                                         serviceInstanceId ->
                                                 cloudFoundryClient
-                                                        .serviceBindingsV2()
+                                                        .serviceBindingsV3()
                                                         .create(
                                                                 CreateServiceBindingRequest
                                                                         .builder()
-                                                                        .applicationId(
-                                                                                applicationId)
-                                                                        .serviceInstanceId(
-                                                                                serviceInstanceId)
+                                                                        .type(
+                                                                                ServiceBindingType
+                                                                                        .APPLICATION)
+                                                                        .relationships(
+                                                                                ServiceBindingRelationships
+                                                                                        .builder()
+                                                                                        .application(
+                                                                                                ToOneRelationship
+                                                                                                        .builder()
+                                                                                                        .data(
+                                                                                                                Relationship
+                                                                                                                        .builder()
+                                                                                                                        .id(
+                                                                                                                                applicationId)
+                                                                                                                        .build())
+                                                                                                        .build())
+                                                                                        .serviceInstance(
+                                                                                                ToOneRelationship
+                                                                                                        .builder()
+                                                                                                        .data(
+                                                                                                                Relationship
+                                                                                                                        .builder()
+                                                                                                                        .id(
+                                                                                                                                serviceInstanceId)
+                                                                                                                        .build())
+                                                                                                        .build())
+                                                                                        .build())
                                                                         .build()))
                                 .collect(Collectors.toList()),
                         a -> Mono.just(applicationId))
@@ -135,7 +166,7 @@ public class ApplicationUtils {
     private static Mono<String> createApplicationId(
             CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-                .map(ResourceUtils::getId);
+                .map(response -> response.getId());
     }
 
     private static Mono<String> createRouteId(
@@ -144,29 +175,73 @@ public class ApplicationUtils {
             String spaceId,
             String hostName) {
         return requestCreateRoute(cloudFoundryClient, domainId, spaceId, hostName)
-                .map(ResourceUtils::getId);
+                .map(response -> response.getId());
     }
 
     private static Mono<String> createRunningApplication(
             CloudFoundryClient cloudFoundryClient,
             Path applicationBits,
             String applicationId,
-            Map<String, Object> env) {
-        return ApplicationUtils.requestUploadApplication(
-                        cloudFoundryClient, applicationId, applicationBits)
+            Map<String, String> env) {
+        return requestUploadApplication(cloudFoundryClient, applicationId, applicationBits)
                 .flatMap(
-                        job ->
-                                JobUtils.waitForCompletion(
-                                        cloudFoundryClient, Duration.ofMinutes(5), job))
-                .then(requestUpdateApplication(cloudFoundryClient, applicationId, env, "STARTED"))
-                .then(
-                        getApplicationPackageState(cloudFoundryClient, applicationId)
-                                .filter(state -> "STAGED".equals(state) || "FAILED".equals(state))
-                                .repeatWhenEmpty(
-                                        exponentialBackOff(
-                                                Duration.ofSeconds(1),
-                                                Duration.ofSeconds(15),
-                                                Duration.ofMinutes(5))))
+                        pkg ->
+                                getApplicationPackageState(cloudFoundryClient, pkg.getId())
+                                        .filter(
+                                                state ->
+                                                        PackageState.READY.equals(state)
+                                                                || PackageState.FAILED.equals(
+                                                                        state))
+                                        .repeatWhenEmpty(
+                                                exponentialBackOff(
+                                                        Duration.ofSeconds(1),
+                                                        Duration.ofSeconds(15),
+                                                        Duration.ofMinutes(5)))
+                                        .thenReturn(pkg.getId()))
+                .flatMap(
+                        packageId ->
+                                cloudFoundryClient
+                                        .builds()
+                                        .create(
+                                                CreateBuildRequest.builder()
+                                                        .getPackage(
+                                                                Relationship.builder()
+                                                                        .id(packageId)
+                                                                        .build())
+                                                        .build()))
+                .flatMap(
+                        build ->
+                                getBuildState(cloudFoundryClient, build.getId())
+                                        .filter(
+                                                state ->
+                                                        BuildState.STAGED.equals(state)
+                                                                || BuildState.FAILED.equals(state))
+                                        .repeatWhenEmpty(
+                                                exponentialBackOff(
+                                                        Duration.ofSeconds(1),
+                                                        Duration.ofSeconds(15),
+                                                        Duration.ofMinutes(5)))
+                                        .then(
+                                                cloudFoundryClient
+                                                        .builds()
+                                                        .get(
+                                                                GetBuildRequest.builder()
+                                                                        .buildId(build.getId())
+                                                                        .build()))
+                                        .map(b -> b.getDroplet().getId()))
+                .flatMap(
+                        dropletId ->
+                                cloudFoundryClient
+                                        .applicationsV3()
+                                        .setCurrentDroplet(
+                                                SetApplicationCurrentDropletRequest.builder()
+                                                        .applicationId(applicationId)
+                                                        .data(
+                                                                Relationship.builder()
+                                                                        .id(dropletId)
+                                                                        .build())
+                                                        .build()))
+                .then(requestUpdateApplication(cloudFoundryClient, applicationId, env))
                 .then(
                         getApplicationInstanceState(cloudFoundryClient, applicationId)
                                 .filter("RUNNING"::equals)
@@ -177,60 +252,80 @@ public class ApplicationUtils {
                                                 Duration.ofMinutes(5))));
     }
 
-    private static Mono<String> getApplicationPackageState(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return requestGetApplication(cloudFoundryClient, applicationId)
-                .map(response -> ResourceUtils.getEntity(response).getPackageState());
+    private static Mono<PackageState> getApplicationPackageState(
+            CloudFoundryClient cloudFoundryClient, String packageId) {
+        return cloudFoundryClient
+                .packages()
+                .get(GetPackageRequest.builder().packageId(packageId).build())
+                .map(pkg -> pkg.getState());
+    }
+
+    private static Mono<BuildState> getBuildState(
+            CloudFoundryClient cloudFoundryClient, String buildId) {
+        return cloudFoundryClient
+                .builds()
+                .get(GetBuildRequest.builder().buildId(buildId).build())
+                .map(build -> build.getState());
     }
 
     private static Mono<String> getApplicationInstanceState(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestApplicationInstances(cloudFoundryClient, applicationId)
-                .flatMapMany(response -> Flux.fromIterable(response.getInstances().values()))
+                .flatMapIterable(response -> response.getResources())
                 .single()
-                .map(ApplicationInstanceInfo::getState);
+                .map(resource -> resource.getState().getValue());
     }
 
-    private static Mono<SharedDomainResource> getSharedDomain(
-            CloudFoundryClient cloudFoundryClient) {
-        return requestListSharedDomains(cloudFoundryClient)
-                .filter(
-                        resource ->
-                                !Optional.ofNullable(
-                                                ResourceUtils.getEntity(resource).getInternal())
-                                        .orElse(false))
-                .next();
+    private static Mono<DomainResource> getSharedDomain(CloudFoundryClient cloudFoundryClient) {
+        return requestListDomains(cloudFoundryClient).filter(domain -> !domain.isInternal()).next();
     }
 
-    private static Mono<ApplicationInstancesResponse> requestApplicationInstances(
+    private static Mono<GetApplicationProcessStatisticsResponse> requestApplicationInstances(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return cloudFoundryClient
-                .applicationsV2()
-                .instances(
-                        ApplicationInstancesRequest.builder().applicationId(applicationId).build());
+                .applicationsV3()
+                .getProcessStatistics(
+                        GetApplicationProcessStatisticsRequest.builder()
+                                .applicationId(applicationId)
+                                .type("web") // hardcoded "web" is save for our tests.
+                                .build());
     }
 
-    private static Mono<AssociateApplicationRouteResponse> requestAssociateApplicationRoute(
+    private static Mono<Void> requestAssociateApplicationRoute(
             CloudFoundryClient cloudFoundryClient, String applicationId, String routeId) {
         return cloudFoundryClient
-                .applicationsV2()
-                .associateRoute(
-                        AssociateApplicationRouteRequest.builder()
-                                .applicationId(applicationId)
+                .routesV3()
+                .insertDestinations(
+                        InsertRouteDestinationsRequest.builder()
                                 .routeId(routeId)
-                                .build());
+                                .destination(
+                                        Destination.builder()
+                                                .application(
+                                                        Application.builder()
+                                                                .applicationId(applicationId)
+                                                                .build())
+                                                .build())
+                                .build())
+                .then();
     }
 
     private static Mono<CreateApplicationResponse> requestCreateApplication(
             CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient
-                .applicationsV2()
+                .applicationsV3()
                 .create(
                         CreateApplicationRequest.builder()
-                                .buildpack("https://github.com/cloudfoundry/java-buildpack.git")
-                                .memory(768)
                                 .name(applicationName)
-                                .spaceId(spaceId)
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
                                 .build());
     }
 
@@ -240,56 +335,85 @@ public class ApplicationUtils {
             String spaceId,
             String hostName) {
         return cloudFoundryClient
-                .routes()
+                .routesV3()
                 .create(
                         CreateRouteRequest.builder()
-                                .domainId(domainId)
                                 .host(hostName)
-                                .spaceId(spaceId)
+                                .relationships(
+                                        RouteRelationships.builder()
+                                                .domain(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(domainId)
+                                                                                .build())
+                                                                .build())
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
                                 .build());
     }
 
-    private static Mono<GetApplicationResponse> requestGetApplication(
-            CloudFoundryClient cloudFoundryClient, String applicationId) {
-        return cloudFoundryClient
-                .applicationsV2()
-                .get(GetApplicationRequest.builder().applicationId(applicationId).build());
-    }
-
-    private static Flux<SharedDomainResource> requestListSharedDomains(
-            CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(
+    private static Flux<DomainResource> requestListDomains(CloudFoundryClient cloudFoundryClient) {
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .sharedDomains()
-                                .list(ListSharedDomainsRequest.builder().page(page).build()));
+                                .domainsV3()
+                                .list(ListDomainsRequest.builder().page(page).build()));
     }
 
-    private static Mono<UpdateApplicationResponse> requestUpdateApplication(
-            CloudFoundryClient cloudFoundryClient,
-            String applicationId,
-            Map<String, Object> env,
-            String state) {
+    private static Mono<Void> requestUpdateApplication(
+            CloudFoundryClient cloudFoundryClient, String applicationId, Map<String, String> env) {
         return cloudFoundryClient
-                .applicationsV2()
-                .update(
-                        UpdateApplicationRequest.builder()
+                .applicationsV3()
+                .updateEnvironmentVariables(
+                        UpdateApplicationEnvironmentVariablesRequest.builder()
                                 .applicationId(applicationId)
-                                .environmentJsons(env)
-                                .state(state)
-                                .build());
+                                .vars(env)
+                                .build())
+                .then(
+                        cloudFoundryClient
+                                .applicationsV3()
+                                .start(
+                                        StartApplicationRequest.builder()
+                                                .applicationId(applicationId)
+                                                .build()))
+                .then();
     }
 
-    private static Mono<UploadApplicationResponse> requestUploadApplication(
+    private static Mono<UploadPackageResponse> requestUploadApplication(
             CloudFoundryClient cloudFoundryClient, String applicationId, Path application) {
+        // here only uploading the application bits, the record is created earlier.
         return cloudFoundryClient
-                .applicationsV2()
-                .upload(
-                        UploadApplicationRequest.builder()
-                                .application(application)
-                                .applicationId(applicationId)
-                                .async(true)
-                                .build());
+                .packages()
+                .create(
+                        CreatePackageRequest.builder()
+                                .type(PackageType.BITS)
+                                .relationships(
+                                        PackageRelationships.builder()
+                                                .application(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(applicationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .flatMap(
+                        pkg ->
+                                cloudFoundryClient
+                                        .packages()
+                                        .upload(
+                                                UploadPackageRequest.builder()
+                                                        .packageId(pkg.getId())
+                                                        .bits(application)
+                                                        .build()));
     }
 
     public static final class ApplicationMetadata {

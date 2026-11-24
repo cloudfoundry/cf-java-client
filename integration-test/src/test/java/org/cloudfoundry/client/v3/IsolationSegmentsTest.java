@@ -22,12 +22,8 @@ import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.organizations.CreateOrganizationRequest;
-import org.cloudfoundry.client.v2.organizations.CreateOrganizationResponse;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.ToOneRelationship;
 import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.AddIsolationSegmentOrganizationEntitlementResponse;
 import org.cloudfoundry.client.v3.isolationsegments.CreateIsolationSegmentRequest;
@@ -42,11 +38,15 @@ import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentSpacesRe
 import org.cloudfoundry.client.v3.isolationsegments.ListIsolationSegmentsRequest;
 import org.cloudfoundry.client.v3.isolationsegments.RemoveIsolationSegmentOrganizationEntitlementRequest;
 import org.cloudfoundry.client.v3.isolationsegments.UpdateIsolationSegmentRequest;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationRequest;
+import org.cloudfoundry.client.v3.organizations.CreateOrganizationResponse;
 import org.cloudfoundry.client.v3.organizations.OrganizationResource;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentRequest;
 import org.cloudfoundry.client.v3.spaces.AssignSpaceIsolationSegmentResponse;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
@@ -54,7 +54,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @IfCloudFoundryVersion(greaterThanOrEqualTo = CloudFoundryVersion.PCF_1_11)
-@RequiresV2Api
 public final class IsolationSegmentsTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -537,13 +536,13 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     private static Mono<String> createOrganizationId(
             CloudFoundryClient cloudFoundryClient, String organizationName) {
         return requestCreateOrganization(cloudFoundryClient, organizationName)
-                .map(ResourceUtils::getId);
+                .map(CreateOrganizationResponse::getId);
     }
 
     private static Mono<String> createSpaceId(
             CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-                .map(ResourceUtils::getId);
+                .map(CreateSpaceResponse::getId);
     }
 
     private static Mono<AddIsolationSegmentOrganizationEntitlementResponse>
@@ -595,18 +594,27 @@ public final class IsolationSegmentsTest extends AbstractIntegrationTest {
     private static Mono<CreateOrganizationResponse> requestCreateOrganization(
             CloudFoundryClient cloudFoundryClient, String organizationName) {
         return cloudFoundryClient
-                .organizations()
+                .organizationsV3()
                 .create(CreateOrganizationRequest.builder().name(organizationName).build());
     }
 
     private static Mono<CreateSpaceResponse> requestCreateSpace(
             CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return cloudFoundryClient
-                .spaces()
+                .spacesV3()
                 .create(
                         CreateSpaceRequest.builder()
                                 .name(spaceName)
-                                .organizationId(organizationId)
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
                                 .build());
     }
 

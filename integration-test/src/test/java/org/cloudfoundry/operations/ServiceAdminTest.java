@@ -22,17 +22,18 @@ import static org.cloudfoundry.ServiceBrokerUtils.deleteServiceBroker;
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CleanupCloudFoundryAfterClass;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.ServiceBrokerUtils;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceRequest;
-import org.cloudfoundry.client.v2.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceRequest;
+import org.cloudfoundry.client.v3.spaces.CreateSpaceResponse;
+import org.cloudfoundry.client.v3.spaces.SpaceRelationships;
 import org.cloudfoundry.operations.serviceadmin.Access;
 import org.cloudfoundry.operations.serviceadmin.DisableServiceAccessRequest;
 import org.cloudfoundry.operations.serviceadmin.EnableServiceAccessRequest;
 import org.cloudfoundry.operations.serviceadmin.ListServiceAccessSettingsRequest;
 import org.cloudfoundry.operations.serviceadmin.ServiceAccess;
-import org.cloudfoundry.util.ResourceUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -41,7 +42,6 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 @CleanupCloudFoundryAfterClass
-@RequiresV2Api
 public final class ServiceAdminTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -602,17 +602,26 @@ public final class ServiceAdminTest extends AbstractIntegrationTest {
     private static Mono<String> createSpaceId(
             CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return requestCreateSpace(cloudFoundryClient, organizationId, spaceName)
-                .map(ResourceUtils::getId);
+                .map(CreateSpaceResponse::getId);
     }
 
     private static Mono<CreateSpaceResponse> requestCreateSpace(
             CloudFoundryClient cloudFoundryClient, String organizationId, String spaceName) {
         return cloudFoundryClient
-                .spaces()
+                .spacesV3()
                 .create(
                         CreateSpaceRequest.builder()
                                 .name(spaceName)
-                                .organizationId(organizationId)
+                                .relationships(
+                                        SpaceRelationships.builder()
+                                                .organization(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(organizationId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
                                 .build());
     }
 
