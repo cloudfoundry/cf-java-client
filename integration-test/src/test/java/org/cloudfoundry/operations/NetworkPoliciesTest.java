@@ -20,22 +20,23 @@ import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
 import org.cloudfoundry.CloudFoundryVersion;
 import org.cloudfoundry.IfCloudFoundryVersion;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.applications.CreateApplicationRequest;
-import org.cloudfoundry.client.v2.applications.CreateApplicationResponse;
+import org.cloudfoundry.client.v3.Relationship;
+import org.cloudfoundry.client.v3.ToOneRelationship;
+import org.cloudfoundry.client.v3.applications.ApplicationRelationships;
+import org.cloudfoundry.client.v3.applications.CreateApplicationRequest;
+import org.cloudfoundry.client.v3.applications.CreateApplicationResponse;
 import org.cloudfoundry.operations.networkpolicies.AddNetworkPolicyRequest;
 import org.cloudfoundry.operations.networkpolicies.ListNetworkPoliciesRequest;
 import org.cloudfoundry.operations.networkpolicies.Policy;
 import org.cloudfoundry.operations.networkpolicies.RemoveNetworkPolicyRequest;
-import org.cloudfoundry.util.ResourceUtils;
+
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@RequiresV2Api
 public final class NetworkPoliciesTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -168,7 +169,7 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
     private static Mono<String> createApplicationId(
             CloudFoundryClient cloudFoundryClient, String applicationName, String spaceId) {
         return requestCreateApplication(cloudFoundryClient, spaceId, applicationName)
-                .map(ResourceUtils::getId);
+                .map(CreateApplicationResponse::getId);
     }
 
     private static Flux<Void> requestAddNetworkPolicy(
@@ -189,15 +190,20 @@ public final class NetworkPoliciesTest extends AbstractIntegrationTest {
     private static Mono<CreateApplicationResponse> requestCreateApplication(
             CloudFoundryClient cloudFoundryClient, String spaceId, String applicationName) {
         return cloudFoundryClient
-                .applicationsV2()
+                .applicationsV3()
                 .create(
                         CreateApplicationRequest.builder()
-                                .buildpack("staticfile_buildpack")
-                                .diego(true)
-                                .diskQuota(512)
-                                .memory(64)
                                 .name(applicationName)
-                                .spaceId(spaceId)
+                                .relationships(
+                                        ApplicationRelationships.builder()
+                                                .space(
+                                                        ToOneRelationship.builder()
+                                                                .data(
+                                                                        Relationship.builder()
+                                                                                .id(spaceId)
+                                                                                .build())
+                                                                .build())
+                                                .build())
                                 .build());
     }
 

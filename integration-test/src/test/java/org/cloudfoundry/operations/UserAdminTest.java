@@ -20,12 +20,15 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import java.time.Duration;
 import org.cloudfoundry.AbstractIntegrationTest;
-import org.cloudfoundry.RequiresV2Api;
 import org.cloudfoundry.client.CloudFoundryClient;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationAuditorsRequest;
-import org.cloudfoundry.client.v2.organizations.ListOrganizationsRequest;
-import org.cloudfoundry.client.v2.users.ListUsersRequest;
-import org.cloudfoundry.client.v2.users.UserResource;
+import org.cloudfoundry.client.v3.organizations.ListOrganizationsRequest;
+import org.cloudfoundry.client.v3.organizations.OrganizationResource;
+import org.cloudfoundry.client.v3.roles.ListRolesRequest;
+import org.cloudfoundry.client.v3.roles.RoleType;
+import org.cloudfoundry.client.v3.users.GetUserRequest;
+import org.cloudfoundry.client.v3.users.GetUserResponse;
+import org.cloudfoundry.client.v3.users.ListUsersRequest;
+import org.cloudfoundry.client.v3.users.UserResource;
 import org.cloudfoundry.operations.organizations.CreateOrganizationRequest;
 import org.cloudfoundry.operations.spaces.CreateSpaceRequest;
 import org.cloudfoundry.operations.useradmin.CreateUserRequest;
@@ -41,14 +44,12 @@ import org.cloudfoundry.operations.useradmin.SpaceUsers;
 import org.cloudfoundry.operations.useradmin.UnsetOrganizationRoleRequest;
 import org.cloudfoundry.operations.useradmin.UnsetSpaceRoleRequest;
 import org.cloudfoundry.util.PaginationUtils;
-import org.cloudfoundry.util.ResourceUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@RequiresV2Api
 public final class UserAdminTest extends AbstractIntegrationTest {
 
     @Autowired private CloudFoundryClient cloudFoundryClient;
@@ -67,9 +68,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                                 .username(username)
                                 .build())
                 .thenMany(requestListUsers(this.cloudFoundryClient))
-                .filter(
-                        response ->
-                                username.equals(ResourceUtils.getEntity(response).getUsername()))
+                .filter(response -> username.equals(response.getUsername()))
                 .as(StepVerifier::create)
                 .expectNextCount(1)
                 .expectComplete()
@@ -101,9 +100,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                                 .userAdmin()
                                 .delete(DeleteUserRequest.builder().username(username).build()))
                 .thenMany(requestListUsers(this.cloudFoundryClient))
-                .filter(
-                        response ->
-                                username.equals(ResourceUtils.getEntity(response).getUsername()))
+                .filter(response -> username.equals(response.getUsername()))
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
@@ -205,7 +202,7 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                         organizationId ->
                                 requestListOrganizationAuditors(
                                         this.cloudFoundryClient, organizationId))
-                .map(resource -> ResourceUtils.getEntity(resource).getUsername())
+                .map(GetUserResponse::getUsername)
                 .as(StepVerifier::create)
                 .expectNext(username)
                 .expectComplete()
@@ -342,16 +339,16 @@ public final class UserAdminTest extends AbstractIntegrationTest {
 
     private static Mono<String> getOrganizationId(
             CloudFoundryClient cloudFoundryClient, String organizationName) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                         page ->
                                 cloudFoundryClient
-                                        .organizations()
+                                        .organizationsV3()
                                         .list(
                                                 ListOrganizationsRequest.builder()
+                                                        .name(organizationName)
                                                         .page(page)
                                                         .build()))
-                .filter(r -> organizationName.equals(ResourceUtils.getEntity(r).getName()))
-                .map(ResourceUtils::getId)
+                .map(OrganizationResource::getId)
                 .singleOrEmpty();
     }
 
@@ -378,24 +375,37 @@ public final class UserAdminTest extends AbstractIntegrationTest {
                                 .build());
     }
 
-    private static Flux<UserResource> requestListOrganizationAuditors(
+    private static Flux<GetUserResponse> requestListOrganizationAuditors(
             CloudFoundryClient cloudFoundryClient, String organizationId) {
-        return PaginationUtils.requestClientV2Resources(
-                page ->
-                        cloudFoundryClient
-                                .organizations()
-                                .listAuditors(
-                                        ListOrganizationAuditorsRequest.builder()
-                                                .organizationId(organizationId)
-                                                .page(page)
-                                                .build()));
+        return PaginationUtils.requestClientV3Resources(
+                        page ->
+                                cloudFoundryClient
+                                        .rolesV3()
+                                        .list(
+                                                ListRolesRequest.builder()
+                                                        .organizationId(organizationId)
+                                                        .type(RoleType.ORGANIZATION_AUDITOR)
+                                                        .page(page)
+                                                        .build()))
+                .flatMap(
+                        role ->
+                                cloudFoundryClient
+                                        .usersV3()
+                                        .get(
+                                                GetUserRequest.builder()
+                                                        .userId(
+                                                                role.getRelationships()
+                                                                        .getUser()
+                                                                        .getData()
+                                                                        .getId())
+                                                        .build()));
     }
 
     private static Flux<UserResource> requestListUsers(CloudFoundryClient cloudFoundryClient) {
-        return PaginationUtils.requestClientV2Resources(
+        return PaginationUtils.requestClientV3Resources(
                 page ->
                         cloudFoundryClient
-                                .users()
+                                .usersV3()
                                 .list(ListUsersRequest.builder().page(page).build()));
     }
 
