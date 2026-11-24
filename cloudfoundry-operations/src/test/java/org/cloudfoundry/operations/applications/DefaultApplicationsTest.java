@@ -2046,6 +2046,73 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
+    void pushManifestV3StripsDockerCredentialsOnlyFromApplyManifest() {
+        Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
+        when(this.cloudFoundryClient.packages()).thenReturn(packages);
+        when(this.cloudFoundryClient.spacesV3().applyManifest(any(ApplyManifestRequest.class)))
+                .thenReturn(
+                        Mono.just(ApplyManifestResponse.builder().jobId("test-job-id").build()));
+        when(this.cloudFoundryClient
+                        .jobsV3()
+                        .get(
+                                org.cloudfoundry.client.v3.jobs.GetJobRequest.builder()
+                                        .jobId("test-job-id")
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder())
+                                        .state(JobState.COMPLETE)
+                                        .build()));
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        // Stop the push after the package request, the rest of the flow isn't relevant here.
+        when(packages.create(any(CreatePackageRequest.class)))
+                .thenReturn(Mono.error(new IllegalStateException("stop after create package")));
+
+        this.applications
+                .pushManifestV3(
+                        PushManifestV3Request.builder()
+                                .manifest(
+                                        ManifestV3.builder()
+                                                .application(
+                                                        ManifestV3Application.builder()
+                                                                .name("test-app")
+                                                                .docker(
+                                                                        Docker.builder()
+                                                                                .image("test-image")
+                                                                                .username(
+                                                                                        "test-username")
+                                                                                .password(
+                                                                                        "test-password")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectErrorMessage("stop after create package")
+                .verify(Duration.ofSeconds(5));
+
+        ArgumentCaptor<ApplyManifestRequest> applyManifest =
+                ArgumentCaptor.forClass(ApplyManifestRequest.class);
+        verify(this.cloudFoundryClient.spacesV3()).applyManifest(applyManifest.capture());
+        String appliedManifest =
+                new String(applyManifest.getValue().getManifest(), StandardCharsets.UTF_8);
+        assertThat(appliedManifest)
+                .contains("test-image")
+                .doesNotContain("test-username")
+                .doesNotContain("test-password");
+
+        ArgumentCaptor<CreatePackageRequest> createPackage =
+                ArgumentCaptor.forClass(CreatePackageRequest.class);
+        verify(packages).create(createPackage.capture());
+        org.cloudfoundry.client.v3.packages.DockerData dockerData =
+                (org.cloudfoundry.client.v3.packages.DockerData) createPackage.getValue().getData();
+        assertThat(dockerData.getImage()).isEqualTo("test-image");
+        assertThat(dockerData.getUsername()).isEqualTo("test-username");
+        assertThat(dockerData.getPassword()).isEqualTo("test-password");
+    }
+
+    @Test
     void pushMultipleRoutes() throws IOException {
         Path testApplication = new ClassPathResource("test-application.zip").getFile().toPath();
 
@@ -3330,122 +3397,6 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
     }
 
     @Test
-    void pushManifestV3StripsDockerCredentialsOnlyFromApplyManifest() {
-        Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
-        when(this.cloudFoundryClient.packages()).thenReturn(packages);
-        when(this.cloudFoundryClient.spacesV3().applyManifest(any(ApplyManifestRequest.class)))
-                .thenReturn(
-                        Mono.just(ApplyManifestResponse.builder().jobId("test-job-id").build()));
-        when(this.cloudFoundryClient
-                        .jobsV3()
-                        .get(
-                                org.cloudfoundry.client.v3.jobs.GetJobRequest.builder()
-                                        .jobId("test-job-id")
-                                        .build()))
-                .thenReturn(
-                        Mono.just(
-                                fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder())
-                                        .state(JobState.COMPLETE)
-                                        .build()));
-        requestApplicationsV3(
-                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
-        // Stop the push after the package request, the rest of the flow isn't relevant here.
-        when(packages.create(any(CreatePackageRequest.class)))
-                .thenReturn(Mono.error(new IllegalStateException("stop after create package")));
-
-        this.applications
-                .pushManifestV3(
-                        PushManifestV3Request.builder()
-                                .manifest(
-                                        ManifestV3.builder()
-                                                .application(
-                                                        ManifestV3Application.builder()
-                                                                .name("test-app")
-                                                                .docker(
-                                                                        Docker.builder()
-                                                                                .image("test-image")
-                                                                                .username(
-                                                                                        "test-username")
-                                                                                .password(
-                                                                                        "test-password")
-                                                                                .build())
-                                                                .build())
-                                                .build())
-                                .build())
-                .as(StepVerifier::create)
-                .expectErrorMessage("stop after create package")
-                .verify(Duration.ofSeconds(5));
-
-        ArgumentCaptor<ApplyManifestRequest> applyManifest =
-                ArgumentCaptor.forClass(ApplyManifestRequest.class);
-        verify(this.cloudFoundryClient.spacesV3()).applyManifest(applyManifest.capture());
-        String appliedManifest =
-                new String(applyManifest.getValue().getManifest(), StandardCharsets.UTF_8);
-        assertThat(appliedManifest)
-                .contains("test-image")
-                .doesNotContain("test-username")
-                .doesNotContain("test-password");
-
-        ArgumentCaptor<CreatePackageRequest> createPackage =
-                ArgumentCaptor.forClass(CreatePackageRequest.class);
-        verify(packages).create(createPackage.capture());
-        org.cloudfoundry.client.v3.packages.DockerData dockerData =
-                (org.cloudfoundry.client.v3.packages.DockerData) createPackage.getValue().getData();
-        assertThat(dockerData.getImage()).isEqualTo("test-image");
-        assertThat(dockerData.getUsername()).isEqualTo("test-username");
-        assertThat(dockerData.getPassword()).isEqualTo("test-password");
-    }
-
-    @Test
-    void stripDockerCredentials() {
-        ManifestV3Application privateDocker =
-                ManifestV3Application.builder()
-                        .name("private-docker-app")
-                        .docker(
-                                Docker.builder()
-                                        .image("my-registry/my-image:latest")
-                                        .username("user")
-                                        .password("secret")
-                                        .build())
-                        .environmentVariable("TEST_KEY", "test-value")
-                        .instances(2)
-                        .build();
-        ManifestV3Application publicDocker =
-                ManifestV3Application.builder()
-                        .name("public-docker-app")
-                        .docker(Docker.builder().image("public-image").build())
-                        .build();
-        ManifestV3Application buildpackApp =
-                ManifestV3Application.builder()
-                        .name("buildpack-app")
-                        .path(Paths.get("/tmp"))
-                        .build();
-        ManifestV3 manifest =
-                ManifestV3.builder()
-                        .application(privateDocker)
-                        .application(publicDocker)
-                        .application(buildpackApp)
-                        .build();
-
-        ManifestV3 stripped = DefaultApplications.stripDockerCredentials(manifest);
-
-        assertThat(stripped.getApplications()).hasSize(3);
-        ManifestV3Application strippedPrivate = stripped.getApplications().get(0);
-        assertThat(strippedPrivate.getName()).isEqualTo("private-docker-app");
-        assertThat(strippedPrivate.getDocker().getImage()).isEqualTo("my-registry/my-image:latest");
-        assertThat(strippedPrivate.getDocker().getUsername()).isNull();
-        assertThat(strippedPrivate.getDocker().getPassword()).isNull();
-        assertThat(strippedPrivate.getEnvironmentVariables())
-                .containsEntry("TEST_KEY", "test-value");
-        assertThat(strippedPrivate.getInstances()).isEqualTo(2);
-        assertThat(stripped.getApplications().get(1)).isSameAs(publicDocker);
-        assertThat(stripped.getApplications().get(2)).isSameAs(buildpackApp);
-
-        // createPackage still reads the credentials from the original manifest
-        assertThat(manifest.getApplications().get(0).getDocker().getPassword()).isEqualTo("secret");
-    }
-
-    @Test
     void rename() {
         requestApplications(
                 this.cloudFoundryClient, "test-app-name", TEST_SPACE_ID, "test-metadata-id");
@@ -4133,6 +4084,52 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void stripDockerCredentials() {
+        ManifestV3Application privateDocker =
+                ManifestV3Application.builder()
+                        .name("private-docker-app")
+                        .docker(
+                                Docker.builder()
+                                        .image("my-registry/my-image:latest")
+                                        .username("user")
+                                        .password("secret")
+                                        .build())
+                        .environmentVariable("TEST_KEY", "test-value")
+                        .instances(2)
+                        .build();
+        ManifestV3Application publicDocker =
+                ManifestV3Application.builder()
+                        .name("public-docker-app")
+                        .docker(Docker.builder().image("public-image").build())
+                        .build();
+        ManifestV3Application buildpackApp =
+                ManifestV3Application.builder()
+                        .name("buildpack-app")
+                        .path(Paths.get("/tmp"))
+                        .build();
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(privateDocker)
+                        .application(publicDocker)
+                        .application(buildpackApp)
+                        .build();
+
+        ManifestV3 stripped = DefaultApplications.stripDockerCredentials(manifest);
+
+        assertThat(stripped.getApplications()).hasSize(3);
+        ManifestV3Application strippedPrivate = stripped.getApplications().get(0);
+        assertThat(strippedPrivate.getName()).isEqualTo("private-docker-app");
+        assertThat(strippedPrivate.getDocker().getImage()).isEqualTo("my-registry/my-image:latest");
+        assertThat(strippedPrivate.getDocker().getUsername()).isNull();
+        assertThat(strippedPrivate.getDocker().getPassword()).isNull();
+        assertThat(strippedPrivate.getEnvironmentVariables())
+                .containsEntry("TEST_KEY", "test-value");
+        assertThat(strippedPrivate.getInstances()).isEqualTo(2);
+        assertThat(stripped.getApplications().get(1)).isSameAs(publicDocker);
+        assertThat(stripped.getApplications().get(2)).isSameAs(buildpackApp);
     }
 
     @Test
