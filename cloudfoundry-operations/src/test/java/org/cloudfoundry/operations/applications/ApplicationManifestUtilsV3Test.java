@@ -1,6 +1,7 @@
 package org.cloudfoundry.operations.applications;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -146,6 +147,52 @@ class ApplicationManifestUtilsV3Test {
                         .build();
 
         assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void testDockerPasswordRoundTrips() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .docker(
+                                                Docker.builder()
+                                                        .image("my-registry/my-image:latest")
+                                                        .username("user")
+                                                        .password("secret")
+                                                        .build())
+                                        .build())
+                        .build();
+
+        assertSerializeDeserialize(manifest);
+    }
+
+    @Test
+    void stripDockerCredentials() {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .docker(
+                                                Docker.builder()
+                                                        .image("my-registry/my-image:latest")
+                                                        .username("user")
+                                                        .password("secret")
+                                                        .build())
+                                        .build())
+                        .build();
+
+        Docker docker =
+                DefaultApplications.stripDockerCredentials(manifest)
+                        .getApplications()
+                        .get(0)
+                        .getDocker();
+
+        assertEquals("my-registry/my-image:latest", docker.getImage());
+        assertNull(docker.getUsername());
+        assertNull(docker.getPassword());
     }
 
     private void assertSerializeDeserialize(ManifestV3 manifest) throws IOException {

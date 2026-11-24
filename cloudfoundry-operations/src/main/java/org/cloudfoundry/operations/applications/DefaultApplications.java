@@ -685,9 +685,12 @@ public final class DefaultApplications implements Applications {
 
     @Override
     public Mono<Void> pushManifestV3(PushManifestV3Request request) {
+        // Don't send docker credentials in the apply_manifest body, they end up in the
+        // audit.app.apply_manifest event. createPackage sends them separately.
+        ManifestV3 manifestForApply = stripDockerCredentials(request.getManifest());
         byte[] manifestSerialized;
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ApplicationManifestUtilsV3.write(baos, request.getManifest());
+            ApplicationManifestUtilsV3.write(baos, manifestForApply);
             manifestSerialized = baos.toByteArray();
         } catch (IOException e) {
             throw new RuntimeException("Could not serialize manifest", e);
@@ -1225,6 +1228,30 @@ public final class DefaultApplications implements Applications {
 
     private static String cleanName(ApplicationManifest manifest) {
         return manifest.getName().replaceAll("\\.", "");
+    }
+
+    static ManifestV3 stripDockerCredentials(ManifestV3 manifest) {
+        List<ManifestV3Application> applications =
+                manifest.getApplications().stream()
+                        .map(
+                                app -> {
+                                    if (app.getDocker() == null
+                                            || app.getDocker().getPassword() == null) {
+                                        return app;
+                                    }
+                                    Docker docker =
+                                            Docker.builder()
+                                                    .from(app.getDocker())
+                                                    .username(null)
+                                                    .password(null)
+                                                    .build();
+                                    return ManifestV3Application.builder()
+                                            .from(app)
+                                            .docker(docker)
+                                            .build();
+                                })
+                        .collect(Collectors.toList());
+        return ManifestV3.builder().from(manifest).applications(applications).build();
     }
 
     private static BiFunction<String, String, String> collectStates() {
