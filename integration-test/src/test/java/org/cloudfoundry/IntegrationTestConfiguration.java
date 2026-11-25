@@ -532,7 +532,11 @@ public class IntegrationTestConfiguration {
                                 return Mono.empty();
                             }
                             return Mono.just(Version.valueOf(version));
-                        });
+                        })
+                // A server that has the V2 API removed instead of disabled answers with a 404
+                .onErrorResume(
+                        AbstractCloudFoundryException.class,
+                        e -> e.getStatusCode() == 404 ? Mono.empty() : Mono.error(e));
     }
 
     private static Mono<Version> serverVersionV3(CloudFoundryClient cloudFoundryClient) {

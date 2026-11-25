@@ -63,20 +63,29 @@ final class CloudFoundryVersionConditionalRule implements ExecutionCondition {
         // This rule is registered on a test instance field, so JUnit only evaluates it for test
         // methods, and a method lookup doesn't see the annotations of its class. A class-level
         // @IfCloudFoundryVersion is therefore looked up on the test class as well.
-        boolean enabled =
-                Stream.of(element, context.getTestClass().orElse(null))
-                        .filter(Objects::nonNull)
-                        .map(e -> AnnotationUtils.findAnnotation(e, IfCloudFoundryVersion.class))
-                        .filter(Objects::nonNull)
-                        .allMatch(this::isTestEnabled);
+        return Stream.of(element, context.getTestClass().orElse(null))
+                .filter(Objects::nonNull)
+                .filter(e -> !isTestEnabled(e))
+                .findFirst()
+                .map(
+                        e ->
+                                ConditionEvaluationResult.disabled(
+                                        String.format(
+                                                "Cloud Foundry version required by"
+                                                        + " @IfCloudFoundryVersion on [%s] is not"
+                                                        + " met (server: V2 API %s, V3 API %s).",
+                                                e,
+                                                this.serverV2 == V2_DISABLED
+                                                        ? "disabled"
+                                                        : this.serverV2,
+                                                this.serverV3)))
+                .orElseGet(() -> ConditionEvaluationResult.enabled("Test enabled"));
+    }
 
-        return enabled
-                ? ConditionEvaluationResult.enabled("Test enabled")
-                : ConditionEvaluationResult.disabled(
-                        String.format(
-                                "Cloud Foundry version required by @IfCloudFoundryVersion is not"
-                                        + " valid for test method [%s].",
-                                element));
+    private boolean isTestEnabled(AnnotatedElement element) {
+        IfCloudFoundryVersion condition =
+                AnnotationUtils.findAnnotation(element, IfCloudFoundryVersion.class);
+        return condition == null || isTestEnabled(condition);
     }
 
     private boolean isTestEnabled(IfCloudFoundryVersion condition) {

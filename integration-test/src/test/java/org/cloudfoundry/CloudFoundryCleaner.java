@@ -202,7 +202,8 @@ final class CloudFoundryCleaner implements InitializingBean, DisposableBean {
                                     cleanNetworkingPolicies(
                                             this.networkingClient,
                                             this.nameFactory,
-                                            this.serverVersion)))
+                                            this.serverVersion),
+                                    cleanUsersV3(this.cloudFoundryClient, this.nameFactory)))
                     .thenMany(
                             Mono.when(
                                     cleanApplicationsV3(this.cloudFoundryClient, this.nameFactory),

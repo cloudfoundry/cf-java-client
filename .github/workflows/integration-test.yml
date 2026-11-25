@@ -45,7 +45,8 @@ jobs:
   integration-test:
     if: ${{ github.event_name != 'schedule' || github.repository == 'cloudfoundry/cf-java-client' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    # The v2 job runs about three quarters of the tests and takes about 1h40m.
+    timeout-minutes: ${{ matrix.api == 'v2' && 150 || 60 }}
     strategy:
       fail-fast: false
       matrix:
