@@ -1654,6 +1654,11 @@ public final class ApplicationsTest extends AbstractIntegrationTest {
                                                 .instances(2)
                                                 .memoryLimit(65)
                                                 .name(applicationName)
+                                                // The memory change restarts the application.
+                                                // Its default startup timeout (5 minutes)
+                                                // equals the test's, so a stalled start
+                                                // would only show up as a test timeout.
+                                                .startupTimeout(Duration.ofMinutes(3))
                                                 .build()))
                 .then(requestGetApplication(this.cloudFoundryOperations, applicationName))
                 .map(ApplicationDetail::getRunningInstances)
