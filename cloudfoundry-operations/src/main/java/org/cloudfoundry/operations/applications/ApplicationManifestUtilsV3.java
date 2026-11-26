@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
@@ -87,14 +88,18 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
     }
 
     /**
-     * Write a {@link ManifestV3} to a {@link Path}
+     * Write a {@link ManifestV3} to a {@link Path} as UTF-8 encoded YAML, replacing any existing content
      *
      * @param path     the path to write to
      * @param manifest the manifest to write
      */
     public static void write(Path path, ManifestV3 manifest) {
         try (OutputStream out =
-                Files.newOutputStream(path, StandardOpenOption.CREATE, StandardOpenOption.WRITE)) {
+                Files.newOutputStream(
+                        path,
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE)) {
             write(out, manifest);
         } catch (IOException e) {
             throw Exceptions.propagate(e);
@@ -102,14 +107,17 @@ public final class ApplicationManifestUtilsV3 extends ApplicationManifestUtilsCo
     }
 
     /**
-     * Write a {@link ManifestV3} to an {@link OutputStream}
+     * Write a {@link ManifestV3} to an {@link OutputStream} as UTF-8 encoded YAML. The stream is flushed but not
+     * closed.
      *
      * @param out      the {@link OutputStream} to write to
      * @param manifest the manifest to write
      */
     public static void write(OutputStream out, ManifestV3 manifest) {
-        try (Writer writer = new OutputStreamWriter(out)) {
+        try {
+            Writer writer = new OutputStreamWriter(out, StandardCharsets.UTF_8);
             YAML.dump(toYaml(manifest), writer);
+            writer.flush();
         } catch (IOException e) {
             throw Exceptions.propagate(e);
         }

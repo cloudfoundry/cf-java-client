@@ -1,16 +1,25 @@
 package org.cloudfoundry.operations.applications;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FilterOutputStream;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.cloudfoundry.client.v3.Metadata;
 import org.cloudfoundry.client.v3.processes.ReadinessHealthCheckType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class ApplicationManifestUtilsV3Test {
+    @TempDir Path tempDir;
+
     @Test
     void testWithDockerApp() throws IOException {
         ManifestV3 manifest =
@@ -167,15 +176,65 @@ class ApplicationManifestUtilsV3Test {
         assertSerializeDeserialize(manifest);
     }
 
-    private void assertSerializeDeserialize(ManifestV3 manifest) throws IOException {
-        Path file = Files.createTempFile("test-manifest-", ".yml");
-        try {
-            ApplicationManifestUtilsV3.write(file, manifest);
-            ManifestV3 read = ApplicationManifestUtilsV3.read(file);
+    @Test
+    void testWriteUsesUtf8() throws IOException {
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(
+                                ManifestV3Application.builder()
+                                        .name("test-app")
+                                        .environmentVariable("CITY", "M\u00fcnchen")
+                                        .build())
+                        .build();
 
-            assertEquals(manifest, read);
-        } finally {
-            Files.deleteIfExists(file);
-        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        ApplicationManifestUtilsV3.write(out, manifest);
+
+        assertTrue(new String(out.toByteArray(), StandardCharsets.UTF_8).contains("M\u00fcnchen"));
+    }
+
+    @Test
+    void testWriteTruncatesExistingFile() throws IOException {
+        Path file = this.tempDir.resolve("test-manifest.yml");
+        Files.write(file, new byte[4096]);
+
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(ManifestV3Application.builder().name("b").build())
+                        .build();
+        ApplicationManifestUtilsV3.write(file, manifest);
+
+        assertEquals(manifest, ApplicationManifestUtilsV3.read(file));
+    }
+
+    @Test
+    void testWriteDoesNotCloseStream() {
+        AtomicBoolean closed = new AtomicBoolean();
+        ByteArrayOutputStream delegate = new ByteArrayOutputStream();
+        FilterOutputStream out =
+                new FilterOutputStream(delegate) {
+                    @Override
+                    public void close() throws IOException {
+                        closed.set(true);
+                        super.close();
+                    }
+                };
+
+        ApplicationManifestUtilsV3.write(
+                out,
+                ManifestV3.builder()
+                        .application(ManifestV3Application.builder().name("test-app").build())
+                        .build());
+
+        assertFalse(closed.get());
+        assertTrue(new String(delegate.toByteArray(), StandardCharsets.UTF_8).contains("test-app"));
+    }
+
+    private void assertSerializeDeserialize(ManifestV3 manifest) throws IOException {
+        Path file = this.tempDir.resolve("test-manifest.yml");
+        ApplicationManifestUtilsV3.write(file, manifest);
+        ManifestV3 read = ApplicationManifestUtilsV3.read(file);
+
+        assertEquals(manifest, read);
     }
 }

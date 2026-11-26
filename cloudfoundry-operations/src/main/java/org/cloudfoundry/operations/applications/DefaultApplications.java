@@ -687,18 +687,16 @@ public final class DefaultApplications implements Applications {
     public Mono<Void> pushManifestV3(PushManifestV3Request request) {
         // Don't send docker credentials in the apply_manifest body, they end up in the
         // audit.app.apply_manifest event. createPackage sends them separately.
-        ManifestV3 manifestForApply = stripDockerCredentials(request.getManifest());
-        byte[] manifestSerialized;
-        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
-            ApplicationManifestUtilsV3.write(baos, manifestForApply);
-            manifestSerialized = baos.toByteArray();
-        } catch (IOException e) {
-            throw new RuntimeException("Could not serialize manifest", e);
-        }
-        return Mono.zip(this.cloudFoundryClient, this.spaceId)
+        return serializeManifest(stripDockerCredentials(request.getManifest()))
+                .flatMap(
+                        manifestSerialized ->
+                                Mono.zip(
+                                        this.cloudFoundryClient,
+                                        this.spaceId,
+                                        Mono.just(manifestSerialized)))
                 .flatMap(
                         function(
-                                (cloudFoundryClient, spaceId) ->
+                                (cloudFoundryClient, spaceId, manifestSerialized) ->
                                         applyManifestAndWaitForCompletion(
                                                         cloudFoundryClient,
                                                         spaceId,
@@ -741,7 +739,9 @@ public final class DefaultApplications implements Applications {
                                                                                 manifestApp,
                                                                                 packageId,
                                                                                 appId)))))
-                .then();
+                .then()
+                .transform(OperationsLogging.log("Push Manifest V3"))
+                .checkpoint();
     }
 
     @Override
@@ -1224,6 +1224,16 @@ public final class DefaultApplications implements Applications {
                                 waitForBuildStaging(
                                         cloudFoundryClient, buildId, manifestApp.getName(), null))
                 .map(build -> build.getDroplet().getId());
+    }
+
+    private static Mono<byte[]> serializeManifest(ManifestV3 manifest) {
+        return Mono.fromCallable(
+                () -> {
+                    try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                        ApplicationManifestUtilsV3.write(baos, manifest);
+                        return baos.toByteArray();
+                    }
+                });
     }
 
     private static String cleanName(ApplicationManifest manifest) {
