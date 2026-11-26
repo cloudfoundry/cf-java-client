@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 
 import java.util.Date;
 
+import org.cloudfoundry.Nullable;
 import org.immutables.value.Value;
 
 /**
@@ -35,6 +36,7 @@ abstract class _Current {
      * The number of configured limiter mappings
      */
     @JsonProperty("limiterMappings")
+    @Nullable
     abstract Integer getLimiterMappings();
 
     /**
@@ -53,11 +55,13 @@ abstract class _Current {
      * The credentialIdExtractor
      */
     @JsonProperty("credentialIdExtractor")
+    @Nullable
     abstract String getCredentialIdExtractor();
 
     /**
      * The loggingLevel. Valid values include: "OnlyLimited", "AllCalls" and "AllCallsWithDetails"
      */
     @JsonProperty("loggingLevel")
+    @Nullable
     abstract String getLoggingLevel();
 }
