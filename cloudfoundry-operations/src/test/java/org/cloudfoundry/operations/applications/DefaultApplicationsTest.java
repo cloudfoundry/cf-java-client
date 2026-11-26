@@ -20,13 +20,16 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.LifecycleType.BUILDPACK;
 import static org.cloudfoundry.client.v3.LifecycleType.DOCKER;
 import static org.cloudfoundry.operations.TestObjects.fill;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.RETURNS_SMART_NULLS;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.Duration;
 import java.util.Arrays;
 import java.util.Base64;
@@ -135,6 +138,11 @@ import org.cloudfoundry.client.v3.applications.ListApplicationsRequest;
 import org.cloudfoundry.client.v3.applications.ListApplicationsResponse;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureRequest;
 import org.cloudfoundry.client.v3.applications.UpdateApplicationFeatureResponse;
+import org.cloudfoundry.client.v3.jobs.JobState;
+import org.cloudfoundry.client.v3.packages.CreatePackageRequest;
+import org.cloudfoundry.client.v3.packages.Packages;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestRequest;
+import org.cloudfoundry.client.v3.spaces.ApplyManifestResponse;
 import org.cloudfoundry.client.v3.tasks.CancelTaskRequest;
 import org.cloudfoundry.client.v3.tasks.CancelTaskResponse;
 import org.cloudfoundry.client.v3.tasks.CreateTaskRequest;
@@ -159,6 +167,7 @@ import org.cloudfoundry.util.DateUtils;
 import org.cloudfoundry.util.FluentMap;
 import org.cloudfoundry.util.ResourceMatchingUtils;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.core.io.ClassPathResource;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -2034,6 +2043,73 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                                         .isInstanceOf(IllegalArgumentException.class)
                                         .hasMessage("Stack invalid-stack does not exist"))
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void pushManifestV3StripsDockerCredentialsOnlyFromApplyManifest() {
+        Packages packages = mock(Packages.class, RETURNS_SMART_NULLS);
+        when(this.cloudFoundryClient.packages()).thenReturn(packages);
+        when(this.cloudFoundryClient.spacesV3().applyManifest(any(ApplyManifestRequest.class)))
+                .thenReturn(
+                        Mono.just(ApplyManifestResponse.builder().jobId("test-job-id").build()));
+        when(this.cloudFoundryClient
+                        .jobsV3()
+                        .get(
+                                org.cloudfoundry.client.v3.jobs.GetJobRequest.builder()
+                                        .jobId("test-job-id")
+                                        .build()))
+                .thenReturn(
+                        Mono.just(
+                                fill(org.cloudfoundry.client.v3.jobs.GetJobResponse.builder())
+                                        .state(JobState.COMPLETE)
+                                        .build()));
+        requestApplicationsV3(
+                this.cloudFoundryClient, "test-app", TEST_SPACE_ID, "test-application-id");
+        // Stop the push after the package request, the rest of the flow isn't relevant here.
+        when(packages.create(any(CreatePackageRequest.class)))
+                .thenReturn(Mono.error(new IllegalStateException("stop after create package")));
+
+        this.applications
+                .pushManifestV3(
+                        PushManifestV3Request.builder()
+                                .manifest(
+                                        ManifestV3.builder()
+                                                .application(
+                                                        ManifestV3Application.builder()
+                                                                .name("test-app")
+                                                                .docker(
+                                                                        Docker.builder()
+                                                                                .image("test-image")
+                                                                                .username(
+                                                                                        "test-username")
+                                                                                .password(
+                                                                                        "test-password")
+                                                                                .build())
+                                                                .build())
+                                                .build())
+                                .build())
+                .as(StepVerifier::create)
+                .expectErrorMessage("stop after create package")
+                .verify(Duration.ofSeconds(5));
+
+        ArgumentCaptor<ApplyManifestRequest> applyManifest =
+                ArgumentCaptor.forClass(ApplyManifestRequest.class);
+        verify(this.cloudFoundryClient.spacesV3()).applyManifest(applyManifest.capture());
+        String appliedManifest =
+                new String(applyManifest.getValue().getManifest(), StandardCharsets.UTF_8);
+        assertThat(appliedManifest)
+                .contains("test-image")
+                .doesNotContain("test-username")
+                .doesNotContain("test-password");
+
+        ArgumentCaptor<CreatePackageRequest> createPackage =
+                ArgumentCaptor.forClass(CreatePackageRequest.class);
+        verify(packages).create(createPackage.capture());
+        org.cloudfoundry.client.v3.packages.DockerData dockerData =
+                (org.cloudfoundry.client.v3.packages.DockerData) createPackage.getValue().getData();
+        assertThat(dockerData.getImage()).isEqualTo("test-image");
+        assertThat(dockerData.getUsername()).isEqualTo("test-username");
+        assertThat(dockerData.getPassword()).isEqualTo("test-password");
     }
 
     @Test
@@ -4008,6 +4084,52 @@ final class DefaultApplicationsTest extends AbstractOperationsTest {
                 .as(StepVerifier::create)
                 .expectComplete()
                 .verify(Duration.ofSeconds(5));
+    }
+
+    @Test
+    void stripDockerCredentials() {
+        ManifestV3Application privateDocker =
+                ManifestV3Application.builder()
+                        .name("private-docker-app")
+                        .docker(
+                                Docker.builder()
+                                        .image("my-registry/my-image:latest")
+                                        .username("user")
+                                        .password("secret")
+                                        .build())
+                        .environmentVariable("TEST_KEY", "test-value")
+                        .instances(2)
+                        .build();
+        ManifestV3Application publicDocker =
+                ManifestV3Application.builder()
+                        .name("public-docker-app")
+                        .docker(Docker.builder().image("public-image").build())
+                        .build();
+        ManifestV3Application buildpackApp =
+                ManifestV3Application.builder()
+                        .name("buildpack-app")
+                        .path(Paths.get("/tmp"))
+                        .build();
+        ManifestV3 manifest =
+                ManifestV3.builder()
+                        .application(privateDocker)
+                        .application(publicDocker)
+                        .application(buildpackApp)
+                        .build();
+
+        ManifestV3 stripped = DefaultApplications.stripDockerCredentials(manifest);
+
+        assertThat(stripped.getApplications()).hasSize(3);
+        ManifestV3Application strippedPrivate = stripped.getApplications().get(0);
+        assertThat(strippedPrivate.getName()).isEqualTo("private-docker-app");
+        assertThat(strippedPrivate.getDocker().getImage()).isEqualTo("my-registry/my-image:latest");
+        assertThat(strippedPrivate.getDocker().getUsername()).isNull();
+        assertThat(strippedPrivate.getDocker().getPassword()).isNull();
+        assertThat(strippedPrivate.getEnvironmentVariables())
+                .containsEntry("TEST_KEY", "test-value");
+        assertThat(strippedPrivate.getInstances()).isEqualTo(2);
+        assertThat(stripped.getApplications().get(1)).isSameAs(publicDocker);
+        assertThat(stripped.getApplications().get(2)).isSameAs(buildpackApp);
     }
 
     @Test

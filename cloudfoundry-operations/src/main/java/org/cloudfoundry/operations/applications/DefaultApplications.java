@@ -1236,7 +1236,8 @@ public final class DefaultApplications implements Applications {
                         .map(
                                 app -> {
                                     if (app.getDocker() == null
-                                            || app.getDocker().getPassword() == null) {
+                                            || (app.getDocker().getUsername() == null
+                                                    && app.getDocker().getPassword() == null)) {
                                         return app;
                                     }
                                     Docker docker =
