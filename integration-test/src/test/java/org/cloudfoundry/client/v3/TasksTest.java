@@ -16,6 +16,7 @@
 
 package org.cloudfoundry.client.v3;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.cloudfoundry.client.v3.tasks.TaskState.RUNNING;
 import static org.cloudfoundry.util.tuple.TupleUtils.function;
 
@@ -74,7 +75,11 @@ public final class TasksTest extends AbstractIntegrationTest {
                 .flatMap(
                         function(
                                 (applicationId, dropletId) ->
-                                        createTaskId(this.cloudFoundryClient, applicationId)))
+                                        // A short command like "ls" can finish before the cancel
+                                        // request, which then fails with "Task state is SUCCEEDED
+                                        // and therefore cannot be canceled".
+                                        createLongRunningTaskId(
+                                                this.cloudFoundryClient, applicationId)))
                 .flatMap(
                         taskId ->
                                 this.cloudFoundryClient
@@ -82,7 +87,11 @@ public final class TasksTest extends AbstractIntegrationTest {
                                         .cancel(CancelTaskRequest.builder().taskId(taskId).build())
                                         .map(CancelTaskResponse::getState))
                 .as(StepVerifier::create)
-                .expectNext(TaskState.CANCELING)
+                // The Cloud Controller sets the task to CANCELING, cancels it in Diego and then
+                // reloads it for the response. If Diego has already reported the canceled task as
+                // FAILED by then, the response shows FAILED instead of CANCELING.
+                .consumeNextWith(
+                        state -> assertThat(state).isIn(TaskState.CANCELING, TaskState.FAILED))
                 .expectComplete()
                 .verify(Duration.ofMinutes(5));
     }
@@ -303,6 +312,20 @@ public final class TasksTest extends AbstractIntegrationTest {
     private static Mono<String> createTaskId(
             CloudFoundryClient cloudFoundryClient, String applicationId) {
         return requestCreateTask(cloudFoundryClient, applicationId).map(CreateTaskResponse::getId);
+    }
+
+    private static Mono<String> createLongRunningTaskId(
+            CloudFoundryClient cloudFoundryClient, String applicationId) {
+        return cloudFoundryClient
+                .tasks()
+                .create(
+                        CreateTaskRequest.builder()
+                                .applicationId(applicationId)
+                                .command("sleep 99")
+                                .diskInMb(64)
+                                .memoryInMb(67)
+                                .build())
+                .map(CreateTaskResponse::getId);
     }
 
     private static Mono<String> getApplicationId(
