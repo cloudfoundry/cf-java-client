@@ -70,7 +70,7 @@
         <junit-jupiter.version>5.14.4</junit-jupiter.version>
         <mockito.version>5.8.0</mockito.version>
         <snakeyaml.version>2.4</snakeyaml.version>
-        <wire.version>4.9.1</wire.version>
+        <wire.version>6.3.0</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
         <spotless.version>2.44.4</spotless.version>
         <resilience4j.version>1.7.0</resilience4j.version>
