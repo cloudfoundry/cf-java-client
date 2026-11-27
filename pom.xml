@@ -68,16 +68,24 @@
         <java-semver.version>0.10.2</java-semver.version>
         <jjwt.version>0.12.7</jjwt.version>
         <junit-jupiter.version>5.14.4</junit-jupiter.version>
+        <kotlin.version>2.0.21</kotlin.version>
         <mockito.version>5.8.0</mockito.version>
         <snakeyaml.version>2.4</snakeyaml.version>
-        <wire.version>3.7.1</wire.version>
+        <wire.version>6.3.0</wire.version>
         <wire.plugin.version>3.0.2</wire.plugin.version>
-        <wire.suffix></wire.suffix>
         <spotless.version>2.44.4</spotless.version>
     </properties>
 
     <dependencyManagement>
         <dependencies>
+            <!-- Must precede spring-boot-dependencies: Wire's runtime needs a Kotlin 2 stdlib, Spring Boot 2.7 would pin 1.6.x -->
+            <dependency>
+                <groupId>org.jetbrains.kotlin</groupId>
+                <artifactId>kotlin-bom</artifactId>
+                <version>${kotlin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
@@ -90,11 +98,6 @@
                 <groupId>com.github.zafarkhaja</groupId>
                 <artifactId>java-semver</artifactId>
                 <version>${java-semver.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.squareup.wire</groupId>
-                <artifactId>wire-runtime</artifactId>
-                <version>${wire.version}</version>
             </dependency>
             <dependency>
                 <groupId>com.squareup.wire</groupId>
@@ -363,9 +366,6 @@
             <properties>
                 <java.version>17</java.version>
                 <dependencies.version>3.2.1</dependencies.version>
-                <wire.version>4.9.1</wire.version>
-                <wire.plugin.version>3.0.2</wire.plugin.version>
-                <wire.suffix>-jvm</wire.suffix>
             </properties>
             <build>
                 <finalName>${project.artifactId}-jdk17-${project.version}</finalName>
@@ -396,9 +396,6 @@
             <properties>
                 <java.version>21</java.version>
                 <dependencies.version>3.2.1</dependencies.version>
-                <wire.version>4.9.1</wire.version>
-                <wire.plugin.version>3.0.2</wire.plugin.version>
-                <wire.suffix>-jvm</wire.suffix>
             </properties>
             <build>
                 <finalName>${project.artifactId}-jdk21-${project.version}</finalName>
